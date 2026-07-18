@@ -103,11 +103,22 @@ document.addEventListener("DOMContentLoaded", () => {
     // ---------------------------------------------------------
     // 3b. Shimmer reveal for standalone lazy images (index.html
     //     mockup screenshot, card banners, institute logos) that use
-    //     the generic .lazy-shimmer class instead of .figure-img-wrap.
+    //     the .lazy-wrap wrapper instead of .figure-img-wrap.
     //     Runs once — these images aren't swapped by the docs router.
+    //     A minimum visible duration is enforced so a fast/cached load
+    //     doesn't finish before the shimmer has a chance to paint.
     // ---------------------------------------------------------
-    document.querySelectorAll("img.lazy-shimmer").forEach(img => {
-        const reveal = () => img.classList.add("img-loaded");
+    const MIN_SHIMMER_MS = 400;
+    document.querySelectorAll(".lazy-wrap img").forEach(img => {
+        const wrap = img.closest(".lazy-wrap");
+        if (!wrap || wrap.classList.contains("img-loaded")) return;
+
+        const startedAt = performance.now();
+        const reveal = () => {
+            const elapsed = performance.now() - startedAt;
+            const remaining = Math.max(0, MIN_SHIMMER_MS - elapsed);
+            setTimeout(() => wrap.classList.add("img-loaded"), remaining);
+        };
 
         if (img.complete && img.naturalWidth > 0) {
             reveal();

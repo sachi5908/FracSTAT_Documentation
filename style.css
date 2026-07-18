@@ -662,12 +662,11 @@ body {
 }
 
 .logo-track {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: flex-end;
-    gap: 4rem;
-    max-width: 1200px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 1.75rem;
+    width: 100%;
+    max-width: 1800px;
     margin: 0 auto;
 }
 
@@ -675,16 +674,15 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.2rem; 
+    justify-content: center;
+    gap: 1rem;
     cursor: pointer;
-}
-
-.logo-item img {
-    height: 90px;
-    width: auto;
-    max-width: 220px;
-    object-fit: contain;
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    padding: 1.5rem 1.25rem;
+    background-color: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    border-radius: 18px;
+    box-shadow: 0 2px 4px rgba(15, 23, 42, 0.02);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .logo-name {
@@ -692,9 +690,16 @@ body {
     font-weight: 600;
     color: #64748b; 
     transition: color 0.3s ease;
+    text-align: center;
 }
 
-.logo-item:hover img {
+.logo-item:hover {
+    transform: translateY(-6px);
+    border-color: rgba(37, 99, 235, 0.25);
+    box-shadow: 0 16px 30px -12px rgba(15, 23, 42, 0.12);
+}
+
+.logo-item:hover .lazy-wrap--logo img {
     transform: scale(1.08);
 }
 
@@ -704,10 +709,15 @@ body {
 
 @media (max-width: 768px) {
     .logo-track {
-        gap: 3rem;
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: 1.25rem;
     }
-    .logo-item img {
-        height: 55px;
+    .logo-item {
+        padding: 1.1rem 1rem;
+    }
+    .lazy-wrap--logo {
+        width: 120px;
+        height: 56px;
     }
     .logo-name {
         font-size: 0.85rem;
@@ -984,29 +994,93 @@ body {
     }
 }
 
-/* ---- Generic shimmer placeholder for images that AREN'T inside a
-   .figure-img-wrap (e.g. index.html's mockup screenshot, card banners,
-   and institute logos). Reuses the same skeleton-shimmer keyframes above,
-   but applies straight to the <img> itself so it works at any size
-   without needing a dedicated wrapper element. ---- */
-.lazy-shimmer {
-    color: transparent; /* hide alt text / broken-image glyph while loading */
+/* ---- Generic shimmer-placeholder WRAPPER for images outside the docs
+   .figure-img-wrap system (index.html hero screenshot, card banners,
+   institute logos). This has to be a wrapper (not styling the <img>
+   directly) because opacity on the <img> itself would hide its own
+   background too — wrapping lets the real photo fade in over a
+   background that keeps shimmering underneath, which is what makes the
+   placeholder visible even when the image resolves almost instantly
+   (e.g. already cached). Reuses the skeleton-shimmer keyframes above. ---- */
+.lazy-wrap {
+    position: relative;
+    overflow: hidden;
+    display: block;
     background-color: #e2e8f0;
+}
+
+.lazy-wrap::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
     background-image: linear-gradient(90deg, #e2e8f0 25%, #eef2f6 37%, #e2e8f0 63%);
     background-size: 400% 100%;
     animation: skeleton-shimmer 1.4s ease infinite;
 }
 
-.lazy-shimmer.img-loaded {
-    animation: none;
-    background-image: none;
+.lazy-wrap img {
+    position: relative;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.lazy-wrap.img-loaded {
     background-color: transparent;
 }
 
+.lazy-wrap.img-loaded::before {
+    animation: none;
+    content: none;
+}
+
+.lazy-wrap.img-loaded img {
+    opacity: 1;
+}
+
 @media (prefers-reduced-motion: reduce) {
-    .lazy-shimmer {
+    .lazy-wrap::before {
         animation: none;
     }
+}
+
+/* Sizing per usage context — the wrapper needs a placeholder size
+   before the image's real dimensions are known */
+.lazy-wrap--hero {
+    width: 100%;
+    min-height: 320px;
+    border-radius: 0 0 16px 16px;
+}
+.lazy-wrap--hero.img-loaded {
+    min-height: 0;
+}
+
+.lazy-wrap--banner {
+    width: 100%;
+    min-height: 160px;
+    margin-top: auto;
+    background-color: #eef2f6;
+}
+.lazy-wrap--banner::before {
+    background-image: linear-gradient(90deg, #eef2f6 25%, #f8fafc 37%, #eef2f6 63%);
+}
+.lazy-wrap--banner.img-loaded {
+    min-height: 0;
+    background-color: transparent;
+}
+
+.lazy-wrap--logo {
+    display: inline-flex;
+    width: 150px;
+    height: 68px;
+    border-radius: 8px;
+}
+.lazy-wrap--logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: opacity 0.4s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .figure-zoom-btn {
