@@ -133,14 +133,60 @@ document.addEventListener("DOMContentLoaded", () => {
     // ---------------------------------------------------------
     const contentContainer = document.querySelector(".docs-content");
 
-    async function loadPage(url) {
-        try {
-            // Fade out current content
-            contentContainer.style.opacity = '0';
+    // ---- YouTube-style top progress bar ----
+    let ytBar = null;
+    let ytProgressTimer = null;
+    let ytHideTimer = null;
 
+    function ensureYtBar() {
+        if (ytBar) return ytBar;
+        ytBar = document.createElement("div");
+        ytBar.id = "ytProgressBar";
+        ytBar.className = "yt-progress-bar";
+        document.body.appendChild(ytBar);
+        return ytBar;
+    }
+
+    function startYtProgress() {
+        const bar = ensureYtBar();
+        clearTimeout(ytHideTimer);
+        clearInterval(ytProgressTimer);
+
+        // Reset instantly with no transition, then animate forward
+        bar.style.transition = "none";
+        bar.style.opacity = "1";
+        bar.style.width = "0%";
+        // Force reflow so the reset actually applies before we animate
+        void bar.offsetWidth;
+        bar.style.transition = "width 0.3s ease-out, opacity 0.25s ease";
+
+        let progress = 0;
+        ytProgressTimer = setInterval(() => {
+            // Ease toward ~90% but never quite reach it, like YouTube's bar
+            const remaining = 90 - progress;
+            progress += Math.max(remaining * 0.08, 0.3);
+            if (progress >= 90) progress = 90;
+            bar.style.width = progress + "%";
+        }, 150);
+    }
+
+    function finishYtProgress(success) {
+        clearInterval(ytProgressTimer);
+        const bar = ensureYtBar();
+        bar.style.width = "100%";
+        ytHideTimer = setTimeout(() => {
+            bar.style.opacity = "0";
+            setTimeout(() => { bar.style.width = "0%"; }, 250);
+        }, success ? 200 : 400);
+    }
+
+    async function loadPage(url) {
+        startYtProgress();
+        let succeeded = false;
+        try {
             // Fetch the new HTML file
             const response = await fetch(url);
-            if (!response.ok) throw new Error("Page not found");
+            if (!response.ok) throw new Error("Page not found: " + response.status);
             const htmlText = await response.text();
 
             // Parse the HTML and extract just the content area
@@ -148,26 +194,36 @@ document.addEventListener("DOMContentLoaded", () => {
             const doc = parser.parseFromString(htmlText, "text/html");
             const newContent = doc.querySelector(".docs-content-inner");
 
-            if (newContent) {
-                // Wait for the fade-out to finish (200ms)
-                setTimeout(() => {
-                    // Replace the content
-                    document.querySelector(".docs-content-inner").innerHTML = newContent.innerHTML;
-                    
-                    // Scroll back to top
-                    contentContainer.scrollTo(0, 0); 
-                    
-                    // Fade back in
-                    contentContainer.style.opacity = '1';
-
-                    // Re-bind buttons and update sidebar for the new content
-                    initDynamicBehaviors();
-                }, 200);
+            if (!newContent) {
+                throw new Error("Could not find .docs-content-inner in fetched page");
             }
+
+            // Fade out current content, then swap it in
+            contentContainer.style.opacity = '0';
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            // Replace the content
+            document.querySelector(".docs-content-inner").innerHTML = newContent.innerHTML;
+
+            // Scroll back to top
+            contentContainer.scrollTo(0, 0);
+
+            // Fade back in
+            contentContainer.style.opacity = '1';
+
+            // Re-bind buttons and update sidebar for the new content
+            initDynamicBehaviors();
+
+            succeeded = true;
         } catch (error) {
             console.error("Routing error:", error);
-            // Fallback: If fetch fails, just do a normal hard redirect
+            // Make sure the page is never left blank, even on failure
+            contentContainer.style.opacity = '1';
+            // Fallback: do a normal hard redirect so the user still gets the page
             window.location.href = url;
+        } finally {
+            finishYtProgress(succeeded);
         }
     }
 

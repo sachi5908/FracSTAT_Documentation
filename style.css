@@ -1377,3 +1377,23 @@ body.lightbox-open {
 .toc-box a:hover {
     text-decoration: underline;
 }
+
+/* ==========================================================================
+   YouTube-style Top Loading Progress Bar
+   Shown during AJAX-routed doc navigation (see script.js loadPage()).
+   Sits above everything, including the sticky navbar.
+   ========================================================================== */
+.yt-progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    width: 0%;
+    z-index: 2000;
+    background: linear-gradient(90deg, var(--gradient-end) 0%, var(--primary-color) 60%, #60a5fa 100%);
+    box-shadow: 0 0 8px rgba(37, 99, 235, 0.6), 0 0 3px rgba(37, 99, 235, 0.8);
+    border-radius: 0 2px 2px 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: width 0.3s ease-out, opacity 0.25s ease;
+}
