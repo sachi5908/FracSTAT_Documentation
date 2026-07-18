@@ -984,93 +984,29 @@ body {
     }
 }
 
-/* ---- Generic shimmer-placeholder WRAPPER for images outside the docs
-   .figure-img-wrap system (index.html hero screenshot, card banners,
-   institute logos). This has to be a wrapper (not styling the <img>
-   directly) because opacity on the <img> itself would hide its own
-   background too — wrapping lets the real photo fade in over a
-   background that keeps shimmering underneath, which is what makes the
-   placeholder visible even when the image resolves almost instantly
-   (e.g. already cached). Reuses the skeleton-shimmer keyframes above. ---- */
-.lazy-wrap {
-    position: relative;
-    overflow: hidden;
-    display: block;
+/* ---- Generic shimmer placeholder for images that AREN'T inside a
+   .figure-img-wrap (e.g. index.html's mockup screenshot, card banners,
+   and institute logos). Reuses the same skeleton-shimmer keyframes above,
+   but applies straight to the <img> itself so it works at any size
+   without needing a dedicated wrapper element. ---- */
+.lazy-shimmer {
+    color: transparent; /* hide alt text / broken-image glyph while loading */
     background-color: #e2e8f0;
-}
-
-.lazy-wrap::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 0;
     background-image: linear-gradient(90deg, #e2e8f0 25%, #eef2f6 37%, #e2e8f0 63%);
     background-size: 400% 100%;
     animation: skeleton-shimmer 1.4s ease infinite;
 }
 
-.lazy-wrap img {
-    position: relative;
-    z-index: 1;
-    opacity: 0;
-    transition: opacity 0.4s ease;
-}
-
-.lazy-wrap.img-loaded {
-    background-color: transparent;
-}
-
-.lazy-wrap.img-loaded::before {
+.lazy-shimmer.img-loaded {
     animation: none;
-    content: none;
-}
-
-.lazy-wrap.img-loaded img {
-    opacity: 1;
+    background-image: none;
+    background-color: transparent;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .lazy-wrap::before {
+    .lazy-shimmer {
         animation: none;
     }
-}
-
-/* Sizing per usage context — the wrapper needs a placeholder size
-   before the image's real dimensions are known */
-.lazy-wrap--hero {
-    width: 100%;
-    min-height: 320px;
-    border-radius: 0 0 16px 16px;
-}
-.lazy-wrap--hero.img-loaded {
-    min-height: 0;
-}
-
-.lazy-wrap--banner {
-    width: 100%;
-    min-height: 160px;
-    margin-top: auto;
-    background-color: #eef2f6;
-}
-.lazy-wrap--banner::before {
-    background-image: linear-gradient(90deg, #eef2f6 25%, #f8fafc 37%, #eef2f6 63%);
-}
-.lazy-wrap--banner.img-loaded {
-    min-height: 0;
-    background-color: transparent;
-}
-
-.lazy-wrap--logo {
-    display: inline-flex;
-    width: 90px;
-    height: 90px;
-    border-radius: 10px;
-}
-.lazy-wrap--logo img {
-    height: 90px;
-    width: auto;
-    max-width: 220px;
-    object-fit: contain;
 }
 
 .figure-zoom-btn {
