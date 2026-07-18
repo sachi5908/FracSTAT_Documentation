@@ -101,6 +101,23 @@ document.addEventListener("DOMContentLoaded", () => {
     initDynamicBehaviors();
 
     // ---------------------------------------------------------
+    // 3b. Shimmer reveal for standalone lazy images (index.html
+    //     mockup screenshot, card banners, institute logos) that use
+    //     the generic .lazy-shimmer class instead of .figure-img-wrap.
+    //     Runs once — these images aren't swapped by the docs router.
+    // ---------------------------------------------------------
+    document.querySelectorAll("img.lazy-shimmer").forEach(img => {
+        const reveal = () => img.classList.add("img-loaded");
+
+        if (img.complete && img.naturalWidth > 0) {
+            reveal();
+        } else {
+            img.addEventListener("load", reveal, { once: true });
+            img.addEventListener("error", reveal, { once: true });
+        }
+    });
+
+    // ---------------------------------------------------------
     // 4. Smooth Page Routing (No-Flicker Navigation)
     // ---------------------------------------------------------
     const contentContainer = document.querySelector(".docs-content");
