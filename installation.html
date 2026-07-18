@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Installation Guide | FracSTAT Docs</title>
+    <link rel="icon" type="image/png" href="https://i.ibb.co/rRpnD4NW/icon.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="docs-body">
+    <nav class="navbar docs-navbar">
+        <div class="logo-container">
+            <button id="mobileToggle" class="mobile-toggle-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+            <img src="https://i.ibb.co/XfLkPMMg/logo.png" alt="FracSTAT Logo" class="logo-img">
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="introduction.html" class="active">Docs</a></li>
+            <li>
+                <a href="#" class="github-link">
+                    <svg height="20" width="20" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+                    </svg>
+                    GitHub
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="docs-layout">
+        <!-- ==========================================
+             MASTER ACCORDION SIDEBAR
+             ========================================== -->
+        <aside class="docs-sidebar" id="docsSidebar">
+            
+            <div class="sidebar-section open">
+                <button class="sidebar-toggle">
+                    Getting Started
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <ul class="sidebar-links">
+                    <li><a href="introduction.html">Introduction</a></li>
+                    <li><a href="installation.html" class="active">Installation Guide</a></li>
+                    <li><a href="launcher.html">FracSTAT Home Page</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <button class="sidebar-toggle">
+                    Static Analyzer
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <ul class="sidebar-links">
+                    <li><a href="docs_static_map.html">Map Tab</a></li>
+                    <li><a href="docs_static_histogram.html">Histogram Tab</a></li>
+                    <li><a href="docs_static_cdf.html">CDF Tab</a></li>
+                    <li><a href="docs_static_rose.html">Rose Tab</a></li>
+                    <li><a href="docs_static_stereonet.html">Stereonet Tab</a></li>
+                    <li><a href="docs_static_connectivity.html">Connectivity Tab</a></li>
+                    <li><a href="docs_static_intensity.html">Intensity Tab</a></li>
+                    <li><a href="docs_static_profile.html">Profile Tab</a></li>
+                    <li><a href="docs_static_results.html">Results Tab</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <button class="sidebar-toggle">
+                    Dynamic Analyzer
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <ul class="sidebar-links">
+                    <li><a href="docs_dynamic_map.html">Map Tab</a></li>
+                    <li><a href="docs_dynamic_rose.html">Rose Tab</a></li>
+                    <li><a href="docs_dynamic_mohr.html">Mohr Tab</a></li>
+                    <li><a href="docs_dynamic_stereonet.html">Stereonet Tab</a></li>
+                    <li><a href="docs_dynamic_table.html">Table Tab</a></li>
+                    <li><a href="docs_dynamic_method.html">Method Tab</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <button class="sidebar-toggle">
+                    Uncertainty Analyzer
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <ul class="sidebar-links">
+                    <li><a href="docs_uncertainty_montecarlo.html">Monte Carlo Tab</a></li>
+                    <li><a href="docs_uncertainty_lhs.html">LHS Tab</a></li>
+                    <li><a href="docs_uncertainty_pce.html">PCE Tab</a></li>
+                </ul>
+            </div>
+
+        </aside>
+
+        <main class="docs-content">
+            <div class="docs-content-inner">
+                <h1>Installation Guide</h1>
+                <p>Welcome! Don't worry if you aren't familiar with coding or terminals. Follow these simple, step-by-step instructions to get FracSTAT running on your computer.</p>
+
+                <h2>Prerequisites (Before You Begin)</h2>
+                <ul>
+                    <li><strong>Install Python:</strong> The users are requested to install the Python version 3.10 and above. You can download the installer easily from <a href="https://www.python.org/downloads/" target="_blank">https://www.python.org/downloads/</a>. <em>(During installation, make sure to check the box that says "Add Python to PATH" if you are on Windows!)</em></li>
+                    <li><strong>Download FracSTAT:</strong> After installing Python, login to GitHub and download the FracSTAT application. You can find the download link here: <a href="https://github.com/sachi5908/FracSTAT" target="_blank">https://github.com/sachi5908/FracSTAT</a>.</li>
+                </ul>
+
+                <hr style="margin: 30px 0; border: 0; border-top: 1px solid #e2e8f0;">
+
+                <h2>1. Windows Installation</h2>
+                
+                <h3>Step 1: Prepare the Folder</h3>
+                <p>Create a new folder in the preferred location (e.g., Desktop or any other drive such as D or E). Once done, then copy and extract the entire FracSTAT application into this folder.</p>
+                
+                <h3>Step 2: Open the Command Prompt</h3>
+                <p>Next, open the command prompt (CMD) to tell your computer what to do. You can do this by pressing the <strong>Windows Key</strong>, typing <strong>cmd</strong>, and hitting <strong>Enter</strong>.</p>
+
+                <h3>Step 3: Navigate to Your Folder</h3>
+                <p>You need to tell the command prompt where your FracSTAT folder is located. We use the <code>cd</code> (Change Directory) command for this. Navigate to the FracSTAT project directory by typing <code>cd</code> followed by the path to your folder, then hit Enter.</p>
+
+                <!-- Fake Windows CMD -->
+                <div style="background-color: #0c0c0c; color: #f2f2f2; font-family: 'Consolas', 'Courier New', monospace; padding: 0; border-radius: 8px; margin: 20px 0; font-size: 0.9rem; border: 1px solid #333; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                    <div style="background-color: #1e1e1e; padding: 8px 12px; display: flex; align-items: center; border-bottom: 1px solid #333;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#cccccc" stroke-width="2" style="margin-right: 8px;"><path d="M4 17l6-6-6-6M12 19h8"></path></svg>
+                        <span style="color: #cccccc; font-size: 0.8rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Command Prompt</span>
+                    </div>
+                    <div style="padding: 15px; overflow-x: auto;">
+                        <div style="color: #cccccc;">Microsoft Windows [Version 10.0.26200.8737]</div>
+                        <div style="color: #cccccc;">(c) Microsoft Corporation. All rights reserved.</div>
+                        <br>
+                        <div style="color: #888;">(Example: If your folder is on your Desktop)</div>
+                        <div>C:\Users\your_username&gt;cd C:\Users\your_username\OneDrive\Desktop\FracSTAT</div>
+                        <br>
+                        <div style="color: #888;">(Example: If your folder is in your D: drive)</div>
+                        <div>C:\Users\your_username&gt;D:</div>
+                        <div>D:\&gt;cd FracSTAT</div>
+                    </div>
+                </div>
+
+                <h3>Step 4: Install Required Packages</h3>
+                <p>FracSTAT needs a few background tools to run properly. Once you are into the project directory, install all the required Python packages by running the following command and hitting <strong>Enter</strong>:</p>
+                <div class="code-window">
+                    <div class="code-header">
+                        <span class="code-lang">cmd</span>
+                        <button class="copy-btn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code class="language-bash">python -m pip install -r requirements.txt</code></pre>
+                </div>
+                <p>Once you hit “Enter” in the command prompt, all the required packages will automatically get installed in the system memory. You will see a lot of text scrolling by—this is completely normal!</p>
+
+                <h3>Step 5: Launch FracSTAT</h3>
+                <p>Next, to open the main graphic user interface (GUI) of FracSTAT, type the following command and hit <strong>Enter</strong>:</p>
+                <div class="code-window">
+                    <div class="code-header">
+                        <span class="code-lang">cmd</span>
+                        <button class="copy-btn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code class="language-bash">python main.py</code></pre>
+                </div>
+
+                <hr style="margin: 40px 0; border: 0; border-top: 1px solid #e2e8f0;">
+
+                <h2>2. macOS Installation</h2>
+                
+                <h3>Step 1: Prepare the Folder</h3>
+                <p>Create a new folder on your Mac (e.g., on your Desktop), then copy and extract the entire FracSTAT application into this folder.</p>
+                
+                <h3>Step 2: Open Terminal</h3>
+                <p>Press <strong>Command (⌘) + Space</strong> to open Spotlight, type <strong>Terminal</strong>, and hit <strong>Enter</strong> to open the command line application.</p>
+
+                <h3>Step 3: Navigate to Your Folder</h3>
+                <p>Use the <code>cd</code> command (which stands for Change Directory) to tell Terminal where your FracSTAT folder is. Type this command and hit <strong>Enter</strong>:</p>
+
+                <!-- Fake macOS Terminal -->
+                <div style="background-color: #1c1c1e; color: #f2f2f2; font-family: 'Menlo', 'Monaco', monospace; padding: 0; border-radius: 8px; margin: 20px 0; font-size: 0.9rem; border: 1px solid #333; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                    <div style="background-color: #2d2d2f; padding: 8px 12px; display: flex; align-items: center; justify-content: center; position: relative; border-bottom: 1px solid #111;">
+                        <div style="position: absolute; left: 12px; display: flex; gap: 6px;">
+                            <span style="width: 12px; height: 12px; border-radius: 50%; background: #ff5f56;"></span>
+                            <span style="width: 12px; height: 12px; border-radius: 50%; background: #ffbd2e;"></span>
+                            <span style="width: 12px; height: 12px; border-radius: 50%; background: #27c93f;"></span>
+                        </div>
+                        <span style="color: #999; font-size: 0.8rem; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">your_username — -zsh — 80x24</span>
+                    </div>
+                    <div style="padding: 15px; overflow-x: auto;">
+                        <div>your_username@MacBook-Pro ~ % cd ~/Desktop/FracSTAT</div>
+                    </div>
+                </div>
+
+                <h3>Step 4: Install Required Packages</h3>
+                <p>FracSTAT needs a few background tools to run smoothly. Copy, paste, and run the following command to download and install them:</p>
+                <div class="code-window">
+                    <div class="code-header">
+                        <span class="code-lang">terminal</span>
+                        <button class="copy-btn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code class="language-bash">python3 -m pip install -r requirements.txt</code></pre>
+                </div>
+
+                <h3>Step 5: Launch FracSTAT</h3>
+                <p>Finally, to start the application and open the main GUI of FracSTAT, type the following command and hit <strong>Enter</strong>:</p>
+                <div class="code-window">
+                    <div class="code-header">
+                        <span class="code-lang">terminal</span>
+                        <button class="copy-btn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code class="language-bash">python3 main.py</code></pre>
+                </div>
+
+                <hr style="margin: 40px 0; border: 0; border-top: 1px solid #e2e8f0;">
+
+                <h2>3. Linux Installation</h2>
+                
+                <h3>Step 1: Prepare the Folder</h3>
+                <p>Create a new directory in your preferred path (like your Downloads folder), copy, and extract the entire FracSTAT application into this folder.</p>
+                
+                <h3>Step 2: Open Terminal</h3>
+                <p>Open your system's <strong>Terminal</strong> application (usually you can press <strong>Ctrl + Alt + T</strong>).</p>
+
+                <h3>Step 3: Navigate to Your Folder</h3>
+                <p>Use the <code>cd</code> (Change Directory) command to move into the FracSTAT project directory. Press <strong>Enter</strong> after typing:</p>
+
+                <!-- Fake Linux Terminal -->
+                <div style="background-color: #300a24; color: #ffffff; font-family: 'Ubuntu Mono', 'DejaVu Sans Mono', monospace; padding: 0; border-radius: 8px; margin: 20px 0; font-size: 0.9rem; border: 1px solid #531842; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                    <div style="background-color: #43313f; padding: 8px 12px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #200518;">
+                        <span style="color: #dfdbde; font-size: 0.8rem; font-family: 'Ubuntu', sans-serif;">your_username@ubuntu: ~/Downloads/FracSTAT</span>
+                    </div>
+                    <div style="padding: 15px; overflow-x: auto;">
+                        <div><span style="color: #8ae234; font-weight: bold;">your_username@ubuntu</span>:<span style="color: #729fcf; font-weight: bold;">~</span>$ cd ~/Downloads/FracSTAT</div>
+                    </div>
+                </div>
+
+                <h3>Step 4: Install Required Packages</h3>
+                <p>Run the following command to let the system automatically fetch and install the required Python packages:</p>
+                <div class="code-window">
+                    <div class="code-header">
+                        <span class="code-lang">terminal</span>
+                        <button class="copy-btn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code class="language-bash">python3 -m pip install -r requirements.txt</code></pre>
+                </div>
+
+                <h3>Step 5: Launch FracSTAT</h3>
+                <p>Open the FracSTAT GUI by typing the final command and pressing <strong>Enter</strong>:</p>
+                <div class="code-window">
+                    <div class="code-header">
+                        <span class="code-lang">terminal</span>
+                        <button class="copy-btn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code class="language-bash">python3 main.py</code></pre>
+                </div>
+
+                <hr style="margin: 40px 0; border: 0; border-top: 1px solid #e2e8f0;">
+                
+                <h2>Welcome to FracSTAT</h2>
+                <p>If you followed the steps correctly, this will open the GUI of FracSTAT!</p>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="https://i.ibb.co/dwSd4vX2/main-py.png" alt="FracSTAT Main GUI" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption">FracSTAT's main GUI, opened successfully after installation.</span>
+                </figure>
+
+                <p>Now that the users are ready to get into the FracSTAT application, they are requested to explore each of the modules. It is noted that FracSTAT v1.0 is fully equipped with the static, dynamic and uncertainty analyzer modules. Enjoy analyzing your data!</p>
+
+                <!-- Spacer for scrolling -->
+                <div style="height: 100px;"></div>
+                
+                <!-- Pagination Navigation -->
+                <div class="pagination-nav">
+                    <!-- PREVIOUS BUTTON -->
+                    <a href="introduction.html" class="nav-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        Previous: Introduction
+                    </a>
+
+                    <!-- NEXT BUTTON -->
+                    <a href="launcher.html" class="nav-btn">
+                        Next: FracSTAT Home Page
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

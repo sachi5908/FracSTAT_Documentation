@@ -1,0 +1,1280 @@
+/* ==========================================================================
+   Global Styles & Variables
+   ========================================================================== */
+:root {
+    --primary-color: #2563eb;
+    --primary-hover: #1d4ed8;
+    --secondary-color: #f8fafc;
+    --text-main: #0f172a;
+    --text-light: #475569;
+    --bg-main: #ffffff;
+    --gradient-start: #0f172a;
+    --gradient-end: #3b82f6;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* ==========================================================================
+   Navbar Elements
+   ========================================================================== */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 5%;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-img {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--text-main);
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover, .nav-links a.active {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.github-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.github-link svg {
+    transition: fill 0.3s ease, transform 0.3s ease;
+}
+
+.github-link:hover svg {
+    fill: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   Modern Hero Section
+   ========================================================================== */
+.hero {
+    position: relative;
+    padding: 8rem 5% 4rem 5%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background: radial-gradient(circle at 50% 0%, rgba(224, 231, 255, 0.4) 0%, rgba(255, 255, 255, 0) 70%);
+}
+
+.hero-bg-grid {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: linear-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    z-index: -1;
+    mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+}
+
+/* Badge Styling */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border-radius: 999px;
+    background: rgba(37, 99, 235, 0.05);
+    border: 1px solid rgba(37, 99, 235, 0.2);
+    color: var(--primary-color);
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 10px rgba(37, 99, 235, 0.05);
+}
+
+.badge-pulse {
+    width: 8px;
+    height: 8px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(37, 99, 235, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+}
+
+/* Hero Typography */
+.hero-content {
+    max-width: 800px;
+    margin: 0 auto 4rem auto;
+    z-index: 2;
+}
+
+.gradient-text {
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-content p {
+    font-size: 1.25rem;
+    color: var(--text-light);
+    margin-bottom: 2.5rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Buttons */
+.hero-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.875rem 1.75rem;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+}
+
+.primary-btn {
+    background: linear-gradient(180deg, var(--primary-color) 0%, #1e40af 100%);
+    color: white;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.primary-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.secondary-btn {
+    background-color: white;
+    color: var(--text-main);
+    border: 1px solid rgba(226, 232, 240, 1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.secondary-btn:hover {
+    border-color: #cbd5e1;
+    background-color: #f8fafc;
+    transform: translateY(-2px);
+}
+
+/* Desktop App Mockup */
+.app-mockup-container {
+    width: 100%;
+    max-width: 1000px;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0,0,0,0.02);
+    overflow: hidden;
+    z-index: 2;
+    transition: transform 0.5s ease;
+}
+
+.app-mockup-container:hover {
+    transform: translateY(-8px); 
+    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0,0,0,0.02);
+}
+
+.app-mockup-header {
+    background: #f1f5f9;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.mockup-dots {
+    display: flex;
+    gap: 6px;
+}
+
+.mockup-dots span {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+.mockup-dots span:nth-child(1) { background: #ff5f56; }
+.mockup-dots span:nth-child(2) { background: #ffbd2e; }
+.mockup-dots span:nth-child(3) { background: #27c93f; }
+
+.mockup-title {
+    flex-grow: 1;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 500;
+    margin-right: 48px;
+}
+
+.app-mockup-body {
+    width: 100%;
+    background: #fafafa;
+    display: block; 
+}
+
+.mockup-screenshot {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+}
+
+.mockup-placeholder {
+    text-align: center;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+/* ==========================================================================
+   Features Section (Analyzer Cards)
+   ========================================================================== */
+.features {
+    padding: 6rem 5%;
+    background-color: #f8fafc;
+    text-align: center;
+}
+
+.features h2 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 4rem;
+    letter-spacing: -0.025em;
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.feature-card {
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    border-radius: 24px;
+    border: 1px solid rgba(226, 232, 240, 0.6);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    text-align: left;
+}
+
+.feature-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.03);
+    border-color: rgba(37, 99, 235, 0.15);
+}
+
+.card-content {
+    padding: 2.5rem 2.5rem 1.5rem 2.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-content h3 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 1rem;
+}
+
+.card-content p {
+    color: #64748b;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
+.card-banner {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+    margin-top: auto;
+    padding: 0 1.5rem 1.5rem 1.5rem;
+    background-color: transparent;
+    transition: transform 0.5s ease;
+}
+
+.feature-card:hover .card-banner {
+    transform: scale(1.02);
+}
+
+/* ==========================================================================
+   Documentation Full-Screen Layout
+   ========================================================================== */
+.docs-body {
+    overflow: hidden; 
+}
+
+.docs-navbar {
+    height: 70px;
+}
+
+.docs-layout {
+    display: flex;
+    height: calc(100vh - 70px); 
+    width: 100%;
+    background-color: var(--bg-main);
+}
+
+.docs-sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    background-color: #f8fafc;
+    border-right: 1px solid #e2e8f0;
+    padding: 2rem 1.5rem;
+    overflow-y: auto;
+    transition: transform 0.3s ease;
+}
+
+/* ==========================================================================
+   Accordion Sidebar Styles
+   ========================================================================== */
+.sidebar-section {
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.sidebar-toggle {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: none;
+    border: none;
+    color: #0f172a;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    padding: 0.75rem 0.5rem;
+    cursor: pointer;
+    text-align: left;
+    transition: color 0.2s;
+}
+
+.sidebar-toggle:hover {
+    color: var(--primary-color);
+}
+
+.sidebar-toggle .chevron {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.3s ease;
+}
+
+.sidebar-section .sidebar-links {
+    display: none;
+    padding-bottom: 1rem;
+    margin-top: 0;
+    list-style: none; /* Removes the black dot */
+    padding-left: 0;  /* Removes default browser indentation */
+}
+
+.sidebar-section.open .sidebar-links {
+    display: block;
+}
+
+.sidebar-section.open .sidebar-toggle .chevron {
+    transform: rotate(180deg);
+}
+
+/* ==========================================
+   *MISSING BLOCK RESTORED HERE*
+   Sidebar Link Styling & Active States
+   ========================================== */
+.sidebar-links a {
+    display: block;
+    padding: 0.5rem 0.5rem 0.5rem 1rem;
+    border-left: 3px solid transparent; 
+    border-radius: 0 6px 6px 0;
+    text-decoration: none;
+    color: var(--text-light);
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.sidebar-links a:hover {
+    background-color: #e2e8f0;
+    color: var(--primary-color);
+}
+
+.sidebar-links a.active {
+    background-color: #eff6ff; 
+    color: var(--primary-color);
+    font-weight: 600;
+    border-left-color: var(--primary-color); 
+}
+
+/* ==========================================================================
+   Main Content Area
+   ========================================================================== */
+.docs-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 3rem 5%;
+    scroll-behavior: smooth;
+    transition: opacity 0.2s ease-in-out; 
+}
+
+.docs-content-inner {
+    max-width: 850px;
+    margin: 0 auto;
+}
+
+.docs-content h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #0f172a;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+}
+
+.docs-content h2 {
+    font-size: 1.75rem;
+    color: #0f172a;
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    font-weight: 700;
+}
+
+.docs-content p, .docs-content ul {
+    color: var(--text-light);
+    margin-bottom: 1.2rem;
+    font-size: 1.05rem;
+    line-height: 1.7;
+}
+
+.docs-content li {
+    margin-bottom: 0.5rem;
+    margin-left: 1.5rem;
+}
+
+.docs-content p code, .docs-content li code {
+    background-color: #f1f5f9;
+    color: #ef4444; 
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.9em;
+}
+
+/* ==========================================================================
+   Modern Code Display Blocks
+   ========================================================================== */
+.code-window {
+    background: #0f172a; 
+    border-radius: 12px;
+    margin: 2rem 0;
+    overflow: hidden;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.code-header {
+    background: #1e293b; 
+    padding: 0.5rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #334155;
+}
+
+.code-lang {
+    color: #94a3b8;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.copy-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid #475569;
+    color: #cbd5e1;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.copy-btn:hover {
+    background: #334155;
+    color: white;
+    border-color: #64748b;
+}
+
+.copy-btn.copied {
+    background: #10b981;
+    border-color: #10b981;
+    color: white;
+}
+
+.code-window pre {
+    margin: 0;
+    padding: 1.5rem;
+    overflow-x: auto;
+}
+
+.code-window code {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    color: #e2e8f0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    white-space: pre;
+}
+
+/* ==========================================================================
+   Mobile Responsiveness for Documentation
+   ========================================================================== */
+.mobile-toggle-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-main);
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+@media (max-width: 900px) {
+    .docs-body {
+        overflow: auto; 
+    }
+    
+    .docs-layout {
+        height: auto;
+        display: block;
+    }
+    
+    .mobile-toggle-btn {
+        display: block; 
+    }
+    
+    .docs-sidebar {
+        position: fixed;
+        top: 70px; 
+        left: 0;
+        bottom: 0;
+        z-index: 50;
+        box-shadow: 4px 0 15px rgba(0,0,0,0.05);
+        transform: translateX(-100%); 
+    }
+    
+    .docs-sidebar.show {
+        transform: translateX(0); 
+    }
+    
+    .docs-content {
+        padding: 2rem 5%;
+    }
+}
+
+/* ==========================================================================
+   Institute Logo Banner
+   ========================================================================== */
+.institute-banner {
+    background-color: #ffffff;
+    padding: 4rem 5%;
+    border-top: 1px solid rgba(226, 232, 240, 0.8);
+    text-align: center;
+}
+
+.institute-banner h3 {
+    font-size: 1rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 3.5rem;
+    font-weight: 600;
+}
+
+.logo-track {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.logo-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem; 
+    cursor: pointer;
+}
+
+.logo-item img {
+    height: 90px;
+    width: auto;
+    max-width: 220px;
+    object-fit: contain;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.logo-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #64748b; 
+    transition: color 0.3s ease;
+}
+
+.logo-item:hover img {
+    transform: scale(1.08);
+}
+
+.logo-item:hover .logo-name {
+    color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+    .logo-track {
+        gap: 3rem;
+    }
+    .logo-item img {
+        height: 55px;
+    }
+    .logo-name {
+        font-size: 0.85rem;
+    }
+}
+
+/* ==========================================================================
+   Modern Mega-Footer
+   ========================================================================== */
+.modern-footer {
+    background-color: #0f172a; 
+    color: #94a3b8;
+    padding: 5rem 5% 2rem 5%;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1.5fr 1fr;
+    gap: 3rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding-bottom: 4rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-brand .logo-container {
+    margin-bottom: 1rem;
+}
+
+.footer-tagline {
+    font-size: 1.05rem;
+    color: #cbd5e1;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.footer-version {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(37, 99, 235, 0.2);
+    color: #60a5fa;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.footer-section h4 {
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.footer-list {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-list li {
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.footer-list.affiliations li {
+    font-size: 0.85rem;
+}
+
+.footer-list.affiliations strong {
+    color: #cbd5e1;
+}
+
+.footer-list.emails a {
+    color: #94a3b8;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.footer-list.emails a:hover {
+    color: #60a5fa;
+    text-decoration: underline;
+}
+
+.footer-bottom {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding-top: 2rem;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 1024px) {
+    .footer-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .footer-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==========================================================================
+   Pagination Navigation
+   ========================================================================== */
+.pagination-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5rem;
+    padding-top: 2rem;
+    border-top: 2px solid #f1f5f9;
+}
+
+.nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--text-light);
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.nav-btn:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background-color: #eff6ff;
+}
+
+/* If you need to hide a button on the first or last page */
+.nav-btn.hidden {
+    visibility: hidden;
+}
+
+@media (max-width: 600px) {
+    .pagination-nav {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+
+/* ==========================================================================
+   Documentation Page Components (figure placeholders, tables, formula
+   blocks, note/tip boxes, in-page table of contents)
+   Lives here — rather than in a per-page <style> tag — because the
+   sidebar's AJAX router (see script.js loadPage()) only swaps out
+   .docs-content-inner's HTML when navigating between docs pages; anything
+   placed in an individual page's <head> would be lost on that kind of
+   navigation. Putting it in style.css means it's loaded once and applies
+   everywhere, on both hard loads and routed navigation.
+   ========================================================================== */
+
+.image-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 220px;
+    margin: 1.5rem 0;
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    background-color: #f8fafc;
+    color: #94a3b8;
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 1.5rem;
+}
+
+.image-placeholder .ph-icon {
+    width: 36px;
+    height: 36px;
+    opacity: 0.6;
+}
+
+.image-placeholder .ph-caption {
+    max-width: 560px;
+    color: #64748b;
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+/* Filled figure — a real screenshot + caption, once an image is available.
+   Kept separate from .image-placeholder (the dashed empty-state box) so a
+   full-resolution screenshot is always constrained to the content column
+   width instead of spilling past its container. */
+.figure-block {
+    margin: 1.5rem 0;
+    text-align: center;
+}
+
+.figure-block img {
+    display: block;
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.06);
+}
+
+.figure-block .ph-caption {
+    display: block;
+    max-width: 640px;
+    margin: 0.75rem auto 0 auto;
+    color: #64748b;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    text-align: center;
+}
+
+/* ---- Zoom-to-enlarge affordance on figure screenshots, plus a
+   shimmering "skeleton" placeholder shown while each image loads
+   (matches loading="lazy" — the shimmer covers the gap until the
+   browser actually fetches the image, instead of a blank/white box) ---- */
+.figure-img-wrap {
+    position: relative;
+    display: block;
+    width: 100%;
+    line-height: 0;
+    min-height: 200px;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #e2e8f0;
+}
+
+.figure-img-wrap::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-image: linear-gradient(90deg, #e2e8f0 25%, #eef2f6 37%, #e2e8f0 63%);
+    background-size: 400% 100%;
+    animation: skeleton-shimmer 1.4s ease infinite;
+}
+
+.figure-img-wrap img {
+    position: relative;
+    z-index: 1;
+    cursor: zoom-in;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+/* script.js adds this class once the <img> fires its "load" event
+   (or immediately, if it was already cached/complete) */
+.figure-img-wrap.img-loaded {
+    min-height: 0;
+    background-color: transparent;
+}
+
+.figure-img-wrap.img-loaded::before {
+    animation: none;
+    content: none;
+}
+
+.figure-img-wrap.img-loaded img {
+    opacity: 1;
+}
+
+@keyframes skeleton-shimmer {
+    0%   { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .figure-img-wrap::before {
+        animation: none;
+    }
+}
+
+.figure-zoom-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: none;
+    border-radius: 8px;
+    background-color: rgba(15, 23, 42, 0.55);
+    color: #ffffff;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+}
+
+.figure-img-wrap:hover .figure-zoom-btn,
+.figure-zoom-btn:focus-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.figure-zoom-btn:hover {
+    background-color: rgba(37, 99, 235, 0.9);
+}
+
+/* Always show the button on touch/small screens, since :hover doesn't apply */
+@media (max-width: 900px) {
+    .figure-zoom-btn {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* ---- Full-screen lightbox (built dynamically by script.js on first use) ---- */
+.lightbox-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background-color: rgba(8, 11, 20, 0.92);
+    z-index: 1000;
+    cursor: zoom-out;
+}
+
+.lightbox-overlay.active {
+    display: flex;
+}
+
+.lightbox-img {
+    max-width: 92vw;
+    max-height: 80vh;
+    width: auto;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    cursor: default;
+}
+
+.lightbox-caption {
+    max-width: 720px;
+    margin-top: 1.25rem;
+    color: #e2e8f0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    text-align: center;
+    cursor: default;
+}
+
+.lightbox-close {
+    position: fixed;
+    top: 24px;
+    right: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.lightbox-close:hover {
+    background-color: rgba(255, 255, 255, 0.24);
+}
+
+body.lightbox-open {
+    overflow: hidden;
+}
+
+.docs-content h3 {
+    font-size: 1.25rem;
+    color: #0f172a;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+}
+
+.docs-content h4 {
+    font-size: 1.02rem;
+    color: #0f172a;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.docs-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.25rem 0 1.75rem 0;
+    font-size: 0.95rem;
+}
+
+.docs-content table th, .docs-content table td {
+    border: 1px solid #e2e8f0;
+    padding: 0.6rem 0.75rem;
+    text-align: left;
+    vertical-align: top;
+    color: var(--text-light);
+}
+
+.docs-content table th {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    font-weight: 700;
+}
+
+/* ---- Excel/CSV import format tables (Load Excel section) ----
+   Colours mirror the in-app "Accepted Excel Formats" dialog
+   (workspace_header.py): required columns are red-tinted, optional
+   columns are neutral slate-tinted, so a reader can tell at a glance
+   which columns their spreadsheet absolutely needs. */
+.excel-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin: 0 0 1.25rem 0;
+    font-size: 0.88rem;
+    color: var(--text-light);
+}
+
+.excel-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.excel-swatch {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.excel-swatch.req {
+    background-color: #fee2e2;
+    border: 1px solid #fca5a5;
+}
+
+.excel-swatch.opt {
+    background-color: #f1f5f9;
+    border: 1px solid #cbd5e1;
+}
+
+.docs-content table.excel-format-table {
+    margin: 0.75rem 0 1rem 0;
+}
+
+.docs-content table.excel-format-table th {
+    background-color: #f1f5f9;
+    color: #475569;
+    font-size: 0.85rem;
+}
+
+.docs-content table.excel-format-table th.req {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.docs-content table.excel-format-table td.opt {
+    background-color: #f8fafc;
+    color: #64748b;
+}
+
+.docs-content table.excel-format-table td.req {
+    background-color: #fef2f2;
+    color: #7f1d1d;
+    font-weight: 600;
+}
+
+.docs-content table.excel-meta-table {
+    margin: 0 0 1.75rem 0;
+    font-size: 0.9rem;
+}
+
+.docs-content table.excel-meta-table th {
+    width: 110px;
+    background-color: #ffffff;
+    color: #94a3b8;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 700;
+    border-right: none;
+}
+
+.docs-content table.excel-meta-table td {
+    background-color: #ffffff;
+}
+
+.docs-content .formula-block {
+    background-color: #0f172a;
+    color: #e2e8f0;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin: 1rem 0;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.92rem;
+    overflow-x: auto;
+    white-space: pre;
+}
+
+.docs-content .note-box, .docs-content .tip-box {
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin: 1.25rem 0;
+    font-size: 0.98rem;
+}
+
+.docs-content .note-box {
+    background-color: #fff7ed;
+    border: 1px solid #fed7aa;
+    color: #7c2d12;
+}
+
+.docs-content .tip-box {
+    background-color: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1e3a8a;
+}
+
+.docs-content .step-list li { margin-bottom: 0.9rem; }
+
+/* In-page Table of Contents box.
+   Explicitly resets list-style/margins here because the generic
+   `.docs-content li` rule earlier in this file adds a disc bullet and a
+   1.5rem left margin to every <li> — without this override the TOC shows
+   a bullet dot in front of each entry. */
+.toc-box {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin: 1.5rem 0 2rem 0;
+}
+
+.toc-box p {
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.toc-box ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.toc-box li {
+    list-style: none;
+    margin: 0 0 0.45rem 0;
+    padding-left: 0;
+}
+
+.toc-box a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.toc-box a:hover {
+    text-decoration: underline;
+}

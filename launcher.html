@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Launcher | FracSTAT Docs</title>
+    <link rel="icon" type="image/png" href="https://i.ibb.co/rRpnD4NW/icon.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="docs-body">
+    <!-- 1. The Navigation Bar -->
+    <nav class="navbar docs-navbar">
+        <div class="logo-container">
+            <button id="mobileToggle" class="mobile-toggle-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+            <img src="https://i.ibb.co/XfLkPMMg/logo.png" alt="FracSTAT Logo" class="logo-img">
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="introduction.html" class="active">Docs</a></li>
+            <li><a href="#" class="github-link">GitHub</a></li>
+        </ul>
+    </nav>
+
+    <div class="docs-layout">
+        <!-- ==========================================
+             MASTER ACCORDION SIDEBAR
+             ========================================== -->
+        <aside class="docs-sidebar" id="docsSidebar">
+            
+            <div class="sidebar-section">
+                <button class="sidebar-toggle">
+                    Getting Started
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <ul class="sidebar-links">
+                    <li><a href="introduction.html">Introduction</a></li>
+                    <li><a href="installation.html">Installation Guide</a></li>
+                    <li><a href="launcher.html" class="active">FracSTAT Home Page</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <button class="sidebar-toggle">
+                    Static Analyzer
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <ul class="sidebar-links">
+                    <li><a href="docs_static_map.html">Map Tab</a></li>
+                    <li><a href="docs_static_histogram.html">Histogram Tab</a></li>
+                    <li><a href="docs_static_cdf.html">CDF Tab</a></li>
+                    <li><a href="docs_static_rose.html">Rose Tab</a></li>
+                    <li><a href="docs_static_stereonet.html">Stereonet Tab</a></li>
+                    <li><a href="docs_static_connectivity.html">Connectivity Tab</a></li>
+                    <li><a href="docs_static_intensity.html">Intensity Tab</a></li>
+                    <li><a href="docs_static_profile.html">Profile Tab</a></li>
+                    <li><a href="docs_static_results.html">Results Tab</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <button class="sidebar-toggle">
+                    Dynamic Analyzer
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <ul class="sidebar-links">
+                    <li><a href="docs_dynamic_map.html">Map Tab</a></li>
+                    <li><a href="docs_dynamic_rose.html">Rose Tab</a></li>
+                    <li><a href="docs_dynamic_mohr.html">Mohr Tab</a></li>
+                    <li><a href="docs_dynamic_stereonet.html">Stereonet Tab</a></li>
+                    <li><a href="docs_dynamic_table.html">Table Tab</a></li>
+                    <li><a href="docs_dynamic_method.html">Method Tab</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <button class="sidebar-toggle">
+                    Uncertainty Analyzer
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <ul class="sidebar-links">
+                    <li><a href="docs_uncertainty_montecarlo.html">Monte Carlo Tab</a></li>
+                    <li><a href="docs_uncertainty_lhs.html">LHS Tab</a></li>
+                    <li><a href="docs_uncertainty_pce.html">PCE Tab</a></li>
+                </ul>
+            </div>
+
+        </aside>
+
+        <!-- 3. The Main Content specific to this page -->
+        <main class="docs-content">
+            <div class="docs-content-inner">
+                <h1>FracSTAT Home Page</h1>
+                <p>The launcher serves as the primary entry point and home screen for the entire FracSTAT application. It operates as a single root window that embeds both the Analyzer modules and project settings, allowing the software to behave as one continuous desktop program without opening multiple detached windows.</p>
+                
+                <h2>Application Workflow</h2>
+                <p>Before exploring the user interface, it is helpful to understand where the launcher sits within the broader FracSTAT processing pipeline. The diagram below illustrates the start-to-finish workflow, beginning with data preparation and routing through the GUI into the specific calculation modules.</p>
+                
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="https://i.ibb.co/kskgK383/Frac-STAT-workflow.jpg" alt="FracSTAT Application Workflow Diagram" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption">FracSTAT application workflow — from data acquisition through the GUI into the Static, Dynamic and Uncertainty calculation modules.</span>
+                </figure>
+                
+                <p>The general workflow includes:</p>
+                <ul>
+                    <li><strong>Data Acquisition & Preparation:</strong> Start with outcrop photographs (including scale and view direction), digitized fault/fracture traces (preferably in SVG format), or tabulated data (Fault/Frac ID, Strike, Dip, Dip Direction, Length, Aperture).</li>
+                    <li><strong>Enter FracSTAT GUI:</strong> Use the launcher to import data, scale, and calibrate.</li>
+                    <li><strong>Calculations:</strong> Choose between the Static Analyzer (for Trace/Segment Maps, Histogram Plots, Orientation Plots, Topology, Intensity, etc.), Dynamic Analyzer (for Stress Inputs, Slip Tendency, Dilatation Tendency, Mohr-Coulomb Plots, etc.), or the Uncertainty Analyzer (for Uncertainty Plots and Maps).</li>
+                    <li><strong>Visualization & Export:</strong> Export your finalized results as PNG/JPEG images, CSV/Excel spreadsheets, PDFs, or Word documents.</li>
+                </ul>
+
+                <h2>Navigating the Launcher Interface</h2>
+                <p>The Home Window is designed to be user-friendly, organizing project management on the left and analytical modules on the right.</p>
+                
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="https://i.ibb.co/WWfCrdR4/Frac-STAT-Launcher-Interface.jpg" alt="Annotated FracSTAT Launcher Interface" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption">Annotated FracSTAT Launcher interface — project management on the left, analytical module cards on the right.</span>
+                </figure>
+                <h4>1. The Sidebar (Left Panel)</h4>
+                <p>The left panel is your control center for application navigation and managing project files.</p>
+                <ul>
+                    <li><strong>Version Type of FracSTAT:</strong> A badge below the logo indicates your current running version (e.g., v1.0).</li>
+                    <li><strong>Workspace Navigation:</strong> Use the sidebar links to switch between Home, Projects, Documentation, Settings, and About pages.</li>
+                    <li><strong>Project Information:</strong> A dedicated form allows you to easily create a new workspace. You must provide a Project Name, Location / Site, and designate a Save Directory before opening a module.</li>
+                    <li><strong>Loaded and Saved Projects:</strong> A scrollable "Recent Projects" list allows you to quickly load previous sessions with a single click.</li>
+                </ul>
+
+                <h4>2. The Top Header Bar</h4>
+                <p>The top right corner of the home interface provides quick outbound links:</p>
+                <ul>
+                    <li><strong>Link to online documentation and GitHub:</strong> Direct shortcut buttons are available to open the online docs or visit the project's source code repository.</li>
+                </ul>
+
+                <h4>3. The Module Cards (Main View)</h4>
+                <p>The center of the launcher features three large interactive cards corresponding to the primary FracSTAT modules. Each card highlights the tools available within.</p>
+                <ul>
+                    <li><strong>Static Module:</strong> Focused on geometric fracture characterization. Features include Trace and Segment classification, Histogram Plots, Rose Plots, Connectivity & topology mapping, and Profile Cross-sections.</li>
+                    <li><strong>Dynamic Module:</strong> Focused on stress-based fracture evaluation. Features include Slip & dilation tendency, Mohr circle stress visualization, susceptibility mapping, and stereonet projections.</li>
+                    <li><strong>Uncertainty Module:</strong> Dedicated to probabilistic risk evaluation. It encompasses Monte Carlo Simulations (MCS), Latin Hypercube Sampling (LHS), and Polynomial Chaos Expansion (PCE).</li>
+                    <li><strong>Click to open Module:</strong> At the bottom of each card is a prominent button used to launch that specific environment with your defined project parameters.</li>
+                </ul>
+
+                <hr style="margin: 3rem 0; border: 0; border-top: 1px solid #e2e8f0;">
+
+                <h2>Exploring Application Pages</h2>
+                <p>The launcher includes several dedicated pages to help you manage your workspace, access help, and configure global preferences.</p>
+                
+                <ul>
+                    <li><strong>Projects Page:</strong> View and manage all your recent workspaces. You can easily load existing sessions, delete old ones, or quickly create new projects from this menu.</li>
+                    <li><strong>Documentation Page:</strong> Access comprehensive in-app help. This section includes a quick-start guide, data format requirements, keyboard shortcuts, and detailed explanations of the Static, Dynamic, and Uncertainty Analyzers.</li>
+                    <li><strong>Settings Page:</strong> Customize your global application preferences[cite: 8]. Here you can configure default plot styling (fonts and colors), default stress parameters, map color scales, and export directories[cite: 8].</li>
+                    <li><strong>About Page:</strong> Find information about the software's version, release notes, open-source licensing (MIT), and the underlying technology stack powering the application.</li>
+                </ul>
+
+                <!-- Pagination Navigation -->
+                <div class="pagination-nav">
+                    <!-- PREVIOUS BUTTON -->
+                    <a href="installation.html" class="nav-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        Previous: Installation Guide
+                    </a>
+
+                    <!-- NEXT BUTTON -->
+                    <a href="docs_static_map.html" class="nav-btn">
+                        Next: Static Map Tab
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

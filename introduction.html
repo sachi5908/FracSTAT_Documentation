@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introduction | FracSTAT Docs</title>
+    <link rel="icon" type="image/png" href="https://i.ibb.co/rRpnD4NW/icon.png">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .author-info {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .authors {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        .affiliations, .emails {
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+        .affiliations sup, .emails sup {
+            margin-right: 2px;
+        }
+    </style>
+</head>
+<body class="docs-body">
+    <nav class="navbar docs-navbar">
+        <div class="logo-container">
+            <button id="mobileToggle" class="mobile-toggle-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+            <img src="https://i.ibb.co/XfLkPMMg/logo.png" alt="FracSTAT Logo" class="logo-img">
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="introduction.html" class="active">Docs</a></li>
+            <li>
+                <a href="#" class="github-link">
+                    <svg height="20" width="20" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+                    </svg>
+                    GitHub
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="docs-layout">
+        <!-- ==========================================
+             MASTER ACCORDION SIDEBAR
+             ========================================== -->
+        <aside class="docs-sidebar" id="docsSidebar">
+            
+            <div class="sidebar-section">
+                <button class="sidebar-toggle">
+                    Getting Started
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <ul class="sidebar-links">
+                    <li><a href="introduction.html">Introduction</a></li>
+                    <li><a href="installation.html">Installation Guide</a></li>
+                    <li><a href="launcher.html">FracSTAT Home Page</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <button class="sidebar-toggle">
+                    Static Analyzer
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <ul class="sidebar-links">
+                    <li><a href="docs_static_map.html">Map Tab</a></li>
+                    <li><a href="docs_static_histogram.html">Histogram Tab</a></li>
+                    <li><a href="docs_static_cdf.html">CDF Tab</a></li>
+                    <li><a href="docs_static_rose.html">Rose Tab</a></li>
+                    <li><a href="docs_static_stereonet.html">Stereonet Tab</a></li>
+                    <li><a href="docs_static_connectivity.html">Connectivity Tab</a></li>
+                    <li><a href="docs_static_intensity.html">Intensity Tab</a></li>
+                    <li><a href="docs_static_profile.html">Profile Tab</a></li>
+                    <li><a href="docs_static_results.html">Results Tab</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <button class="sidebar-toggle">
+                    Dynamic Analyzer
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <ul class="sidebar-links">
+                    <li><a href="docs_dynamic_map.html">Map Tab</a></li>
+                    <li><a href="docs_dynamic_rose.html">Rose Tab</a></li>
+                    <li><a href="docs_dynamic_mohr.html">Mohr Tab</a></li>
+                    <li><a href="docs_dynamic_stereonet.html">Stereonet Tab</a></li>
+                    <li><a href="docs_dynamic_table.html">Table Tab</a></li>
+                    <li><a href="docs_dynamic_method.html">Method Tab</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <button class="sidebar-toggle">
+                    Uncertainty Analyzer
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <ul class="sidebar-links">
+                    <li><a href="docs_uncertainty_montecarlo.html">Monte Carlo Tab</a></li>
+                    <li><a href="docs_uncertainty_lhs.html">LHS Tab</a></li>
+                    <li><a href="docs_uncertainty_pce.html">PCE Tab</a></li>
+                </ul>
+            </div>
+
+        </aside>
+        <main class="docs-content">
+            <div class="docs-content-inner">
+                
+                <h1>User Manual v1.0</h1>
+                
+                <div class="author-info">
+                    <p class="authors">Sachida Nanda Mahanta<sup>1,a</sup>, Priyadarshi Chinmoy Kumar<sup>2, b, *</sup>, Eshan Srivastava<sup>3, c</sup>, Jitender Kumar<sup>2, d</sup>, Giuseppe Francesco Rizzo<sup>3, 4, e</sup>, Maurizio Gasparo Morticelli<sup>3, 5, f</sup>, Attilio Sulli<sup>3, 5, g</sup>, Kalachand Sain<sup>6, h</sup></p>
+                    
+                    <p class="affiliations">
+                        <sup>1</sup>Department of Applied Geology, Dr. Harisingh Gaur Vishwavidhyalaya, Sagar, M.P, India<br>
+                        <sup>2</sup>Wadia Institute of Himalayan Geology, 33 GMS Road, Dehradun, India<br>
+                        <sup>3</sup>Department of Earth and Marine Sciences, University of Palermo, Palermo, Italy<br>
+                        <sup>4</sup>Department of Earth Science and Geo-Environment, University of Bari, Bari, Italy<br>
+                        <sup>5</sup>Istituto Nazionale di Geofisica e Vulcanologia, Rome, Italy.<br>
+                        <sup>6</sup>CSIR-National Geophysical Research Institute, Hyderabad, India
+                    </p>
+
+                    <p class="emails">
+                        <em>Emails:</em> <sup>a</sup>sachida5908@gmail.com; <sup>b</sup>chinmoy@wihg.res.in; <sup>c</sup>eshaan.srivastava@unipa.it; <sup>d</sup>jitender@wihg.res.in; <sup>e</sup>giuseppefrancesco.rizzo@unipa.it; <sup>f</sup>maurizio.gasparo@unipa.it; <sup>g</sup>attilio.sulli@unipa.it; <sup>h</sup>kalachandsain7@gmail.com
+                    </p>
+                </div>
+
+                <h2>Why We Need FracSTAT</h2>
+                <p>Quantitative characterization of fracture networks has become an indispensable component of structural geology, rock mechanics, and reservoir characterization. These networks exert fundamental control over the mechanical, hydraulic, and transport properties of rocks, which in turn influences critical factors like fluid migration, reservoir productivity, geothermal circulation, groundwater flow, mineralization, and the long-term integrity of subsurface engineering systems.</p>
+                
+                <h3>The Fragmentation Problem</h3>
+                <p>Despite significant advancements in software development over the past decade, the process of analyzing fracture networks often remains fragmented across multiple environments. This creates several bottlenecks for researchers and engineers:</p>
+                <ul>
+                    <li>Digitization, topological analysis, statistical analysis, stress evaluation, and uncertainty quantification are frequently performed in entirely different software packages or through custom scripts.</li>
+                    <li>This disjointed workflow requires unnecessary data transfer, repeated preprocessing, and leads to inconsistent parameter handling.</li>
+                    <li>It severely limits reproducibility and creates a steep learning curve, especially for students or researchers without extensive scientific programming experience.</li>
+                    <li>Many of these fragmented workflows rely on proprietary software environments, making comprehensive fracture characterization both technically demanding and time-consuming.</li>
+                </ul>
+
+                <h3>The FracSTAT Solution</h3>
+                <p>FracSTAT is not designed to simply replace existing software, but to provide a cohesive, open-source, and user-oriented computational framework that unifies these critical analytical components into a single application. Key benefits include:</p>
+                
+                <ul>
+                    <li><strong>Integrated Workflow:</strong> It combines geometric analysis, statistical characterization, spatial analysis, network topology, visualization, stress-based fracture assessment, and uncertainty quantification into a consistent, reproducible pipeline.</li>
+                    <li><strong>Seamless Data Utilization:</strong> Information generated in one module is smoothly transferred and utilized by subsequent modules, minimizing manual intervention and ensuring methodological consistency.</li>
+                    <li><strong>Open-Source Accessibility:</strong> FracSTAT is completely Python-based and open-source, removing the reliance on proprietary tools. It features a graphical user interface (GUI) that allows for advanced analysis without requiring deep programming expertise.</li>
+                    <li><strong>Extensible Architecture:</strong> While accessible to beginners, its modular design provides advanced users with the flexibility to extend the software's capabilities as new research challenges arise.</li>
+                    <li><strong>Uncertainty Quantification:</strong> Modern geological investigations require more than deterministic measurements. FracSTAT answers this by incorporating rigorous quantification of uncertainties and evaluating their implications for geomechanical interpretation directly within the workflow.</li>
+                </ul>
+
+                <p>Ultimately, FracSTAT serves as an integrated analytical platform intended to bridge the gap between conventional fracture characterization and modern quantitative structural analysis. It delivers a transparent, extensible framework to investigate all facets of a fracture network within one unified environment.</p>
+                
+                <!-- Spacer for scrolling -->
+                <div style="height: 100px;"></div>
+
+                <!-- Pagination Navigation -->
+                <div class="pagination-nav">
+                    <div></div>
+                    <a href="installation.html" class="nav-btn">
+                        Next: Installation Guide
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
