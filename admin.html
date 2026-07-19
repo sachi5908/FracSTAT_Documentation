@@ -390,8 +390,8 @@
     // ---------------------------------------------------------
     // Config
     // ---------------------------------------------------------
-    var ADMIN_USER = "admin";
-    var ADMIN_PASS = "admin";
+    // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL BELOW:
+    var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz99_7j93QYJzc-iEPuJhEeLjdvm6gzieWn35MWU5RnXW_2uuy3tk6u6fMmkqzNPNOpdQ/exec";
     var SESSION_KEY = "fracstat_admin_session";
 
     // ---------------------------------------------------------
@@ -480,16 +480,44 @@
     // ---------------------------------------------------------
     loginForm.addEventListener("submit", function (e) {
         e.preventDefault();
-        var u = document.getElementById("loginUser").value.trim();
-        var p = document.getElementById("loginPass").value;
-        if (u === ADMIN_USER && p === ADMIN_PASS) {
-            sessionStorage.setItem(SESSION_KEY, "1");
-            loginError.textContent = "";
-            showDashboard();
-        } else {
-            loginError.textContent = "Incorrect username or password.";
-        }
+        checkLogin();
     });
+
+    async function checkLogin() {
+        var u = document.getElementById("loginUser").value.trim();
+        var p = document.getElementById("loginPass").value.trim();
+
+        if (!u || !p) {
+            loginError.textContent = "Please enter both username and password.";
+            return;
+        }
+
+        loginError.textContent = "Verifying credentials…";
+
+        try {
+            // 'text/plain' avoids triggering a strict CORS preflight check
+            var response = await fetch(SCRIPT_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "text/plain;charset=utf-8"
+                },
+                body: JSON.stringify({ username: u, password: p })
+            });
+
+            var data = await response.json();
+
+            if (data.success) {
+                sessionStorage.setItem(SESSION_KEY, "1");
+                loginError.textContent = "";
+                showDashboard();
+            } else {
+                loginError.textContent = "Incorrect username or password.";
+            }
+        } catch (err) {
+            loginError.textContent = "Server connection failed.";
+            console.error(err);
+        }
+    }
 
     document.getElementById("logoutBtn").addEventListener("click", function () {
         sessionStorage.removeItem(SESSION_KEY);
