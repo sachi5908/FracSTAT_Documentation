@@ -289,6 +289,11 @@
     }
     .btn-save { background: var(--primary); color: #fff; }
     .btn-save:hover { background: var(--primary-dark); }
+    
+    /* New GitHub Button Styles */
+    .btn-github { background: #24292e; color: #fff; border: 1px solid #1b1f23; }
+    .btn-github:hover { background: #000; border-color: #000; }
+    
     .btn-discard { background: #334155; color: #e2e8f0; }
     .btn-discard:hover { background: #475569; }
     .btn-undo, .btn-redo { background: #1e293b; color: #e2e8f0; }
@@ -406,6 +411,7 @@
                 <button class="action btn-redo" id="redoBtn" title="Redo (Ctrl+Y)" disabled><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 7v6h-6"></path><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path></svg> Redo</button>
                 <button class="action btn-discard" id="discardBtn"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-9.21l5.75 4.64"></path></svg> Reload (discard changes)</button>
                 <button class="action btn-save" id="saveBtn"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download Page</button>
+                <button class="action btn-github" id="githubBtn"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg> Update In Github</button>
             </div>
             <div class="et-status" id="editorStatus"></div>
         </div>
@@ -433,8 +439,13 @@
     // Config
     // ---------------------------------------------------------
     // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL BELOW:
-    var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz99_7j93QYJzc-iEPuJhEeLjdvm6gzieWn35MWU5RnXW_2uuy3tk6u6fMmkqzNPNOpdQ/exec";
+    var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr3q4_tW290WNlox3drYx9Xh8gxJdLR1FM-mgUoYGTVcn_RrCWUMOv_DL1IFzy8GR2/exec";
     var SESSION_KEY = "fracstat_admin_session";
+    
+    // GITHUB PUSH CONFIGURATION
+    var GITHUB_REPO_OWNER = "sachi5908";
+    var GITHUB_REPO_NAME = "FracSTAT_Documentation";
+    var GITHUB_BRANCH = "main";
 
     // ---------------------------------------------------------
     // Cloudinary image hosting — same unsigned-upload-preset flow
@@ -516,6 +527,7 @@
     var editorStatus = document.getElementById("editorStatus");
     var undoBtn = document.getElementById("undoBtn");
     var redoBtn = document.getElementById("redoBtn");
+    var githubBtn = document.getElementById("githubBtn");
 
     // ---------------------------------------------------------
     // Login
@@ -565,6 +577,12 @@
 
             if (data.success) {
                 sessionStorage.setItem(SESSION_KEY, "1");
+                
+                // Save the github token if it was provided by the backend script
+                if (data.token) {
+                    sessionStorage.setItem("github_token", data.token);
+                }
+                
                 loginError.textContent = "";
                 showDashboard();
             } else {
@@ -578,6 +596,7 @@
 
     document.getElementById("logoutBtn").addEventListener("click", function () {
         sessionStorage.removeItem(SESSION_KEY);
+        sessionStorage.removeItem("github_token");
         editorFrame.src = "about:blank";
         editorView.classList.add("hidden");
         dashboard.classList.add("hidden");
@@ -674,6 +693,11 @@
 
     document.getElementById("saveBtn").addEventListener("click", function () {
         saveCurrentFile();
+    });
+    
+    // Add GitHub Button listener
+    githubBtn.addEventListener("click", function () {
+        updateInGithub();
     });
 
     undoBtn.addEventListener("click", function () {
@@ -1507,6 +1531,95 @@
                 editorStatus.textContent = "Export failed: " + err.message;
                 alert("Couldn't export this page: " + err.message);
             });
+    }
+
+    // ---------------------------------------------------------
+    // Push updates directly to GitHub
+    // ---------------------------------------------------------
+    async function updateInGithub() {
+        if (!currentFile) return;
+        var doc = editorFrame.contentDocument;
+        if (!doc) {
+            alert("No editable page is currently loaded.");
+            return;
+        }
+
+        const token = sessionStorage.getItem("github_token");
+        if (!token) {
+            alert("No GitHub token found. Please ensure your token is in the database and log in again.");
+            return;
+        }
+        
+        if (!GITHUB_REPO_OWNER || !GITHUB_REPO_NAME || GITHUB_REPO_OWNER === "sachi5908") {
+            alert("Please configure GITHUB_REPO_OWNER and GITHUB_REPO_NAME in the script.");
+            return;
+        }
+
+        const filePath = currentFile; 
+        editorStatus.textContent = "Preparing upload to GitHub…";
+
+        try {
+            // 1. Generate the clean HTML
+            var container = doc.querySelector(".docs-content-inner") || doc.body;
+            var cleanHtml = getCleanHTML(container);
+            
+            // 2. Fetch the original file to inject the clean HTML into it
+            const localRes = await fetch(currentFile);
+            if (!localRes.ok) throw new Error("Could not fetch local template.");
+            const rawHtml = await localRes.text();
+            
+            var parser = new DOMParser();
+            var freshDoc = parser.parseFromString(rawHtml, "text/html");
+            var target = freshDoc.querySelector(".docs-content-inner");
+            if (target) target.innerHTML = cleanHtml;
+            
+            var outHtml = "<!DOCTYPE html>\n" + freshDoc.documentElement.outerHTML;
+
+            // 3. Base64 Encode the HTML for GitHub (Safe for Unicode)
+            const encodedContent = btoa(unescape(encodeURIComponent(outHtml)));
+
+            editorStatus.textContent = "Connecting to GitHub…";
+
+            // 4. Get the file's current SHA (Required to update existing files)
+            const apiUrl = `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${filePath}`;
+            
+            let fileSha = null;
+            const shaRes = await fetch(apiUrl, {
+                headers: { "Authorization": `token ${token}` }
+            });
+            
+            if (shaRes.ok) {
+                const shaData = await shaRes.json();
+                fileSha = shaData.sha;
+            }
+
+            // 5. Push the update to GitHub
+            const updateRes = await fetch(apiUrl, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `token ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    message: `Update ${filePath} via Admin Panel`,
+                    content: encodedContent,
+                    sha: fileSha,
+                    branch: GITHUB_BRANCH
+                })
+            });
+
+            if (!updateRes.ok) {
+                const errData = await updateRes.json();
+                throw new Error(errData.message || "GitHub upload failed.");
+            }
+
+            editorStatus.textContent = `Successfully updated ${currentFile} on GitHub!`;
+            
+        } catch (err) {
+            console.error(err);
+            editorStatus.textContent = "GitHub Export failed: " + err.message;
+            alert("Couldn't upload to GitHub: " + err.message);
+        }
     }
 })();
 </script>
