@@ -1613,7 +1613,7 @@
                 throw new Error(errData.message || "GitHub upload failed.");
             }
 
-            editorStatus.textContent = `Successfully updated ${currentFile} on GitHub!`;
+            editorStatus.innerHTML = `<span style="color: #10b981; font-weight: 700;">🎉 Success!</span> <b>${currentFile}</b> has been pushed to GitHub. <span style="opacity: 0.85;">(Please allow 1–2 minutes for the live site to update)</span>`;
             
         } catch (err) {
             console.error(err);
