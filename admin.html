@@ -21,6 +21,18 @@
     /* ---------- shared bits ---------- */
     .hidden { display: none !important; }
     button { cursor: pointer; font-family: inherit; }
+    
+    .svg-icon {
+        display: inline-block;
+        width: 1.1em;
+        height: 1.1em;
+        vertical-align: -0.2em;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
 
     /* ---------- LOGIN SCREEN ---------- */
     #loginScreen {
@@ -44,6 +56,9 @@
         font-size: 1.4rem;
         margin-bottom: 0.35rem;
         letter-spacing: -0.02em;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
     }
     .login-card p.sub {
         color: var(--ink-light);
@@ -184,6 +199,9 @@
         color: var(--primary);
         font-weight: 600;
         font-size: 0.82rem;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
         transition: background-color 0.15s ease, color 0.15s ease;
     }
     .file-card .fc-edit:hover { background: var(--primary); color: #fff; }
@@ -207,6 +225,9 @@
         border-radius: 8px;
         font-size: 0.82rem;
         font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
     }
     .editor-toolbar .back-btn:hover { background: rgba(255,255,255,0.18); }
     .editor-toolbar .et-title {
@@ -226,11 +247,18 @@
         padding: 0.5rem 0.9rem;
         font-weight: 700;
         font-size: 0.82rem;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
     }
     .btn-save { background: var(--primary); color: #fff; }
     .btn-save:hover { background: var(--primary-dark); }
     .btn-discard { background: #334155; color: #e2e8f0; }
     .btn-discard:hover { background: #475569; }
+    .btn-undo, .btn-redo { background: #1e293b; color: #e2e8f0; }
+    .btn-undo:hover, .btn-redo:hover { background: #334155; }
+    .btn-undo:disabled, .btn-redo:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-undo:disabled:hover, .btn-redo:disabled:hover { background: #1e293b; }
 
     /* ---------- FORMAT TOOLBAR ---------- */
     .format-toolbar {
@@ -283,7 +311,7 @@
     <!-- ================= LOGIN SCREEN ================= -->
     <div id="loginScreen">
         <form class="login-card" id="loginForm">
-            <h1>🔐 FracSTAT Docs Admin</h1>
+            <h1><svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> FracSTAT Docs Admin</h1>
             <p class="sub">Sign in to edit the documentation pages in your browser.</p>
 
             <div class="field">
@@ -299,8 +327,7 @@
             <div id="loginError"></div>
 
             <div class="login-hint">
-                This is a temporary in-browser editor for the developer's own use — remove
-                <code>admin.html</code> once you're done making edits.
+                This is a temporary in-browser editor for the developer's own use.
             </div>
         </form>
     </div>
@@ -308,7 +335,7 @@
     <!-- ================= DASHBOARD ================= -->
     <div id="dashboard" class="hidden">
         <div class="admin-header">
-            <h1>🛠️ FracSTAT Docs — Admin Panel</h1>
+            <h1><svg class="svg-icon" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg> FracSTAT Docs — Admin Panel</h1>
             <button class="logout-btn" id="logoutBtn">Log Out</button>
         </div>
         <div class="dashboard-body">
@@ -330,11 +357,13 @@
     <!-- ================= EDITOR VIEW ================= -->
     <div id="editorView" class="hidden">
         <div class="editor-toolbar">
-            <button class="back-btn" id="backBtn">← Back to file list</button>
+            <button class="back-btn" id="backBtn"><svg class="svg-icon" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back to file list</button>
             <div class="et-title" id="editorTitle">—</div>
             <div class="et-actions">
-                <button class="action btn-discard" id="discardBtn">↺ Reload (discard changes)</button>
-                <button class="action btn-save" id="saveBtn">⬇ Download Page</button>
+                <button class="action btn-undo" id="undoBtn" title="Undo (Ctrl+Z)" disabled><svg class="svg-icon" viewBox="0 0 24 24"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg> Undo</button>
+                <button class="action btn-redo" id="redoBtn" title="Redo (Ctrl+Y)" disabled><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 7v6h-6"></path><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path></svg> Redo</button>
+                <button class="action btn-discard" id="discardBtn"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-9.21l5.75 4.64"></path></svg> Reload (discard changes)</button>
+                <button class="action btn-save" id="saveBtn"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download Page</button>
             </div>
             <div class="et-status" id="editorStatus"></div>
         </div>
@@ -364,6 +393,36 @@
     var ADMIN_USER = "admin";
     var ADMIN_PASS = "admin";
     var SESSION_KEY = "fracstat_admin_session";
+
+    // ---------------------------------------------------------
+    // Cloudinary image hosting — same unsigned-upload-preset flow
+    // used by upload.html. Every "Upload" button in the editor
+    // (replacing an existing figure, or filling in a freshly
+    // inserted Image block) funnels through uploadImageToCloudinary(),
+    // which POSTs the file and resolves with the hosted secure_url
+    // ready to drop straight into an <img src>.
+    // ---------------------------------------------------------
+    var CLOUDINARY_CLOUD_NAME = "hcaqjcqf";
+    var CLOUDINARY_UPLOAD_PRESET = "FracSTAT";
+
+    function uploadImageToCloudinary(file) {
+        var formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+        return fetch("https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD_NAME + "/image/upload", {
+            method: "POST",
+            body: formData
+        }).then(function (response) {
+            return response.json().then(function (data) {
+                if (!response.ok || !data.secure_url) {
+                    var msg = (data && data.error && data.error.message) || ("Upload failed (HTTP " + response.status + ")");
+                    throw new Error(msg);
+                }
+                return data.secure_url;
+            });
+        });
+    }
 
     var FILE_SECTIONS = [
         { title: "Getting Started", files: [
@@ -413,6 +472,8 @@
     var editorFrame = document.getElementById("editorFrame");
     var editorTitle = document.getElementById("editorTitle");
     var editorStatus = document.getElementById("editorStatus");
+    var undoBtn = document.getElementById("undoBtn");
+    var redoBtn = document.getElementById("redoBtn");
 
     // ---------------------------------------------------------
     // Login
@@ -472,7 +533,7 @@
                 card.innerHTML =
                     '<div class="fc-title">' + entry.label + '</div>' +
                     '<div class="fc-name">' + entry.file + '</div>' +
-                    '<button type="button" class="fc-edit">✎ Edit Page</button>';
+                    '<button type="button" class="fc-edit"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> Edit Page</button>';
                 card.querySelector(".fc-edit").addEventListener("click", function () {
                     openEditor(entry.file, entry.label);
                 });
@@ -528,6 +589,31 @@
 
     document.getElementById("saveBtn").addEventListener("click", function () {
         saveCurrentFile();
+    });
+
+    undoBtn.addEventListener("click", function () {
+        var doc = editorFrame.contentDocument;
+        if (doc) undo(doc);
+    });
+    redoBtn.addEventListener("click", function () {
+        var doc = editorFrame.contentDocument;
+        if (doc) redo(doc);
+    });
+
+    // Fallback so Ctrl+Z / Ctrl+Y also work if focus happens to be on
+    // the admin chrome (e.g. a toolbar button) rather than inside the
+    // iframe's document. bindHistoryShortcuts() covers the normal case
+    // where focus is on the edited page itself.
+    document.addEventListener("keydown", function (e) {
+        if (!currentFile) return;
+        var doc = editorFrame.contentDocument;
+        if (!doc || doc.hasFocus()) return; // already handled inside the iframe
+        var mod = e.ctrlKey || e.metaKey;
+        if (!mod) return;
+        var key = e.key ? e.key.toLowerCase() : "";
+        if (key === "z" && e.shiftKey) { e.preventDefault(); redo(doc); }
+        else if (key === "z") { e.preventDefault(); undo(doc); }
+        else if (key === "y") { e.preventDefault(); redo(doc); }
     });
 
     // ---------------------------------------------------------
@@ -616,28 +702,64 @@
             "[data-admin-editable]:focus { outline: 2px solid #2563eb; background-color: rgba(37,99,235,0.07); }" +
             ".admin-img-overlay { position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center; gap: 0.6rem; background: rgba(15,23,42,0.45); opacity: 0; pointer-events: none; transition: opacity .2s ease; }" +
             ".figure-img-wrap:hover .admin-img-overlay { opacity: 1; pointer-events: auto; }" +
-            ".admin-img-btn { padding: 0.6rem 1.1rem; border: none; border-radius: 8px; background: #fff; color: #0f172a; font-weight: 700; font-size: 0.85rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.25); }" +
+            ".admin-img-btn { display: flex; align-items: center; padding: 0.6rem 1.1rem; border: none; border-radius: 8px; background: #fff; color: #0f172a; font-weight: 700; font-size: 0.85rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.25); }" +
+            ".admin-img-btn .svg-icon { margin-right: 0.4em; width: 1.2em; height: 1.2em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }" +
             ".admin-img-btn:hover { background: #2563eb; color: #fff; }" +
             ".admin-block-wrap { position: relative; }" +
             ".admin-block-toolbar { position: absolute; top: -14px; right: 4px; display: flex; gap: 3px; opacity: 0; pointer-events: none; transition: opacity .15s ease; z-index: 15; }" +
             ".admin-block-wrap:hover > .admin-block-toolbar, .admin-block-wrap:focus-within > .admin-block-toolbar { opacity: 1; pointer-events: auto; }" +
             ".admin-block-toolbar button { width: 24px; height: 24px; border: none; border-radius: 5px; background: #0f172a; color: #fff; font-size: 12px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.25); }" +
+            ".admin-block-toolbar button svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }" +
             ".admin-block-toolbar button:hover { background: #2563eb; }" +
             ".admin-table-toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin: 0.4rem 0 1.5rem 0; }" +
             ".admin-table-toolbar button { border: 1px solid #cbd5e1; background: #f8fafc; color: #0f172a; font-size: 0.78rem; font-weight: 600; padding: 4px 10px; border-radius: 6px; cursor: pointer; }" +
             ".admin-table-toolbar button:hover { background: #2563eb; color: #fff; border-color: #2563eb; }" +
             ".admin-insert-bar { position: relative; height: 15px; margin: 3px 0; display: flex; align-items: center; justify-content: center; opacity: 0.28; transition: opacity .15s ease; }" +
             ".admin-insert-bar::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: #2563eb; }" +
-            ".admin-insert-bar:hover, .admin-insert-bar:focus-within { opacity: 1; }" +
+            ".admin-insert-bar:hover, .admin-insert-bar:focus-within, .admin-insert-bar.admin-bar-active { opacity: 1; }" +
             ".admin-insert-plus { position: relative; width: 22px; height: 22px; border-radius: 50%; border: none; background: #2563eb; color: #fff; font-size: 15px; font-weight: 700; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.3); z-index: 16; }" +
             ".admin-insert-plus:hover { background: #1d4ed8; transform: scale(1.08); }" +
-            ".admin-insert-menu { position: absolute; top: 26px; left: 50%; transform: translateX(-50%); background: #fff; border: 1px solid #cbd5e1; border-radius: 10px; box-shadow: 0 12px 24px rgba(15,23,42,0.2); padding: 6px; display: flex; flex-direction: column; gap: 1px; z-index: 50; min-width: 190px; text-align: left; }" +
-            ".admin-insert-menu button { text-align: left; border: none; background: transparent; padding: 7px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; cursor: pointer; color: #0f172a; }" +
-            ".admin-insert-menu button:hover { background: #eff6ff; color: #2563eb; }";
+            ".admin-insert-menu { position: fixed; opacity: 1; background: #fff; border: 1px solid #cbd5e1; border-radius: 10px; box-shadow: 0 12px 24px rgba(15,23,42,0.2); padding: 6px; display: flex; flex-direction: column; gap: 1px; z-index: 50; min-width: 190px; max-width: 240px; text-align: left; }" +
+            ".admin-insert-menu button { display: flex; align-items: center; text-align: left; border: none; background: transparent; padding: 7px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; cursor: pointer; color: #0f172a; }" +
+            ".admin-insert-menu button .svg-icon { margin-right: 0.5em; width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }" +
+            ".admin-insert-menu button:hover { background: #eff6ff; color: #2563eb; }" +
+            ".admin-hover-blocker { position: fixed; inset: 0; z-index: 45; background: transparent; }";
         doc.head.appendChild(style);
 
         var container = doc.querySelector(".docs-content-inner") || doc.body;
 
+        hydrateEditableContent(doc, container);
+
+        // Stop the page's own links/router from navigating the iframe away
+        // from the page currently being edited.
+        doc.addEventListener("click", function (e) {
+            var link = e.target.closest("a");
+            if (link) e.preventDefault();
+        }, true);
+
+        // ---- Undo / Redo history ----
+        doc.__adminHistory = { stack: [getCleanHTML(container)], index: 0 };
+        updateUndoRedoButtons(doc);
+        bindHistoryShortcuts(doc);
+
+        // Any direct text edit (typing inside a contenteditable block)
+        // schedules a debounced snapshot; losing focus captures one
+        // immediately so a quick edit-then-click isn't lost.
+        container.addEventListener("input", function () {
+            scheduleHistorySnapshot(doc);
+        }, true);
+        container.addEventListener("blur", function (e) {
+            if (e.target && e.target.hasAttribute && e.target.hasAttribute("data-admin-editable")) {
+                recordHistory(doc);
+            }
+        }, true);
+    }
+
+    // Re-applies every piece of admin scaffolding (contenteditable
+    // marking, image-replace overlays, block wrappers/toolbars/insert
+    // bars) to whatever HTML currently sits in `container`. Used both
+    // on first load and after an undo/redo restores a clean snapshot.
+    function hydrateEditableContent(doc, container) {
         container.querySelectorAll(EDITABLE_SELECTOR).forEach(function (el) {
             el.setAttribute("contenteditable", "true");
             el.setAttribute("data-admin-editable", "true");
@@ -648,13 +770,6 @@
         });
 
         setupBlockControls(doc, container);
-
-        // Stop the page's own links/router from navigating the iframe away
-        // from the page currently being edited.
-        doc.addEventListener("click", function (e) {
-            var link = e.target.closest("a");
-            if (link) e.preventDefault();
-        }, true);
     }
 
     function addImageOverlay(doc, wrap) {
@@ -670,7 +785,7 @@
         var uploadBtn = doc.createElement("button");
         uploadBtn.type = "button";
         uploadBtn.className = "admin-img-btn";
-        uploadBtn.textContent = "📷 Upload";
+        uploadBtn.innerHTML = '<svg class="svg-icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg> Upload';
         uploadBtn.addEventListener("click", function (e) {
             e.stopPropagation();
             e.preventDefault();
@@ -680,12 +795,25 @@
             input.addEventListener("change", function () {
                 var file = input.files[0];
                 if (!file) return;
-                var reader = new FileReader();
-                reader.onload = function () {
-                    img.src = reader.result;
-                    wrap.classList.add("img-loaded");
-                };
-                reader.readAsDataURL(file);
+
+                var originalHTML = uploadBtn.innerHTML;
+                uploadBtn.disabled = true;
+                uploadBtn.textContent = "Uploading…";
+
+                uploadImageToCloudinary(file)
+                    .then(function (secureUrl) {
+                        img.src = secureUrl;
+                        wrap.classList.add("img-loaded");
+                        recordHistory(doc);
+                    })
+                    .catch(function (err) {
+                        console.error(err);
+                        window.alert("Image upload failed: " + (err && err.message ? err.message : "unknown error"));
+                    })
+                    .finally(function () {
+                        uploadBtn.disabled = false;
+                        uploadBtn.innerHTML = originalHTML;
+                    });
             });
             input.click();
         });
@@ -693,7 +821,7 @@
         var urlBtn = doc.createElement("button");
         urlBtn.type = "button";
         urlBtn.className = "admin-img-btn";
-        urlBtn.textContent = "🔗 Image URL";
+        urlBtn.innerHTML = '<svg class="svg-icon" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg> Image URL';
         urlBtn.addEventListener("click", function (e) {
             e.stopPropagation();
             e.preventDefault();
@@ -702,6 +830,7 @@
             if (url) {
                 img.src = url;
                 wrap.classList.add("img-loaded");
+                recordHistory(doc);
             }
         });
 
@@ -721,17 +850,17 @@
     // ---------------------------------------------------------
 
     var BLOCK_TYPES = [
-        ["paragraph", "\u00B6 Paragraph"],
-        ["heading2", "H2 Heading"],
-        ["heading3", "H3 Heading"],
-        ["bulletlist", "\u2022 Bulleted list"],
-        ["numberlist", "1. Numbered list"],
-        ["blockquote", "\u275D Quote"],
-        ["table", "\u25A6 Table"],
-        ["code", "</> Code snippet"],
-        ["note", "\u24D8 Note box"],
-        ["tip", "\u2605 Tip box"],
-        ["image", "\uD83D\uDDBC Image figure"]
+        ["paragraph", "<svg class='svg-icon' viewBox='0 0 24 24'><path d='M13 4v16'/><path d='M17 4v16'/><path d='M19 4H9.5a4.5 4.5 0 0 0 0 9H13'/></svg> Paragraph"],
+        ["heading2", "<svg class='svg-icon' viewBox='0 0 24 24'><path d='M4 12h8'/><path d='M4 18V6'/><path d='M12 18V6'/><path d='M21 18h-4c0-4 4-3 4-6 0-1.5-2-2.5-4-1'/></svg> H2 Heading"],
+        ["heading3", "<svg class='svg-icon' viewBox='0 0 24 24'><path d='M4 12h8'/><path d='M4 18V6'/><path d='M12 18V6'/><path d='M17.5 10.5c1.7-1 3.5 0 3.5 1.5a2 2 0 0 1-2 2 2 2 0 0 1 2 2c0 1.5-1.8 2.5-3.5 1.5'/></svg> H3 Heading"],
+        ["bulletlist", "<svg class='svg-icon' viewBox='0 0 24 24'><line x1='8' y1='6' x2='21' y2='6'/><line x1='8' y1='12' x2='21' y2='12'/><line x1='8' y1='18' x2='21' y2='18'/><line x1='3' y1='6' x2='3.01' y2='6'/><line x1='3' y1='12' x2='3.01' y2='12'/><line x1='3' y1='18' x2='3.01' y2='18'/></svg> Bulleted list"],
+        ["numberlist", "<svg class='svg-icon' viewBox='0 0 24 24'><line x1='10' y1='6' x2='21' y2='6'/><line x1='10' y1='12' x2='21' y2='12'/><line x1='10' y1='18' x2='21' y2='18'/><path d='M4 6h1v4'/><path d='M4 10h2'/><path d='M6 18H4c0-1 2-2 2-3s-1-1.5-2-1'/></svg> Numbered list"],
+        ["blockquote", "<svg class='svg-icon' viewBox='0 0 24 24'><path d='M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z'/><path d='M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h1c0 1 0 1 0 2v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z'/></svg> Quote"],
+        ["table", "<svg class='svg-icon' viewBox='0 0 24 24'><rect x='3' y='3' width='18' height='18' rx='2' ry='2'/><line x1='3' y1='9' x2='21' y2='9'/><line x1='3' y1='15' x2='21' y2='15'/><line x1='9' y1='3' x2='9' y2='21'/><line x1='15' y1='3' x2='15' y2='21'/></svg> Table"],
+        ["code", "<svg class='svg-icon' viewBox='0 0 24 24'><polyline points='16 18 22 12 16 6'/><polyline points='8 6 2 12 8 18'/></svg> Code snippet"],
+        ["note", "<svg class='svg-icon' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10'/><line x1='12' y1='16' x2='12' y2='12'/><line x1='12' y1='8' x2='12.01' y2='8'/></svg> Note box"],
+        ["tip", "<svg class='svg-icon' viewBox='0 0 24 24'><polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'/></svg> Tip box"],
+        ["image", "<svg class='svg-icon' viewBox='0 0 24 24'><rect x='3' y='3' width='18' height='18' rx='2' ry='2'/><circle cx='8.5' cy='8.5' r='1.5'/><polyline points='21 15 16 10 5 21'/></svg> Image figure"]
     ];
 
     function setupBlockControls(doc, container) {
@@ -779,25 +908,25 @@
         var toolbar = doc.createElement("div");
         toolbar.className = "admin-block-toolbar";
         toolbar.innerHTML =
-            '<button type="button" data-act="up" title="Move block up">\u2191</button>' +
-            '<button type="button" data-act="down" title="Move block down">\u2193</button>' +
-            '<button type="button" data-act="dup" title="Duplicate block">\u29C9</button>' +
-            '<button type="button" data-act="del" title="Delete block">\uD83D\uDDD1</button>';
+            '<button type="button" data-act="up" title="Move block up"><svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg></button>' +
+            '<button type="button" data-act="down" title="Move block down"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg></button>' +
+            '<button type="button" data-act="dup" title="Duplicate block"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>' +
+            '<button type="button" data-act="del" title="Delete block"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>';
         toolbar.querySelectorAll("button").forEach(function (btn) {
             btn.addEventListener("mousedown", function (e) { e.preventDefault(); });
             btn.addEventListener("click", function (e) {
                 e.stopPropagation();
                 var act = btn.getAttribute("data-act");
-                if (act === "up") moveBlock(wrap, -1);
-                else if (act === "down") moveBlock(wrap, 1);
+                if (act === "up") moveBlock(doc, wrap, -1);
+                else if (act === "down") moveBlock(doc, wrap, 1);
                 else if (act === "dup") duplicateBlock(doc, wrap);
-                else if (act === "del") deleteBlock(wrap);
+                else if (act === "del") deleteBlock(doc, wrap);
             });
         });
         return toolbar;
     }
 
-    function moveBlock(wrap, dir) {
+    function moveBlock(doc, wrap, dir) {
         var container = wrap.parentNode;
         if (!container) return;
         var wraps = Array.from(container.children).filter(function (c) {
@@ -807,6 +936,7 @@
         var targetIdx = idx + dir;
         if (idx === -1 || targetIdx < 0 || targetIdx >= wraps.length) return;
         swapNodes(wrap, wraps[targetIdx]);
+        recordHistory(doc);
     }
 
     // Swaps two arbitrary DOM nodes in place, leaving everything
@@ -834,11 +964,13 @@
             var w = clone.querySelector(".figure-img-wrap");
             if (w) addImageOverlay(doc, w);
         }
+        recordHistory(doc);
     }
 
-    function deleteBlock(wrap) {
-        if (!window.confirm("Delete this block? Use \u21BA Reload to discard all unsaved changes if you change your mind.")) return;
+    function deleteBlock(doc, wrap) {
+        if (!window.confirm("Delete this block? Use \u21BA Reload to discard all unsaved changes, or Ctrl+Z to undo just this.")) return;
         wrap.remove();
+        recordHistory(doc);
     }
 
     // ---------------------------------------------------------
@@ -851,7 +983,7 @@
         btn.type = "button";
         btn.className = "admin-insert-plus";
         btn.title = "Insert a new block here";
-        btn.textContent = "+";
+        btn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
         btn.addEventListener("mousedown", function (e) { e.preventDefault(); });
         btn.addEventListener("click", function (e) {
             e.stopPropagation();
@@ -862,12 +994,12 @@
     }
 
     function showInsertMenu(doc, bar, btn) {
-        var existing = doc.querySelector(".admin-insert-menu");
-        if (existing) {
-            var wasForThisBar = existing.parentNode === bar;
-            existing.remove();
-            if (wasForThisBar) return; // clicking the same "+" again just closes it
-        }
+        var wasForThisBar = doc.__adminActiveInsertBar === bar && !!doc.querySelector(".admin-insert-menu");
+        closeInsertMenu(doc);
+        if (wasForThisBar) return; // clicking the same "+" again just closes it
+
+        bar.classList.add("admin-bar-active");
+        doc.__adminActiveInsertBar = bar;
 
         var menu = doc.createElement("div");
         menu.className = "admin-insert-menu";
@@ -879,18 +1011,77 @@
             mb.addEventListener("click", function (e) {
                 e.stopPropagation();
                 insertNewBlock(doc, bar, mb.getAttribute("data-type"));
-                menu.remove();
+                closeInsertMenu(doc);
             });
         });
-        bar.appendChild(menu);
+
+        // Appended to <body> and positioned with getBoundingClientRect
+        // (not nested inside the "+" bar) so it always renders at full
+        // opacity — nesting it inside the bar meant the bar's own
+        // low-opacity "unhovered" state visually washed the whole menu
+        // out the instant the pointer left the bar's tiny hit area on
+        // its way down to a menu item.
+        doc.body.appendChild(menu);
+        positionInsertMenu(doc, menu, btn);
+
+        // A fixed, transparent, full-viewport layer sitting just below
+        // the menu (but above every block's hover-triggered toolbar)
+        // so moving the mouse toward a lower menu item doesn't pass
+        // over — and light up — the block/insert-bar underneath it.
+        var blocker = doc.createElement("div");
+        blocker.className = "admin-hover-blocker";
+        doc.body.appendChild(blocker);
 
         var closeHandler = function (ev) {
             if (!menu.contains(ev.target) && ev.target !== btn) {
-                menu.remove();
-                doc.removeEventListener("click", closeHandler, true);
+                closeInsertMenu(doc);
             }
         };
+        doc.__adminMenuCloseHandler = closeHandler;
         doc.addEventListener("click", closeHandler, true);
+
+        var reposition = function () { positionInsertMenu(doc, menu, btn); };
+        doc.__adminMenuReposition = reposition;
+        if (doc.defaultView) doc.defaultView.addEventListener("resize", reposition);
+    }
+
+    function positionInsertMenu(doc, menu, btn) {
+        var rect = btn.getBoundingClientRect();
+        var view = doc.defaultView;
+        var vw = (view && view.innerWidth) || 800;
+        var vh = (view && view.innerHeight) || 600;
+        var estWidth = 200;
+        var left = rect.left + rect.width / 2;
+        left = Math.min(Math.max(left, estWidth / 2 + 8), vw - estWidth / 2 - 8);
+        var top = rect.bottom + 6;
+        // Flip above the button if there isn't room below.
+        if (top + 260 > vh && rect.top > 260) {
+            top = rect.top - 6;
+            menu.style.transform = "translate(-50%, -100%)";
+        } else {
+            menu.style.transform = "translateX(-50%)";
+        }
+        menu.style.left = left + "px";
+        menu.style.top = top + "px";
+    }
+
+    function closeInsertMenu(doc) {
+        var menu = doc.querySelector(".admin-insert-menu");
+        if (menu) menu.remove();
+        var blocker = doc.querySelector(".admin-hover-blocker");
+        if (blocker) blocker.remove();
+        if (doc.__adminMenuCloseHandler) {
+            doc.removeEventListener("click", doc.__adminMenuCloseHandler, true);
+            doc.__adminMenuCloseHandler = null;
+        }
+        if (doc.__adminMenuReposition) {
+            if (doc.defaultView) doc.defaultView.removeEventListener("resize", doc.__adminMenuReposition);
+            doc.__adminMenuReposition = null;
+        }
+        if (doc.__adminActiveInsertBar) {
+            doc.__adminActiveInsertBar.classList.remove("admin-bar-active");
+            doc.__adminActiveInsertBar = null;
+        }
     }
 
     function insertNewBlock(doc, bar, type) {
@@ -919,6 +1110,8 @@
         if (focusTarget) {
             try { focusTarget.focus(); } catch (err) { /* ignore */ }
         }
+
+        recordHistory(doc);
     }
 
     function createBlockElement(doc, type) {
@@ -1035,6 +1228,7 @@
                 else if (act === "delrow") delTableRow(table);
                 else if (act === "addcol") addTableCol(doc, table);
                 else if (act === "delcol") delTableCol(table);
+                recordHistory(doc);
             });
         });
         return tb;
@@ -1081,7 +1275,7 @@
     // and the wrapper <div>s themselves) out of a cloned subtree
     // before it is serialized back out to a downloadable .html file.
     function cleanupAdminBlocks(root) {
-        root.querySelectorAll(".admin-insert-bar, .admin-block-toolbar, .admin-table-toolbar, .admin-insert-menu").forEach(function (el) {
+        root.querySelectorAll(".admin-insert-bar, .admin-block-toolbar, .admin-table-toolbar, .admin-insert-menu, .admin-hover-blocker").forEach(function (el) {
             el.remove();
         });
         root.querySelectorAll(".admin-block-wrap").forEach(function (wrap) {
@@ -1089,6 +1283,100 @@
             if (!parent) return;
             while (wrap.firstChild) parent.insertBefore(wrap.firstChild, wrap);
             parent.removeChild(wrap);
+        });
+    }
+
+    // Returns the fully "clean" (no admin scaffolding, no
+    // contenteditable attributes) HTML for `container` — used both
+    // for the final downloaded file and as an undo/redo snapshot.
+    function getCleanHTML(container) {
+        var clone = container.cloneNode(true);
+        clone.querySelectorAll("[contenteditable]").forEach(function (el) {
+            el.removeAttribute("contenteditable");
+            el.removeAttribute("data-admin-editable");
+        });
+        clone.querySelectorAll(".admin-img-overlay").forEach(function (el) { el.remove(); });
+        cleanupAdminBlocks(clone);
+        return clone.innerHTML;
+    }
+
+    // ---------------------------------------------------------
+    // Undo / Redo
+    // ---------------------------------------------------------
+    var HISTORY_MAX = 100;
+    var HISTORY_DEBOUNCE_MS = 600;
+
+    function recordHistory(doc) {
+        var h = doc.__adminHistory;
+        if (!h) return;
+        var container = doc.querySelector(".docs-content-inner") || doc.body;
+        var html = getCleanHTML(container);
+        if (h.stack[h.index] === html) return; // nothing actually changed
+        h.stack = h.stack.slice(0, h.index + 1);
+        h.stack.push(html);
+        h.index = h.stack.length - 1;
+        if (h.stack.length > HISTORY_MAX) {
+            h.stack.shift();
+            h.index--;
+        }
+        updateUndoRedoButtons(doc);
+    }
+
+    function scheduleHistorySnapshot(doc) {
+        var h = doc.__adminHistory;
+        if (!h) return;
+        clearTimeout(h.debounceTimer);
+        h.debounceTimer = setTimeout(function () { recordHistory(doc); }, HISTORY_DEBOUNCE_MS);
+    }
+
+    function undo(doc) {
+        var h = doc.__adminHistory;
+        if (!h || h.index <= 0) return;
+        clearTimeout(h.debounceTimer);
+        recordHistory(doc); // capture any pending unsaved edit first
+        if (h.index <= 0) return;
+        h.index--;
+        restoreHistorySnapshot(doc, h);
+    }
+
+    function redo(doc) {
+        var h = doc.__adminHistory;
+        if (!h || h.index >= h.stack.length - 1) return;
+        clearTimeout(h.debounceTimer);
+        h.index++;
+        restoreHistorySnapshot(doc, h);
+    }
+
+    function restoreHistorySnapshot(doc, h) {
+        var container = doc.querySelector(".docs-content-inner") || doc.body;
+        closeInsertMenu(doc);
+        container.innerHTML = h.stack[h.index];
+        hydrateEditableContent(doc, container);
+        updateUndoRedoButtons(doc);
+    }
+
+    function updateUndoRedoButtons(doc) {
+        var h = doc.__adminHistory;
+        if (!h) return;
+        if (undoBtn) undoBtn.disabled = h.index <= 0;
+        if (redoBtn) redoBtn.disabled = h.index >= h.stack.length - 1;
+    }
+
+    function bindHistoryShortcuts(doc) {
+        doc.addEventListener("keydown", function (e) {
+            var mod = e.ctrlKey || e.metaKey;
+            if (!mod) return;
+            var key = e.key ? e.key.toLowerCase() : "";
+            if (key === "z" && e.shiftKey) {
+                e.preventDefault();
+                redo(doc);
+            } else if (key === "z") {
+                e.preventDefault();
+                undo(doc);
+            } else if (key === "y") {
+                e.preventDefault();
+                redo(doc);
+            }
         });
     }
 
@@ -1112,15 +1400,10 @@
                 var freshDoc = parser.parseFromString(rawHtml, "text/html");
                 var target = freshDoc.querySelector(".docs-content-inner");
 
-                var liveContainer = (doc.querySelector(".docs-content-inner") || doc.body).cloneNode(true);
-                liveContainer.querySelectorAll("[contenteditable]").forEach(function (el) {
-                    el.removeAttribute("contenteditable");
-                    el.removeAttribute("data-admin-editable");
-                });
-                liveContainer.querySelectorAll(".admin-img-overlay").forEach(function (el) { el.remove(); });
-                cleanupAdminBlocks(liveContainer);
+                var container = doc.querySelector(".docs-content-inner") || doc.body;
+                var cleanHtml = getCleanHTML(container);
 
-                if (target) target.innerHTML = liveContainer.innerHTML;
+                if (target) target.innerHTML = cleanHtml;
 
                 var outHtml = "<!DOCTYPE html>\n" + freshDoc.documentElement.outerHTML;
                 var blob = new Blob([outHtml], { type: "text/html" });
