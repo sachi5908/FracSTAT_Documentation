@@ -14,7 +14,7 @@
             <button id="mobileToggle" class="mobile-toggle-btn">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
-            <img src="https://i.ibb.co/XfLkPMMg/logo.png" alt="FracSTAT Logo" class="logo-img">
+            <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1784441778/zgskue8vqbh15i7pnnev.png" alt="FracSTAT Logo" class="logo-img">
         </div>
         <ul class="nav-links">
             <li><a href="index.html">Home</a></li>
@@ -93,8 +93,20 @@
             <div class="docs-content-inner">
                 <h1>FracSTAT Home Page</h1>
                 <p>The launcher serves as the primary entry point and home screen for the entire FracSTAT application. It operates as a single root window that embeds both the Analyzer modules and project settings, allowing the software to behave as one continuous desktop program without opening multiple detached windows.</p>
-                
-                <h2>Application Workflow</h2>
+
+                <div class="toc-box">
+                    <p>On this page</p>
+                    <ul>
+                        <li><a href="#workflow">Application Workflow</a></li>
+                        <li><a href="#navigating">Navigating the Launcher Interface</a></li>
+                        <li><a href="#sidebar-panel">1. The Sidebar (Left Panel)</a></li>
+                        <li><a href="#header-bar">2. The Top Header Bar</a></li>
+                        <li><a href="#module-cards">3. The Module Cards (Main View)</a></li>
+                        <li><a href="#app-pages">Exploring Application Pages</a></li>
+                    </ul>
+                </div>
+
+                <h2 id="workflow">Application Workflow</h2>
                 <p>Before exploring the user interface, it is helpful to understand where the launcher sits within the broader FracSTAT processing pipeline. The diagram below illustrates the start-to-finish workflow, beginning with data preparation and routing through the GUI into the specific calculation modules.</p>
                 
                 <figure class="figure-block">
@@ -115,7 +127,7 @@
                     <li><strong>Visualization & Export:</strong> Export your finalized results as PNG/JPEG images, CSV/Excel spreadsheets, PDFs, or Word documents.</li>
                 </ul>
 
-                <h2>Navigating the Launcher Interface</h2>
+                <h2 id="navigating">Navigating the Launcher Interface</h2>
                 <p>The Home Window is designed to be user-friendly, organizing project management on the left and analytical modules on the right.</p>
                 
                 <figure class="figure-block">
@@ -127,7 +139,7 @@
                     </div>
                     <span class="ph-caption">Annotated FracSTAT Launcher interface — project management on the left, analytical module cards on the right.</span>
                 </figure>
-                <h4>1. The Sidebar (Left Panel)</h4>
+                <h4 id="sidebar-panel">1. The Sidebar (Left Panel)</h4>
                 <p>The left panel is your control center for application navigation and managing project files.</p>
                 <ul>
                     <li><strong>Version Type of FracSTAT:</strong> A badge below the logo indicates your current running version (e.g., v1.0).</li>
@@ -136,13 +148,13 @@
                     <li><strong>Loaded and Saved Projects:</strong> A scrollable "Recent Projects" list allows you to quickly load previous sessions with a single click.</li>
                 </ul>
 
-                <h4>2. The Top Header Bar</h4>
+                <h4 id="header-bar">2. The Top Header Bar</h4>
                 <p>The top right corner of the home interface provides quick outbound links:</p>
                 <ul>
                     <li><strong>Link to online documentation and GitHub:</strong> Direct shortcut buttons are available to open the online docs or visit the project's source code repository.</li>
                 </ul>
 
-                <h4>3. The Module Cards (Main View)</h4>
+                <h4 id="module-cards">3. The Module Cards (Main View)</h4>
                 <p>The center of the launcher features three large interactive cards corresponding to the primary FracSTAT modules. Each card highlights the tools available within.</p>
                 <ul>
                     <li><strong>Static Module:</strong> Focused on geometric fracture characterization. Features include Trace and Segment classification, Histogram Plots, Rose Plots, Connectivity & topology mapping, and Profile Cross-sections.</li>
@@ -153,7 +165,7 @@
 
                 <hr style="margin: 3rem 0; border: 0; border-top: 1px solid #e2e8f0;">
 
-                <h2>Exploring Application Pages</h2>
+                <h2 id="app-pages">Exploring Application Pages</h2>
                 <p>The launcher includes several dedicated pages to help you manage your workspace, access help, and configure global preferences.</p>
                 
                 <ul>

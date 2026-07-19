@@ -1207,6 +1207,33 @@ body.lightbox-open {
     font-size: 0.95rem;
 }
 
+/* Responsive tables — on narrow viewports, wide tables (in particular the
+   multi-column Excel import format tables) would otherwise overflow the
+   content column and get clipped. Instead of shrinking columns illegibly,
+   let each table scroll horizontally within its own bounds. */
+@media (max-width: 900px) {
+    .docs-content table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
+    }
+
+    .docs-content table th,
+    .docs-content table td {
+        white-space: nowrap;
+    }
+
+    .docs-content table.excel-meta-table {
+        white-space: normal;
+    }
+
+    .docs-content table.excel-meta-table td {
+        white-space: normal;
+    }
+}
+
 .docs-content table th, .docs-content table td {
     border: 1px solid #e2e8f0;
     padding: 0.6rem 0.75rem;
@@ -1379,7 +1406,7 @@ body.lightbox-open {
 }
 
 /* ==========================================================================
-   YouTube-style Top Loading Progress Bar
+   Top Loading Progress Bar
    Shown during AJAX-routed doc navigation (see script.js loadPage()).
    Sits above everything, including the sticky navbar.
    ========================================================================== */

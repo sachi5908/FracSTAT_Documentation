@@ -3,18 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Static Map Tab | FracSTAT Docs</title>
+    <title>Static CDF Tab | FracSTAT Docs</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="docs-body">
-    <!-- PASTE <nav> HERE -->
-    
+    <nav class="navbar docs-navbar">
+        <div class="logo-container">
+            <button id="mobileToggle" class="mobile-toggle-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+            <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1784441778/zgskue8vqbh15i7pnnev.png" alt="FracSTAT Logo" class="logo-img">
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="introduction.html" class="active">Docs</a></li>
+            <li>
+                <a href="https://github.com/sachi5908/FracSTAT" target="_blank" class="github-link">
+                    <svg height="20" width="20" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+                    </svg>
+                    GitHub
+                </a>
+            </li>
+        </ul>
+    </nav>
+
     <div class="docs-layout">
         <!-- ==========================================
              MASTER ACCORDION SIDEBAR
              ========================================== -->
         <aside class="docs-sidebar" id="docsSidebar">
-            
+
             <div class="sidebar-section open">
                 <button class="sidebar-toggle">
                     Getting Started
@@ -22,7 +41,7 @@
                 </button>
                 <ul class="sidebar-links">
                     <li><a href="introduction.html">Introduction</a></li>
-                    <li><a href="installation.html" class="active">Installation Guide</a></li>
+                    <li><a href="installation.html">Installation Guide</a></li>
                     <li><a href="launcher.html">FracSTAT Home Page</a></li>
                 </ul>
             </div>
@@ -76,17 +95,758 @@
 
         <main class="docs-content">
             <div class="docs-content-inner">
+
                 <h1>Static CDF Tab</h1>
-                
+                <p>
+                    Located at <code>static_analyzer/tabs/static_cdf_tab.py</code>, the <strong>CDF Analyzer</strong>
+                    tab (implemented as the class <code>StaticCDFTab</code>) is the platform's dedicated module for
+                    quantitative fracture‑length statistics. Where the Fracture Map, Histogram, and Rose Plot tabs
+                    address the spatial and orientation character of a fracture network, the CDF tab addresses its
+                    <em>size distribution</em> — arguably the single most diagnostic statistical property of a
+                    fracture population for reservoir characterisation, fractured‑basement modelling, geohazard
+                    assessment, and outcrop‑analogue studies.
+                </p>
+                <p>
+                    The module computes empirical cumulative statistics (frequency counts, CDF, complementary CDF,
+                    and rank‑based Q‑Q/P‑P comparisons) directly from the segment or trace geometry produced by the
+                    Static Analyzer's SVG or Excel/CSV loading pipeline, and offers rigorous maximum‑likelihood
+                    fitting of five candidate theoretical models — power‑law, exponential, log‑normal,
+                    stretched‑exponential (Weibull), and truncated power‑law — using the statistical methodology of
+                    Clauset, Shalizi and Newman (2009), as implemented by the open‑source <code>powerlaw</code>
+                    Python package.
+                </p>
+                <p>
+                    Beyond single‑model fitting, the tab performs formal statistical model selection: Akaike
+                    Information Criterion (AIC/AICc), Bayesian Information Criterion (BIC),
+                    Kolmogorov–Smirnov (KS) goodness‑of‑fit testing, pairwise log‑likelihood‑ratio tests (LRT),
+                    and non‑parametric bootstrap confidence intervals and goodness‑of‑fit p‑values. The intent is
+                    to give the practitioner an evidence‑based judgement of which statistical model, if any, is a
+                    defensible description of the observed fracture‑length population, rather than a single
+                    uncritical best‑fit line.
+                </p>
+
+                <div class="toc-box">
+                    <p>On this page</p>
+                    <ul>
+                        <li><a href="#interface-overview">1. Interface Overview</a></li>
+                        <li><a href="#data-input">2. Data Input</a></li>
+                        <li><a href="#controls">3. Settings and Controls, Card by Card</a></li>
+                        <li><a href="#maths">4. Mathematical Background</a></li>
+                        <li><a href="#algorithms">5. Algorithms</a></li>
+                        <li><a href="#statistics">6. Statistical Methods</a></li>
+                        <li><a href="#visualization">7. Visualization &amp; Figure Components</a></li>
+                        <li><a href="#workflow">8. Step‑by‑Step Example Workflows</a></li>
+                        <li><a href="#interpretation">9. Geological Interpretation</a></li>
+                        <li><a href="#performance">10. Performance Optimization</a></li>
+                        <li><a href="#advanced">11. Advanced Features</a></li>
+                        <li><a href="#limitations">12. Limitations</a></li>
+                        <li><a href="#references">13. References</a></li>
+                    </ul>
+                </div>
+
+                <!-- ================================================= -->
+                <h2 id="interface-overview">1. Interface Overview</h2>
+                <p>
+                    The CDF tab is arranged as a two‑column workspace: a scrollable settings sidebar
+                    (approximately 330&nbsp;px wide) on the left, and a resizable plot canvas with an accompanying
+                    live statistics panel on the right. The statistics panel is docked at the bottom of the same
+                    sidebar column, below the settings cards, so that the numeric output of the currently selected
+                    model remains visible alongside the controls that produced it.
+                </p>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="#" alt="Overall layout of the CDF Analyzer tab showing the settings sidebar and plot canvas" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 1.1</strong> — Overall layout of the CDF Analyzer tab: settings sidebar (left) with stacked configuration cards, main CDF/CCDF plot (right), and the toolbar with the Save Image action.</span>
+                </figure>
+
+                <h3>1.1 Sidebar Card Groups</h3>
+                <p>
+                    The sidebar is organised into six functional cards, presented top‑to‑bottom in the order a
+                    user would typically configure an analysis: Data &amp; Plot Settings, Distribution Fitting
+                    (MLE), Bootstrap CI &amp; GOF, Plot Toggles, Appearance &amp; Colors, and Axis Bounds &amp;
+                    Canvas, followed by the live Statistics Summary panel.
+                </p>
+                <table>
+                    <tr><th>Card</th><th>Primary Function</th></tr>
+                    <tr><td>Data &amp; Plot Settings</td><td>Choose data source (segment vs. trace lengths), plot type, and axis scaling.</td></tr>
+                    <tr><td>Distribution Fitting (MLE)</td><td>Select and configure the theoretical model(s) fitted to the tail of the distribution, including x_min cutoff mode and Truncated Power‑law manual overrides.</td></tr>
+                    <tr><td>Bootstrap CI &amp; GOF</td><td>Configure and trigger non‑parametric bootstrap resampling for parameter confidence intervals and a refit‑based goodness‑of‑fit p‑value.</td></tr>
+                    <tr><td>Plot Toggles</td><td>Toggle auxiliary plot elements: x_min cutoff line, DKW confidence band, residuals subplot, on‑plot equation, and grid.</td></tr>
+                    <tr><td>Appearance &amp; Colors</td><td>Title, legend position, line/marker/grid/spine widths, point size, and a full colour palette for every plotted element and each of the five fit curves.</td></tr>
+                    <tr><td>Axis Bounds &amp; Canvas</td><td>Manual axis limits and explicit plot canvas pixel dimensions.</td></tr>
+                    <tr><td>Statistics Summary</td><td>Scrollable, auto‑updating panel presenting descriptive statistics and, for the active fit model(s), all MLE parameters, information criteria, and goodness‑of‑fit diagnostics, plus the multi‑model comparison table when applicable.</td></tr>
+                </table>
+
+                <h3>1.2 Toolbar</h3>
+                <p>
+                    A slim toolbar sits above the plot canvas, displaying the caption
+                    <em>"MLE fitting · LRT · AIC/BIC · Bootstrap CI (Clauset et al., 2009)"</em> as a permanent
+                    reminder of the statistical framework in use, and a <strong>Save Image</strong> button that
+                    exports the current figure at the DPI configured in the application‑wide Settings page,
+                    including any floating legend or equation annotation that would otherwise be cropped.
+                </p>
+
+                <h3>1.3 Move Elements Mode</h3>
+                <p>
+                    When the workspace‑wide "Move Elements" toggle is active, the on‑canvas legend and the
+                    on‑canvas equation annotation both become individually draggable. Their released positions are
+                    captured in axes‑fraction coordinates and are honoured on every subsequent redraw and by the
+                    Save Image export, so a legend repositioned to avoid overlapping a data cluster remains in that
+                    position until explicitly reset.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="data-input">2. Data Input</h2>
+
+                <h3>2.1 Upstream Data Sources</h3>
+                <p>
+                    The CDF tab does not load files directly; it consumes the results table already computed by
+                    the Static Analyzer for the currently loaded dataset, which arrives from one of three upstream
+                    pathways: SVG trace maps (vector fracture traces tessellated into straight segments and scaled
+                    into the calibrated real‑world profile box), spatial Excel/CSV tables (orientation tables
+                    carrying real X1/Y1/X2/Y2 endpoint coordinates), and legacy orientation‑only Excel/CSV tables
+                    (which may still supply a per‑row Length value even without spatial coordinates).
+                </p>
+
+                <h3>2.2 Data Source Selection</h3>
+                <table>
+                    <tr><th>Option</th><th>Underlying Column</th><th>Statistical Unit</th></tr>
+                    <tr><td>Segment Lengths</td><td><code>Length_m</code> (per straight segment)</td><td>Individual fracture segment</td></tr>
+                    <tr><td>Trace Total Lengths</td><td><code>TraceLengthM</code> (summed per trace)</td><td>Complete fracture trace</td></tr>
+                </table>
+                <p>
+                    Segment lengths are the finer‑grained population and are typically preferred for
+                    fractal/power‑law length‑scaling studies. Trace total lengths aggregate all segments belonging
+                    to one continuous fracture and are preferred when the object of study is the geological
+                    discontinuity rather than its digitisation artefacts.
+                </p>
+
+                <h3>2.3 Data Cleaning Applied Before Analysis</h3>
+                <p>
+                    Before any statistic is computed, the raw column is sorted ascending and every non‑positive or
+                    non‑finite value is discarded. This guards against zero‑length degenerate segments (which can
+                    arise from duplicated vertices in a traced SVG) and against NaN values in trace aggregation. If,
+                    after this filtering, zero valid observations remain, the plot area displays an explanatory
+                    message rather than raising an error.
+                </p>
+
+                <h3>2.4 Minimum Sample Size for Fitting</h3>
+                <p>
+                    Distribution fitting (the <code>powerlaw</code> MLE engine) is only attempted when the cleaned
+                    sample contains more than 10 observations (n&nbsp;&gt;&nbsp;10). Below this threshold the module
+                    still renders the empirical curve but does not attempt a theoretical fit, since MLE parameter
+                    estimates for two‑parameter models are not meaningfully identifiable from very small samples.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="controls">3. Settings and Controls, Card by Card</h2>
+                <p>
+                    Unless stated otherwise, every control triggers an immediate redraw. Controls that would
+                    trigger an expensive maximum‑likelihood refit are explicitly flagged, since the module
+                    distinguishes <em>style‑only</em> redraws from <em>heavy</em> redraws for performance reasons
+                    (see Section 10).
+                </p>
+
+                <h3>3.1 Data &amp; Plot Settings</h3>
+                <table>
+                    <tr><th>Control</th><th>Type</th><th>Options</th><th>Effect</th></tr>
+                    <tr><td>Data Source</td><td>Dropdown</td><td>Segment Lengths; Trace Total Lengths</td><td>Selects the underlying length population. Triggers a full heavy redraw including MLE refit.</td></tr>
+                    <tr><td>Plot Type</td><td>Dropdown</td><td>Cumulative Frequency; Cumulative CDF; Complementary CCDF; Q‑Q Plot; P‑P Plot</td><td>Chooses which empirical/theoretical comparison is rendered.</td></tr>
+                    <tr><td>Axis Scaling</td><td>Dropdown</td><td>Log‑Log; Semi‑Log (X); Semi‑Log (Y); Linear</td><td>Controls the matplotlib axis transform applied to the main plot. Not applied to P‑P plots, which are always linear on [0,1].</td></tr>
+                </table>
+
+                <h3>3.2 Distribution Fitting (MLE)</h3>
+                <table>
+                    <tr><th>Control</th><th>Type</th><th>Effect</th></tr>
+                    <tr><td>Distribution Fit Model</td><td>Dropdown</td><td>None; Power‑law; Exponential; Log‑normal; Weibull; Truncated Power‑law; Auto Best Fit. "Auto Best Fit" runs the full model‑selection procedure.</td></tr>
+                    <tr><td>Model Comparison</td><td>Button + dialog</td><td>Opens a dialog letting the user choose an arbitrary subset of models to compare side‑by‑side using AIC/BIC/KS/LRT machinery, without being constrained to the full five‑model panel.</td></tr>
+                    <tr><td>Fit x_min cutoff — Automatic (MLE)</td><td>Radio button</td><td>The tail threshold x_min is estimated by the <code>powerlaw</code> library by scanning candidate cutoffs and minimising the KS distance between the empirical and fitted tail.</td></tr>
+                    <tr><td>Fit x_min cutoff — Manual</td><td>Radio + entry + Update button</td><td>Fixes x_min to a user‑supplied value. Requires pressing Update Fit (or Enter) to apply and forces a fresh MLE refit.</td></tr>
+                    <tr><td>Click to Set Fit x_min on Plot</td><td>Toggle button</td><td>Enters an interactive picking mode: the next mouse click on the plot reads the clicked x‑coordinate, writes it into the Manual x_min field, switches to Manual mode, and triggers a refit.</td></tr>
+                    <tr><td>Truncated PL — Fix α =</td><td>Checkbox + entry</td><td>Locks the truncated‑power‑law scaling exponent to a user‑supplied value; the truncation rate λ is then re‑optimised for that fixed α.</td></tr>
+                    <tr><td>Truncated PL — Fix λ =</td><td>Checkbox + entry</td><td>Locks the truncation rate; α is then re‑derived in closed form for that fixed λ.</td></tr>
+                    <tr><td>Apply Override / Clear</td><td>Buttons</td><td>Apply Override recomputes the constrained truncated power‑law fit and its KS statistic; Clear removes both overrides and restores the ordinary two‑parameter MLE fit.</td></tr>
+                </table>
+
+                <h3>3.3 Bootstrap CI &amp; GOF</h3>
+                <table>
+                    <tr><th>Control</th><th>Type</th><th>Default</th><th>Effect</th></tr>
+                    <tr><td>Resamples (n)</td><td>Numeric entry</td><td>10</td><td>Number of bootstrap resamples drawn (with replacement) for both the parameter confidence interval and the goodness‑of‑fit p‑value. Higher values tighten the interval at proportionally higher computation cost.</td></tr>
+                    <tr><td>Level</td><td>Dropdown</td><td>95%</td><td>Confidence level (90 / 95 / 99 %) used to compute the percentile bootstrap interval.</td></tr>
+                    <tr><td>Show Parametric CI Envelope</td><td>Checkbox</td><td>Off</td><td>Overlays a shaded envelope on the CDF/CCDF curve spanning every combination of the bootstrap parameter confidence bounds (a conservative visual band, not itself a formal CI on the curve).</td></tr>
+                    <tr><td>Calculate</td><td>Button</td><td>—</td><td>Runs the bootstrap procedure for every model currently selected for plotting and caches the result.</td></tr>
+                    <tr><td>Clear</td><td>Button</td><td>—</td><td>Disables bootstrapping and removes cached bootstrap results from the current redraw (the model fit itself is retained).</td></tr>
+                </table>
+
+                <h3>3.4 Plot Toggles</h3>
+                <table>
+                    <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
+                    <tr><td>Show x_min cutoff line</td><td>On</td><td>Draws vertical dashed reference lines at the fitted x_min and at the maximum tail value, labelled with their numeric values.</td></tr>
+                    <tr><td>Show 95% Empirical Band (DKW)</td><td>Off</td><td>Shades a Dvoretzky–Kiefer–Wolfowitz distribution‑free confidence band around the empirical CDF/CCDF curve.</td></tr>
+                    <tr><td>Show residuals subplot</td><td>Off</td><td>Adds a secondary axes beneath the main CDF/CCDF plot showing standardised residuals between the empirical curve and each fitted model.</td></tr>
+                    <tr><td>Show equation on plot</td><td>On</td><td>Draws the fitted model's closed‑form equation, with substituted parameter values, as a floating annotation on the canvas.</td></tr>
+                    <tr><td>Show grid lines</td><td>On</td><td>Toggles major/minor gridlines on both axes.</td></tr>
+                </table>
+
+                <h3>3.5 Appearance &amp; Colors</h3>
+                <table>
+                    <tr><th>Control</th><th>Type</th><th>Purpose</th></tr>
+                    <tr><td>Custom Title</td><td>Text entry</td><td>Overrides the automatically generated plot title (which otherwise states the plot type and sample count).</td></tr>
+                    <tr><td>Legend Position</td><td>Dropdown</td><td>Outside Bottom, Outside Right, best, the four matplotlib corner anchors, center, or None. Persists a dragged legend anchor between redraws until changed.</td></tr>
+                    <tr><td>Grid Width</td><td>Numeric entry</td><td>Line width, in points, of the major/minor gridlines.</td></tr>
+                    <tr><td>Border Width</td><td>Numeric entry</td><td>Line width of the plot's outer spines.</td></tr>
+                    <tr><td>Point Size</td><td>Numeric entry</td><td>Marker size (points) for observed‑data markers and for P‑P/Q‑Q scatter points; clamped to 0.5–40.</td></tr>
+                    <tr><td>Outer Background / Plot Background / Grid Color / Border Color / CDF Line Color / Point Color</td><td>Colour swatch buttons</td><td>Full colour customisation of every non‑fit plot element, applied without re‑running the MLE fit.</td></tr>
+                    <tr><td>Fit: Power‑law / Exponential / Log‑normal / Weibull / Truncated PL</td><td>Colour swatch buttons</td><td>Independent colour assignment for each of the five candidate model curves, consistent across the main plot, the residuals subplot, and the CI envelope.</td></tr>
+                </table>
+
+                <h3>3.6 Axis Bounds &amp; Canvas</h3>
+                <table>
+                    <tr><th>Control</th><th>Type</th><th>Effect</th></tr>
+                    <tr><td>X min / X max / Y min / Y max</td><td>Numeric entries (blank = auto)</td><td>Overrides matplotlib's automatic axis limits on the corresponding axis. Only applied when both a lower and upper value are supplied and the lower value is smaller than the upper.</td></tr>
+                    <tr><td>Reset Bounds to Auto</td><td>Button</td><td>Clears all four manual bound fields.</td></tr>
+                    <tr><td>Plot Area Size — Width / Height (px)</td><td>Numeric entries</td><td>Rebuilds the matplotlib Figure and its Tkinter canvas at an explicit pixel size (default 700 × 850, a portrait‑leaning box matching the conventional aspect of published CDF/CCDF figures).</td></tr>
+                    <tr><td>Reset Size to Auto</td><td>Button</td><td>Returns to the default 700 × 850 canvas.</td></tr>
+                </table>
+
+                <h3>3.7 Statistics Summary Panel</h3>
+                <p>
+                    This panel is not an input control but an always‑current, colour‑banded, scrollable read‑out
+                    of every statistic produced by the current configuration. It automatically re‑renders whenever
+                    the plot redraws, grouping values under bold section headers (e.g. "Descriptive",
+                    "Power‑law", "Auto Best Fit") and, for the Auto Best Fit and Model Comparison modes,
+                    embedding a horizontally scrollable results table directly in the sidebar in addition to the
+                    plot canvas.
+                </p>
+
+                <h3>3.8 Reset Defaults</h3>
+                <p>
+                    A single <strong>Reset Defaults</strong> button at the foot of the sidebar restores every
+                    setting to its factory value, clears the MLE fit cache, and rebuilds the entire tab.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="maths">4. Mathematical Background</h2>
+                <p>
+                    Let the cleaned, sorted sample of n positive fracture lengths be denoted
+                    L = {L₁ ≤ L₂ ≤ … ≤ Lₙ}. All formulas below use this notation; x refers to a length value
+                    on the horizontal axis.
+                </p>
+
+                <h3>4.1 Empirical Descriptive Statistics</h3>
+                <p>The statistics panel always reports the following descriptive quantities, computed on the full cleaned sample independent of any theoretical fit:</p>
+                <table>
+                    <tr><th>Statistic</th><th>Formula</th><th>Interpretation</th></tr>
+                    <tr><td>n</td><td>count of L</td><td>Sample size</td></tr>
+                    <tr><td>Min / Max</td><td>L₁, Lₙ</td><td>Range of observed lengths</td></tr>
+                    <tr><td>Q1, Median, Q3</td><td>25th, 50th, 75th percentiles</td><td>Robust central tendency and spread</td></tr>
+                    <tr><td>IQR</td><td>Q3 − Q1</td><td>Interquartile range</td></tr>
+                    <tr><td>Mean (μ̂)</td><td>(1/n) Σ Lᵢ</td><td>Arithmetic mean length</td></tr>
+                    <tr><td>Std. Dev (s)</td><td>√[ (1/(n−1)) Σ (Lᵢ − μ̂)² ]</td><td>Sample standard deviation (Bessel‑corrected)</td></tr>
+                    <tr><td>CV</td><td>s / μ̂</td><td>Coefficient of variation (dimensionless spread)</td></tr>
+                    <tr><td>Total Length</td><td>Σ Lᵢ</td><td>Cumulative fracture length in the sample</td></tr>
+                    <tr><td>Skewness</td><td>Fisher–Pearson adjusted, requires n ≥ 8</td><td>Asymmetry of the length distribution</td></tr>
+                    <tr><td>Kurtosis</td><td>Adjusted excess kurtosis, requires n ≥ 8</td><td>Tail heaviness relative to a normal distribution</td></tr>
+                </table>
+
+                <h3>4.2 Empirical Cumulative Functions</h3>
+                <p>For the sorted sample, rank rᵢ = n − i + 1 (i.e. Lᵢ is exceeded by n − i observations). Three empirical curves are available:</p>
+                <div class="formula-block">
+C(x)  = number of observations ≥ x              (Cumulative Frequency)
+F̂(x)  = P(L ≤ x) = 1 − r(x)/n                  (Cumulative CDF)
+Ŝ(x)  = P(L > x) = r(x)/n                       (Complementary CCDF)</div>
+                <p>
+                    The Complementary CCDF is the conventional choice for fractal/scaling analysis because a true
+                    power‑law tail appears as a straight line on log–log axes, making deviations from linearity —
+                    and hence departures from pure scale‑invariance — visually apparent.
+                </p>
+
+                <h3>4.3 Power‑law Model</h3>
+                <div class="formula-block">
+p(x)    = ((α − 1) / x_min) · (x / x_min)^(−α)     for x ≥ x_min
+P(L > x) = (x / x_min)^(−α + 1)</div>
+                <p>
+                    α is the scaling exponent. The theoretically interesting and frequently reported range for
+                    natural fracture networks is roughly 1.5 &lt; α &lt; 3.5.
+                </p>
+
+                <h3>4.4 Exponential Model</h3>
+                <div class="formula-block">P(L > x) = e^(−λ(x − x_min))</div>
+                <p>λ (units of inverse length) is the decay rate; its reciprocal 1/λ is the characteristic length scale of the population.</p>
+
+                <h3>4.5 Log‑normal Model</h3>
+                <div class="formula-block">P(L > x) = ½ · erfc[ (ln x − μ) / (σ√2) ]</div>
+                <p>μ and σ are the mean and standard deviation of ln(L). The log‑normal model is common where fracture length reflects the multiplicative combination of several independent growth processes.</p>
+
+                <h3>4.6 Weibull (Stretched‑Exponential) Model</h3>
+                <div class="formula-block">P(L > x) = e^(−(λx)^β)</div>
+                <p>β is the shape parameter (β = 1 recovers the exponential model) and λ is a scale parameter. FracSTAT labels this Weibull in the user interface because that is the more familiar name in geoscience and reliability contexts.</p>
+
+                <h3>4.7 Truncated Power‑law Model</h3>
+                <div class="formula-block">p(x) ∝ x^(−α) · e^(−λx)     for x ≥ x_min</div>
+                <p>
+                    This model superimposes an exponential cutoff on a power‑law scaling regime and is frequently
+                    invoked when a genuinely scale‑invariant fracturing process is bounded by a finite physical
+                    control, such as mechanical layer thickness. The module supports fixing either α or λ by the
+                    user, in which case the free parameter is re‑optimised by direct maximisation of the
+                    truncated‑power‑law log‑likelihood subject to the fixed value.
+                </p>
+
+                <h3>4.8 Maximum Likelihood Estimation and x_min Selection</h3>
+                <p>
+                    All parameter estimates use maximum likelihood, not least‑squares curve fitting, following
+                    Clauset, Shalizi &amp; Newman (2009). When x_min is not fixed by the user, the library
+                    evaluates every candidate cutoff present in the data, fits each model's parameters by MLE
+                    above that cutoff, computes the KS distance between the fitted model and the empirical tail,
+                    and selects the cutoff that minimises this distance. This avoids the well‑known bias of
+                    fitting a power‑law to the entire dataset (including the non‑scaling small‑length population
+                    that dominates most natural fracture length distributions).
+                </p>
+
+                <h3>4.9 Model‑Fit Anchoring for Display</h3>
+                <p>
+                    Because the theoretical CDF/CCDF is normalised over [x_min, ∞) while the empirical curve is
+                    normalised over the full sample, the displayed theoretical curve is rescaled by a
+                    multiplicative anchor factor so that it passes exactly through the empirical curve's value at
+                    x_min. This anchoring preserves the shape and relative comparison of the tail fit while making
+                    the visual overlay directly comparable to the empirical curve across the full displayed range.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="algorithms">5. Algorithms</h2>
+
+                <h3>5.1 Empirical‑Curve Construction</h3>
+                <ol class="step-list">
+                    <li>Extract the selected length column (segment or trace) from the current results table.</li>
+                    <li>Discard non‑finite and non‑positive values; sort the remainder ascending.</li>
+                    <li>Compute rank‑based frequency/CDF/CCDF arrays as defined in Section 4.2.</li>
+                    <li>Plot the requested representation, applying the chosen axis‑scaling transform.</li>
+                </ol>
+
+                <h3>5.2 MLE Fit‑and‑Cache Algorithm</h3>
+                <p>
+                    Fitting is the most computationally expensive operation in the module, so the module maintains
+                    an in‑memory cache keyed on a tuple of (hash of the cleaned data array, selected fit model,
+                    active comparison‑model set, data source, x_min mode, manual x_min value). Before invoking
+                    <code>powerlaw</code>, the cache is checked; on a hit, every downstream quantity (fitted
+                    object, tail sample, log‑likelihoods, AIC/BIC, KS statistics) is restored without
+                    recomputation. On a miss:
+                </p>
                 <div class="code-window">
                     <div class="code-header">
                         <span class="code-lang">python</span>
                         <button class="copy-btn">Copy</button>
                     </div>
-                    <pre><code class="language-python">
-                        DEMO OF CODE SNIPPET
-                    </code></pre>
+                    <pre><code class="language-python">import io, warnings
+from contextlib import redirect_stdout
+import powerlaw
+
+# Suppress console chatter from the powerlaw library
+with redirect_stdout(io.StringIO()), warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    fit = powerlaw.Fit(tail_sample, xmin=x_min if manual_mode else None,
+                       discrete=False, verbose=False)
+
+# Extract tail sample (observations >= fitted x_min)
+tail = data[data >= fit.xmin]
+if len(tail) < 2:
+    raise ValueError("Fewer than 2 points remain in the tail above x_min.")
+
+# Compute per-model log-likelihoods, AIC, BIC, KS
+for model_name in ALL_MODELS:
+    dist = getattr(fit, model_name)
+    ll   = dist.loglikelihoods(tail).sum()
+    k    = MODEL_PARAMS[model_name]
+    aic  = 2*k - 2*ll
+    bic  = k * np.log(len(tail)) - 2*ll
+    ks_stat, ks_p = stats.ks_1samp(tail, dist.cdf)
+    cache[model_name] = dict(ll=ll, aic=aic, bic=bic, ks=ks_stat, ks_p=ks_p)</code></pre>
                 </div>
+                <p>The cache evicts the oldest entry once more than three distinct configurations are stored — a small LRU‑style bound that keeps memory bounded while still covering rapid toggling between recently examined models.</p>
+
+                <h3>5.3 Auto Best Fit / Model Comparison Selection</h3>
+                <p>
+                    Given the AIC (or small‑sample‑corrected AICc when n_tail / k &lt; 40), BIC, and KS rank of
+                    every candidate model, the algorithm proceeds as follows:
+                </p>
+                <ol class="step-list">
+                    <li>Rank every model independently by AIC/AICc, by BIC, and by KS statistic; average the three ranks into a composite rank used for default ordering.</li>
+                    <li>Identify the AIC‑minimising model and the BIC‑minimising model separately.</li>
+                    <li>Declare a consensus model only if the AIC‑minimising and BIC‑minimising models coincide and are unique.</li>
+                    <li>Run every pairwise log‑likelihood‑ratio test between the consensus model and every other candidate via the library's <code>distribution_compare</code> routine.</li>
+                    <li>Declare a single Preferred model only when AIC and BIC agree, the winner is within the top two by KS, no rival is indistinguishable (p ≥ 0.05), and no rival is significantly favoured (p &lt; 0.05 with ratio favouring the rival).</li>
+                    <li>If any condition fails, report every model within ΔAIC/ΔAICc ≤ 2 or ΔBIC ≤ 2 of the leader as 'plausible', together with Akaike and BIC model‑averaging support weights, so the user sees the genuine ambiguity.</li>
+                </ol>
+
+                <h3>5.4 Bootstrap Resampling</h3>
+
+                <h4>5.4.1 Parameter Confidence Intervals</h4>
+                <ol class="step-list">
+                    <li>Draw a resample of size equal to the tail sample, with replacement.</li>
+                    <li>Refit the selected model to the resample at the already‑established x_min (kept fixed to isolate parameter uncertainty from x_min‑selection uncertainty).</li>
+                    <li>Record the fitted parameter value(s).</li>
+                    <li>Repeat n_boot times; report the percentile interval at the requested confidence level for every parameter.</li>
+                </ol>
+
+                <h4>5.4.2 Parametric Bootstrap GOF p‑value</h4>
+                <p>
+                    A conventional (asymptotic) KS p‑value assumes the theoretical CDF was specified in advance
+                    of seeing the data, which is not true here. The module therefore computes a refit‑based,
+                    simulation‑driven GOF p‑value: generate a synthetic dataset from the fitted model's own
+                    random‑number generator, refit from scratch, compute its KS statistic against its own
+                    refitted model, and repeat n_boot times. The reported p‑value is the fraction of simulated KS
+                    statistics that equal or exceed the KS statistic actually observed on the real data (with
+                    add‑one Laplace smoothing to avoid an impossible p = 0 from a finite simulation).
+                </p>
+
+                <h3>5.5 Interactive x_min Picking</h3>
+                <p>
+                    When mouse‑picking mode is enabled, the next left‑click registered inside the plot axes is
+                    intercepted: its data‑space x‑coordinate is written into the Manual x_min field (to four
+                    significant figures), the cutoff mode is switched to Manual, picking mode is deactivated, and
+                    a refit is triggered — giving the user an immediate, visual way to test how sensitive the
+                    fitted parameters are to the choice of tail cutoff.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="statistics">6. Statistical Methods</h2>
+
+                <h3>6.1 Kolmogorov–Smirnov Goodness of Fit</h3>
+                <table>
+                    <tr><th>Quantity</th><th>Source</th><th>Interpretation</th></tr>
+                    <tr><td>KS stat (powerlaw)</td><td>The <code>powerlaw</code> library's internal D statistic, used during x_min selection</td><td>Internal diagnostic consistent with the library's x_min search; primarily useful for comparing candidate x_min values against each other.</td></tr>
+                    <tr><td>KS statistic (SciPy)</td><td><code>scipy.stats.ks_1samp</code> against the fitted CDF</td><td>Independently computed, standard one‑sample KS statistic; used as the basis for all AIC/BIC/LRT model ranking in this module.</td></tr>
+                    <tr><td>KS p‑value (SciPy asymptotic)</td><td><code>scipy.stats.ks_1samp</code> two‑sided p‑value</td><td>The classical asymptotic p‑value. Reported for reference but is descriptive only, since it does not account for x_min and parameter estimation from the same sample.</td></tr>
+                    <tr><td>GOF p‑value (bootstrap, refit KS)</td><td>Section 5.4.2 parametric bootstrap</td><td>The statistically appropriate goodness‑of‑fit p‑value for an estimated model; requires the Bootstrap CI &amp; GOF card to be run.</td></tr>
+                </table>
+
+                <div class="note-box">
+                    <strong>Note:</strong> the asymptotic SciPy KS p‑value is not statistically valid on its own once x_min and model parameters have been estimated from the same data. Only the bootstrap‑based GOF p‑value is methodologically appropriate for that purpose, and it is not computed automatically — the user must explicitly run the Bootstrap CI &amp; GOF card.
+                </div>
+
+                <h3>6.2 Dvoretzky–Kiefer–Wolfowitz (DKW) Confidence Band</h3>
+                <div class="formula-block">
+ε = √[ ln(2 / 0.05) / (2n) ]
+band = [ F̂(x) − ε,  F̂(x) + ε ]  clipped to [0, 1]</div>
+                <p>
+                    This distribution‑free band provides a simultaneous 95% confidence envelope around the
+                    empirical CDF/CCDF that is valid regardless of the true underlying distribution, making it a
+                    useful visual companion to (but not a substitute for) a specific model's parametric confidence
+                    interval.
+                </p>
+
+                <h3>6.3 Information Criteria</h3>
+                <table>
+                    <tr><th>Criterion</th><th>Formula</th><th>Notes</th></tr>
+                    <tr><td>AIC</td><td>2k − 2·ln(L)</td><td>k = number of free parameters (1 for power‑law/exponential, 2 for log‑normal/Weibull/truncated power‑law); L = maximised likelihood over the tail sample.</td></tr>
+                    <tr><td>AICc</td><td>AIC + 2k(k+1) / (n_tail − k − 1)</td><td>Small‑sample‑corrected AIC; used as the primary information criterion whenever n_tail / k_max &lt; 40.</td></tr>
+                    <tr><td>BIC</td><td>k·ln(n_tail) − 2·ln(L)</td><td>Penalises additional parameters more heavily than AIC as n_tail grows, favouring simpler models in larger samples.</td></tr>
+                    <tr><td>Akaike / BIC weights</td><td>exp(−½Δᵢ) normalised over all candidates</td><td>Interpreted as the relative probability that model i is the Kullback–Leibler‑best (Akaike) or Bayes‑best (BIC) model among the candidate set.</td></tr>
+                </table>
+
+                <h3>6.4 Likelihood‑Ratio Test (LRT)</h3>
+                <p>
+                    For any pair of candidate models, the log‑likelihood ratio R and its asymptotic significance p
+                    are obtained from the <code>powerlaw</code> library's <code>distribution_compare</code>
+                    routine. A positive R favours the first‑named model, a negative R favours the second; p &lt;
+                    0.05 is treated as a statistically significant preference, while p ≥ 0.05 is treated as the
+                    two models being statistically indistinguishable — a result the module reports explicitly
+                    rather than silently defaulting to whichever model happened to have the lower AIC.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="visualization">7. Visualization &amp; Figure Components</h2>
+
+                <h3>7.1 Plot Types</h3>
+                <table>
+                    <tr><th>Plot Type</th><th>Horizontal Axis</th><th>Vertical Axis</th><th>Typical Use</th></tr>
+                    <tr><td>Cumulative Frequency</td><td>Length</td><td>Raw count of observations ≥ x</td><td>Absolute‑count view; not itself a probability.</td></tr>
+                    <tr><td>Cumulative CDF</td><td>Length</td><td>P(L ≤ x), 0 → 1</td><td>Standard cumulative distribution function.</td></tr>
+                    <tr><td>Complementary CCDF</td><td>Length</td><td>P(L &gt; x), 1 → 0</td><td>Preferred for scale‑invariance / power‑law diagnosis on log–log axes.</td></tr>
+                    <tr><td>Q‑Q Plot</td><td>Theoretical quantiles</td><td>Empirical quantiles</td><td>Compares the shape of the fitted model against the data in length units; departures from the 1:1 reference line indicate where the model over‑ or under‑predicts length.</td></tr>
+                    <tr><td>P‑P Plot</td><td>Theoretical cumulative probability</td><td>Empirical cumulative probability</td><td>Compares the two distributions on a common [0,1] scale; more sensitive to disagreement in the bulk than the tails.</td></tr>
+                </table>
+
+                <h3>7.2 Axis Scaling Options</h3>
+                <p>
+                    Log‑Log scaling is the conventional choice for power‑law diagnosis (a straight line indicates
+                    scale‑invariant behaviour); Semi‑Log(X) and Semi‑Log(Y) are useful for isolating exponential
+                    behaviour (a straight line on Semi‑Log(Y) indicates an exponential tail); Linear scaling is
+                    most useful for small samples or for a plain, non‑technical presentation.
+                </p>
+
+                <h3>7.3 Residuals Subplot</h3>
+                <p>
+                    When enabled, the standardised residual at each observed tail point is computed as the
+                    empirical minus the anchored theoretical curve value, divided by the standard deviation of the
+                    residuals across the tail. A well‑fitting model shows residuals scattered without systematic
+                    trend around zero, while a curved or trending residual pattern indicates the theoretical model
+                    captures the wrong functional shape even if its overall KS statistic appears acceptable.
+                </p>
+
+                <h3>7.4 On‑Plot Equation Annotation and Legend</h3>
+                <p>
+                    The fitted model's closed‑form CDF/CCDF equation, with the estimated parameter values
+                    substituted in and any bootstrap confidence interval appended in square brackets, is rendered
+                    as a floating, draggable annotation box on the canvas, positioned by default just outside the
+                    top‑right of the axes. The legend lists every plotted series (observed data, each active model
+                    curve, x_min/x_max reference lines, the DKW band, and the CI envelope where enabled) and can
+                    be placed at any of the standard matplotlib anchor points or in one of two dedicated
+                    outside‑the‑axes positions designed to avoid ever overlapping the data.
+                </p>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="#" alt="Example Complementary CCDF plot with Truncated Power-law fit overlay and equation annotation" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 7.1</strong> — Example Complementary CCDF plot in Log‑Log scaling with a Truncated Power‑law fit overlay, x_min/x_max reference lines, and the fitted equation annotation.</span>
+                </figure>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="#" alt="Example Auto Best Fit comparison showing multiple candidate model curves and the model-comparison table" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 7.2</strong> — Example Auto Best Fit comparison showing multiple candidate model curves and the accompanying model‑comparison table rendered in the Statistics Summary panel.</span>
+                </figure>
+
+                <h3>7.5 Save Image</h3>
+                <p>
+                    The Save Image toolbar button rasterises the current figure at the DPI configured in the
+                    application Settings page (default 300&nbsp;dpi), including the floating legend and equation
+                    annotation via matplotlib's extra‑artists mechanism so that neither is cropped out of the
+                    saved file. Exported images are written into the project's dedicated plot‑exports folder,
+                    following the same naming and folder convention used by every other Static Analyzer plot tab.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="workflow">8. Step‑by‑Step Example Workflows</h2>
+
+                <h3>8.1 Example 1 — Diagnosing Scale‑Invariant Behaviour</h3>
+                <ol class="step-list">
+                    <li>Load an SVG fracture trace map (or a spatial Excel/CSV table) in the Static Analyzer and confirm the Fracture Map tab renders correctly.</li>
+                    <li>Open the CDF tab; leave Data Source at Segment Lengths and set Plot Type to Complementary CCDF with Axis Scaling set to Log‑Log.</li>
+                    <li>Set Distribution Fit Model to <strong>Auto Best Fit</strong> and inspect the Statistics Summary panel's "Final Recommendation" line.</li>
+                    <li>If a single Preferred model is reported with Power‑law or Truncated Power‑law as the winner, and the fitted α falls in the range typically reported for tectonic fracture networks (roughly 1.5–3.5), this is supportive (not conclusive) evidence of scale‑invariant fracturing across the sampled length range.</li>
+                    <li>Enable Bootstrap CI &amp; GOF with 100–500 resamples to obtain a defensible confidence interval on α before quoting it in a report.</li>
+                </ol>
+
+                <h3>8.2 Example 2 — Comparing Segment vs. Trace Populations</h3>
+                <p>
+                    Run the Auto Best Fit procedure once with Data Source set to Segment Lengths, and once with
+                    it set to Trace Total Lengths. A material difference in the preferred model or in x_min
+                    between the two runs indicates that the network's connectivity/segmentation (how many segments
+                    make up each trace) is itself influencing the apparent length‑scaling behaviour, which should
+                    be investigated alongside the Connectivity tab's I‑Y‑X node statistics before drawing
+                    conclusions from either population alone.
+                </p>
+
+                <h3>8.3 Example 3 — Testing Sensitivity to the Tail Cutoff</h3>
+                <ol class="step-list">
+                    <li>With any single model selected, enable <strong>Click to Set Fit x_min on Plot</strong> and click at several different points along the empirical curve.</li>
+                    <li>Observe how the fitted parameter values, KS statistic, and AIC/BIC change as x_min moves — a fit whose parameters are stable across a wide range of x_min choices is considerably more defensible than one that changes sharply with small adjustments to the cutoff.</li>
+                </ol>
+
+                <h3>8.4 Example 4 — Truncated Power‑law with a Known Physical Boundary</h3>
+                <ol class="step-list">
+                    <li>If independent evidence (e.g. measured bed thickness) suggests a specific truncation length scale, select Truncated Power‑law, check <strong>Fix λ =</strong>, enter the corresponding rate, and press Apply Override.</li>
+                    <li>Compare the resulting constrained fit's KS statistic and AIC against the unconstrained MLE truncated‑power‑law fit and against a plain power‑law fit, to test whether the proposed physical control is statistically consistent with the observed data.</li>
+                </ol>
+
+                <!-- ================================================= -->
+                <h2 id="interpretation">9. Geological Interpretation</h2>
+
+                <h4>9.1 Power‑law (Fractal) Behaviour</h4>
+                <p>
+                    A well‑supported power‑law fit across a wide length range is classically associated with
+                    self‑similar, scale‑invariant fracture growth, commonly attributed to fracture propagation and
+                    coalescence processes operating similarly at all observable scales. The exponent α controls how
+                    rapidly the population is dominated by short fractures versus how much cumulative length
+                    resides in the few longest fractures; low α values (closer to 1.5–2) indicate a length
+                    population with proportionally more very‑long fractures, which is significant for connectivity
+                    and percolation.
+                </p>
+
+                <h4>9.2 Exponential Behaviour</h4>
+                <p>
+                    An exponential model implies a single characteristic length scale (1/λ), often interpreted as
+                    evidence of a single dominant mechanical control — such as fracture growth arrested by a
+                    specific bed thickness, an early joint set with a narrow length range, or a
+                    sampling/measurement artefact that truncates the population before scale‑invariance can
+                    develop.
+                </p>
+
+                <h4>9.3 Log‑normal Behaviour</h4>
+                <p>
+                    A log‑normal fit is frequently interpreted as evidence that fracture length is the
+                    multiplicative product of several independent, comparably influential growth‑limiting factors,
+                    rather than a single dominant control — a pattern also common in populations affected by
+                    measurement/digitisation resolution limits at the short end of the range.
+                </p>
+
+                <h4>9.4 Truncated Power‑law Behaviour</h4>
+                <p>
+                    A preferred truncated‑power‑law fit — scale‑invariant at short‑to‑intermediate lengths but
+                    decaying faster than a pure power‑law at the longest lengths — is the classic signature of
+                    scale‑invariant fracture growth that is ultimately bounded by a finite physical control, most
+                    often mechanical layer (bed) thickness in layer‑bound fracture systems. The fitted λ can, with
+                    care, be compared against independently measured layer thickness as a consistency check.
+                </p>
+
+                <h4>9.5 Practical Cautions for Interpretation</h4>
+                <p>
+                    A statistically preferred model is a description of the sampled data, not proof of the
+                    underlying physical mechanism; multiple mechanisms can produce statistically similar length
+                    distributions. Truncation of the observed length range by outcrop or map extent (censoring)
+                    can masquerade as an exponential or truncated‑power‑law signature even when the true
+                    population is a pure power‑law; the Histogram tab's "Censor edge traces" option should be
+                    considered alongside this module when outcrop‑edge effects are suspected. Reported exponents
+                    and rates should always be accompanied by their bootstrap confidence intervals and by the
+                    model‑comparison evidence when used to support a specific geological or engineering conclusion.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="performance">10. Performance Optimization</h2>
+
+                <h3>10.1 MLE Fit Cache</h3>
+                <p>
+                    Every completed MLE fit is cached keyed on the exact configuration that produced it, so
+                    switching back and forth between recently examined models, data sources, or x_min settings
+                    does not repeatedly pay the cost of a fresh non‑linear optimisation. The cache is
+                    deliberately small (three entries) to bound memory use while still covering the common
+                    "compare a couple of models" workflow.
+                </p>
+
+                <h3>10.2 Bootstrap Result Cache</h3>
+                <p>
+                    Bootstrap confidence intervals and goodness‑of‑fit p‑values are the single most expensive
+                    computation the tab can perform (each resample requires a full model refit). Their results are
+                    cached separately from the MLE fit cache, keyed additionally on the resample count, confidence
+                    level, and the active model set, so that a redraw triggered by an unrelated cosmetic change
+                    reuses the previous bootstrap result rather than silently re‑running hundreds of refits.
+                </p>
+
+                <h3>10.3 Style‑only vs. Heavy Redraw Separation</h3>
+                <p>
+                    Purely cosmetic changes (colour, legend, grid, axis bounds, point size) never touch either
+                    cache or invoke <code>powerlaw</code>, keeping these adjustments instantaneous regardless of
+                    dataset size or model complexity. Heavy redraws (data source, fit model, x_min cutoff, plot
+                    type when it changes the fitted data) invalidate the fit cache where necessary and may re‑run
+                    the full MLE and bootstrap pipeline.
+                </p>
+
+                <h3>10.4 Progress Reporting for Long‑Running Bootstraps</h3>
+                <p>
+                    Rather than reporting progress on every single bootstrap iteration (which would itself impose
+                    UI‑repaint overhead on a large resample count), the progress callback throttles updates to
+                    roughly fifty reports across the full run for large n_boot values, while still reporting every
+                    iteration when n_boot is small enough that per‑iteration updates are cheap.
+                </p>
+
+                <h3>10.5 Warning Suppression</h3>
+                <p>
+                    Several categories of benign, expected warnings emitted by the <code>powerlaw</code> and
+                    SciPy optimisation internals (parameter estimates landing near an internal search‑bound edge,
+                    or an internal initial guess falling outside declared bounds before the library's own clamping
+                    resolves it) are filtered at the module level so they do not flood the console on every redraw
+                    or bootstrap iteration, while genuinely actionable fit failures are still surfaced to the user
+                    as an explicit pop‑up.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="advanced">11. Advanced Features</h2>
+
+                <h3>11.1 Model Comparison Dialog</h3>
+                <p>
+                    In addition to the automatic five‑model Auto Best Fit procedure, a Model Comparison dialog
+                    lets the user restrict the comparison to a hand‑picked subset of models (for example,
+                    comparing only Power‑law against Truncated Power‑law when the analyst already has a strong
+                    geological reason to exclude log‑normal and Weibull behaviour). The dialog offers Select All /
+                    Select None convenience buttons and runs the identical AIC/BIC/KS/LRT machinery, restricted
+                    to the chosen subset.
+                </p>
+
+                <h3>11.2 Truncated Power‑law Manual Override</h3>
+                <p>
+                    Because MLE estimates for the two‑parameter truncated power‑law can occasionally land at the
+                    edge of the library's internal numerical search bounds for challenging datasets, the module
+                    allows either parameter (α or λ, or both) to be pinned to a user‑supplied, geologically
+                    motivated value. When only one parameter is fixed, the other is re‑derived analytically or by
+                    direct log‑likelihood maximisation over the tail sample so that the resulting curve remains a
+                    genuine (constrained) maximum‑likelihood fit rather than an arbitrary hand‑drawn line, and the
+                    KS statistic, log‑likelihood, AIC, and BIC are all recomputed consistently for the
+                    constrained model.
+                </p>
+
+                <h3>11.3 Interactive x_min Picking</h3>
+                <p>
+                    The "Click to Set Fit x_min on Plot" feature turns the fitting cutoff into a directly
+                    manipulable, visual parameter rather than a number the analyst must estimate by trial and
+                    error in the sidebar entry field (see Section 5.5 for the full algorithm).
+                </p>
+
+                <h3>11.4 Draggable Legend and Equation</h3>
+                <p>
+                    Both the legend and the equation annotation participate in the workspace's shared Move
+                    Elements mode; their final dragged positions are captured in axes‑fraction coordinates on
+                    mouse release and are preserved across redraws and included in the Save Image export, so a
+                    publication‑ready layout, once arranged, does not have to be re‑arranged after every
+                    parameter change.
+                </p>
+
+                <h3>11.5 Manual Axis Bounds and Explicit Canvas Sizing</h3>
+                <p>
+                    For preparing figures to a fixed physical size or aspect ratio (for example, matching a
+                    journal's column width), the Axis Bounds &amp; Canvas card allows every axis limit and the
+                    canvas's own pixel dimensions to be set explicitly, overriding matplotlib's automatic choices
+                    while the underlying statistics remain unaffected.
+                </p>
+
+                <h3>11.6 Software Dependencies</h3>
+                <table>
+                    <tr><th>Library</th><th>Role in this Module</th></tr>
+                    <tr><td><code>powerlaw</code></td><td>Core MLE fitting engine for all five candidate distributions, x_min search, and pairwise log‑likelihood‑ratio comparison.</td></tr>
+                    <tr><td><code>SciPy</code></td><td>One‑sample KS testing, descriptive statistics (skewness/kurtosis), numerical optimisation for the Truncated Power‑law manual override, numerical integration of the constrained density, and the complementary error function used in the log‑normal survival function.</td></tr>
+                    <tr><td><code>NumPy</code></td><td>All array‑based numerical computation, percentile‑based bootstrap interval construction, and random resampling.</td></tr>
+                    <tr><td><code>Matplotlib</code></td><td>All plotting, including log/linear axis transforms, the residuals subplot, the draggable legend and equation annotation, and PNG export.</td></tr>
+                    <tr><td><code>CustomTkinter</code></td><td>Every sidebar control, the Model Comparison dialog, and the scrollable Statistics Summary panel.</td></tr>
+                </table>
+
+                <!-- ================================================= -->
+                <h2 id="limitations">12. Limitations</h2>
+                <table>
+                    <tr><th>Limitation</th><th>Description</th></tr>
+                    <tr><td>One‑dimensional analysis only</td><td>The module analyses length statistics only; it does not account for spatial clustering, orientation bias, or network connectivity, all of which materially affect the true, unbiased fracture‑size distribution. These are addressed by the Connectivity, Rose Plot, Stereonet, and Intensity &amp; Density tabs.</td></tr>
+                    <tr><td>Asymptotic KS p‑value validity</td><td>The asymptotic SciPy KS p‑value is not statistically valid on its own once x_min and model parameters have been estimated from the same data. Only the bootstrap‑based GOF p‑value (Section 5.4.2) is methodologically appropriate, and it must be computed explicitly.</td></tr>
+                    <tr><td>Default bootstrap resample count</td><td>The default of 10 resamples gives unstable confidence intervals and GOF p‑values, chosen for responsiveness during exploratory analysis. This should be increased substantially (200–1000) before any value is quoted in a final report.</td></tr>
+                    <tr><td>Truncated Power‑law numerical integration speed</td><td>The manual‑override's numerical integration of the constrained density can be slower than the unconstrained MLE fit for very large tail samples, since it performs numerical quadrature at every evaluated point of the fitted curve.</td></tr>
+                    <tr><td>Censoring not auto‑detected</td><td>Censoring caused by finite outcrop, map, or image extent is not automatically detected or corrected. Users working with edge‑truncated data should consult the Histogram tab's edge‑censoring option before drawing scaling conclusions.</td></tr>
+                    <tr><td>Digitisation artefacts</td><td>The module assumes the supplied length column already reflects the desired physical population. It does not itself distinguish artefacts of digitisation (e.g. an SVG curve tessellated into many short straight segments) from genuinely short natural fractures; the Curve Step setting on the Fracture Map sidebar controls this trade‑off upstream.</td></tr>
+                    <tr><td>Session‑local configuration</td><td>The CDF tab's configuration (fit model, bootstrap settings, styling) is session‑local and is not currently part of the project's saved‑session JSON file; reopening a project returns the CDF tab's controls to their defaults.</td></tr>
+                    <tr><td>Main‑thread bootstrapping</td><td>All fitting and bootstrap computation runs on the main UI thread rather than a background worker thread, since matplotlib's TkAgg backend is not safe to drive concurrently from a worker thread. Very large bootstrap runs will therefore block interaction with the rest of the application until they complete.</td></tr>
+                </table>
+
+                <!-- ================================================= -->
+                <h2 id="references">13. References</h2>
+                <p>Clauset, A., Shalizi, C. R., &amp; Newman, M. E. J. (2009). Power‑Law Distributions in Empirical Data. <em>SIAM Review</em>, 51(4), 661–703.</p>
+                <p>Bonnet, E., Bour, O., Odling, N. E., Davy, P., Main, I., Cowie, P., &amp; Berkowitz, B. (2001). Scaling of fracture systems in geological media. <em>Reviews of Geophysics</em>, 39(3), 347–383.</p>
+                <p>Bour, O., &amp; Davy, P. (1997). Connectivity of random fault networks following a power law fault length distribution. <em>Water Resources Research</em>, 33(7), 1567–1583.</p>
+                <p>Akaike, H. (1974). A new look at the statistical model identification. <em>IEEE Transactions on Automatic Control</em>, 19(6), 716–723.</p>
+                <p>Schwarz, G. (1978). Estimating the dimension of a model. <em>Annals of Statistics</em>, 6(2), 461–464.</p>
+                <p>Dvoretzky, A., Kiefer, J., &amp; Wolfowitz, J. (1956). Asymptotic minimax character of the sample distribution function. <em>Annals of Mathematical Statistics</em>, 27(3), 642–669.</p>
+                <p>Alstott, J., Bullmore, E., &amp; Plenz, D. (2014). powerlaw: A Python package for analysis of heavy‑tailed distributions. <em>PLoS ONE</em>, 9(1), e85777.</p>
+                <p>Efron, B., &amp; Tibshirani, R. J. (1993). <em>An Introduction to the Bootstrap</em>. Chapman &amp; Hall/CRC.</p>
+
                 <!-- Pagination Navigation -->
                 <div class="pagination-nav">
                     <!-- PREVIOUS BUTTON -->
@@ -94,13 +854,13 @@
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
                         Previous: Static Histogram Tab
                     </a>
-
                     <!-- NEXT BUTTON -->
                     <a href="docs_static_rose.html" class="nav-btn">
                         Next: Static Rose Tab
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </a>
                 </div>
+
             </div>
         </main>
     </div>
