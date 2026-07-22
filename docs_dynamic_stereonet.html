@@ -97,16 +97,822 @@
         <main class="docs-content">
             <div class="docs-content-inner">
                 <h1>Dynamic Stereonet Tab</h1>
-                
+                <p>
+                    Located at <code>dynamic_analyzer/tabs/dynamic_stereonet_tab.py</code>, the
+                    <strong>Stereonet Tab</strong> (implemented as the mixin class <code>StereonetTab</code>) is
+                    one of six coordinated views inside the Dynamic Analyzer workspace (the others being Map,
+                    Rose, Mohr, Table, and Method). It renders a lower-hemisphere, equal-area (Schmidt) projection
+                    of every fracture plane currently loaded into the workspace, plotted as poles (points
+                    representing the plane normal). Superimposed on the same projection is a continuous colour
+                    field showing how a chosen stress-derived attribute — slip tendency, dilation tendency,
+                    fracture susceptibility, or a binary critical-stress classification — would vary across every
+                    conceivable plane orientation for the stress tensor currently defined in the sidebar. The
+                    combination of discrete, data-derived poles and a continuous theoretical field is what makes
+                    the Stereonet Tab a genuinely predictive tool rather than a simple plotting utility: it lets
+                    the analyst see at a glance whether the orientations actually present in the fractured rock
+                    mass coincide with the orientations that the applied or inferred stress field would drive
+                    toward failure.
+                </p>
+                <p>
+                    Within the broader FracSTAT architecture, the Stereonet Tab consumes the same
+                    <code>self.results</code> DataFrame that feeds the Map, Rose, Mohr, and Table tabs, and it
+                    shares the same stress-resolution outputs (<code>SlipTendencyNorm</code>,
+                    <code>DilationTendency</code>, <code>FractureSusceptibility</code>,
+                    <code>CriticalStressValue</code>) produced by <code>calculator.run_calculation()</code>. It
+                    therefore requires no independent data entry: any SVG trace map or Excel/CSV orientation
+                    table already loaded for the Map tab is automatically available here. The module's scope is
+                    strictly the stereographic (angular) domain — it does not compute spatial statistics (that is
+                    the Rose tab's role) or the Mohr–Coulomb failure-envelope diagram (the Mohr tab's role); rather,
+                    it is the 3-D orientation counterpart to the 2-D Mohr diagram, showing where in orientation
+                    space the fractures sit relative to the full field of possible responses.
+                </p>
+
+                <h3>Position within FracSTAT</h3>
+                <ul>
+                    <li><strong>Static Analyzer — Stereonet Plot tab:</strong> purely geometric (strike/dip only), no stress resolution.</li>
+                    <li><strong>Dynamic Analyzer — Stereonet Tab (this module):</strong> stress-informed, colour-coded by the active tendency attribute.</li>
+                    <li><strong>Dynamic Analyzer — Mohr Tab:</strong> the 2-D shear/normal-stress analogue of this 3-D orientation view; both tabs share the same four colour-by metrics and the same selection state.</li>
+                    <li><strong>Dynamic Analyzer — Map Tab:</strong> spatial view of the same segments; clicking a pole here highlights the same segment on the Map.</li>
+                </ul>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="put_your_img_here.png" alt="Overview of the Stereonet Tab layout" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 1.1</strong> — The Stereonet Tab within the Dynamic Analyzer workspace, showing the header tile row, the main stereographic plot with coloured tendency field and fracture poles, and the right-hand Pole Inspector / Settings panel.</span>
+                </figure>
+
+                <div class="toc-box">
+                    <p>On this page</p>
+                    <ul>
+                        <li><a href="#interface-overview">1. Interface Overview</a></li>
+                        <li><a href="#data-input">2. Data Input and Preprocessing</a></li>
+                        <li><a href="#maths">3. Mathematical Background</a></li>
+                        <li><a href="#algorithms">4. Algorithms</a></li>
+                        <li><a href="#controls">5. Settings and Controls</a></li>
+                        <li><a href="#workflow">6. Internal Workflow</a></li>
+                        <li><a href="#statistics">7. Statistical Methods</a></li>
+                        <li><a href="#visualization">8. Visualization Components</a></li>
+                        <li><a href="#advanced">9. Advanced Features</a></li>
+                        <li><a href="#performance">10. Performance Optimization</a></li>
+                        <li><a href="#workflow-examples">11. Practical Examples</a></li>
+                        <li><a href="#interpretation">12. Geological Interpretation</a></li>
+                        <li><a href="#implementation">13. Implementation Notes</a></li>
+                        <li><a href="#limitations">14. Limitations</a></li>
+                        <li><a href="#references">15. References</a></li>
+                    </ul>
+                </div>
+
+                <!-- ================================================= -->
+                <h2 id="interface-overview">1. Interface Overview</h2>
+                <p>
+                    The tab is organised as a two-column layout inside the Dynamic Analyzer's tabbed workspace.
+                    The left (main) column is a rounded card containing a header, a row of three summary tiles,
+                    and the plotting canvas. The right column is a scrollable panel containing the Pole Inspector,
+                    the dip-override loader, a usage tip, the Colour Metric selector, and the full Settings
+                    section.
+                </p>
+
+                <h3>1.1 Header and Summary Tiles</h3>
+                <p>
+                    The header carries the title "Stereonet", a one-line description ("Lower-hemisphere equal-area
+                    projection of fracture poles and tendency field"), a colour-scale dropdown (shared with the
+                    Mohr tab, see <a href="#controls">Section 5.1</a>), and a Save Image button. Beneath the
+                    header, three tiles summarise, at a glance, the current state of the plot:
+                </p>
+                <table>
+                    <tr><th>Tile</th><th>Displayed Value</th><th>Update Trigger</th></tr>
+                    <tr><td>Fracture poles</td><td>Count of segments/planes currently plotted (<code>len(self.results)</code>)</td><td>Every redraw of the stereonet</td></tr>
+                    <tr><td>Active field</td><td>Name of the currently selected colour-by attribute (e.g. "Slip tendency")</td><td>Whenever the Mohr/Stereonet shared metric checkboxes change</td></tr>
+                    <tr><td>Colour scale</td><td>Name of the selected Matplotlib colormap (e.g. "Plasma")</td><td>Whenever the colormap dropdown changes</td></tr>
+                </table>
+
+                <h3>1.2 Main Plot Canvas</h3>
+                <p>
+                    The plot canvas is a single square Matplotlib Axes hosting: the equal-area primitive circle,
+                    optional grid rings/degree ticks, the N/E/S/W (or numeric) perimeter labels, the continuous
+                    tendency field (a filled Delaunay triangulation), the fracture poles (a scatter collection
+                    with picking enabled), optional great-circle planes, the three principal-stress markers, a
+                    draggable "Symbols" legend box, and — when a colour metric is active — a colour bar. A
+                    dedicated horizontal Axes beneath the main plot hosts the colour bar so that its position and
+                    thickness can be adjusted independently of the main circle's aspect ratio.
+                </p>
+
+                <h3>1.3 Pole Inspector Panel</h3>
+                <p>
+                    The right panel opens with a short instructional paragraph ("Click a pole to inspect the
+                    resolved stress for that fracture.") followed by a bordered card labelled SELECTED FRACTURE.
+                    This card is blank ("No pole selected yet.") until the user clicks a pole or a row in the
+                    Table tab; it is populated by <code>update_stereonet_selection_panel()</code>, described in
+                    <a href="#maths">Section 3.6</a>.
+                </p>
+
+                <h3>1.4 Navigation and Selection Controls</h3>
+                <table>
+                    <tr><th>Control</th><th>Type</th><th>Action</th></tr>
+                    <tr><td>Show in Map</td><td>Button</td><td>Switches the workspace to the Map tab with the same segment ID highlighted (<code>select_segment(..., switch_to_map=True)</code>).</td></tr>
+                    <tr><td>Clear Selection</td><td>Button</td><td>Deselects the current pole across Map, Mohr, Table, and Stereonet simultaneously (<code>clear_selection()</code>).</td></tr>
+                    <tr><td>Dip Override card</td><td>Composite widget</td><td>Shared control (built by <code>_build_dip_override_card</code>) for loading a CSV/Excel dip-override file; described in <a href="#controls">Section 5.6</a>.</td></tr>
+                </table>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="put_your_img_here.png" alt="Pole Inspector panel with a segment selected" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 1.2</strong> — The SELECTED FRACTURE card after clicking a pole, showing segment ID, strike, dip, effective normal stress, and shear stress.</span>
+                </figure>
+
+                <!-- ================================================= -->
+                <h2 id="data-input">2. Data Input and Preprocessing</h2>
+                <p>
+                    The Stereonet Tab performs no file I/O of its own. All orientation and stress data arrive
+                    pre-computed in <code>self.results</code>, a pandas DataFrame produced by
+                    <code>calculator.run_calculation()</code> once the user has loaded an SVG trace map or an
+                    Excel/CSV orientation table and pressed Calculate (or edited any stress parameter). The
+                    columns the Stereonet Tab reads are summarised below.
+                </p>
+                <table>
+                    <tr><th>Column</th><th>Source</th><th>Role in Stereonet Tab</th></tr>
+                    <tr><td><code>StrikeDeg</code></td><td>SVG geometry or preset Excel strike</td><td>Converted to pole trend (Section 3.2); read modulo 360° to preserve dip direction.</td></tr>
+                    <tr><td><code>DipDeg</code></td><td>SVG default dip / Excel preset dip / per-ID override</td><td>Converted to pole plunge via the equal-area radius formula (Section 3.1).</td></tr>
+                    <tr><td><code>ID</code></td><td>Row index assigned in <code>run_calculation()</code></td><td>Used for pole picking (<code>on_stereonet_pick</code>) and cross-tab selection.</td></tr>
+                    <tr><td><code>SlipTendencyNorm</code></td><td>Wallace–Bott resolved shear/normal ratio, normalised by the theoretical maximum</td><td>One of four selectable colour-by metrics.</td></tr>
+                    <tr><td><code>DilationTendency</code></td><td>(σ1 − σn)/(σ1 − σ3)</td><td>One of four selectable colour-by metrics.</td></tr>
+                    <tr><td><code>FractureSusceptibility</code></td><td>σn − Pf − (τ − C0)/μ</td><td>One of four selectable colour-by metrics.</td></tr>
+                    <tr><td><code>CriticalStressValue</code></td><td>Boolean Coulomb test cast to 0/1</td><td>One of four selectable colour-by metrics; forces a discrete two-colour scale.</td></tr>
+                    <tr><td><code>EffectiveSigmaN, Tau</code></td><td>Resolved normal/shear stress at the current stress tensor</td><td>Displayed verbatim in the Pole Inspector card.</td></tr>
+                </table>
+
+                <h3>2.1 Dip Override Injection</h3>
+                <p>
+                    Before strikes and dips reach the plotting routine, the tab checks <code>self.results</code>
+                    for an ID column and a non-empty static/dynamic <code>dip_overrides</code> mapping (populated
+                    by the shared Load Dip Override control, see <a href="#controls">Section 5.6</a>). Where an
+                    override exists for a given ID, the <code>DipDeg</code> value is replaced; rows without an
+                    override keep their original dip. Because the dip determines the pole's radial position on
+                    the equal-area net, this override changes where — but not whether — the corresponding pole
+                    is drawn.
+                </p>
+
+                <h3>2.2 Dip-Direction Correction</h3>
+                <p>
+                    Legacy Excel imports and any workflow that supplies a <code>DipDirection</code> column
+                    trigger an additional correction: wherever <code>DipDirection</code> is finite, the strike
+                    used for pole placement is recomputed as (DipDirection − 90°) mod 360°, overriding the raw
+                    <code>StrikeDeg</code> value for that row only. This keeps the stereonet consistent with data
+                    sources that report dip azimuth directly rather than strike.
+                </p>
+
+                <h3>2.3 Validity Filtering</h3>
+                <p>
+                    Rows with non-finite strike or dip (e.g. produced by malformed input rows that survived
+                    upstream validation) are excluded from the plotted set via a combined finite-value mask; dip
+                    is additionally clipped to the physically valid 0–90° range before any trigonometric
+                    evaluation. If the filtered set is empty, the tab falls back to an explanatory empty state
+                    (<a href="#workflow">Section 6.4</a>) rather than attempting to draw.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="maths">3. Mathematical Background</h2>
+
+                <h3>3.1 Lower-Hemisphere Equal-Area (Schmidt) Projection</h3>
+                <p>
+                    Every point plotted on the net — poles, principal-stress axes, and great-circle traces of
+                    planes — uses the Lambert equal-area, lower-hemisphere convention standard in structural
+                    geology. For a line with trend θ (measured clockwise from north) and plunge δ (measured
+                    downward from horizontal), the projected radius r and Cartesian plotting coordinates (x, y)
+                    are:
+                </p>
+                <div class="formula-block">
+r = √2 · sin( (90° − δ) / 2 )
+
+x = r · sin(θ),   y = r · cos(θ)</div>
+                <p>
+                    The primitive circle (the outer boundary of the net) corresponds to r = 1, i.e. a horizontal
+                    line (δ = 0°); the centre of the net corresponds to a vertical line (δ = 90°). This
+                    projection preserves area, which is what permits density-style visual comparison between
+                    clusters of poles without the areal distortion of a stereographic (equal-angle) projection.
+                </p>
+
+                <h3>3.2 Pole Position from Strike and Dip</h3>
+                <p>
+                    A fracture plane is fully described by its strike (azimuth of the horizontal line contained
+                    in the plane, right-hand-rule convention) and dip (angle below horizontal, measured
+                    perpendicular to strike). Its pole is the line perpendicular to the plane, and by the
+                    right-hand rule its trend is exactly 90° counter-clockwise from the dip-direction, i.e.:
+                </p>
+                <div class="formula-block">
+pole_trend = (strike − 90°) mod 360°
+pole_plunge = 90° − dip</div>
+                <p>
+                    Substituting pole_plunge into the equal-area radius formula from Section 3.1 gives the
+                    specific expression used throughout the module for the pole radius, r = √2 · sin(dip/2),
+                    since 90° − pole_plunge = dip. The module deliberately preserves the fully-directed 0–360°
+                    form of strike (rather than folding it into the 0–180° fracture convention used by the Rose
+                    tab) precisely because the pole position depends on which side of the strike line the plane
+                    dips toward; folding the strike would silently collapse two physically distinct dip
+                    directions onto a single hemisphere position.
+                </p>
+                <div class="note-box">
+                    <strong>Note:</strong> the module uses the full 0–360° strike (mod 360) rather than trusting
+                    whatever range <code>StrikeDeg</code> happens to already be in. Folding strike to 0–180°
+                    upstream throws away which side the plane dips toward — exactly what would collapse poles
+                    onto a single hemisphere instead of the two clusters a correct stereonet should show for the
+                    same data.
+                </div>
+
+                <h3>3.3 Great-Circle (Plane) Trace</h3>
+                <p>
+                    When the "Show all planes" or "Show selected plane only" toggle is enabled, each plane's full
+                    great-circle trace is drawn by sweeping a parameter t from 0 to π across the strike and
+                    down-dip unit vectors in an East-North-Up basis:
+                </p>
+                <div class="formula-block">
+v(t) = strike_vector · cos(t) + down_dip_vector · sin(t)</div>
+                <p>
+                    where strike_vector = (sinψ, cosψ, 0), and down_dip_vector = (sin(ψ+90°)cosδ′, cos(ψ+90°)cosδ′,
+                    −sinδ′) for strike azimuth ψ and dip δ′. Each swept vector v(t) = (vE, vN, vU) is converted
+                    back to a trend/plunge pair via plunge = asin(−vU) and trend = atan2(vE, vN), then projected
+                    with the same equal-area radius formula, producing the smooth curved trace characteristic of
+                    a dipping plane on an equal-area net (a vertical plane traces a straight diameter; a shallow
+                    plane traces a tight loop near the primitive circle).
+                </p>
+
+                <h3>3.4 Stress Resolution on the Continuous Orientation Field</h3>
+                <p>
+                    The coloured field underlying the poles is not derived from the loaded fracture data at all —
+                    it is the theoretical response of the current stress tensor evaluated across a dense, regular
+                    grid of colatitude and trend values covering the entire lower hemisphere (64 colatitude steps
+                    × 128 trend steps, avoiding the exact pole and equator to prevent singularities). For each
+                    grid orientation the unit normal vector components in an East/North/Up basis are:
+                </p>
+                <div class="formula-block">
+nE = sin(colat)·sin(trend)
+nN = sin(colat)·cos(trend)
+nU = −cos(colat)</div>
+                <p>
+                    These are projected onto the three principal-stress axis directions (Section 3.5) to obtain
+                    direction cosines c0, c1, c2, from which the resolved normal and shear stress follow the
+                    standard Cauchy stress-transformation identities:
+                </p>
+                <div class="formula-block">
+σn = σ1·c0² + σ2·c1² + σ3·c2²
+
+τ = √[ σ1²c0² + σ2²c1² + σ3²c2² − σn² ]</div>
+                <p>
+                    From these, the four selectable field values are computed grid-point-by-grid-point exactly
+                    as in the Mohr tab:
+                </p>
+                <table>
+                    <tr><th>Metric</th><th>Formula</th><th>Normalisation</th></tr>
+                    <tr><td>Slip tendency (normalised)</td><td>Ts = τ / max(σn, 10⁻¹²)</td><td>Divided by the maximum Ts found on the grid so the field spans 0–1.</td></tr>
+                    <tr><td>Dilation tendency</td><td>Td = (σ1 − σn) / (σ1 − σ3)</td><td>Already dimensionless, 0–1 by construction.</td></tr>
+                    <tr><td>Fracture susceptibility</td><td>Sf = σn − Pf − (τ − C0)/μ</td><td>Displayed in stress units (e.g. MPa); colour range set from data min/max.</td></tr>
+                    <tr><td>Critical stress (binary)</td><td>1 if τ ≥ C0 + μ(σn − Pf), else 0</td><td>Two-colour discrete scale (stable / critical).</td></tr>
+                </table>
+                <p>
+                    This same field-evaluation logic is shared with the Mohr tab's own contour computation,
+                    ensuring the two diagrams are always mutually consistent for a given stress state — a
+                    fracture that appears deep in the "hot" colour region on the stereonet will also plot on or
+                    beyond the Coulomb envelope in the Mohr diagram.
+                </p>
+
+                <h3>3.5 Principal Stress Axis Construction</h3>
+                <p>
+                    Two stress-orientation modes are supported, matching the Mohr and Map tabs. In Andersonian
+                    mode, σ1 is horizontal along the entered azimuth, σ2 is exactly vertical, and σ3 is horizontal
+                    and perpendicular to σ1:
+                </p>
+                <div class="formula-block">
+σ1_axis = (sinα, cosα, 0)
+σ2_axis = (0, 0, 1)
+σ3_axis = (cosα, −sinα, 0)</div>
+                <p>
+                    where α is the σ1 azimuth in radians. In General 3-D mode, the fully general routine
+                    <code>principal_stress_axes_fracstat(σ1_trend, σ1_plunge, σ3_trend)</code> is used: σ1 is
+                    built directly from its own trend/plunge; σ3's plunge is solved so that σ3 is exactly
+                    orthogonal to σ1 (using the supplied σ3 trend as a starting horizontal direction and
+                    re-normalising); and σ2 is obtained as the cross product σ3 × σ1, ensuring a mutually
+                    orthogonal right-handed frame from only three independent input angles. For plotting
+                    purposes, <code>axis_to_trend_plunge()</code> converts each resulting axis back into a
+                    trend/plunge pair using a downward-pointing-line convention with a tolerance-based sign
+                    correction (±10⁻⁹) that guards against floating-point noise spuriously flipping a
+                    near-horizontal axis by 180°.
+                </p>
+
+                <h3>3.6 Kinematic (Wallace–Bott) Consistency for Focal Mechanisms</h3>
+                <p>
+                    When a loaded dataset is a focal-mechanism (earthquake) file supplying a rake/slip value, the
+                    Stereonet Tab shares the same slip-tendency, dilation-tendency, and fracture-susceptibility
+                    metrics computed for the nodal plane; the underlying calculator additionally resolves the
+                    shear traction along the observed slip vector and reports a Rake Misfit, but this
+                    Wallace–Bott diagnostic is displayed in the Pole Inspector and Table tab rather than as a
+                    separate stereonet colour metric.
+                </p>
+
                 <div class="code-window">
                     <div class="code-header">
                         <span class="code-lang">python</span>
                         <button class="copy-btn">Copy</button>
                     </div>
-                    <pre><code class="language-python">
-                        DEMO OF CODE SNIPPET
-                    </code></pre>
+                    <pre><code class="language-python">colatitude = np.linspace(.01, np.pi / 2 - .01, 64)
+trend = np.linspace(0, 2 * np.pi, 128, endpoint=False)
+colatitude, trend = np.meshgrid(colatitude, trend)
+
+normal_east  = np.sin(colatitude) * np.sin(trend)
+normal_north = np.sin(colatitude) * np.cos(trend)
+normal_up    = -np.cos(colatitude)
+s1, s2, s3 = stress["sigma1"], stress["sigma2"], stress.get("sigma3", stress["sigma2"])
+
+sigma_n = s1*c0**2 + s2*c1**2 + s3*c2**2
+traction_sq = s1**2*c0**2 + s2**2*c1**2 + s3**2*c2**2
+tau = np.sqrt(np.maximum(traction_sq - sigma_n**2, 0.0))
+
+if column == "SlipTendencyNorm":
+    field_values = tau / np.maximum(sigma_n, 1e-12)
+    field_values /= field_values.max()
+elif column == "DilationTendency":
+    field_values = (s1 - sigma_n) / max(s1 - s3, 1e-12)
+elif column == "FractureSusceptibility":
+    field_values = sigma_n - stress["pore_pressure"] - (tau - stress["cohesion"]) / max(stress["friction"], 1e-12)
+else:
+    field_values = (tau >= stress["cohesion"] + stress["friction"]*(sigma_n - stress["pore_pressure"])).astype(float)
+
+radius = np.sqrt(2) * np.sin(colatitude / 2)
+field_x, field_y = (radius*np.sin(trend)).ravel(), (radius*np.cos(trend)).ravel()</code></pre>
                 </div>
+                <p class="ph-caption" style="text-align:left; margin: -1rem 0 1.5rem 0;">Simplified excerpt of <code>_draw_stereonet()</code>, showing the analytic 64×128 grid construction and the four selectable field-value formulas.</p>
+
+                <!-- ================================================= -->
+                <h2 id="algorithms">4. Algorithms</h2>
+
+                <h3>4.1 Field-Contouring Algorithm</h3>
+                <ol class="step-list">
+                    <li>Build a meshgrid of 64 colatitude values (0.01 to π/2 − 0.01) by 128 trend values (0 to 2π, endpoint excluded).</li>
+                    <li>Compute the unit normal-vector components at every grid node (Section 3.4).</li>
+                    <li>Project each normal onto the active principal-stress frame to obtain direction cosines.</li>
+                    <li>Evaluate σn and τ, then the selected scalar field value (Ts, Td, Sf, or the binary critical-stress test).</li>
+                    <li>Convert every grid node's (colatitude, trend) into equal-area (x, y) plotting coordinates using the same radius formula as the poles.</li>
+                    <li>Triangulate the resulting scattered point cloud with <code>matplotlib.tri.Triangulation</code> and render it with <code>ax.tricontourf</code> at 24 discrete colour levels.</li>
+                </ol>
+                <p>
+                    Because the triangulation is built once per redraw directly from the analytic grid (not from
+                    the sparse, irregularly spaced fracture poles), the field is smooth and continuous regardless
+                    of how many or how few fractures are actually loaded — it represents the theoretical stress
+                    response, not an interpolation of the data.
+                </p>
+
+                <h3>4.2 Pole Placement and Picking</h3>
+                <p>
+                    Poles are computed vectorised across the entire filtered DataFrame using NumPy: pole_trend =
+                    (strike − 90°) mod 360° and pole_radius = √2·sin(dip_rad/2), then x = radius·sin(trend_rad), y
+                    = radius·cos(trend_rad). The resulting scatter artist is registered as a matplotlib "pickable"
+                    object with a pick radius of 6 points; a click within that radius fires
+                    <code>on_stereonet_pick</code>, which maps the picked index back to a row of
+                    <code>self.results</code> and calls the shared <code>select_segment()</code> method — the
+                    same selection entry point used by the Map, Mohr, and Table tabs, guaranteeing the four views
+                    never fall out of sync.
+                </p>
+
+                <h3>4.3 Draggable Symbol Index</h3>
+                <p>
+                    The legend ("Symbols") box in the lower-right corner of the plot is not a native Matplotlib
+                    Legend but a hand-built composite of a <code>FancyBboxPatch</code>, text labels, and scatter
+                    markers, all scaled by the current global font size relative to a 10-pt baseline. This custom
+                    construction allows the box to be interactively repositioned when "Move Elements" mode is
+                    active in the workspace header: <code>on_stereo_press</code> hit-tests the box's stored (x0,
+                    y_top, width, height) footprint in axes-fraction coordinates; <code>on_stereo_motion</code>
+                    translates the anchor by the mouse displacement (expressed as a fraction of the axes' pixel
+                    bounding box) and calls a cheap redraw routine (<code>_redraw_stereo_symbol_index</code>) that
+                    repositions only the index artists rather than re-running the full stereonet draw, which
+                    would be considerably more expensive because it would re-evaluate the entire
+                    field-contouring grid. The anchor position persists across redraws in
+                    <code>self._stereo_symbol_index_pos</code>, and defaults to just outside the plot's own axes
+                    bounding box (x0 = 1.02) so it never overlaps the stereonet circle regardless of how large
+                    the font grows.
+                </p>
+
+                <h3>4.4 Colour-Bar Layout Algorithm</h3>
+                <p>
+                    Depending on the selected Colour bar position (Bottom/Top/Left/Right/None), the routine
+                    computes a rectangle for the dedicated colour-bar Axes (in figure-fraction coordinates) sized
+                    by the user-configured thickness and length fractions, and simultaneously repositions the
+                    main stereonet Axes so the circle stays centred and undistorted next to the bar. The Diagram
+                    Scale slider (<a href="#controls">Section 5.3</a>) is applied multiplicatively to both width
+                    and height of the main Axes about the same centre point used for the colour-bar layout, so
+                    enlarging or shrinking the diagram never displaces its centre.
+                </p>
+
+                <h3>4.5 Selected-Pole Highlight and Selected-Plane Trace</h3>
+                <p>
+                    When <code>self.selected_segment_id</code> is not <code>None</code>, a three-layer halo
+                    (white ring, dark ring, coloured "P" plus-marker) is drawn over the corresponding pole and
+                    annotated with its ID. If "Show Selected Plane" is enabled, the great-circle trace of that
+                    one plane (Section 3.3) is additionally drawn in the user-selected highlight colour, letting
+                    the analyst see the full orientation of a single fracture of interest without cluttering the
+                    net with every plane in the dataset.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="controls">5. Settings and Controls</h2>
+                <p>
+                    All settings are held in dedicated CTk variables, lazily initialised the first time the tab
+                    is built (<code>_stereo_init_vars</code>) so that re-opening the tab, switching projects, or
+                    restoring a saved session never silently resets a control the user had already configured.
+                    Every control below triggers <code>_draw_stereonet()</code> on change unless noted otherwise.
+                </p>
+
+                <h3>5.1 Colour Metric (shared with the Mohr Tab)</h3>
+                <p>
+                    Four checkboxes — Slip tendency, Dilation tendency, Fracture susceptibility, Critical stress —
+                    are mutually exclusive (selecting one automatically clears the others) and are bound to the
+                    same <code>mohr_slip_var</code> / <code>mohr_dilation_var</code> / <code>mohr_fracture_var</code>
+                    / <code>mohr_critical_var</code> variables used by the Mohr tab, via the shared
+                    <code>change_mohr_metric()</code> callback. This deliberate sharing means changing the active
+                    metric on either tab updates both simultaneously.
+                </p>
+
+                <h3>5.2 Settings Card — General Appearance</h3>
+                <table>
+                    <tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
+                    <tr><td>Colour bar position</td><td>Dropdown</td><td>Bottom</td><td>Bottom / Top / Left / Right / None; repositions colour bar and rescales the main diagram (Section 4.4).</td></tr>
+                    <tr><td>Outer BG</td><td>Colour swatch</td><td>#F8FAFC</td><td>Figure (outer canvas) background colour.</td></tr>
+                    <tr><td>Inner BG</td><td>Colour swatch</td><td>#FFFFFF</td><td>Stereonet Axes background colour.</td></tr>
+                    <tr><td>CBar Width</td><td>Numeric entry</td><td>0.03</td><td>Colour-bar thickness as a fraction of the figure.</td></tr>
+                    <tr><td>CBar Length</td><td>Numeric entry</td><td>0.64</td><td>Colour-bar length as a fraction of the figure.</td></tr>
+                </table>
+
+                <h3>5.3 Settings Card — Pole and Border Styling</h3>
+                <table>
+                    <tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
+                    <tr><td>Pole Color</td><td>Colour swatch</td><td>#FF0000</td><td>Fill colour of pole markers when solid-colour mode effectively applies (no metric selected uses this colour for the index; poles themselves are always coloured by the active field when a metric is chosen).</td></tr>
+                    <tr><td>Pole Border</td><td>Colour swatch</td><td>#FF0000</td><td>Marker edge colour.</td></tr>
+                    <tr><td>Border Width</td><td>Numeric entry</td><td>0.3</td><td>Marker edge line width, points.</td></tr>
+                    <tr><td>Selected Pole</td><td>Colour swatch</td><td>#00D4FF</td><td>Highlight colour used for the selected pole's plus-marker and, if enabled, the selected plane's great-circle trace.</td></tr>
+                    <tr><td>Boundary Color</td><td>Colour swatch</td><td>#111111</td><td>Colour of the primitive circle and (if enabled) the 30° tick marks.</td></tr>
+                    <tr><td>Boundary Width</td><td>Numeric entry</td><td>1.2</td><td>Line width of the primitive circle.</td></tr>
+                    <tr><td>Pole Shape</td><td>Dropdown</td><td>Circle</td><td>Circle / Diamond / Square / Triangle Up / Star / Cross — maps to Matplotlib marker codes o / D / s / ^ / * / X.</td></tr>
+                    <tr><td>Pole Size</td><td>Numeric entry</td><td>24</td><td>Marker area in points² (matplotlib scatter <code>s</code> parameter).</td></tr>
+                    <tr><td>Diagram Scale</td><td>Numeric entry</td><td>1.0</td><td>Multiplicative scale factor applied to both width and height of the main Axes about its current centre (Section 4.4).</td></tr>
+                    <tr><td>Custom Title</td><td>Text entry</td><td>(blank)</td><td>Overrides the auto-generated title "&lt;metric&gt; — fracture poles".</td></tr>
+                </table>
+
+                <h3>5.4 Settings Card — Toggles</h3>
+                <table>
+                    <tr><th>Toggle</th><th>Default</th><th>Effect</th></tr>
+                    <tr><td>Show N-S / E-W Lines</td><td>On</td><td>Draws the two crosshair diameters through the net centre.</td></tr>
+                    <tr><td>Show Selected Plane</td><td>Off</td><td>Draws the great-circle trace of only the currently selected fracture, in the Selected Pole colour.</td></tr>
+                    <tr><td>Show All Poles</td><td>On</td><td>Toggles visibility (and pickability) of the entire pole scatter collection; turning it off disables clicking to select a fracture from the stereonet.</td></tr>
+                    <tr><td>Show All Planes</td><td>Off</td><td>Draws every loaded fracture's great-circle trace at low opacity (alpha = 0.25), useful for visualising the overall fabric of dipping surfaces rather than just their poles.</td></tr>
+                </table>
+
+                <h3>5.5 Reset Defaults</h3>
+                <p>
+                    The Reset Defaults button (<code>_stereo_reset_defaults</code>) restores every one of the
+                    settings above to its factory value in a single action and immediately redraws — useful
+                    after exploratory styling changes before generating a publication figure.
+                </p>
+
+                <h3>5.6 Dip Override Card</h3>
+                <p>
+                    Shared with every other Dynamic Analyzer tab that displays per-segment dip (Mohr, Map,
+                    Stereonet), this card provides: a "Load Dip Override (CSV/Excel)" button that opens a file
+                    dialog and parses an ID/DipDeg table (column names are matched case-insensitively after
+                    stripping non-alphanumeric characters, so "Dip Deg", "dip_deg", and "DipDeg" are all
+                    accepted); a "File Format" button that opens a hover preview showing the exact two-column
+                    layout expected; and a "Clear Overrides" button. Overrides are validated to lie within 0–90°
+                    before being accepted, and are keyed by the same one-based ID used in the Table tab, so an
+                    override file exported from one project session can be reused directly against another
+                    session with an identical segment count and ordering.
+                </p>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="put_your_img_here.png" alt="Settings panel, fully expanded" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 5.1</strong> — The scrollable Settings panel showing the General Appearance, Pole and Border Styling, and Toggle cards described above.</span>
+                </figure>
+
+                <!-- ================================================= -->
+                <h2 id="workflow">6. Internal Workflow</h2>
+
+                <h3>6.1 Build Sequence (_build_stereonet_tab)</h3>
+                <ol class="step-list">
+                    <li>Initialise all settings variables (Section 5) and the draggable symbol-index state (position, drag flag, artist list).</li>
+                    <li>Construct the outer rounded card, header row (title, subtitle, colour-scale dropdown, Save Image button), and the three summary tiles.</li>
+                    <li>Construct the plot card containing the Matplotlib Figure/Axes pair and its dedicated colour-bar Axes, then wrap it in a <code>FigureCanvasTkAgg</code> and bind <code>pick_event</code>, <code>button_press_event</code>, <code>motion_notify_event</code>, and <code>button_release_event</code> handlers.</li>
+                    <li>Construct the right-hand scrollable panel: Pole Inspector heading and instructions, the Selected Fracture card, Show in Map / Clear Selection buttons, the Dip Override card, a Tip card, the Colour Metric checkboxes, and the full Settings card tree.</li>
+                    <li>Call <code>_draw_stereonet()</code> once to render the initial (likely empty) state.</li>
+                </ol>
+
+                <h3>6.2 Draw Sequence (_draw_stereonet)</h3>
+                <ol class="step-list">
+                    <li>Read and validate every styling variable (colours, widths, sizes), falling back to a safe default on any parse failure so a malformed numeric entry never crashes the redraw.</li>
+                    <li>Clear the Axes and colour-bar Axes; reset the fixed aspect-1 limits (−1.15 to 1.15 in both axes) and hide the default tick marks.</li>
+                    <li>Draw the primitive circle, optional crosshairs, and either the 30° perimeter tick/degree-label ring (when "Show Selected Plane" is on) or the plain N/E/S/W labels.</li>
+                    <li>If <code>self.results</code> is empty or no stress has been calculated, populate the summary tiles with placeholder text, render the title "Stereonet", and return early (Section 6.4).</li>
+                    <li>Resolve the active colour metric (falling back to Slip tendency if none is checked), update the three summary tiles, and build the principal-stress axis frame (Section 3.5).</li>
+                    <li>Evaluate the continuous tendency field over the analytic grid (Sections 3.4/4.1) and render it with <code>tricontourf</code>; redraw the primitive circle on top so the field never bleeds past the net's boundary.</li>
+                    <li>Compute pole_trend/pole_radius for every valid row (Section 4.2); optionally draw every plane's great circle first (so poles render on top), then draw the pole scatter (respecting "Show All Poles").</li>
+                    <li>If a segment is selected, draw its highlight halo, ID annotation, and (optionally) its individual great-circle trace.</li>
+                    <li>Attach the ScalarMappable-driven colour bar per the chosen position (Section 4.4), draw the three principal-stress axis symbols, and render the draggable Symbols index (Section 4.3).</li>
+                    <li>Apply the custom or auto-generated title and request an idle redraw of the canvas (<code>draw_idle</code>).</li>
+                </ol>
+
+                <h3>6.3 Selection Synchronisation</h3>
+                <p>
+                    <code>select_segment()</code> (defined at the <code>SlipTendencyApp</code> level, not within
+                    this mixin) is the single choke point through which a pole click, a Table row click, or a
+                    Mohr-diagram click all flow. It updates <code>self.selected_segment_id</code>, calls
+                    <code>update_stereonet_selection_panel()</code> to refresh the Pole Inspector card, and then
+                    calls <code>_draw_stereonet()</code> (among the other tabs' own redraw methods) so the newly
+                    selected pole's halo appears immediately, without the user needing to manually refresh.
+                </p>
+
+                <h3>6.4 Empty and Degenerate States</h3>
+                <p>
+                    Two distinct "nothing to show" conditions are handled: (a) no data loaded at all, or no
+                    stress tensor yet calculated — the tiles reset to "0" / "Slip tendency" / the current
+                    colour-scale name, and the title reads simply "Stereonet"; and (b) data loaded but every row
+                    fails strike/dip validity filtering (Section 2.3) — handled by the same early-return path
+                    since the filtered array would again be empty. In both cases the primitive circle,
+                    crosshairs, and cardinal labels are still drawn, so the net's geometry frame of reference is
+                    always visible even with no data.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="statistics">7. Statistical Methods</h2>
+                <p>
+                    The Stereonet Tab itself performs no descriptive statistics beyond a simple count (the
+                    "Fracture poles" tile). All quantitative summary statistics for the loaded fracture population
+                    (mean strike, dominant azimuth bin, dispersion, etc.) belong to the Rose tab; the Stereonet
+                    Tab is instead the qualitative / visual complement, letting the analyst judge cluster
+                    tightness, bimodality, or great-circle girdle patterns by eye against the coloured stress
+                    field. Where quantitative rigor is required — e.g. testing whether a pole cluster is
+                    statistically consistent with the maximum-Ts orientation predicted by the stress tensor — the
+                    underlying field values (Ts, Td, Sf) available per-fracture in the Table tab and
+                    per-orientation on the continuous grid used here can be exported and analysed externally
+                    (<a href="#advanced">Section 9.3</a>).
+                </p>
+
+                <h3>7.1 Theoretical Maximum Normalisation</h3>
+                <p>
+                    The normalised slip-tendency field (Ts) divides every grid value of τ/σn by the single
+                    largest value found anywhere on the 64×128 analytic grid, i.e. the theoretical maximum
+                    tau/sigmaN over every possible orientation for that stress tensor. This is the same
+                    closed-form-equivalent normalisation constant used by the calculator module's
+                    <code>_theoretical_max_slip_tendency()</code> for the <code>SlipTendencyNorm</code> column,
+                    ensuring the stereonet field and the per-fracture Table/Map colouring are numerically
+                    consistent with one another.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="visualization">8. Visualization Components</h2>
+                <table>
+                    <tr><th>Component</th><th>Matplotlib Primitive</th><th>Purpose</th></tr>
+                    <tr><td>Primitive circle</td><td><code>ax.plot</code> on a 361-point unit circle</td><td>Defines the projection boundary (equator of the lower hemisphere).</td></tr>
+                    <tr><td>Grid rings / degree ticks</td><td><code>ax.plot</code> radial tick segments + <code>ax.text</code></td><td>Optional 30° azimuth reference marks around the perimeter, shown only when "Show Selected Plane" is enabled.</td></tr>
+                    <tr><td>N-S / E-W crosshair</td><td><code>ax.plot</code> two diameters</td><td>Quick visual reference for cardinal directions.</td></tr>
+                    <tr><td>Tendency field</td><td><code>ax.tricontourf</code> over a Delaunay triangulation</td><td>Continuous colour-coded stress-response surface across the whole hemisphere.</td></tr>
+                    <tr><td>Fracture poles</td><td><code>ax.scatter</code> (pickable)</td><td>Discrete data points; colour and/or shape configurable.</td></tr>
+                    <tr><td>Great-circle plane traces</td><td><code>ax.plot</code> (per-plane parametric sweep)</td><td>Optional visualisation of full plane orientation, not just its pole.</td></tr>
+                    <tr><td>Principal-stress markers</td><td><code>ax.scatter</code> with square/diamond/triangle markers</td><td>σ1 (square), σ2 (diamond), σ3 (triangle) axis positions.</td></tr>
+                    <tr><td>Selected-pole halo</td><td>Two concentric <code>ax.scatter</code> rings + plus-marker</td><td>Draws attention to the currently selected fracture.</td></tr>
+                    <tr><td>Symbols index</td><td>Custom <code>FancyBboxPatch</code> + text/markers</td><td>Draggable legend explaining every marker on the plot (Section 4.3).</td></tr>
+                    <tr><td>Colour bar</td><td><code>fig.colorbar</code> bound to a <code>ScalarMappable</code></td><td>Quantitative scale for the active tendency metric.</td></tr>
+                </table>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="put_your_img_here.png" alt="Stereonet with Show All Planes enabled" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 8.1</strong> — Example rendering showing translucent great-circle traces for every loaded fracture plane overlaid with their poles, coloured by fracture susceptibility.</span>
+                </figure>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="put_your_img_here.png" alt="Colour-bar position comparison" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 8.2</strong> — Side-by-side comparison of the Bottom, Right, and None colour-bar layouts, illustrating how the main diagram is automatically rescaled and re-centred for each.</span>
+                </figure>
+
+                <!-- ================================================= -->
+                <h2 id="advanced">9. Advanced Features</h2>
+
+                <h3>9.1 General 3-D Stress Orientation Mode</h3>
+                <p>
+                    When the sidebar's Orientation Mode tab is set to General 3D, the Stereonet Tab automatically
+                    re-derives the principal-stress axis positions using
+                    <code>principal_stress_axes_fracstat()</code> rather than the simplified Andersonian
+                    formulas, so the three principal-stress markers correctly reflect fully general
+                    (non-Andersonian) stress-field orientations such as oblique-slip regimes.
+                </p>
+
+                <h3>9.2 Draggable Symbols Index</h3>
+                <p>
+                    Described in Section 4.3. This is a workspace-wide "Move Elements" feature: when enabled from
+                    the header, every draggable overlay across all Dynamic Analyzer tabs (Mohr's Symbols index,
+                    the Rose tab's legend, and this Stereonet index) becomes repositionable by click-and-drag,
+                    letting the analyst tailor figure layout before exporting an image for a report.
+                </p>
+
+                <h3>9.3 Cross-Tab Data Sharing and Export</h3>
+                <p>
+                    Because the Stereonet Tab reads directly from <code>self.results</code>, any change made
+                    elsewhere in the workspace — loading a different data source, editing the stress tensor,
+                    applying a dip override, or switching units — is reflected here on the very next redraw with
+                    no separate synchronisation step. The Save Image toolbar button exports the current
+                    stereonet figure (including whatever position the Symbols index has been dragged to) as a
+                    high-resolution PNG through the shared <code>save_plot_image()</code> routine, using the
+                    export DPI configured in Settings and a filename that encodes the project name, plot name,
+                    active metric, and a timestamp.
+                </p>
+
+                <h3>9.4 Focal-Mechanism Aware Pole Placement</h3>
+                <p>
+                    For Excel/CSV files following the Global CMT-style focal-mechanism format (Lat, Lon, FP1/FP2
+                    Strike/Dip, optional Slip/Rake), each nodal plane becomes its own row in
+                    <code>self.results</code> and is plotted here exactly like any other fracture plane, letting
+                    seismological nodal-plane populations be compared on the same equal-area net and against the
+                    same resolved-stress colour field as outcrop- or map-derived fracture data.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="performance">10. Performance Optimization</h2>
+
+                <h3>10.1 Analytic Grid Sizing</h3>
+                <p>
+                    The continuous tendency field is evaluated on a fixed 64×128 grid (8,192 nodes) rather than
+                    scaling with the number of loaded fractures. This keeps the triangulation and contour-fill
+                    cost constant and fast even for datasets containing many thousands of segments, since the
+                    expensive part of the redraw is the field, not the (fully vectorised) pole scatter.
+                </p>
+
+                <h3>10.2 Vectorised Pole Computation</h3>
+                <p>
+                    Strike, dip, pole trend, and pole radius are all computed with NumPy array operations across
+                    the entire filtered DataFrame in a single pass rather than a per-row Python loop, so plotting
+                    thousands of poles remains a near-constant-time operation relative to redrawing the field.
+                </p>
+
+                <h3>10.3 Cheap Redraw Path for Dragging</h3>
+                <p>
+                    As noted in Section 4.3, dragging the Symbols index calls
+                    <code>_redraw_stereo_symbol_index()</code>, which removes and rebuilds only the index's own
+                    artists (cached from the most recent full draw's arguments in
+                    <code>self._stereo_index_last_args</code>) rather than invoking the full
+                    <code>_draw_stereonet()</code> pipeline. This avoids recomputing the 8,192-node field and
+                    re-triangulating on every mouse-move event during a drag, which would otherwise make the
+                    interaction feel sluggish.
+                </p>
+
+                <h3>10.4 Idle-Draw Scheduling</h3>
+                <p>
+                    All redraws finish with <code>self.stereo_canvas.draw_idle()</code> rather than a blocking
+                    <code>draw()</code>, deferring the actual GPU/CPU rendering work to the next idle slot in
+                    Tkinter's event loop so rapid successive setting changes (e.g. typing in a numeric field) do
+                    not each force an immediate, separate render pass.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="workflow-examples">11. Practical Examples</h2>
+
+                <h3>11.1 Example — Checking Orientation-Stress Compatibility</h3>
+                <ol class="step-list">
+                    <li>Load an SVG trace map or Excel orientation table, then enter or confirm the principal stress magnitudes and orientation on the sidebar.</li>
+                    <li>Open the Stereonet Tab and leave Slip tendency selected as the colour metric.</li>
+                    <li>Observe whether the plotted poles cluster inside the "hot" (high-Ts) region of the field, near the perimeter close to the σ1 marker's perpendicular great circle, or in the "cool" low-Ts region near σ3.</li>
+                    <li>If most poles fall in a cool region, the current stress field is unlikely to be reactivating that fracture set, prompting a re-examination of either the assumed stress orientation or the possibility that the fractures are inherited from an earlier tectonic event.</li>
+                </ol>
+
+                <h3>11.2 Example — Verifying a Dip Override</h3>
+                <ol class="step-list">
+                    <li>Load a dip-override CSV containing ID and DipDeg columns for a subset of segments.</li>
+                    <li>Compare the Stereonet Tab before and after loading: overridden poles will move radially (their trend is unchanged; only their distance from the centre, governed by dip, changes).</li>
+                    <li>Use the Show in Map button after selecting an overridden pole to confirm the correct segment was affected.</li>
+                </ol>
+
+                <h3>11.3 Example — Comparing Fracture Sets Against a Focal Mechanism Catalogue</h3>
+                <ol class="step-list">
+                    <li>Load a Global CMT-style focal-mechanism Excel/CSV file alongside (in a separate session) or instead of an outcrop dataset.</li>
+                    <li>Enable "Show All Planes" to visualise the family of nodal-plane great circles, then toggle Critical stress as the colour metric to see which nodal planes are predicted to be critically stressed under the entered regional stress tensor.</li>
+                </ol>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="put_your_img_here.png" alt="Worked example: slip-tendency compatibility check" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 11.1</strong> — A fracture population whose poles cluster near the σ1 great circle (high slip tendency), suggesting active reactivation potential under the current stress field.</span>
+                </figure>
+
+                <!-- ================================================= -->
+                <h2 id="interpretation">12. Geological Interpretation</h2>
+                <p>
+                    The equal-area stereonet is one of the most information-dense diagrams available to a
+                    structural geologist because it simultaneously encodes plane orientation (via pole position)
+                    and, in this module's stress-aware variant, the mechanical favourability of every conceivable
+                    orientation (via the continuous colour field). Several interpretive principles follow
+                    directly from the plotted geometry:
+                </p>
+                <ul>
+                    <li>Poles near the primitive circle correspond to steeply dipping planes; poles near the centre correspond to shallow, near-horizontal planes.</li>
+                    <li>A tight cluster of poles indicates a single, well-defined fracture set (consistent formation mechanism and stress history); a girdle (poles distributed along a great circle) suggests folding or a rotational deformation history superimposed on an originally more uniform set.</li>
+                    <li>Poles coinciding with the high-Ts (hot) region of the field, typically forming two conjugate bands roughly 20–30° from the σ1 direction depending on the friction coefficient μ, are the orientations most favourable for shear reactivation under the current stress state — classic Andersonian conjugate shear-fracture geometry.</li>
+                    <li>Poles coinciding with high dilation tendency (near σ3) are those most favourable for tensile opening or hydraulic-fracture propagation, relevant for fluid-flow and permeability assessment.</li>
+                    <li>A Critical stress colouring that shows most poles in the "stable" colour, despite reasonable stress magnitudes, may indicate either a genuinely low-permeability, mechanically stable fracture network, or that the assumed pore pressure Pf or friction coefficient μ is too conservative for the field setting.</li>
+                </ul>
+                <p>
+                    Because the field is recomputed live from the sidebar stress tensor, the Stereonet Tab also
+                    functions as an exploratory sensitivity tool: adjusting σ1/σ2/σ3 magnitudes, azimuth, pore
+                    pressure, or friction and watching how the hot/cool regions shift relative to the fixed pole
+                    population is a fast, visual way to bound plausible in-situ stress states consistent with an
+                    observed fracture set — a technique closely related to the stress-inversion methods used in
+                    borehole image-log interpretation (e.g. Barton et al., 1995; Zoback, 2007).
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="implementation">13. Implementation Notes</h2>
+
+                <h3>13.1 Class Structure</h3>
+                <p>
+                    <code>StereonetTab</code> is implemented as a Python mixin class, combined with
+                    <code>MapTab</code>, <code>RoseTab</code>, <code>MohrTab</code>, <code>TableTab</code>, and
+                    <code>MethodTab</code> via multiple inheritance into the top-level <code>SlipTendencyApp</code>
+                    class (see <code>dynamic_app.py</code>). This means every method described in this document
+                    (e.g. <code>_draw_stereonet</code>, <code>on_stereo_press</code>) executes with
+                    <code>self</code> bound to the full application instance, giving it direct access to
+                    <code>self.results</code>, <code>self.current_stress</code>,
+                    <code>self.selected_segment_id</code>, and every other tab's shared state without any explicit
+                    message-passing layer.
+                </p>
+
+                <h3>13.2 Variable Naming and Persistence</h3>
+                <p>
+                    All CTk variables use the <code>stereo_</code> prefix (e.g. <code>stereo_pole_color_var</code>)
+                    to avoid collisions with the identically-purposed variables in the Mohr and Map tabs.
+                    <code>_stereo_init_vars()</code> uses a <code>hasattr</code> guard on every variable so it can
+                    be called safely multiple times (e.g. on every rebuild after a Reset Defaults) without
+                    clobbering a value the user has since changed through some other code path.
+                </p>
+
+                <h3>13.3 Colour-Scale Sharing</h3>
+                <p>
+                    The colormap dropdown at the top of the tab is bound to the same
+                    <code>mohr_colormap_var</code> used by the Mohr tab (via
+                    <code>change_mohr_colour_scale()</code>), and the available colour-scale catalogue (Turbo,
+                    Viridis, Plasma, a custom Parula approximation, etc.) is defined once in the top-level
+                    <code>SlipTendencyApp</code> (<code>_colour_scale_definitions()</code>) and reused across
+                    every tab that offers a colour-scale choice.
+                </p>
+
+                <h3>13.4 Marker Shape Mapping</h3>
+                <p>
+                    The Pole Shape dropdown's human-readable labels are translated to Matplotlib marker codes
+                    through a fixed lookup: Circle→o, Diamond→D, Square→s, Triangle Up→^, Star→*, Cross→X. Note
+                    this Cross mapping ('X', a filled X) differs slightly from the Mohr tab's own pole-shape
+                    dictionary, which maps Cross to 'P' (a plus/filled-cross marker) — a cosmetic difference
+                    between the two tabs' otherwise parallel styling systems.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="limitations">14. Limitations</h2>
+                <table>
+                    <tr><th>Limitation</th><th>Description</th></tr>
+                    <tr><td>Spatially uniform stress assumption</td><td>The continuous tendency field assumes the stress tensor is spatially uniform; it does not account for local stress perturbations near existing fractures, free surfaces, or heterogeneous lithology.</td></tr>
+                    <tr><td>Visual clutter for dense datasets</td><td>Great-circle plane traces ("Show All Planes") can become visually cluttered for datasets with many hundreds of fractures; the fixed low alpha (0.25) mitigates but does not eliminate this.</td></tr>
+                    <tr><td>Non-linear angular compression</td><td>The equal-area projection, while area-preserving, still compresses angular relationships non-linearly toward the primitive circle; visual judgements of "cluster tightness" should be corroborated with the quantitative statistics available on the Rose tab.</td></tr>
+                    <tr><td>Dip clamping</td><td>Dip values are clipped to 0–90°; any input data implying an overturned or otherwise out-of-range dip will be silently clamped rather than rejected.</td></tr>
+                    <tr><td>Symbols index position not persisted</td><td>The Symbols index drag-repositioning state is not currently persisted in the saved project session file, so it resets to its default anchor when a project is reopened.</td></tr>
+                    <tr><td>No rake-misfit colour metric</td><td>Kinematic (Wallace–Bott) rake-misfit diagnostics for focal-mechanism data are available in the Table tab but are not exposed as a Stereonet colour-by metric.</td></tr>
+                </table>
+
+                <!-- ================================================= -->
+                <h2 id="references">15. References</h2>
+                <p>Allmendinger, R. W., Cardozo, N., &amp; Fisher, D. M. (2012). <em>Structural Geology Algorithms: Vectors and Tensors</em>. Cambridge University Press.</p>
+                <p>Anderson, E. M. (1951). <em>The Dynamics of Faulting and Dyke Formation with Applications to Britain</em> (2nd ed.). Oliver and Boyd.</p>
+                <p>Barton, C. A., Zoback, M. D., &amp; Moos, D. (1995). Fluid flow along potentially active faults in crystalline rock. <em>Geology</em>, 23(8), 683–686.</p>
+                <p>Morris, A., Ferrill, D. A., &amp; Henderson, D. B. (1996). Slip-tendency analysis and fault reactivation. <em>Geology</em>, 24(3), 275–278.</p>
+                <p>Wallace, R. E. (1951). Geometry of shearing stress and relation to faulting. <em>The Journal of Geology</em>, 59(2), 118–130.</p>
+                <p>Zoback, M. D. (2007). <em>Reservoir Geomechanics</em>. Cambridge University Press.</p>
+
                 <!-- Pagination Navigation -->
                 <div class="pagination-nav">
                     <!-- PREVIOUS BUTTON -->

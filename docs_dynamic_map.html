@@ -97,16 +97,789 @@
         <main class="docs-content">
             <div class="docs-content-inner">
                 <h1>Dynamic Map Tab</h1>
-                
+                <p>
+                    Located at <code>dynamic_analyzer/tabs/dynamic_map_tab.py</code>, the <strong>Map Tab</strong> (implemented as the
+                    <code>MapTab</code> mixin class) is the primary spatial visualization component of the
+                    <strong>Dynamic Analyzer</strong> workspace within FracSTAT. Whereas the Static Analyzer's
+                    Fracture Map tab presents purely geometric information (trace geometry, segment length,
+                    orientation), the Dynamic Analyzer's Map Tab overlays the mechanical response of each fracture
+                    segment — its resolved slip tendency, dilation tendency, fracture susceptibility, or binary
+                    critical-stress state — onto the same spatial or angular reference frame from which the segment
+                    was digitized.
+                </p>
+                <p>
+                    This module functions as the geometric and cartographic rendering engine for the
+                    <code>SlipTendencyApp</code> workspace (<code>dynamic_app.py</code>). It receives a fully
+                    populated pandas DataFrame of per-segment stress-resolution results (produced by
+                    <code>core.calculator.run_calculation</code>) and renders it using one of three complementary
+                    spatial representations, automatically selected according to the nature of the loaded dataset:
+                </p>
+                <ul>
+                    <li>A true-to-scale Cartesian map for SVG-digitized trace networks and for Excel/CSV datasets that carry genuine X–Y coordinate geometry;</li>
+                    <li>A synthetic unit-circle orientation wheel for legacy Excel/CSV fracture-plane tables (Strike/Dip only, with no real spatial position);</li>
+                    <li>A geographic longitude–latitude scatter map, with optional embedded beachball diagrams, for Global-CMT-style focal-mechanism datasets.</li>
+                </ul>
+                <p>
+                    The module also provides the calibrated real-world photographic background overlay, interactive
+                    pan/zoom, cross-tab segment highlighting, a fully configurable appearance settings panel, and a
+                    Move-Elements layout editor that lets the user reposition the plot axes and colour bar for
+                    publication-quality figure export.
+                </p>
+
+                <div class="toc-box">
+                    <p>On this page</p>
+                    <ul>
+                        <li><a href="#position">1. Position within the FracSTAT Architecture</a></li>
+                        <li><a href="#interface-overview">2. Interface Overview</a></li>
+                        <li><a href="#data-input">3. Data Input and Prerequisites</a></li>
+                        <li><a href="#controls">4. Settings and Controls</a></li>
+                        <li><a href="#maths">5. Mathematical Background</a></li>
+                        <li><a href="#algorithms">6. Algorithms</a></li>
+                        <li><a href="#workflow">7. Internal Workflow</a></li>
+                        <li><a href="#statistics">8. Statistical Methods &amp; Colour-Bar Geometry</a></li>
+                        <li><a href="#visualization">9. Visualization Components</a></li>
+                        <li><a href="#advanced">10. Advanced Features</a></li>
+                        <li><a href="#performance">11. Performance Optimization</a></li>
+                        <li><a href="#workflow-examples">12. Practical Examples</a></li>
+                        <li><a href="#interpretation">13. Geological Interpretation</a></li>
+                        <li><a href="#implementation">14. Implementation Notes</a></li>
+                        <li><a href="#limitations">15. Limitations</a></li>
+                        <li><a href="#references">16. References</a></li>
+                    </ul>
+                </div>
+
+                <!-- ================================================= -->
+                <h2 id="position">1. Position within the FracSTAT Architecture</h2>
+                <p>
+                    The Map Tab is one of six tabs assembled inside <code>SlipTendencyApp</code>
+                    (<code>dynamic_app.py</code>), the others being Rose, Mohr, Stereonet, Table, and Method. All six
+                    tabs share a single results DataFrame (<code>self.results</code>) that is recomputed whenever the
+                    user presses Calculate, changes a stress or geometry parameter, or loads a new SVG/Excel file. The
+                    Map Tab does not perform stress resolution itself; it is a pure consumer of the DataFrame produced
+                    by <code>core/calculator.py</code> and, for SVG data, the trace geometry produced by
+                    <code>core/svg_loader.py</code> and <code>core/models.py</code>.
+                </p>
+
+                <h3>1.1 Data Flow</h3>
+                <ol class="step-list">
+                    <li><code>core.svg_loader.read_svg_segments()</code> or <code>core.excel_loader.read_excel_segments()</code> parse the source file into a list of <code>Segment</code> objects.</li>
+                    <li><code>core.calculator.run_calculation()</code> resolves the stress tensor onto each segment, producing columns such as <code>StrikeDeg</code>, <code>DipDeg</code>, <code>SigmaN</code>, <code>Tau</code>, <code>SlipTendency</code>, <code>SlipTendencyNorm</code>, <code>DilationTendency</code>, <code>FractureSusceptibility</code>, <code>FractureSusceptibilityNorm</code>, <code>CriticalStress</code>, <code>CriticalStressValue</code>, <code>X1/Y1/X2/Y2</code>, <code>RawX1…RawY2</code>, <code>Lat</code>, <code>Lon</code>, <code>EventLabel</code>, <code>PlaneName</code>, <code>BeachballURL</code>, and related fields.</li>
+                    <li><code>dynamic_app.py</code> stores this table as <code>self.results</code> and calls <code>refresh_plots()</code>, which in turn calls <code>MapTab._draw_map()</code>.</li>
+                    <li><code>MapTab._draw_map()</code> dispatches to one of four internal drawing routines depending on the data source and the geometry actually present, and renders the result onto a Matplotlib Figure embedded in the CustomTkinter window via <code>FigureCanvasTkAgg</code>.</li>
+                    <li>User interaction with the Map Tab (segment selection, pan/zoom, appearance changes) feeds back into shared application state (<code>selected_segment_id</code>, view limits) that the Mohr, Stereonet, and Table tabs also read, enabling synchronized cross-tab highlighting.</li>
+                </ol>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="put_your_img_here.png" alt="Data-flow diagram: file loaders to calculator.run_calculation to results DataFrame to MapTab drawing dispatch to rendered canvas" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 2.1</strong> — Data-flow diagram: file loaders → <code>calculator.run_calculation()</code> → results DataFrame → MapTab drawing dispatch → rendered canvas.</span>
+                </figure>
+
+                <!-- ================================================= -->
+                <h2 id="interface-overview">2. Interface Overview</h2>
+                <p>
+                    The Map Tab occupies the full content area of the "Map" tab within the Dynamic Analyzer's
+                    CTkTabview. Its layout is a two-column grid: a resizable plot area on the left (weighted to
+                    expand) and a collapsible settings panel on the right (fixed width, hidden by default).
+                </p>
+
+                <h3>2.1 Toolbar</h3>
+                <p>A horizontal toolbar sits above the plot canvas and contains, from left to right:</p>
+                <table>
+                    <tr><th>Control</th><th>Type</th><th>Function</th></tr>
+                    <tr><td>"Scroll to zoom" label</td><td>Static label</td><td>Hint text reminding the user that the mouse scroll wheel zooms the plot.</td></tr>
+                    <tr><td>Zoom percentage label</td><td>Dynamic label</td><td>Displays the current zoom level as a percentage of the home (fit-to-data) view, e.g. "Zoom 100%".</td></tr>
+                    <tr><td>↻ Reset View</td><td>Button</td><td>Restores the axis limits to the home view computed the last time the map was drawn from data.</td></tr>
+                    <tr><td>⚙ Settings</td><td>Toggle button</td><td>Shows or hides the appearance/settings panel on the right-hand side of the tab.</td></tr>
+                    <tr><td>Save Image</td><td>Button</td><td>Exports the current figure (including any layout edits) to a PNG file in the project's plot-export folder, at the DPI configured in application settings.</td></tr>
+                </table>
+
+                <h3>2.2 Plot Canvas</h3>
+                <p>
+                    The plot canvas is a Matplotlib Figure (9 × 6 inches at 100 DPI) embedded via
+                    <code>FigureCanvasTkAgg</code>, containing one primary Axes object (<code>self.map_ax</code>) for
+                    the spatial or angular plot and one auxiliary Axes object (<code>self.map_cbar_ax</code>) reserved
+                    for the colour bar. The canvas supports mouse-wheel zoom, click-and-drag pan (left button),
+                    segment/event picking (for focal-mechanism data), and — when Move Elements mode is enabled from
+                    the shared workspace header — direct dragging of the plot and colour-bar axes to arbitrary
+                    positions within the figure.
+                </p>
+
+                <h3>2.3 Settings Panel</h3>
+                <p>
+                    The settings panel is a <code>CTkScrollableFrame</code>, 230&nbsp;px wide, that is not built into
+                    the layout until the user first opens it via the ⚙ Settings toolbar button
+                    (<code>toggle_map_settings</code>). It is organized into four labelled sections — Display
+                    Options, Map Elements, Colour Bar, and Background Image — followed by a
+                    <strong>Reset Map Defaults</strong> button. Every control in the panel is wired to immediately
+                    redraw the map with <code>preserve_view=True</code>, so pan/zoom position is not lost while the
+                    user experiments with appearance settings.
+                </p>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="put_your_img_here.png" alt="Overview of the Dynamic Analyzer workspace with the Map Tab active, showing the toolbar, plot canvas, and collapsed settings panel" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 3.1</strong> — Annotated screenshot of the Map Tab toolbar, plot canvas, and expanded settings panel.</span>
+                </figure>
+
+                <!-- ================================================= -->
+                <h2 id="data-input">3. Data Input and Prerequisites</h2>
+                <p>
+                    The Map Tab does not load files itself; it consumes state populated by the shared workspace
+                    header's Load SVG / Load Excel actions and by <code>core.calculator.run_calculation()</code>.
+                    Three attributes on the parent <code>SlipTendencyApp</code> instance govern which drawing
+                    routine is used:
+                </p>
+                <table>
+                    <tr><th>Attribute</th><th>Origin</th><th>Role</th></tr>
+                    <tr><td><code>self.results</code></td><td><code>core.calculator.run_calculation()</code></td><td>Per-segment DataFrame; the sole data source for every plotted element.</td></tr>
+                    <tr><td><code>self.data_source</code></td><td>"svg" or "excel"</td><td>Selected when a file is loaded; drives the top-level branch of the drawing dispatch.</td></tr>
+                    <tr><td><code>self.segments[0]._has_map_geometry</code></td><td><code>core.models.Segment</code></td><td>Boolean flag distinguishing genuinely spatial data (True) from orientation-only legacy fracture-plane or Trend/Plunge tables (False).</td></tr>
+                </table>
+
+                <h3>3.1 Required and Optional Columns</h3>
+                <p>Depending on the branch selected, the following results columns are read:</p>
+                <ul>
+                    <li><strong>Cartesian / SVG mode:</strong> <code>X1, Y1, X2, Y2</code> (scaled, real-world units) and <code>RawX1, RawY1, RawX2, RawY2</code> (unscaled SVG pixel coordinates, used only when the profile has not yet been calibrated — see <a href="#maths">Section 5.3</a>).</li>
+                    <li><strong>Orientation-wheel mode:</strong> <code>StrikeDeg</code>, <code>DipDeg</code>, <code>ID</code>.</li>
+                    <li><strong>Geographic mode:</strong> <code>Lat</code>, <code>Lon</code>, <code>PlaneName</code>, <code>EventLabel</code>, <code>Region</code>, <code>BeachballURL</code>.</li>
+                    <li><strong>All modes:</strong> <code>ID</code> (for selection), plus whichever attribute column is selected for colouring (<code>SlipTendency</code>/<code>SlipTendencyNorm</code>, <code>DilationTendency</code>, <code>FractureSusceptibility</code>/<code>FractureSusceptibilityNorm</code>, or <code>CriticalStressValue</code>).</li>
+                </ul>
+
+                <h3>3.2 Coordinate Calibration Prerequisite</h3>
+                <p>
+                    Cartesian rendering assumes the fracture network has been placed within a physically meaningful
+                    profile box. If the profile has not yet been calibrated (Width and Length sidebar fields still at
+                    their uncalibrated defaults of 260 and 100), the module falls back to plotting the raw, unscaled
+                    SVG pixel coordinates so that the original digitized proportions are preserved rather than being
+                    artificially stretched to fill a default 260 × 100 box — see the raw-coordinate detection logic
+                    described in <a href="#algorithms">Section 6.2</a>.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="controls">4. Settings and Controls</h2>
+                <p>
+                    This section documents every control in the Map Tab settings panel, its default value, its
+                    valid range or accepted values, and its visual effect. All controls redraw the map immediately
+                    upon change (<code>preserve_view=True</code>) except where noted.
+                </p>
+
+                <h3>4.1 Display Options</h3>
+                <table>
+                    <tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
+                    <tr><td>Line width (SVG/Geo)</td><td>Text entry</td><td>1.8</td><td>Sets the LineCollection stroke width (points) for Cartesian traces, and separately scales the marker size of focal-mechanism event points (base_size = 85 × value) and orientation-wheel tick width.</td></tr>
+                    <tr><td>Custom title (blank = auto)</td><td>Text entry</td><td>(empty)</td><td>Overrides the automatically generated plot title. When blank, a descriptive title is generated from the active attribute (e.g. "Slip tendency by fracture segment").</td></tr>
+                    <tr><td>Show compass (Wheel Map)</td><td>Checkbox</td><td>On</td><td>Toggles the N/E/S/W compass labels drawn around the orientation wheel. Has no visible effect in Cartesian or geographic modes.</td></tr>
+                </table>
+
+                <h3>4.2 Map Elements</h3>
+                <table>
+                    <tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
+                    <tr><td>Outer BG</td><td>Colour swatch</td><td>#F5F7FA</td><td>Figure (outer canvas) background colour.</td></tr>
+                    <tr><td>Plot BG</td><td>Colour swatch</td><td>#FFFFFF</td><td>Axes (inner plot) background colour.</td></tr>
+                    <tr><td>Grid Color</td><td>Colour swatch</td><td>#D9E2EC</td><td>Colour of the gridlines, when shown.</td></tr>
+                    <tr><td>Show grid lines</td><td>Checkbox</td><td>On</td><td>Toggles the Matplotlib grid overlay.</td></tr>
+                    <tr><td>Grid line width</td><td>Text entry</td><td>0.6</td><td>Line width (points) of gridlines; alpha is fixed internally at 0.6.</td></tr>
+                    <tr><td>Boundary Color</td><td>Colour swatch</td><td>#1F2933</td><td>Colour applied to all four Axes spines (the plot border).</td></tr>
+                    <tr><td>Boundary width</td><td>Text entry</td><td>1.0</td><td>Line width (points) of the plot border spines.</td></tr>
+                </table>
+
+                <h3>4.3 Colour Bar</h3>
+                <table>
+                    <tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
+                    <tr><td>Position</td><td>Dropdown</td><td>Bottom</td><td>Bottom / Top / Left / Right / None. Determines where the colour bar is docked and how the main Axes is resized to make room for it (see <a href="#statistics">Section 8.4</a> for exact geometry).</td></tr>
+                    <tr><td>Length (e.g., 0.8 for 80%)</td><td>Text entry</td><td>0.8</td><td>Fractional length of the colour bar relative to the corresponding figure dimension, clamped to [0.1, 1.0].</td></tr>
+                </table>
+
+                <h3>4.4 Background Image</h3>
+                <table>
+                    <tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
+                    <tr><td>Show real photo behind traces</td><td>Checkbox</td><td>Off</td><td>Enables the calibrated background photograph overlay. If no image path is known, checking this box immediately opens a file-selection dialog; if the user cancels, the checkbox is reverted to off.</td></tr>
+                    <tr><td>Status label</td><td>Read-only label</td><td>"No image set"</td><td>Displays the file name of the currently associated background image, or "No image set".</td></tr>
+                    <tr><td>Change Image…</td><td>Button</td><td>—</td><td>Opens a file dialog (PNG/JPG/JPEG/BMP/TIFF/TIF/WEBP) to select or replace the background image; redraws immediately if the overlay is currently enabled.</td></tr>
+                    <tr><td>Image opacity (0–1)</td><td>Text entry</td><td>1.0</td><td>Alpha blending factor applied to the background image via <code>imshow</code>, clamped to [0, 1].</td></tr>
+                </table>
+
+                <h3>4.5 Reset Map Defaults</h3>
+                <p>
+                    The <strong>Reset Map Defaults</strong> button restores every Display Options, Map Elements, and
+                    Colour Bar control to the factory values listed above and redraws the map with
+                    <code>preserve_view=True</code>. By deliberate design, this reset does <em>not</em> clear the
+                    Background Image settings (mode, path, or opacity): the code comment in the implementation notes
+                    that "resetting plot cosmetics shouldn't silently detach a calibrated reference photo the user
+                    deliberately attached." A calibrated photograph therefore survives a cosmetic reset and must be
+                    removed explicitly by unchecking the Background Image checkbox.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="maths">5. Mathematical Background</h2>
+
+                <h3>5.1 Colour-Mapped Attributes</h3>
+                <p>
+                    The Map Tab colours every plotted element (line segment, orientation tick, or event marker)
+                    according to one of four mechanical attributes, selected via the Display card's "Map Display"
+                    dropdown in the sidebar (outside the Map Tab itself, but consumed here) and the "Color by
+                    normalized Tₛ" checkbox. The mapping from the selected mode to a results column, axis label, and
+                    title fragment is:
+                </p>
+                <table>
+                    <tr><th>Map Display Mode</th><th>Normalized column</th><th>Raw column</th><th>Formula</th></tr>
+                    <tr><td>Slip tendency</td><td>SlipTendencyNorm</td><td>SlipTendency</td><td>Tₛ = τ / σₙ</td></tr>
+                    <tr><td>Dilation tendency</td><td>— (always shown raw)</td><td>DilationTendency</td><td>T_d = (σ₁ − σₙ) / (σ₁ − σ₃)</td></tr>
+                    <tr><td>Fracture susceptibility</td><td>FractureSusceptibilityNorm</td><td>FractureSusceptibility</td><td>S_f = σₙ − P_f − (τ − C₀) / μ</td></tr>
+                    <tr><td>Critical fractures</td><td>CriticalStressValue (binary)</td><td>—</td><td>1 if τ ≥ μ(σₙ − P_f) + C₀, else 0</td></tr>
+                </table>
+
+                <h4>5.1.1 Definition of Terms</h4>
+                <ul>
+                    <li><strong>σₙ</strong> — normal stress resolved on the fracture plane (MPa).</li>
+                    <li><strong>τ</strong> — shear stress resolved on the fracture plane (MPa).</li>
+                    <li><strong>σ₁, σ₃</strong> — maximum and minimum principal stresses (MPa).</li>
+                    <li><strong>P_f</strong> — pore-fluid pressure (MPa).</li>
+                    <li><strong>C₀</strong> — cohesion of the fracture surface (MPa).</li>
+                    <li><strong>μ</strong> — coefficient of friction (dimensionless).</li>
+                    <li><strong>Tₛ (Slip Tendency)</strong> — the ratio of resolved shear to normal stress; a plane slips when Tₛ approaches or exceeds μ.</li>
+                    <li><strong>T_d (Dilation Tendency)</strong> — the propensity of a fracture to open (dilate) under the current stress state, normalized between the two principal stress extremes.</li>
+                    <li><strong>S_f (Fracture Susceptibility)</strong> — a Mohr-Coulomb failure-margin proxy combining effective normal stress and cohesion-corrected shear stress; lower (more negative) values indicate closer proximity to shear failure.</li>
+                </ul>
+
+                <h4>5.1.2 Normalization</h4>
+                <p>
+                    When "Color by normalized Tₛ" is enabled, Slip Tendency is divided by a theoretical maximum
+                    Tₛ,max computed analytically from σ₁ and σ₃ alone (independent of the sampled fracture set — see
+                    <code>core.calculator._theoretical_max_slip_tendency</code>), guaranteeing that
+                    <code>SlipTendencyNorm</code> values fall in a stable, comparable [0, ~1] range regardless of
+                    which fractures happen to be present in the loaded dataset. <code>FractureSusceptibilityNorm</code>
+                    is instead a simple min–max rescaling across the loaded fracture population:
+                    (S_f − S_f,min) / (S_f,max − S_f,min). Dilation Tendency and Critical Fractures are
+                    dimensionless/binary by construction and are never further normalized.
+                </p>
+
+                <h3>5.2 Colour Normalization for Rendering</h3>
+                <p>
+                    Once the attribute column is selected, <code>MapTab.attribute_colormap_and_norm()</code>
+                    (delegating to <code>SlipTendencyApp._attribute_norm</code> in <code>dynamic_app.py</code>)
+                    determines the Matplotlib <code>Normalize</code> object used to map data values to the 0–1
+                    colormap domain:
+                </p>
+                <ul>
+                    <li>Columns ending in "Norm", plus <code>CriticalStressValue</code> and <code>DilationTendency</code>, use a fixed <code>Normalize(vmin=0, vmax=1)</code>.</li>
+                    <li>All other (raw, unnormalized) columns use the empirical minimum and maximum of the finite values present in the current dataset. If the data is degenerate (min ≈ max), a symmetric padding of 5% of the magnitude (or 1.0 if the value is exactly zero) is applied so the colour scale remains well-defined.</li>
+                    <li><code>CriticalStressValue</code> is treated specially: rather than a continuous colormap, a two-colour <code>ListedColormap(["muted", "failure"])</code> is combined with a <code>BoundaryNorm([-0.5, 0.5, 1.5], N)</code> so that the binary 0/1 values are rendered as two crisp, discrete colours ("Stable" and "Critical") rather than a misleading continuous gradient. The colour bar in this mode is relabelled with the ticks "Stable" and "Critical" instead of numeric values.</li>
+                </ul>
+
+                <h3>5.3 Cartesian Coordinate Scaling</h3>
+                <p>
+                    For SVG-sourced traces, real-world segment endpoints (X1, Y1, X2, Y2) are computed upstream by
+                    scaling the raw pixel bounding box of the digitized traces onto the user-specified Profile Width
+                    × Profile Length box. Because the module cannot know from the DataFrame alone whether this
+                    calibration has actually been performed, it applies a heuristic: if the scaled data's X-span and
+                    Y-span are numerically close (relative tolerance 1 × 10⁻³) to the un-calibrated default profile
+                    dimensions of 260 and 100 (the StringVar defaults for <code>profile_width_var</code> and
+                    <code>profile_height_var</code> in <code>dynamic_app.py</code>), the module infers that no real
+                    calibration has occurred and instead renders the <code>RawX1/RawY1/RawX2/RawY2</code> pixel
+                    columns, preserving the original digitized aspect ratio rather than an arbitrary default
+                    stretch. Axis labels switch accordingly from "X (unit)"/"Y (unit)" to "X (px)"/"Y (px)".
+                </p>
+
+                <h3>5.4 Orientation-Wheel Geometry</h3>
+                <p>
+                    For legacy Excel/CSV fracture-plane tables with Strike/Dip but no spatial coordinates, each
+                    fracture is represented as a short radial tick mark on a unit circle (radius R = 1). Let θ be the
+                    strike azimuth in radians (compass convention: 0° = north, increasing clockwise) and δ be the
+                    true dip in degrees. The tick's centre point is:
+                </p>
+                <div class="formula-block">cx = R · sin(θ),   cy = R · cos(θ)</div>
+                <p>and the tick extends symmetrically along the local perpendicular direction, (cos θ, −sin θ), by a half-length of:</p>
+                <div class="formula-block">half = 0.12 · sin(δ · π/180)</div>
+                <p>
+                    so that a vertical fracture (δ = 90°) is drawn as the longest possible tick, while a horizontal
+                    (bedding-parallel, δ = 0°) fracture collapses to a point — an intuitive visual analogue of true
+                    dip magnitude. The wheel therefore encodes strike as angular position around the circle and dip
+                    as radial tick length, giving a compact one-glance summary of the orientation population without
+                    requiring real spatial coordinates.
+                </p>
+
+                <h3>5.5 Geographic (Focal-Mechanism) Projection</h3>
+                <p>
+                    For focal-mechanism datasets, event locations are plotted directly in longitude/latitude space.
+                    Because one degree of longitude does not span the same physical distance as one degree of
+                    latitude away from the equator, the Axes aspect ratio is corrected by:
+                </p>
+                <div class="formula-block">aspect = 1 / max(cos(latitude_mean · π/180), 0.15)</div>
+                <p>
+                    where latitude_mean is the arithmetic mean latitude of the plotted events. This keeps
+                    circular/point features visually undistorted at the map's characteristic latitude, using a lower
+                    bound of 0.15 to avoid an unbounded aspect ratio near the poles.
+                </p>
+
+                <h3>5.6 Interactive Zoom Mathematics</h3>
+                <p>
+                    Mouse-wheel zooming is implemented as a cursor-anchored rescaling of the current axis limits.
+                    Given a zoom factor f (0.85 per "scroll up" step, 1.18 per "scroll down" step) and cursor
+                    data-coordinates (cx, cy), the fractional position of the cursor within the current view is
+                    computed for each axis, e.g. for x:
+                </p>
+                <div class="formula-block">relx = (cx − x_min) / (x_max − x_min)</div>
+                <p>
+                    The axis span is then scaled by f and the new limits are placed so that the cursor's fractional
+                    position within the view is preserved, i.e. the point under the cursor remains stationary on
+                    screen while the surrounding view expands or contracts. The same logic is applied independently
+                    to the y-axis, and correctly accounts for inverted axis directions (relevant when the SVG Y-axis
+                    convention places larger Y values toward the top of the screen).
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="algorithms">6. Algorithms</h2>
+
+                <h3>6.1 Drawing Dispatch Algorithm</h3>
+                <p>
+                    Every call to <code>_draw_map()</code> begins by determining which of four internal renderers
+                    should handle the current dataset. The decision tree, implemented in <code>_draw_map()</code> and
+                    mirrored in the table below, is evaluated in this priority order:
+                </p>
+                <table>
+                    <tr><th>Step</th><th>Condition Tested</th><th>Routine Invoked</th></tr>
+                    <tr><td>1</td><td><code>data_source == "excel"</code> and <code>segments[0]._has_map_geometry is False</code></td><td><code>_draw_map_no_geometry</code> — explanatory empty-state message</td></tr>
+                    <tr><td>2</td><td><code>data_source == "excel"</code>, geometry present, and "Lat" column has at least one non-null value</td><td><code>_draw_map_geo</code> — geographic focal-mechanism map</td></tr>
+                    <tr><td>3</td><td><code>data_source == "excel"</code>, geometry present, no Lat data, and "Length" column is not uniformly zero</td><td><code>_draw_map_svg</code> — Cartesian map using the genuine X/Y coordinates supplied by the spreadsheet</td></tr>
+                    <tr><td>4</td><td><code>data_source == "excel"</code>, none of the above (legacy Strike/Dip table)</td><td><code>_draw_map_excel</code> — synthetic orientation wheel</td></tr>
+                    <tr><td>5</td><td><code>data_source == "svg"</code> (default branch)</td><td><code>_draw_map_svg</code> — Cartesian map from digitized trace geometry</td></tr>
+                </table>
+
                 <div class="code-window">
                     <div class="code-header">
                         <span class="code-lang">python</span>
                         <button class="copy-btn">Copy</button>
                     </div>
-                    <pre><code class="language-python">
-                        DEMO OF CODE SNIPPET
-                    </code></pre>
+                    <pre><code class="language-python">def _draw_map(self, preserve_view=False):
+    if getattr(self, "data_source", "svg") == "excel":
+        segs = getattr(self, "segments", None)
+        has_geometry = bool(segs) and getattr(segs[0], "_has_map_geometry", True)
+
+        # 0. No real spatial coordinates and no Lat/Lon — e.g. a legacy
+        #    fracture-plane file or a Trend/Plunge pole file. There is no
+        #    meaningful map to draw, so show an explanatory empty state.
+        if not has_geometry:
+            self._draw_map_no_geometry(preserve_view)
+
+        # 1. Geographic Data (Focal Mechanisms)
+        elif "Lat" in self.results.columns and self.results["Lat"].notna().any():
+            self._draw_map_geo(preserve_view)
+
+        # 2. Raw Coordinate Data (Spatial Map)
+        elif "Length" in self.results.columns and not (self.results["Length"] == 0).all():
+            self._draw_map_svg(preserve_view)
+
+        # 3. Legacy Strike/Dip (Orientation Wheel)
+        else:
+            self._draw_map_excel(preserve_view)
+    else:
+        # Standard SVG
+        self._draw_map_svg(preserve_view)</code></pre>
                 </div>
+                <p class="ph-caption" style="text-align:left; margin: -1rem 0 1.5rem 0;">Simplified excerpt of the drawing dispatch logic implemented in <code>_draw_map()</code>.</p>
+
+                <h3>6.2 Cartesian Rendering Algorithm (<code>_draw_map_svg</code>)</h3>
+                <ol class="step-list">
+                    <li>Preserve the current axis limits if <code>preserve_view</code> is requested and a home view already exists.</li>
+                    <li>Clear the plot and colour-bar Axes and apply the outer/inner background colours.</li>
+                    <li>Determine whether raw (uncalibrated) or scaled coordinates should be used, per the heuristic in <a href="#maths">Section 5.3</a>.</li>
+                    <li>Reshape the endpoint columns into an (N, 2, 2) array suitable for a Matplotlib <code>LineCollection</code>.</li>
+                    <li>Compute the data bounding box and draw the calibrated background photograph, if enabled, beneath the traces (zorder = 0).</li>
+                    <li>Apply a 2% padding margin to the bounding box so that boundary segments are not visually clipped.</li>
+                    <li>Resolve the active colouring attribute and its colormap/normalization (<a href="#maths">Sections 5.1–5.2</a>), build the <code>LineCollection</code> with per-segment colour values, and add it to the Axes.</li>
+                    <li>If a segment is currently selected (<code>selected_segment_id</code>), redraw it with a two-layer halo-and-core highlight (a thick under-stroke in the text colour, a slightly narrower over-stroke in the failure/accent colour) plus endpoint markers, so the selection remains visible against any colormap.</li>
+                    <li>Position and populate the colour bar according to the chosen dock position (<a href="#statistics">Section 8.4</a>), or hide it and expand the plot Axes if "None" is selected.</li>
+                    <li>Apply axis limits (respecting the Y-axis reversal setting), then set the aspect ratio to 'equal' with <code>adjustable='box'</code> — deliberately applied after the limits so the plot area shrinks to fit the data rather than stretching the data to fill the plot area.</li>
+                    <li>Store the resulting (pre-aspect-correction) tight data bounds as the new "home" view for the Reset View button and zoom-percentage calculation.</li>
+                    <li>Apply axis labels, title, gridlines, and boundary spine styling; refresh the zoom label; request an idle canvas redraw.</li>
+                </ol>
+
+                <h3>6.3 Orientation-Wheel Rendering Algorithm (<code>_draw_map_excel</code>)</h3>
+                <ol class="step-list">
+                    <li>Draw the unit-circle boundary ring and, if enabled, the four compass labels.</li>
+                    <li>For each fracture, compute its tick centre and half-length per <a href="#maths">Section 5.4</a>, colour it by the active attribute, and collect all ticks into a single <code>LineCollection</code> for efficient rendering.</li>
+                    <li>If a segment is selected, recompute its tick position and draw the same halo-and-core highlight pattern used in Cartesian mode, plus an "ID n" text annotation offset from the tick.</li>
+                    <li>Fix the axis limits to a symmetric [-1.35, 1.35] box (turning off axis ticks and labels, since the wheel has no physical coordinate system), apply the descriptive title, and finalize styling exactly as in Cartesian mode.</li>
+                </ol>
+
+                <h3>6.4 Geographic Rendering Algorithm (<code>_draw_map_geo</code>)</h3>
+                <ol class="step-list">
+                    <li>Reduce the results table to one representative row per event: rows tagged <code>PlaneName == "FP1"</code> are preferred when present (so two-nodal-plane focal mechanisms are not double-plotted); otherwise rows are de-duplicated on the (Lat, Lon) pair.</li>
+                    <li>Resolve the active attribute for colouring and build a single scatter plot of all events, with marker size proportional to the Line width control.</li>
+                    <li>Compute padded longitude/latitude limits (12% of the data range, or a fixed 0.5–1.0° minimum pad for single-point or degenerate datasets) and apply the latitude-corrected aspect ratio from <a href="#maths">Section 5.5</a>.</li>
+                    <li>If a segment/event is selected, draw a double concentric-ring highlight around it, an event-label annotation, and — if a Beachball URL is present for that event — invoke the beachball inset renderer (<a href="#visualization">Section 9.2</a>).</li>
+                    <li>Position the colour bar and finalize styling as in the other two modes.</li>
+                </ol>
+
+                <h3>6.5 Empty-State Algorithm (<code>_draw_map_no_geometry</code>)</h3>
+                <p>
+                    When the loaded Excel/CSV table has neither spatial coordinates nor latitude/longitude columns
+                    (e.g. a legacy fracture-plane file lacking even orientation-wheel-compatible fields, or a
+                    Trend/Plunge pole file), the module deliberately avoids drawing a misleading synthetic map.
+                    Instead it clears the Axes, hides the colour bar, and displays a centred, word-wrapped
+                    explanatory message directing the user to the Table, Rose, Mohr, and Stereonet tabs, where
+                    orientation and stress results remain fully available.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="workflow">7. Internal Workflow</h2>
+                <p>The Map Tab participates in the broader Dynamic Analyzer refresh cycle as follows:</p>
+                <ol class="step-list">
+                    <li>The user loads an SVG or Excel/CSV file, or edits a stress/geometry parameter, or clicks Calculate.</li>
+                    <li><code>SlipTendencyApp.calculate()</code> (<code>dynamic_app.py</code>) invokes <code>core.calculator.run_calculation()</code> and stores the returned DataFrame as <code>self.results</code>.</li>
+                    <li><code>SlipTendencyApp.refresh_plots()</code> is called, which invokes <code>MapTab._draw_map(preserve_view=...)</code> alongside the Rose, Mohr, and Stereonet tabs' own redraw methods.</li>
+                    <li><code>_draw_map()</code> runs the dispatch algorithm of <a href="#algorithms">Section 6.1</a> and delegates to the appropriate renderer.</li>
+                    <li>The renderer clears and repopulates the Matplotlib Axes, updates <code>self._map_home_limits</code>, and calls <code>draw_idle()</code> on the <code>FigureCanvasTkAgg</code> for an efficient, non-blocking repaint.</li>
+                    <li>Subsequent user interactions — mouse-wheel zoom, click-drag pan, segment selection in this or another tab, or a settings-panel change — call <code>_draw_map(preserve_view=True)</code> so the current pan/zoom state (rather than the freshly computed home view) is retained across cosmetic or selection-only updates.</li>
+                </ol>
+
+                <h3>7.1 Cross-Tab Segment Selection</h3>
+                <p>
+                    Clicking a focal-mechanism event marker (geographic mode only; Cartesian and wheel modes do not
+                    currently support direct click-to-select on the map itself) triggers <code>on_map_pick()</code>,
+                    which resolves the picked scatter index back to a segment ID via the parallel
+                    <code>_map_geo_ids</code> array and calls the shared <code>select_segment()</code> method on the
+                    parent application. This, in turn, updates <code>selected_segment_id</code> and triggers a
+                    synchronized redraw of the Map, Mohr, and Stereonet tabs, and refreshes the Table tab's active
+                    row — so a fracture identified as critically stressed in the Mohr diagram can be located
+                    instantly on the map, and vice versa.
+                </p>
+
+                <h3>7.2 State Persistence</h3>
+                <p>
+                    Several pieces of Map Tab state persist across saves/reloads of a project session (see
+                    <code>core/project_state.py</code>): the background-image mode flag, image path, and opacity are
+                    written into the saved session JSON so a calibrated photograph reattaches automatically when the
+                    project is reopened. Pan/zoom position and the settings-panel open/closed state are, by contrast,
+                    session-local UI state and are not persisted.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="statistics">8. Statistical Methods and Colour-Bar Geometry</h2>
+
+                <h3>8.1 Descriptive Range Handling</h3>
+                <p>
+                    For raw (non-normalized) attribute columns, the module relies on the empirical minimum and
+                    maximum of the finite values in the current results table (<a href="#maths">Section 5.2</a>)
+                    rather than any fixed theoretical range. This is a deliberate choice: because Fracture
+                    Susceptibility and raw Slip Tendency have stress-tensor-dependent physical ranges, a fixed
+                    colour scale would either clip informative variation or waste dynamic range on datasets with a
+                    narrow spread. The 5% padding rule for degenerate (single-value) datasets prevents a
+                    divide-by-zero condition in Matplotlib's <code>Normalize</code> and ensures the colour bar always
+                    renders a visible, non-degenerate gradient.
+                </p>
+
+                <h3>8.2 Binary Classification Display</h3>
+                <p>
+                    The Critical Fractures mode is a two-class statistical summary rather than a continuous field:
+                    each segment is classified as "Critical" (τ at or above the Mohr-Coulomb failure threshold) or
+                    "Stable" (below it). The Map Tab renders this classification with a fixed two-colour palette and
+                    boundary-normalized colour mapping (<a href="#maths">Section 5.2</a>) so that the discrete nature
+                    of the result is never misrepresented as a continuous gradient — a common source of
+                    misinterpretation in geomechanical figures.
+                </p>
+
+                <h3>8.3 Event De-duplication (Geographic Mode)</h3>
+                <p>
+                    Focal-mechanism datasets may contain one or two nodal-plane rows per physical earthquake. The Map
+                    Tab's de-duplication step (preferring the FP1-tagged row, or otherwise the first occurrence of
+                    each unique Lat/Lon pair) ensures that summary statistics implied by the map — the number of
+                    markers, their spatial density — correctly reflect the number of physical events rather than the
+                    number of nodal-plane table rows.
+                </p>
+
+                <h3>8.4 Colour-Bar Docking Geometry</h3>
+                <p>
+                    The exact rectangle occupied by the colour bar Axes, and the corresponding resize of the main
+                    plot Axes, is computed from the user-selected Position and Length settings as follows (all
+                    values in figure-fraction coordinates; L = user-configured colour-bar length fraction):
+                </p>
+                <table>
+                    <tr><th>Position</th><th>Colour-bar rectangle (left, bottom, width, height)</th><th>Main-axes rectangle (left, bottom, width, height)</th></tr>
+                    <tr><td>Bottom</td><td>(0.5 − L/2, 0.07, L, 0.03)</td><td>(0.08, 0.18, 0.88, 0.74)</td></tr>
+                    <tr><td>Top</td><td>(0.5 − L/2, 0.92, L, 0.03)</td><td>(0.08, 0.06, 0.88, 0.78)</td></tr>
+                    <tr><td>Left</td><td>(0.03, 0.5 − L/2, 0.02, L)</td><td>(0.12, 0.06, 0.84, 0.88)</td></tr>
+                    <tr><td>Right</td><td>(0.94, 0.5 − L/2, 0.02, L)</td><td>(0.06, 0.06, 0.84, 0.88)</td></tr>
+                    <tr><td>None</td><td>(colour bar hidden)</td><td>(0.08, 0.06, 0.88, 0.88)</td></tr>
+                </table>
+                <p>
+                    For binary Critical Fractures colouring, the colour bar's tick marks are overridden to display
+                    the text labels "Stable" and "Critical" at positions 0 and 1 respectively, in place of numeric
+                    tick values.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="visualization">9. Visualization Components</h2>
+
+                <h3>9.1 Line and Marker Rendering</h3>
+                <p>
+                    All fracture segments (or orientation ticks) sharing a common colouring attribute are rendered
+                    as a single Matplotlib <code>LineCollection</code> rather than as individually plotted lines.
+                    This is both a performance optimization (<a href="#performance">Section 11</a>) and a
+                    visual-consistency measure, since a <code>LineCollection</code> guarantees uniform handling of
+                    colour mapping, z-ordering, and anti-aliasing across the entire fracture population.
+                </p>
+
+                <h3>9.2 Beachball Diagram Insets</h3>
+                <p>
+                    For focal-mechanism datasets that supply a Beachball URL, selecting an event renders an inset
+                    diagram card near that event's marker using Matplotlib's offsetbox machinery
+                    (<code>AnnotationBbox</code>, <code>OffsetImage</code>, <code>VPacker</code>,
+                    <code>DrawingArea</code>, <code>TextArea</code>). The inset card displays:
+                </p>
+                <ul>
+                    <li>A bold title line showing the event label (or "Focal mechanism" if unavailable);</li>
+                    <li>The downloaded beachball image, once available, rendered via <code>OffsetImage</code>;</li>
+                    <li>A live "Loading…" placeholder — a circular ring with a coloured arc segment mimicking a spinner — while the image is still downloading;</li>
+                    <li>An "Image unavailable" placeholder if the download failed.</li>
+                </ul>
+                <p>
+                    The card is drawn with a rounded, semi-transparent background box, an arrow connector back to the
+                    event's map location, and (where the Matplotlib version supports it) a subtle drop-shadow path
+                    effect for visual depth, styled to match the current light/dark appearance mode.
+                </p>
+
+                <h3>9.3 Selection Highlighting</h3>
+                <p>
+                    Across all three rendering modes, the currently selected fracture is emphasized with a
+                    consistent two-layer "halo and core" technique: a wider stroke in the workspace text colour is
+                    drawn first, followed by a narrower stroke in the failure/accent colour on top, producing a
+                    high-contrast outline that remains legible regardless of the underlying colormap. Endpoint or
+                    event markers are added in the accent colour with a contrasting edge, and — in geographic and
+                    wheel modes — a short text label identifying the segment ID or event label is annotated nearby.
+                </p>
+
+                <h3>9.4 Background Photograph Overlay</h3>
+                <p>
+                    The calibrated real-world photograph, when enabled, is drawn beneath all vector content (zorder
+                    = 0) using <code>imshow</code> with an extent tuple of (xmin, xmax, ymax, ymin) rather than the
+                    more conventional (xmin, xmax, ymin, ymax). This intentional vertical flip compensates for the
+                    SVG coordinate convention (Y increasing downward) so that the photograph aligns pixel-for-pixel
+                    with the overlaid trace geometry rather than appearing upside-down relative to it.
+                </p>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="put_your_img_here.png" alt="Example Cartesian map with a calibrated background photograph, coloured by normalized Slip Tendency, with a selected segment highlighted" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 10.1</strong> — Example Cartesian map with a calibrated background photograph, coloured by normalized Slip Tendency, with a selected segment highlighted.</span>
+                </figure>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="put_your_img_here.png" alt="Example geographic focal-mechanism map with an expanded beachball diagram inset for the selected event" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 10.2</strong> — Example geographic focal-mechanism map with an expanded beachball diagram inset for the selected event.</span>
+                </figure>
+
+                <!-- ================================================= -->
+                <h2 id="advanced">10. Advanced Features</h2>
+
+                <h3>10.1 Move Elements Layout Editor</h3>
+                <p>
+                    When Move Elements mode is enabled from the shared workspace header (top toolbar, outside this
+                    module), clicking and dragging inside the map or colour-bar Axes repositions that Axes' bounding
+                    box within the figure, in real time, by translating the mouse displacement in screen pixels into
+                    figure-fraction coordinates. This allows the user to manually compose a publication-ready layout
+                    — for example, shrinking the plot slightly and relocating the colour bar to an unconventional
+                    position — before using Save Image to export a high-resolution figure. The Map Tab intercepts
+                    these press/motion/release events itself (<code>_on_layout_press</code>,
+                    <code>_on_layout_motion</code>, <code>_on_layout_release</code>) rather than relying solely on
+                    the generic cross-tab layout-editing handlers used by the Rose, Mohr, and Stereonet tabs, because
+                    the Map Tab's canvas also has ordinary pan/zoom bindings on the same mouse buttons that must be
+                    suppressed while editing is active.
+                </p>
+
+                <h3>10.2 Calibrated Background Photograph Auto-Detection</h3>
+                <p>
+                    The module attempts to automatically reattach a background photograph without requiring the user
+                    to re-browse for it, using a three-tier fallback search: (1) the path already stored for this
+                    session, if the file still exists; (2) a sidecar PNG file named after the source SVG
+                    ("&lt;name&gt;_bg.png"), automatically written by the Trace Map tool when a photograph was
+                    calibrated there; (3) a photograph already calibrated in the Static Analyzer workspace for the
+                    same project, shared live via the launcher's cross-workspace state. This means a single
+                    calibration performed anywhere in the application — the Trace Map tool, the Static Analyzer, or
+                    the Dynamic Analyzer's own Scale dialog — becomes available to the Map Tab without repetition.
+                </p>
+
+                <h3>10.3 Asynchronous Beachball Retrieval</h3>
+                <p>
+                    Beachball diagram images are fetched over HTTP in a background <code>ThreadPoolExecutor</code>
+                    (four worker threads) rather than on the Tkinter main thread, so downloading a diagram from an
+                    external URL never freezes the user interface. Each URL is tracked in one of three sets —
+                    cached (successfully loaded), pending (download in progress), or failed (download attempted and
+                    unsuccessful) — and a completed download is marshalled back onto the main thread via the
+                    Tkinter <code>after()</code> scheduling mechanism, which then triggers a targeted redraw of the
+                    map only if the just-loaded image belongs to the currently selected event.
+                </p>
+
+                <h3>10.4 Reference-Image Prefetching</h3>
+                <p>
+                    <code>prefetch_beachballs()</code> allows the calling code (invoked when an Excel
+                    focal-mechanism file is first loaded) to warm the cache for every event's beachball URL in the
+                    dataset up front, so that once the user begins clicking through events the corresponding
+                    diagrams are already downloaded or in flight, minimizing perceived latency during interactive
+                    exploration.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="performance">11. Performance Optimization</h2>
+                <table>
+                    <tr><th>Technique</th><th>Applied To</th><th>Benefit</th></tr>
+                    <tr><td>Vectorized LineCollection / batched scatter</td><td>All fracture segments, orientation ticks, or focal-mechanism markers</td><td>A single collection object is added to the Axes per redraw instead of hundreds or thousands of individual <code>plot()</code> / <code>scatter()</code> calls, dramatically reducing Matplotlib artist-management overhead.</td></tr>
+                    <tr><td><code>draw_idle()</code> instead of <code>draw()</code></td><td>Every redraw path</td><td>Matplotlib defers the actual repaint to the next Tk event-loop idle slot and coalesces rapid successive redraw requests (e.g. during a drag), avoiding redundant repaints.</td></tr>
+                    <tr><td>Background-image pixel cache</td><td><code>_load_bg_image_array</code> via <code>_bg_image_cache</code> tuple (path, array)</td><td>The photograph is decoded from disk only once per unique path; repeated redraws (pan, zoom, cosmetic changes) reuse the cached NumPy array.</td></tr>
+                    <tr><td>Threaded network I/O</td><td>Beachball image downloads</td><td>HTTP fetches (up to 8-second timeout each) run off the UI thread in a 4-worker pool, keeping the interface responsive while multiple diagrams load concurrently.</td></tr>
+                    <tr><td><code>preserve_view</code> flag</td><td>All redraw call sites</td><td>Avoids unnecessarily recomputing and resetting the home view / axis limits on every cosmetic change, preserving the user's current pan/zoom position and avoiding a jarring view reset.</td></tr>
+                </table>
+
+                <!-- ================================================= -->
+                <h2 id="workflow-examples">12. Practical Examples</h2>
+
+                <h3>12.1 Example 1 — Mapping Slip Tendency on a Digitized Fault Network</h3>
+                <ol class="step-list">
+                    <li>Load a fracture-trace SVG via the workspace header's Load SVG button.</li>
+                    <li>Calibrate the profile scale (Scale button) against a known reference length in the source image.</li>
+                    <li>Enter appropriate principal stress magnitudes and orientation in the sidebar, then click Calculate.</li>
+                    <li>On the Map Tab, confirm the sidebar's Map Display mode is set to "Slip tendency" and "Color by normalized Tₛ" is checked.</li>
+                    <li>Segments rendered in the colour bar's upper range represent fractures whose resolved shear-to-normal stress ratio approaches the frictional threshold — the most mechanically favourable orientations for reactivation under the current stress state.</li>
+                    <li>Click a segment of interest in the Table tab to see it highlighted with the halo-and-core marker on the Map, and cross-check its exact Tₛ and Mohr-diagram position in the Mohr tab.</li>
+                </ol>
+
+                <h3>12.2 Example 2 — Visualizing a Legacy Fracture-Plane Spreadsheet</h3>
+                <ol class="step-list">
+                    <li>Load an Excel/CSV file containing only ID, Strike, and Dip columns (no spatial coordinates).</li>
+                    <li>The Map Tab automatically falls back to the orientation-wheel renderer, since no genuine geometry is present.</li>
+                    <li>Set Map Display to "Fracture susceptibility" to visualize which orientations are closest to the Mohr-Coulomb failure envelope, independent of their (unknown) spatial position.</li>
+                    <li>Enable "Show compass (Wheel Map)" to retain the N/E/S/W frame of reference while interpreting tick azimuths as fracture strike.</li>
+                </ol>
+
+                <h3>12.3 Example 3 — Focal-Mechanism Regional Stress Screening</h3>
+                <ol class="step-list">
+                    <li>Load a Global-CMT-style Excel file with Lat, Lon, FP1 Strike/Dip/Slip (and optionally FP2) columns.</li>
+                    <li>The Map Tab automatically renders a geographic scatter map; enter a candidate regional stress tensor and click Calculate.</li>
+                    <li>Set Map Display to "Critical fractures" to immediately identify which historical earthquakes are kinematically consistent with reactivation under the candidate stress field ("Critical", shown in the failure colour) versus which are not ("Stable", shown in the muted colour).</li>
+                    <li>Click an event marker to open its beachball diagram inset and inspect the Rake Misfit reported in the Mohr/Table tabs, which quantifies how well the entered stress tensor explains that earthquake's observed slip direction.</li>
+                </ol>
+
+                <!-- ================================================= -->
+                <h2 id="interpretation">13. Geological Interpretation</h2>
+
+                <h4>13.1 Slip Tendency Maps</h4>
+                <p>
+                    Spatial or angular clusters of high slip tendency indicate structural elements that are
+                    mechanically well-oriented for frictional reactivation under the assumed stress field. In
+                    fault-reactivation risk assessment, induced-seismicity screening, and
+                    reservoir-compartmentalization studies, such clusters are frequently used to prioritize which
+                    mapped structures warrant closer geomechanical scrutiny or avoidance during operations such as
+                    fluid injection.
+                </p>
+
+                <h4>13.2 Dilation Tendency Maps</h4>
+                <p>
+                    High dilation tendency identifies fracture orientations most prone to opening (rather than
+                    shearing) under the current stress state. These orientations are of particular interest in
+                    fractured-reservoir permeability studies, since dilated fractures typically provide the dominant
+                    fluid-flow pathways, whereas fractures with low dilation tendency but high slip tendency are more
+                    likely to behave as shear (and potentially seismogenic) structures.
+                </p>
+
+                <h4>13.3 Fracture Susceptibility Maps</h4>
+                <p>
+                    Fracture Susceptibility expresses proximity to the Mohr-Coulomb failure envelope in stress units
+                    (MPa) rather than as a dimensionless ratio, making it directly comparable to engineering
+                    pressure changes (e.g. planned pore-pressure increases during injection). Areas or orientation
+                    sets with low (near-zero or negative) susceptibility values are closest to failure and warrant
+                    the greatest operational caution.
+                </p>
+
+                <h4>13.4 Critical Fracture Maps</h4>
+                <p>
+                    The binary Critical/Stable classification provides an unambiguous, decision-oriented summary
+                    suitable for risk communication to non-specialist stakeholders: it answers the direct question
+                    "is this structure currently at or beyond the failure threshold under the assumed stress state?"
+                    without requiring interpretation of a continuous colour gradient.
+                </p>
+
+                <h4>13.5 Orientation-Wheel Interpretation</h4>
+                <p>
+                    Because the orientation wheel discards spatial position entirely, it is best interpreted as a
+                    structural-domain summary: clusters of ticks at particular azimuths with consistently high-risk
+                    colouring indicate that an entire joint or fault set — irrespective of where individual examples
+                    are located — is mechanically unfavourable under the current stress assumptions, which is often
+                    the more actionable finding for regional structural-domain characterization than any single
+                    mapped trace.
+                </p>
+
+                <h4>13.6 Focal-Mechanism Maps</h4>
+                <p>
+                    Cross-referencing observed earthquake locations and nodal planes against a candidate regional
+                    stress tensor via the Critical Fractures colouring and Rake Misfit statistic (Wallace-Bott
+                    hypothesis; see the Method tab and the Dynamic Analyzer documentation) provides an independent,
+                    seismicity-based test of whether a proposed stress model is consistent with the historical
+                    earthquake record in the study area.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="implementation">14. Implementation Notes</h2>
+
+                <h3>14.1 Key Instance Attributes</h3>
+                <table>
+                    <tr><th>Attribute</th><th>Description</th></tr>
+                    <tr><td><code>self.map_fig</code> / <code>self.map_ax</code> / <code>self.map_cbar_ax</code></td><td>The Matplotlib Figure and the two Axes objects (main plot and colour bar) that together constitute the Map Tab canvas.</td></tr>
+                    <tr><td><code>self.map_canvas</code></td><td>The <code>FigureCanvasTkAgg</code> widget embedding <code>map_fig</code> inside the CustomTkinter window.</td></tr>
+                    <tr><td><code>self._map_home_limits</code></td><td>The tight (pre-aspect-correction) data bounding box computed on the last full redraw; used by Reset View and the zoom-percentage indicator.</td></tr>
+                    <tr><td><code>self._map_geo_scatter</code> / <code>self._map_geo_ids</code></td><td>The scatter-plot artist and parallel array of segment IDs used for click-to-select picking in geographic mode.</td></tr>
+                    <tr><td><code>self._beachball_cache</code> / <code>_pending</code> / <code>_failed</code></td><td>Three sets/dicts tracking the asynchronous download state of every beachball image URL encountered.</td></tr>
+                    <tr><td><code>self._beachball_executor</code></td><td>The 4-worker <code>ThreadPoolExecutor</code> used for all beachball HTTP downloads.</td></tr>
+                    <tr><td><code>self._map_bg_image_cache</code></td><td>A (path, decoded-array) tuple caching the most recently loaded background photograph.</td></tr>
+                    <tr><td><code>self._map_settings_open</code></td><td>Boolean flag tracking whether the settings panel is currently shown or hidden.</td></tr>
+                </table>
+
+                <h3>14.2 Design Notes and Caveats</h3>
+                <ul>
+                    <li>The orientation-wheel colour bar is constructed against the same mappable artist object used by the geographic-mode scatter plot (<code>self._map_geo_scatter</code>); in practice this mappable carries the correct colormap and normalization for the wheel's own data because <code>attribute_colormap_and_norm()</code> is recomputed immediately beforehand, but users inspecting the implementation should be aware that this is an internal artist-reuse detail rather than a dedicated wheel-specific mappable.</li>
+                    <li>Direct click-to-select on the map canvas itself is currently implemented only for geographic (focal-mechanism) mode; in Cartesian and orientation-wheel modes, segment selection is driven from the Table, Mohr, or Stereonet tabs and reflected onto the map via the shared <code>select_segment()</code> mechanism.</li>
+                    <li>The helper method <code>_expanded_map_limits()</code>, which computes an aspect-ratio-matched bounding box from the figure and Axes display geometry, is defined on the <code>MapTab</code> class for potential use in aspect-correction workflows but is not invoked by the drawing routines described in this document; it is retained as available shared logic.</li>
+                    <li>The Reverse Y-axis behaviour (SVG Y-axis points downward) is controlled by a Display-card checkbox on the shared sidebar rather than within the Map Tab itself, but directly affects the <code>home_ylim</code> orientation computed inside <code>_draw_map_svg()</code>.</li>
+                </ul>
+
+                <!-- ================================================= -->
+                <h2 id="limitations">15. Limitations</h2>
+                <ul>
+                    <li>The orientation wheel discards all spatial information; two fractures with identical strike and dip but located kilometres apart are rendered as coincident ticks.</li>
+                    <li>Background-photograph alignment assumes the photograph's full pixel extent corresponds exactly to the calibrated data bounding box; a photograph that does not cover the same physical area as the digitized traces will not register correctly.</li>
+                    <li>Beachball diagram rendering depends on network connectivity and the continued availability of the externally hosted image referenced by each event's Beachball URL; unreachable URLs degrade gracefully to an "Image unavailable" placeholder rather than an error.</li>
+                    <li>Direct click-to-select is unavailable in Cartesian and orientation-wheel modes; selection in those modes must be initiated from another tab.</li>
+                    <li>The raw-vs-scaled coordinate heuristic (<a href="#maths">Section 5.3</a>) is a tolerance-based inference rather than an explicit calibration flag, and could in principle misclassify a genuinely calibrated profile whose dimensions happen to coincide closely with the uncalibrated 260 × 100 default.</li>
+                    <li>Very large fracture populations rendered via a single <code>LineCollection</code> remain efficient to draw, but per-segment tooltip/hover interactivity is not implemented in this module (unlike the Mohr tab's point-hover annotation).</li>
+                </ul>
+
+                <!-- ================================================= -->
+                <h2 id="references">16. References</h2>
+                <p>Wallace, R. E. (1951). Geometry of shearing stress and relation to faulting. <em>Journal of Geology</em>, 59(2), 118–130.</p>
+                <p>Bott, M. H. P. (1959). The mechanics of oblique slip faulting. <em>Geological Magazine</em>, 96(2), 109–117.</p>
+                <p>Morris, A., Ferrill, D. A., &amp; Henderson, D. B. (1996). Slip-tendency analysis and fault reactivation. <em>Geology</em>, 24(3), 275–278.</p>
+                <p>Ferrill, D. A., &amp; Morris, A. P. (2003). Dilational normal faults. <em>Journal of Structural Geology</em>, 25(2), 183–196.</p>
+                <p>Jaeger, J. C., Cook, N. G. W., &amp; Zimmerman, R. W. (2007). <em>Fundamentals of Rock Mechanics</em> (4th ed.). Blackwell Publishing.</p>
+                <p>Dahlen, F. A., &amp; Tromp, J. (1998). <em>Theoretical Global Seismology</em>. Princeton University Press. (Reference for focal-mechanism / beachball diagram conventions.)</p>
+
                 <!-- Pagination Navigation -->
                 <div class="pagination-nav">
                     <!-- PREVIOUS BUTTON -->
@@ -120,6 +893,7 @@
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </a>
                 </div>
+
             </div>
         </main>
     </div>

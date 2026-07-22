@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Static Map Tab | FracSTAT Docs</title>
+    <title>Static Rose Tab | FracSTAT Docs</title>
     <link rel="icon" type="image/png" href="https://res.cloudinary.com/hcaqjcqf/image/upload/v1784441772/akioq6cgnbsigsemtf0f.png">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -28,13 +28,10 @@
             </li>
         </ul>
     </nav>
-    
+
     <div class="docs-layout">
-        <!-- ==========================================
-             MASTER ACCORDION SIDEBAR
-             ========================================== -->
         <aside class="docs-sidebar" id="docsSidebar">
-            
+
             <div class="sidebar-section open">
                 <button class="sidebar-toggle">
                     Getting Started
@@ -42,7 +39,7 @@
                 </button>
                 <ul class="sidebar-links">
                     <li><a href="introduction.html">Introduction</a></li>
-                    <li><a href="installation.html" class="active">Installation Guide</a></li>
+                    <li><a href="installation.html">Installation Guide</a></li>
                     <li><a href="launcher.html">FracSTAT Home Page</a></li>
                 </ul>
             </div>
@@ -97,25 +94,687 @@
         <main class="docs-content">
             <div class="docs-content-inner">
                 <h1>Static Rose Tab</h1>
-                
+                <p>
+                    Located at <code>static_analyzer/tabs/static_rose_tab.py</code>, the <strong>Rose Plot</strong>
+                    tab (implemented as the mixin class <code>StaticAnglesTab</code>) renders an equal-area,
+                    strike-frequency rose diagram — a polar histogram in which each fracture segment is binned by
+                    its trend (strike) azimuth, and the resulting frequency, optionally weighted by segment length,
+                    is displayed as a radially scaled petal. Rose diagrams have been a cornerstone visualisation in
+                    structural geology for over a century, providing an immediate quantitative impression of
+                    preferred fracture orientations, orientation clustering versus dispersion, and the presence of
+                    multiple fracture sets. Within FracSTAT, the Rose Plot tab operates purely on the geometric
+                    results table produced by the Fracture Map tab and performs no stress resolution, making it a
+                    Static Analyzer (geometry-only) tool distinct from the stress-dependent Rose tab found in the
+                    Dynamic Analyzer workspace.
+                </p>
+
+                <div class="toc-box">
+                    <p>On this page</p>
+                    <ul>
+                        <li><a href="#interface-overview">1. Interface Overview</a></li>
+                        <li><a href="#data-input">2. Data Input</a></li>
+                        <li><a href="#controls">3. Settings and Controls, Card by Card</a></li>
+                        <li><a href="#maths">4. Mathematical Background</a></li>
+                        <li><a href="#algorithms">5. Algorithms</a></li>
+                        <li><a href="#statistics">6. Statistical Methods</a></li>
+                        <li><a href="#visualization">7. Visualization &amp; Figure Components</a></li>
+                        <li><a href="#workflow">8. Step‑by‑Step Example Workflows</a></li>
+                        <li><a href="#interpretation">9. Geological Interpretation</a></li>
+                        <li><a href="#performance">10. Performance Optimization</a></li>
+                        <li><a href="#advanced">11. Advanced Features</a></li>
+                        <li><a href="#limitations">12. Limitations</a></li>
+                    </ul>
+                </div>
+
+                <!-- ================================================= -->
+                <h2 id="interface-overview">1. Interface Overview</h2>
+                <p>
+                    The Rose Plot tab uses a two-column layout: a fixed-width (290&nbsp;px), vertically scrollable
+                    settings sidebar on the left, and an expandable polar plot canvas on the right hosting a
+                    Matplotlib polar Axes embedded via <code>FigureCanvasTkAgg</code>. The Figure is sized
+                    9&nbsp;&times;&nbsp;7 inches at 100&nbsp;DPI and hosts one polar Axes
+                    (<code>static_rose_ax</code>) plus one dedicated colorbar Axes
+                    (<code>static_rose_cbar_ax</code>), whose position and visibility are recomputed on every
+                    redraw according to the selected colorbar placement.
+                </p>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="put_your_img_here.png" alt="Static Analyzer workspace showing the Rose Plot tab selected with the settings sidebar on the left and polar plot canvas on the right" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 1.1</strong> — Static Analyzer workspace showing the Rose Plot tab selected, with the settings sidebar on the left and the polar plot canvas on the right.</span>
+                </figure>
+
+                <h3>1.1 Sidebar Card Structure</h3>
+                <table>
+                    <tr><th>Card</th><th>Purpose</th><th>Key Widgets</th></tr>
+                    <tr><td>Plot Mode</td><td>Selects the colouring scheme for the rose petals and, in Classic mode, the solid petal colour.</td><td>Style dropdown, Colormap dropdown + live preview swatch, Petal colour picker</td></tr>
+                    <tr><td>Options</td><td>Controls the statistical construction of the diagram: binning, weighting, orientation range, and annotation of reference circles.</td><td>Custom title, Number of bins, Weight petals by, Colorbar position, Half rose switch, % reference circles switch, Update Rose button</td></tr>
+                    <tr><td>Display Elements</td><td>Controls cosmetic rendering of plot background, grid, cardinal labelling, and plot boundary.</td><td>Outer BG / Plot BG / Grid Color pickers, Show grid lines / Show cardinal labels / Show N-S-E-W crosshairs checkboxes, Border Color picker, Border Width entry</td></tr>
+                    <tr><td>Statistics</td><td>Read-only summary of the currently plotted dataset.</td><td>Segments, Mean Strike, Dominant Bin, Total Length labels</td></tr>
+                </table>
+
+                <h3>1.2 Plot Canvas and Toolbar</h3>
+                <p>
+                    A slim toolbar sits above the polar plot canvas, displaying the descriptive caption
+                    <em>"Equal-area strike rose"</em> and a <strong>Save Image</strong> button. Clicking Save
+                    Image invokes the shared <code>save_plot_image()</code> routine common to every Static
+                    Analyzer tab, writing a timestamped PNG to the project's
+                    <code>FracSTAT_plot_exports/&lt;project_slug&gt;</code> folder at the DPI configured in the
+                    application-wide Settings page (default 300&nbsp;DPI), with a confirmation dialog showing the
+                    full output path.
+                </p>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="put_your_img_here.png" alt="Close-up of the Rose Plot toolbar showing the descriptive caption on the left and the Save Image button on the right" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 1.2</strong> — Close-up of the Rose Plot toolbar, showing the descriptive caption on the left and the Save Image button on the right.</span>
+                </figure>
+
+                <!-- ================================================= -->
+                <h2 id="data-input">2. Data Input</h2>
+                <h3>2.1 Upstream Data Sources</h3>
+                <p>
+                    The Rose Plot tab does not implement its own file-loading logic. It reads directly from
+                    <code>self.results</code>, the shared results DataFrame maintained by the Static Analyzer
+                    workspace, which is refreshed whenever the user loads a new SVG fracture-trace file, a new
+                    Excel/CSV orientation table, or changes the profile calibration. The tab automatically reflects
+                    any such change without requiring user interaction through the workspace's
+                    <code>refresh_all_tabs()</code> chain.
+                </p>
+
+                <h3>2.2 Required Columns</h3>
+                <table>
+                    <tr><th>Column</th><th>Type</th><th>Role in Rose Plot</th></tr>
+                    <tr><td><code>StrikeDeg</code></td><td>float, degrees, 0–360 (fully directed)</td><td>Source orientation value; folded to the 0–180° axial convention via <code>strikes % 180.0</code> before binning.</td></tr>
+                    <tr><td><code>Length_m</code></td><td>float, project display units</td><td>Optional per-segment length used as the histogram weight when "Weight petals by" is set to Length.</td></tr>
+                </table>
+
+                <p>
+                    If <code>StrikeDeg</code> is absent, the tab shows an explanatory empty-state message on the
+                    polar Axes. If <code>StrikeDeg</code> is present but every value is non-finite after validity
+                    filtering, a separate "No valid strike angles found" message is shown. Both conditions are
+                    handled gracefully without exceptions.
+                </p>
+
+                <h3>2.3 Compatible Upstream Data Sources</h3>
+                <p>
+                    All four upstream data formats supported by the Static Analyzer flow into the Rose Plot tab.
+                    SVG fracture-trace maps supply strike computed geometrically from the digitised trace endpoints,
+                    corrected for the Y-axis-from-North azimuth. Excel/CSV segment-coordinate tables carry
+                    pre-computed <code>StrikeDeg</code> values through unchanged. Legacy fracture-plane tables
+                    (ID, Strike, Dip) supply Strike directly, with the optional Length column honoured for length
+                    weighting. Trend/Plunge pole tables are converted internally to an equivalent Strike/Dip pair
+                    before reaching the Rose Plot tab.
+                </p>
+                <div class="note-box">
+                    <strong>Note:</strong> because <code>StrikeDeg</code> is stored as a fully-directed 0°–360°
+                    azimuth throughout the rest of the application (to preserve dip-direction information needed by
+                    the Stereonet and Dynamic Analyzer tabs), the Rose Plot module performs its own modulo-180°
+                    folding at draw time rather than relying on a pre-folded column.
+                </div>
+
+                <!-- ================================================= -->
+                <h2 id="controls">3. Settings and Controls, Card by Card</h2>
+                <p>
+                    Unless stated otherwise, every control triggers an immediate redraw through
+                    <code>_draw_static_rose()</code>. Numeric entry fields commit on both the
+                    <kbd>Enter</kbd> keypress and loss of focus (<kbd>FocusOut</kbd>), matching the convention
+                    used throughout FracSTAT's Static Analyzer sidebars.
+                </p>
+
+                <h3>3.1 Plot Mode Card</h3>
+                <table>
+                    <tr><th>Control</th><th>Default</th><th>Description</th></tr>
+                    <tr><td>Style</td><td>strike colour</td><td>Chooses between two rendering modes: <em>strike colour</em> (FracSTAT mode — petals coloured by bin midpoint via a colormap) and <em>Classic (solid colour)</em> (all petals in a single user-selected colour). The selected mode dispatches to either <code>_draw_fracSTAT_rose()</code> or <code>_draw_classic_rose()</code>.</td></tr>
+                    <tr><td>Colormap</td><td>Viridis</td><td>Selects the Matplotlib colormap used in FracSTAT mode. A live 104&times;28&nbsp;px gradient swatch is redrawn on selection. The resolved Matplotlib identifier is cached in <code>static_rose_cmap_resolved</code> to avoid repeated lookups on every redraw.</td></tr>
+                    <tr><td>Petal colour (Classic mode)</td><td>#2563EB</td><td>Hex colour applied to every petal when Style is Classic. Exposed via the shared <code>_StaticColorButton</code> swatch/hex-entry widget.</td></tr>
+                </table>
+
+                <h3>3.2 Options Card</h3>
+                <table>
+                    <tr><th>Control</th><th>Default</th><th>Valid Range</th><th>Effect</th></tr>
+                    <tr><td>Custom title</td><td>"" (blank)</td><td>Free text</td><td>Overrides the auto-generated plot title (e.g. "Segment angles (equal area), n=…"). Leave blank to use the automatic title.</td></tr>
+                    <tr><td>Number of bins</td><td>18</td><td>Integer, clamped [4, 180]</td><td>Number of equal-width azimuth classes spanning 0°–180°. Directly controls the angular resolution of the histogram. Out-of-range values are silently clamped and written back.</td></tr>
+                    <tr><td>Weight petals by</td><td>Length</td><td>Length | Count</td><td>Whether each fracture contributes its measured <code>Length_m</code> (Length) or a uniform weight of 1 (Count) to its bin. For rows with missing or non-positive <code>Length_m</code>, a fallback weight of 1.0 is substituted.</td></tr>
+                    <tr><td>Colorbar position</td><td>Bottom</td><td>Bottom | Top | Left | Right | None</td><td>Repositions or hides the colour-scale legend and adjusts the polar Axes bounding box to prevent overlap. Ignored in Classic mode.</td></tr>
+                    <tr><td>Half rose (0–180° only)</td><td>Off</td><td>Boolean</td><td>When enabled, restricts the diagram to a semicircle spanning 0°–180°. When disabled, the histogram is mirrored into the 180°–360° half for the conventional full-circle axial rose.</td></tr>
+                    <tr><td>Show % reference circles</td><td>Off</td><td>Boolean</td><td>Overlays three dashed concentric circles annotated with percentage-of-maximum labels calibrated to the equal-area (square-root) radius transform. See <a href="#maths">Section 4.5</a>.</td></tr>
+                    <tr><td>Update Rose (button)</td><td>—</td><td>—</td><td>Manually forces a redraw; provided for consistency even though most controls already redraw automatically.</td></tr>
+                </table>
+
+                <h3>3.3 Display Elements Card</h3>
+                <table>
+                    <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
+                    <tr><td>Outer BG</td><td>#FFFFFF</td><td>Figure (outer canvas) background colour.</td></tr>
+                    <tr><td>Plot BG</td><td>#FFFFFF</td><td>Polar Axes (inner plot) background colour.</td></tr>
+                    <tr><td>Grid Color</td><td>#D9E2EC</td><td>Colour of the radial/angular grid lines when enabled.</td></tr>
+                    <tr><td>Show grid lines</td><td>Off</td><td>Toggles the Matplotlib polar grid.</td></tr>
+                    <tr><td>Show cardinal labels (N/E)</td><td>On</td><td>Replaces the 0°/90°/180°/270° angular tick labels with N/E/S/W; all other ticks remain numeric.</td></tr>
+                    <tr><td>Show N-S / E-W crosshairs</td><td>Off</td><td>Draws faint radial spokes at the cardinal directions from the origin to 1.03&nbsp;&times; the maximum petal radius.</td></tr>
+                    <tr><td>Border Color</td><td>#475569</td><td>Colour of the polar spine (outer plot boundary circle).</td></tr>
+                    <tr><td>Border Width</td><td>1.0</td><td>Line width, in points, of the polar spine.</td></tr>
+                </table>
+
+                <h3>3.4 Statistics Card (Read-Only)</h3>
+                <p>
+                    The Statistics card is a read-only panel, recomputed on every redraw by
+                    <code>_rose_update_stats()</code> from the raw, unbinned observations — not from the
+                    discretised histogram — so its values are independent of the chosen Number of bins.
+                </p>
+                <table>
+                    <tr><th>Field</th><th>Description</th></tr>
+                    <tr><td>Segments</td><td>Count of valid (finite) strike observations included in the diagram after data validation. This is the <em>n</em> value shown in the auto-generated title.</td></tr>
+                    <tr><td>Mean Strike</td><td>The weighted axial (circular) mean strike in degrees, computed via the doubled-angle method in <code>_static_axial_mean()</code> (see <a href="#statistics">Section 6.1</a>).</td></tr>
+                    <tr><td>Dominant Bin</td><td>The midpoint azimuth of the histogram bin carrying the greatest weighted frequency. Sensitive to the chosen bin count.</td></tr>
+                    <tr><td>Total Length</td><td>Sum of <code>Length_m</code> across all valid segments in the project's active display unit.</td></tr>
+                </table>
+
+                <!-- ================================================= -->
+                <h2 id="maths">4. Mathematical Background</h2>
+
+                <h3>4.1 Axial (Bidirectional) Orientation Data</h3>
+                <p>
+                    Fracture strike is an axial quantity: a fracture trending 040° is geometrically identical to
+                    one trending 220°, since both describe the same line in the horizontal plane. The Rose Plot
+                    module respects this by folding every strike value into the half-open interval [0°, 180°) prior
+                    to any statistical operation:
+                </p>
+                <div class="formula-block">
+strikes = StrikeDeg mod 180°</div>
+                <p>
+                    This folding is applied identically in both the FracSTAT-mode and Classic-mode drawing routines
+                    and is a prerequisite for the axial circular-mean formula in <a href="#statistics">Section 6.1</a>.
+                </p>
+
+                <h3>4.2 Weighting Scheme</h3>
+                <p>Each observation <em>i</em> contributes a weight <em>w<sub>i</sub></em> to its assigned azimuth bin. Two modes are supported:</p>
+                <div class="formula-block">
+w_i = L_i    (Weight petals by = "Length")
+w_i = 1      (Weight petals by = "Count")</div>
+                <p>
+                    where <em>L<sub>i</sub></em> is the segment's real-world length (<code>Length_m</code>). When
+                    length weighting is requested but <code>Length_m</code> is missing, non-finite, or non-positive
+                    for a given row, a fallback weight of 1.0 is substituted for that row rather than discarding it.
+                </p>
+
+                <h3>4.3 Histogram Binning</h3>
+                <p>
+                    Given <em>B</em> bins (clamped to [4, 180]), the bin edges form a uniform partition of the
+                    0°–180° axial domain:
+                </p>
+                <div class="formula-block">
+e_k = k · (180° / B),    k = 0, 1, …, B</div>
+                <p>Each observation's folded strike is assigned to exactly one bin via NumPy's weighted histogram, producing bin totals and midpoints:</p>
+                <div class="formula-block">
+V_k = Σ_{i : e_k ≤ strike_i < e_{k+1}} w_i
+m_k = (e_k + e_{k+1}) / 2</div>
+
+                <h3>4.4 Equal-Area (Square-Root) Radius Transform</h3>
+                <p>
+                    A properly constructed rose diagram requires that the visual <em>area</em> of each petal —
+                    not its radial length — be proportional to the quantity it represents. Because the area of a
+                    circular sector scales with the square of its radius, FracSTAT computes the plotted radius as
+                    the square root of the weighted bin total:
+                </p>
+                <div class="formula-block">
+r_k = √V_k</div>
+                <p>
+                    This equal-area convention prevents bins with high raw frequency from visually dominating the
+                    diagram disproportionately, and ensures that comparisons of petal area between diagrams are
+                    quantitatively meaningful.
+                </p>
+
+                <h3>4.5 Full-Circle Mirroring</h3>
+                <p>
+                    Because strike is axial, a complete rose diagram must display the same frequency distribution
+                    twice — once in the 0°–180° half and once, by reflection, in the 180°–360° half. When
+                    <em>Half rose</em> is unchecked, the module concatenates bin midpoints and radii with a 180°
+                    angular offset:
+                </p>
+                <div class="formula-block">
+θ_full = { m_k } ∪ { m_k + 180° },     r_full = { r_k } ∪ { r_k }</div>
+                <p>
+                    This produces a visually symmetric diagram about the origin, matching the universal convention
+                    for axial rose diagrams in the structural-geology literature.
+                </p>
+
+                <h3>4.6 Colour Mapping (FracSTAT Mode)</h3>
+                <p>
+                    In <em>strike colour</em> mode, each petal is coloured according to its bin midpoint using
+                    a fixed linear normalisation over the full axial domain, independent of the actual data range:
+                </p>
+                <div class="formula-block">
+c_k = Colormap( m_k / 180° ),     Norm: [0°, 180°] → [0, 1]</div>
+                <p>
+                    Using a fixed 0°–180° normalisation (rather than normalising to the observed min/max strike)
+                    ensures the same azimuth is always rendered in the same colour across different datasets and
+                    sessions — important when visually comparing rose diagrams from multiple outcrops or wells.
+                </p>
+
+                <h3>4.7 Percentage Reference Circles</h3>
+                <p>When enabled, three dashed reference circles are drawn at radii that are simple fractions of the maximum plotted radius <em>r<sub>max</sub></em>:</p>
+                <div class="formula-block">
+r_k = r_max · (k / 3),     k = 1, 2, 3</div>
+                <p>
+                    Because the plotted radius already embeds the square-root equal-area transform, the fraction
+                    of the maximum bin value represented by each circle is the <em>square</em> of the radial
+                    fraction:
+                </p>
+                <div class="formula-block">
+Percentage_k = round( 100 · (k/3)² )</div>
+                <p>
+                    The three default circles are therefore labelled approximately 11%, 44%, and 100% of the peak
+                    weighted bin value, giving a calibrated visual scale for judging petal size without reading
+                    exact numbers from an axis.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="algorithms">5. Algorithms</h2>
+
+                <h3>5.1 Mode Dispatch</h3>
+                <p>
+                    The top-level redraw entry point <code>_draw_static_rose()</code> is a two-way dispatcher
+                    that inspects <code>static_rose_mode_var</code> and routes to one of two independent drawing
+                    algorithms. If the Style string begins with "Classic", control passes to
+                    <code>_draw_classic_rose()</code>; otherwise it passes to <code>_draw_fracSTAT_rose()</code>.
+                    Both routines share an identical outer skeleton — clear axes, validate data, compute the
+                    weighted histogram, apply the equal-area transform, render petals, format the polar grid, set
+                    the title, configure the colorbar, update the statistics panel, and request a canvas redraw —
+                    but differ in how petal colour is derived.
+                </p>
+
+                <h3>5.2 FracSTAT-Mode Rendering Algorithm</h3>
+                <table>
+                    <tr><th>Step</th><th>Operation</th></tr>
+                    <tr><td>1</td><td>Clear the polar Axes and colorbar Axes; apply outer/inner background colours.</td></tr>
+                    <tr><td>2</td><td>Validate <code>self.results</code> is non-empty and contains <code>StrikeDeg</code>; otherwise show an empty-state message and abort.</td></tr>
+                    <tr><td>3</td><td>Fold strikes to [0°, 180°) via modulo 180; discard non-finite values; abort with a message if none remain.</td></tr>
+                    <tr><td>4</td><td>Resolve weights from <code>Length_m</code> (with 1.0 fallback for invalid entries) or uniform 1.0, depending on "Weight petals by".</td></tr>
+                    <tr><td>5</td><td>Compute bin count <em>B</em> (clamped [4, 180]); build <em>B</em>+1 uniform edges over [0°, 180°); compute weighted histogram <code>values[]</code> and bin midpoints.</td></tr>
+                    <tr><td>6</td><td>Abort with an empty-state message if the histogram sum is zero.</td></tr>
+                    <tr><td>7</td><td>Resolve the active Matplotlib colormap; map every bin midpoint through a fixed <code>Normalize(0, 180)</code> to obtain one RGBA colour per bin.</td></tr>
+                    <tr><td>8</td><td>If Half rose is enabled, use bins as-is; otherwise mirror bins, weights, and colours into the 180°–360° half.</td></tr>
+                    <tr><td>9</td><td>Apply the equal-area square-root transform; draw all petals in one <code>ax.bar()</code> call with per-petal colour array and zero petal gap (full angular width).</td></tr>
+                    <tr><td>10</td><td>Apply shared polar-grid formatting via <code>_format_polar_grid</code>.</td></tr>
+                    <tr><td>11</td><td>Set the plot title (custom or auto-generated "Segment angles (equal area), n=…").</td></tr>
+                    <tr><td>12</td><td>Build a <code>ScalarMappable</code> from the same colormap/normalisation and delegate colorbar placement to <code>_setup_rose_colorbar()</code>.</td></tr>
+                    <tr><td>13</td><td>Compute and push Segments / Mean Strike / Dominant Bin / Total Length into the Statistics card via <code>_rose_update_stats()</code>.</td></tr>
+                    <tr><td>14</td><td>Request an idle canvas redraw via <code>draw_idle()</code>.</td></tr>
+                </table>
+
+                <h3>5.3 Classic-Mode Rendering Algorithm</h3>
+                <p>
+                    The Classic-mode algorithm mirrors steps 1–6 and 8–14 of the table above exactly, but omits
+                    the colormap resolution and per-bin colour-array step. Every petal is rendered with the single
+                    solid colour held in <code>static_rose_color_var</code>, a 90% opacity, and a petal angular
+                    width of 0.92&nbsp;&times; the full bin width to leave a visible gap between adjacent petals
+                    — a more traditional discretised rose-diagram appearance. Because Classic mode carries no
+                    data-dependent colour mapping, the colorbar Axes is always suppressed regardless of the
+                    selected Colorbar position, and the polar Axes expands to fill the reclaimed space.
+                </p>
+
+                <h3>5.4 Shared Polar Grid Formatting</h3>
+                <table>
+                    <tr><th>Step</th><th>Operation</th></tr>
+                    <tr><td>1</td><td>Fix the polar orientation convention: 0° at geographic North (<code>set_theta_zero_location("N")</code>), angles increasing clockwise (<code>set_theta_direction(-1)</code>) — the standard geological azimuth convention.</td></tr>
+                    <tr><td>2</td><td>If Half rose is active, restrict the visible angular sector to [0°, 180°] via <code>set_thetamin/thetamax</code>.</td></tr>
+                    <tr><td>3</td><td>Generate angular tick positions every 30°; substitute N/E/S/W labels at 0°/90°/180°/270° when cardinal labels are enabled.</td></tr>
+                    <tr><td>4</td><td>Hide radial tick labels (petal length is read qualitatively or via the optional percentage circles).</td></tr>
+                    <tr><td>5</td><td>Style the polar spine using Border Color and Border Width settings.</td></tr>
+                    <tr><td>6</td><td>If crosshairs are enabled, draw faint radial spokes at the cardinal directions from the origin to 1.03&nbsp;&times; the maximum petal radius.</td></tr>
+                    <tr><td>7</td><td>Apply or suppress the angular/radial grid according to Show grid lines.</td></tr>
+                    <tr><td>8</td><td>If % reference circles are enabled, delegate to the module-level helper <code>_pct_reference_circles()</code>.</td></tr>
+                </table>
+
+                <h3>5.5 Colorbar Placement Algorithm</h3>
+                <p>
+                    Given the selected Colorbar position, <code>_setup_rose_colorbar()</code> computes two
+                    rectangles in Figure-fraction coordinates: one for the colorbar Axes and one for the
+                    repositioned polar Axes, so that the polar plot never overlaps the legend. Horizontal
+                    placements (Bottom/Top) receive tick marks every 20°; vertical placements (Left/Right) receive
+                    tick marks every 30°, reflecting the differing available label space. Selecting "None", or
+                    being in Classic mode, hides the colorbar Axes entirely and expands the polar Axes to an
+                    enlarged default footprint.
+                </p>
+
                 <div class="code-window">
                     <div class="code-header">
                         <span class="code-lang">python</span>
                         <button class="copy-btn">Copy</button>
                     </div>
-                    <pre><code class="language-python">
-                        DEMO OF CODE SNIPPET
-                    </code></pre>
+                    <pre><code class="language-python">def _pct_reference_circles(ax, max_r, palette, n_circles=3):
+    """Draw dashed percentage reference circles on a polar axis."""
+    if max_r <= 0:
+        return
+    theta_ring = np.linspace(0, 2 * np.pi, 361)
+    for k in range(1, n_circles + 1):
+        r_k = max_r * k / n_circles
+        pct = int(round(100.0 * (k / n_circles) ** 2))
+        ax.plot(theta_ring, np.full_like(theta_ring, r_k),
+                color=palette["spine"], linewidth=0.7, linestyle="--",
+                zorder=1, alpha=0.55)
+        ax.text(np.deg2rad(180), r_k, f"{pct}%",
+                color=palette["muted"], fontsize=8,
+                ha="center", va="bottom", zorder=2)</code></pre>
                 </div>
+                <p class="ph-caption" style="text-align:left; margin: -1rem 0 1.5rem 0;">Module-level helper function <code>_pct_reference_circles()</code> defined at module scope outside the class, so it requires no instance state and remains independently testable.</p>
+
+                <!-- ================================================= -->
+                <h2 id="statistics">6. Statistical Methods</h2>
+
+                <h3>6.1 Weighted Axial (Circular) Mean</h3>
+                <p>
+                    Ordinary arithmetic averaging is invalid for orientation data because of wrap-around
+                    discontinuities — for example, the arithmetic mean of 179° and 1° is 90°, which is
+                    geometrically nonsensical for near-parallel fractures straddling the 0°/180° boundary.
+                    FracSTAT instead uses the doubled-angle circular-statistics method, implemented in
+                    <code>_static_axial_mean(strikes, weights)</code>:
+                </p>
+                <div class="formula-block">
+S = Σ w_i · sin(2 · strike_i)
+C = Σ w_i · cos(2 · strike_i)
+
+strike_mean = ½ · atan2(S, C)  (mod 180°)</div>
+                <p>
+                    Doubling each angle maps the 180°-periodic axial domain onto the standard 360°-periodic
+                    circular domain, where conventional vector-resultant averaging is valid; halving the resultant
+                    direction maps the answer back onto the physically meaningful 0°–180° range. The mean is
+                    always computed from the raw, unbinned observations — not the discretised histogram — so its
+                    value is independent of the chosen Number of bins.
+                </p>
+
+                <h3>6.2 Dominant Bin</h3>
+                <p>
+                    The dominant (modal) orientation is reported as the midpoint of whichever histogram bin
+                    carries the largest weighted total: <code>argmax_k(V_k)</code>. Unlike the axial mean, this
+                    statistic is sensitive to the chosen bin count and edge alignment, and should be interpreted
+                    as a discretised estimate of the peak of the underlying orientation distribution rather than
+                    an exact value.
+                </p>
+
+                <h3>6.3 Summary of Reported Statistics</h3>
+                <table>
+                    <tr><th>Statistic</th><th>Formula / Method</th><th>Sensitive to Bin Count?</th><th>Sensitive to Weighting Mode?</th></tr>
+                    <tr><td>Segments (n)</td><td>Count of finite <code>StrikeDeg</code> values</td><td>No</td><td>No</td></tr>
+                    <tr><td>Mean Strike</td><td>Doubled-angle weighted circular mean (§6.1)</td><td>No</td><td>Yes</td></tr>
+                    <tr><td>Dominant Bin</td><td>argmax of weighted histogram</td><td>Yes</td><td>Yes</td></tr>
+                    <tr><td>Total Length</td><td>Σ Length_m over all segments</td><td>No</td><td>No</td></tr>
+                </table>
+
+                <!-- ================================================= -->
+                <h2 id="visualization">7. Visualization &amp; Figure Components</h2>
+
+                <h3>7.1 Polar Petal Bars</h3>
+                <p>
+                    Petals are rendered with a single vectorised <code>ax.bar()</code> call in polar coordinates.
+                    Bar centre angles equal the (possibly mirrored) bin midpoints in radians; bar heights equal
+                    the equal-area radii <em>r<sub>k</sub></em>; bar bottoms are fixed at zero. In FracSTAT mode
+                    the bar width equals the full bin angular width so adjacent petals visually abut one another
+                    (as in a continuous histogram). In Classic mode a 0.92 width factor introduces a visible
+                    inter-petal gap for a more traditional, discretised rose-diagram appearance.
+                </p>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="put_your_img_here.png" alt="Full-circle FracSTAT-mode rose diagram with Viridis colormap, bottom colour bar, cardinal labels, and percentage reference circles enabled" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 7.1</strong> — Full-circle FracSTAT-mode rose diagram with a Viridis colormap, bottom colour bar, cardinal labels, and percentage reference circles enabled.</span>
+                </figure>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="put_your_img_here.png" alt="Half-circle Classic-mode rose diagram with a solid blue petal colour and visible inter-petal gaps" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 7.2</strong> — Half-circle Classic-mode rose diagram with a solid blue petal colour and visible inter-petal gaps.</span>
+                </figure>
+
+                <h3>7.2 Colour Legend / Colour Bar</h3>
+                <p>
+                    In FracSTAT mode, a <code>ScalarMappable</code> sharing the same colormap and fixed
+                    0°–180° <code>Normalize</code> instance used for the petals is passed to Matplotlib's
+                    <code>fig.colorbar()</code>, producing a legend labelled "Segment strike, degrees". Its
+                    position (Bottom / Top / Left / Right / None) is fully reconfigurable, and the polar Axes'
+                    bounding box is recomputed on every change to avoid overlap. The colour bar is intentionally
+                    omitted in Classic mode, since a single solid petal colour carries no scale to legend.
+                </p>
+
+                <h3>7.3 Cardinal and Angular Labelling</h3>
+                <p>
+                    Angular tick marks are placed every 30° around the full or half circle. When cardinal
+                    labelling is enabled, the four principal directions are rendered as N / E / S / W in place of
+                    0° / 90° / 180° / 270°, while all remaining ticks continue to show numeric degree values —
+                    a hybrid convention familiar from paper-based structural fabric diagrams.
+                </p>
+
+                <h3>7.4 Reference Circles and Crosshairs</h3>
+                <p>
+                    Two independent optional overlays aid quantitative reading of the diagram: the percentage
+                    reference circles (Section 4.7), which calibrate petal size against the peak bin value, and
+                    the N-S/E-W crosshair spokes, which provide a lightweight visual reference grid without the
+                    density of a full polar grid. Both can be enabled or disabled independently via their
+                    respective checkboxes in the Options card.
+                </p>
+
+                <h3>7.5 Empty-State Handling</h3>
+                <p>
+                    Three distinct conditions each trigger a dedicated styled empty-state message rendered
+                    directly on the polar Axes via <code>_static_rose_empty_state()</code>, rather than an
+                    uncaught exception or a blank canvas: no data loaded / <code>StrikeDeg</code> column absent
+                    ("Load SVG or Excel fracture data"); all strike values non-finite ("No valid strike angles
+                    found"); histogram sum is zero, for example all weights filtered out ("No plottable rose
+                    values"). In all three cases the Statistics card fields are reset to a placeholder dash.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="workflow">8. Step-by-Step Example Workflows</h2>
+
+                <h3>8.1 Example 1 — Quick-Look Orientation Screening</h3>
+                <ol class="step-list">
+                    <li>Load an SVG trace map (or Excel/CSV) via the workspace header's Load SVG or Load Excel button; the Fracture Map, Rose Plot, and all other tabs populate automatically.</li>
+                    <li>Open the Rose Plot tab. With default settings (18 bins, Length weighting, FracSTAT strike-colour mode, full circle) the diagram immediately reveals one or more dominant petal directions.</li>
+                    <li>Read the Statistics card: Mean Strike gives the length-weighted average trend; Dominant Bin gives the single most frequent azimuth class, useful for checking whether the mean is being pulled between two conjugate sets.</li>
+                    <li>Toggle <strong>Show % reference circles</strong> to gauge, at a glance, what fraction of the dominant petal's weighted length the secondary petals represent.</li>
+                </ol>
+
+                <h3>8.2 Example 2 — Comparing Count-Based and Length-Weighted Fabrics</h3>
+                <p>
+                    Switching <strong>Weight petals by</strong> from Length to Count on the same loaded dataset
+                    can reveal a different dominant orientation. Count weighting treats every fracture equally
+                    regardless of length; Length weighting emphasises the orientations carrying the greatest total
+                    trace length. Running both modes and comparing the resulting Dominant Bin and Mean Strike
+                    values is a standard diagnostic for distinguishing "many small" versus "few large" fracture
+                    populations — a meaningful distinction for flow-model permeability anisotropy inputs.
+                </p>
+
+                <h3>8.3 Example 3 — Publication-Quality Figure Preparation</h3>
+                <ol class="step-list">
+                    <li>Set <strong>Colorbar position</strong> to "Bottom" and choose a colour-blind-friendly colormap such as Viridis or Cividis.</li>
+                    <li>Disable <strong>Show grid lines</strong> for a cleaner appearance, but enable <strong>Show cardinal labels</strong> and <strong>Show % reference circles</strong> for quantitative legibility.</li>
+                    <li>Enter a descriptive <strong>Custom title</strong> (e.g., "Joint set orientations, Outcrop A, n = 214").</li>
+                    <li>Increase <strong>Border Width</strong> slightly (e.g., to 1.4) for improved visibility at reduced print size.</li>
+                    <li>Click <strong>Save Image</strong> to export a high-resolution PNG to the project's plot-exports folder.</li>
+                </ol>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="put_your_img_here.png" alt="Example workflow: Half-circle rose diagram prepared for publication with Cividis colormap, bottom colour bar, and percentage reference circles" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 8.1</strong> — Example workflow: Half-circle rose diagram prepared for publication with Cividis colormap, bottom colour bar, and percentage reference circles enabled.</span>
+                </figure>
+
+                <!-- ================================================= -->
+                <h2 id="interpretation">9. Geological Interpretation</h2>
+
+                <h4>9.1 Reading a Rose Diagram</h4>
+                <p>
+                    A single sharply peaked petal (or symmetric petal pair in the full-circle presentation)
+                    indicates a strongly unimodal fracture fabric, consistent with a single dominant regional
+                    stress orientation acting during fracture formation — such as joints formed perpendicular to a
+                    uniaxial extension direction or systematic joints related to a single tectonic episode. Two
+                    petals separated by an acute angle (commonly 40°–70°) are the classic signature of a conjugate
+                    shear-fracture pair, and their angular bisector approximates the orientation of the maximum
+                    principal compressive stress (σ₁) at the time of formation, following the Andersonian/Coulomb
+                    faulting framework used in FracSTAT's Dynamic Analyzer. Multiple broadly distributed petals of
+                    comparable magnitude suggest a polymodal or polyphase fracture history.
+                </p>
+
+                <h4>9.2 Significance of Length Weighting</h4>
+                <p>
+                    Length-weighted rose diagrams better represent the orientation distribution of throughgoing,
+                    hydraulically or mechanically significant fractures, since long fractures typically dominate
+                    bulk rock-mass permeability and mechanical anisotropy. Count-based diagrams better represent
+                    the orientation distribution of fracture initiation events and can be more sensitive to
+                    sampling bias toward short, easily digitised features. The two diagrams together provide a
+                    complementary picture of the fracture population.
+                </p>
+
+                <h4>9.3 The Mean Strike as a Design Parameter</h4>
+                <p>
+                    The reported Mean Strike is frequently used as an input for downstream engineering workflows —
+                    for example, orienting a horizontal wellbore trajectory to intersect the dominant fracture set
+                    at a favourable angle for stimulation, or orienting a slope-stability kinematic analysis with
+                    respect to the governing discontinuity set. Because the statistic uses the doubled-angle
+                    axial-mean method, it remains geometrically valid even when the underlying distribution
+                    straddles the 0°/180° boundary — a common pitfall when analysts instead average raw azimuths
+                    arithmetically.
+                </p>
+
+                <h4>9.4 Caution Regarding Sampling Bias</h4>
+                <p>
+                    As with any orientation-frequency analysis derived from a two-dimensional trace map or outcrop
+                    pavement, the rose diagram is subject to the well-documented Terzaghi (1965) sampling-line
+                    bias: fractures oriented sub-parallel to the mapping direction are systematically
+                    under-sampled relative to fractures oriented perpendicular to it. Users should consult the
+                    Static Analyzer's Connectivity and Intensity &amp; Density tabs, and consider the geometry of
+                    the original mapping traverse or outcrop exposure, when assessing whether an apparently
+                    dominant or subordinate petal reflects a genuine geological fabric or a sampling artefact.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="performance">10. Performance Optimization</h2>
+
+                <h3>10.1 Vectorised Histogram and Colour Computation</h3>
+                <p>
+                    All per-observation operations — modulo folding, weight resolution, and the weighted histogram
+                    itself — are performed with NumPy array operations (<code>np.histogram</code>, boolean
+                    masking, <code>np.where</code>) rather than per-row Python loops, giving effectively
+                    linear-time performance in the number of fracture segments, which routinely numbers in the
+                    thousands to tens of thousands for digitised trace maps.
+                </p>
+
+                <h3>10.2 Colormap Resolution Caching</h3>
+                <p>
+                    Resolving a user-facing colormap display name (e.g. "Red-Yellow-Blue") to its underlying
+                    Matplotlib identifier ("RdYlBu") is performed once inside <code>_on_rose_cmap_change()</code>
+                    and the result is cached in the instance attribute <code>static_rose_cmap_resolved</code>.
+                    Subsequent redraws triggered by unrelated setting changes read the cached identifier directly
+                    rather than re-resolving the dropdown's display string on every frame.
+                </p>
+
+                <h3>10.3 Idle-Draw Scheduling</h3>
+                <p>
+                    The canvas is repainted via <code>FigureCanvasTkAgg.draw_idle()</code> rather than the
+                    blocking <code>draw()</code>, deferring pixel-level rendering to the next Tkinter idle cycle.
+                    This keeps rapid successive setting changes (e.g. dragging through bin-count values or
+                    a fast sequence of colour-picker changes) from stalling the UI thread with redundant full
+                    redraws.
+                </p>
+
+                <h3>10.4 Shared Geometry Computation</h3>
+                <p>
+                    Because the Rose Plot tab performs no independent geometry recomputation — it consumes the
+                    DataFrame already computed once by the Fracture Map tab's geometry engine — reloading data or
+                    changing the profile scale triggers only a single shared O(n) geometry pass, not a duplicated
+                    per-tab recalculation. The Rose Plot tab's own per-redraw cost is limited to the histogram,
+                    colour-mapping, and rendering steps.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="advanced">11. Advanced Features</h2>
+
+                <h3>11.1 Colormap Library</h3>
+                <p>
+                    The Colormap dropdown draws from the same 23-entry, application-wide colour-scale catalogue
+                    used throughout FracSTAT, spanning perceptually uniform scientific colormaps (Viridis, Plasma,
+                    Inferno, Magma, Cividis), classic scales (Turbo, Jet, Parula — a bundled MATLAB-style
+                    approximation), diverging scales (Coolwarm, Spectral, Red-Yellow-Blue), cyclic scales (HSV,
+                    Twilight) well suited to angular data, and several thematic/sequential scales (Hot, Ocean,
+                    Terrain, Earth, and others).
+                </p>
+
+                <h3>11.2 Half-Circle vs Full-Circle Presentation</h3>
+                <p>
+                    The Half rose toggle allows analysts to choose between the compact 0°–180° semicircular
+                    presentation (useful when screen or print space is limited, or when comparing several diagrams
+                    side-by-side) and the traditional full-circle mirrored presentation expected in most published
+                    structural-geology figures. Both modes use identical statistical inputs; only the angular
+                    display range and the mirroring of bins differ.
+                </p>
+
+                <h3>11.3 Dynamic Colorbar Repositioning</h3>
+                <p>
+                    Selecting a new Colorbar position does not merely relocate the legend graphic; the polar Axes'
+                    own position rectangle is simultaneously recalculated via <code>_setup_rose_colorbar()</code>
+                    so that the two never overlap and the plot remains centred and appropriately sized —
+                    Bottom/Top placements reserve a horizontal strip and shrink the plot's vertical extent, while
+                    Left/Right placements reserve a vertical strip and shrink its horizontal extent.
+                </p>
+
+                <h3>11.4 Reset to Defaults</h3>
+                <p>
+                    A <strong>Reset to Defaults</strong> button (<code>_rose_reset_defaults</code>) restores every
+                    sidebar control — bins, weighting mode, colorbar position, all display toggles, petal styling,
+                    and colour choices — to their factory defaults in a single action, then immediately triggers a
+                    redraw. This provides a fast recovery path after extensive manual styling experimentation.
+                </p>
+
+                <h3>11.5 Relationship to the Dynamic Analyzer's Rose Tab</h3>
+                <p>
+                    A structurally analogous but functionally distinct Rose tab exists in the Dynamic Analyzer
+                    workspace (<code>dynamic_rose_tab.py</code>). That implementation supports colouring petals by
+                    a resolved stress attribute (slip tendency, dilation tendency, fracture susceptibility, or
+                    critical-stress state) rather than by strike itself, and additionally supports overlaying the
+                    σ₁ azimuth as a reference line. The two modules share the equal-area square-root radius
+                    convention and the general polar-histogram construction, but the Static Rose tab documented
+                    here performs no stress resolution and requires no stress-tensor input.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="limitations">12. Limitations</h2>
+                <table>
+                    <tr><th>Limitation</th><th>Description</th></tr>
+                    <tr><td>Axial data only</td><td>The module treats fracture strike strictly as axial (180°-periodic) data. It cannot represent or distinguish directional (0°–360°, polarity-sensitive) information such as dip direction or fault polarity. Users requiring dip-direction-sensitive visualisation should consult the Static Stereonet tab.</td></tr>
+                    <tr><td>Dominant bin sensitivity</td><td>The Dominant Bin statistic is a discretised estimate dependent on the chosen Number of bins and on the fixed bin-edge alignment starting at 0°. It is not a continuous-distribution mode estimate (e.g. from kernel density estimation) and can shift between adjacent bins for small changes in bin count on noisy or sparse datasets.</td></tr>
+                    <tr><td>No circular dispersion measures</td><td>No formal circular-statistics dispersion measure (e.g. circular variance, Rayleigh test for uniformity, von Mises concentration parameter) is computed or reported. Only the first-order mean direction and modal bin are provided.</td></tr>
+                    <tr><td>Fixed percentage circle spacing</td><td>The percentage reference circles are calibrated to simple thirds of the maximum plotted radius and are not adjustable in count or fractional spacing through the current interface.</td></tr>
+                    <tr><td>Narrow-range colour contrast</td><td>Colour mapping in FracSTAT mode uses a fixed 0°–180° normalisation. Datasets whose entire fabric is confined to a narrow angular range will be rendered across only a narrow slice of the chosen colormap, which can reduce visual contrast between adjacent bins.</td></tr>
+                    <tr><td>No Terzaghi correction</td><td>The module performs no automatic sampling-bias correction (e.g. Terzaghi weighting for scan-line orientation bias). Any such correction must be performed upstream, prior to import, if required.</td></tr>
+                    <tr><td>Main-thread rendering</td><td>All rendering runs on the main UI thread since Matplotlib's TkAgg backend is not safe to drive concurrently. For very large datasets the redraw cost is bounded by Matplotlib's polar bar-collection rendering performance rather than by the NumPy histogram step.</td></tr>
+                </table>
+
                 <!-- Pagination Navigation -->
                 <div class="pagination-nav">
-                    <!-- PREVIOUS BUTTON -->
                     <a href="docs_static_cdf.html" class="nav-btn">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
                         Previous: Static CDF Tab
                     </a>
-
-                    <!-- NEXT BUTTON -->
                     <a href="docs_static_stereonet.html" class="nav-btn">
                         Next: Static Stereonet Tab
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>

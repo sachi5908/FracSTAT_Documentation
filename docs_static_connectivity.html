@@ -28,13 +28,10 @@
             </li>
         </ul>
     </nav>
-    
+
     <div class="docs-layout">
-        <!-- ==========================================
-             MASTER ACCORDION SIDEBAR
-             ========================================== -->
         <aside class="docs-sidebar" id="docsSidebar">
-            
+
             <div class="sidebar-section open">
                 <button class="sidebar-toggle">
                     Getting Started
@@ -42,7 +39,7 @@
                 </button>
                 <ul class="sidebar-links">
                     <li><a href="introduction.html">Introduction</a></li>
-                    <li><a href="installation.html" class="active">Installation Guide</a></li>
+                    <li><a href="installation.html">Installation Guide</a></li>
                     <li><a href="launcher.html">FracSTAT Home Page</a></li>
                 </ul>
             </div>
@@ -96,30 +93,888 @@
 
         <main class="docs-content">
             <div class="docs-content-inner">
+
                 <h1>Static Connectivity Tab</h1>
-                
+                <p>
+                    Located at <code>static_analyzer/tabs/static_connectivity_tab.py</code>, the <strong>Connectivity
+                    Tab</strong> (implemented as the mixin class <code>StaticFluidFlowTab</code>) addresses a
+                    fundamentally different and complementary question to FracSTAT's geometry-focused tabs: how are
+                    fractures connected to one another, and what does that connectivity imply about the ability of the
+                    network to transmit fluid, accommodate strain, or compartmentalise a reservoir?
+                </p>
+                <p>
+                    This module implements the topological node-counting and branch-classification methodology
+                    pioneered by Sanderson and co-workers (Sanderson &amp; Nixon, 2015; Manzocchi, 2002) and widely
+                    used in reservoir characterisation, tunnelling, groundwater hydrology, and CO₂ storage studies.
+                    It operates exclusively on data carrying real map geometry — SVG-digitised trace maps or spatial
+                    Excel/CSV imports — and is the only Static Analyzer tab that performs its own expensive O(n²)
+                    geometric pre-processing step to detect pairwise segment intersections.
+                </p>
+                <p>
+                    The module performs four closely related tasks: classifies every fracture-trace endpoint and
+                    every internal intersection into one of three topological node types (I, Y, X); splits every
+                    digitised segment at its crossing points to obtain true topological branches and classifies each
+                    branch by the connectedness of its endpoints; computes a battery of scalar connectivity
+                    statistics; and renders five complementary diagrams — a spatial node map and four ternary
+                    diagrams — that let the analyst see at a glance where the network sits on the spectrum between
+                    a poorly connected "scattered" network and a well-connected "lattice" network.
+                </p>
+
+                <div class="toc-box">
+                    <p>On this page</p>
+                    <ul>
+                        <li><a href="#interface-overview">1. Interface Overview</a></li>
+                        <li><a href="#data-input">2. Data Input</a></li>
+                        <li><a href="#controls">3. Settings and Controls</a></li>
+                        <li><a href="#maths">4. Mathematical Background</a></li>
+                        <li><a href="#algorithms">5. Algorithms</a></li>
+                        <li><a href="#statistics">6. Statistical Methods</a></li>
+                        <li><a href="#visualization">7. Visualization &amp; Figure Components</a></li>
+                        <li><a href="#workflow">8. Step-by-Step Example Workflows</a></li>
+                        <li><a href="#interpretation">9. Geological Interpretation</a></li>
+                        <li><a href="#performance">10. Performance Optimization</a></li>
+                        <li><a href="#advanced">11. Advanced Features</a></li>
+                        <li><a href="#limitations">12. Limitations</a></li>
+                        <li><a href="#references">13. References</a></li>
+                    </ul>
+                </div>
+
+                <!-- ================================================= -->
+                <h2 id="interface-overview">1. Interface Overview</h2>
+                <p>
+                    The Connectivity tab presents a three-region layout: a left main sidebar, a central plotting
+                    canvas area, and a Display Settings sidebar that temporarily replaces the main sidebar when
+                    activated. The main sidebar is 270 px wide and vertically scrollable, containing five stacked
+                    cards from top to bottom.
+                </p>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="put_your_img_here.png" alt="Overall layout of the Connectivity tab showing the sidebar and plot canvas" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 1.1</strong> — Annotated screenshot of the Connectivity tab showing the main sidebar (left) and the active I-Y-X node map (right).</span>
+                </figure>
+
+                <h3>1.1 Sidebar Card Structure</h3>
+                <table>
+                    <tr><th>Card</th><th>Purpose</th></tr>
+                    <tr><td>Plots</td><td>Grouped navigation buttons for switching between the five available diagrams (one Connectivity view, four Ternary views).</td></tr>
+                    <tr><td>Settings</td><td>Node snap tolerance entry, "Include boundary I-nodes" switch, "Show node labels" switch, and a Recalculate button.</td></tr>
+                    <tr><td>I-Y-X Summary</td><td>Eight live numeric read-outs: I Nodes, Y Nodes, X Nodes, Total Nodes, Branches, Connected Fraction, Connections / Branch, B22.</td></tr>
+                    <tr><td>Branch Topology</td><td>Five live numeric read-outs: I-I Branches, I-C Branches, C-C Branches, C_L, C_B.</td></tr>
+                    <tr><td>Node Colours</td><td>A static colour legend explaining the three node-type colours used on the spatial map.</td></tr>
+                </table>
+
+                <h3>1.2 Plot Navigation</h3>
+                <p>
+                    The Plots card is organised into two labelled groups — Connectivity and Ternary. Clicking a
+                    navigation button sets the active plot key, re-highlights the selected button (fill colour
+                    changes to light blue, text turns bold and coloured), swaps the visible canvas via
+                    <code>grid()</code>/<code>grid_remove()</code>, and updates the toolbar label above the plot.
+                    Because all five Matplotlib canvases are constructed once at tab-build time and simply hidden
+                    or shown, switching between diagrams is instantaneous and requires no recomputation.
+                </p>
+                <table>
+                    <tr><th>Group</th><th>Plot Key</th><th>Diagram</th></tr>
+                    <tr><td>Connectivity</td><td><code>connectivity</code></td><td>I-Y-X Connectivity Nodes (spatial map)</td></tr>
+                    <tr><td>Ternary</td><td><code>ternary_iyx</code></td><td>I-Y-X Ternary Connectivity</td></tr>
+                    <tr><td>Ternary</td><td><code>ternary_cl</code></td><td>Connections per Line (C_L)</td></tr>
+                    <tr><td>Ternary</td><td><code>ternary_cb</code></td><td>Connections per Branch (C_B)</td></tr>
+                    <tr><td>Ternary</td><td><code>ternary_br</code></td><td>Branch Topology (I-I · I-C · C-C)</td></tr>
+                </table>
+
+                <h3>1.3 Plot Area Toolbar</h3>
+                <p>The toolbar above the plot canvas shows the name of the active diagram on the left and three action buttons on the right.</p>
+                <table>
+                    <tr><th>Control</th><th>Action</th></tr>
+                    <tr><td>⬇ Save Image</td><td>Exports the currently active diagram to a timestamped PNG file inside the project's <code>FracSTAT_plot_exports</code> folder via the shared <code>save_plot_image()</code> helper.</td></tr>
+                    <tr><td>↺ Reset View</td><td>Restores the default pan/zoom extent of the active diagram without re-running the topological computation (<code>recalculate=False</code>).</td></tr>
+                    <tr><td>⚙ Settings</td><td>Toggles between the main sidebar and the Display Settings sidebar.</td></tr>
+                </table>
+
+                <!-- ================================================= -->
+                <h2 id="data-input">2. Data Input</h2>
+
+                <h3>2.1 Upstream Data Source</h3>
+                <p>
+                    The Connectivity tab does not load files directly. It consumes the same per-segment results
+                    DataFrame (<code>self.results</code>) produced by the Static Analyzer's shared geometry engine
+                    after an SVG or spatial Excel/CSV file is loaded, and reacts passively whenever results change
+                    via the <code>refresh_static_fluidflow()</code> hook called from
+                    <code>StaticAnalyzerApp.refresh_all_tabs()</code>.
+                </p>
+
+                <h3>2.2 Required Columns</h3>
+                <table>
+                    <tr><th>Column</th><th>Description</th></tr>
+                    <tr><td><code>Trace</code></td><td>Integer or string identifier grouping segments belonging to the same digitised fracture trace.</td></tr>
+                    <tr><td><code>Segment</code></td><td>Integer identifier of a segment within its trace, used to order segments when extracting trace endpoints.</td></tr>
+                    <tr><td><code>X1, Y1, X2, Y2</code></td><td>Real-world (scaled) coordinates of each segment's two endpoints, in the project's selected display unit (m, cm, mm, or km).</td></tr>
+                </table>
+
+                <h3>2.3 Data-Source Gating</h3>
+                <p>
+                    Before any computation is attempted, the tab checks whether the loaded data actually carries
+                    genuine spatial geometry. SVG-digitised trace maps and spatial Excel/CSV imports are accepted.
+                    Legacy orientation-only formats (ID/Strike/Dip tables, Trend/Plunge pole tables) are explicitly
+                    rejected with an explanatory message — node counting on synthetic orientation-wheel coordinates
+                    would be meaningless without real spatial position. The rejection test inspects whether the first
+                    loaded Segment object carries a non-null <code>_preset_strike</code> attribute, set only by the
+                    Excel loader for orientation-only formats.
+                </p>
+                <div class="note-box">
+                    <strong>Note:</strong> when an orientation-only format is detected, all five canvases display
+                    "I-Y-X connectivity needs map geometry; load an SVG or spatial CSV/Excel" rather than raising
+                    an error.
+                </div>
+
+                <h3>2.4 Unit Handling</h3>
+                <p>
+                    The tolerance entry field and all reported lengths and areas automatically track the project's
+                    currently selected display unit (obtained from <code>_static_map_unit_var</code>, defaulting to
+                    metres). The node-snap-tolerance label refreshes on every draw to show the active unit in
+                    parentheses — e.g. "Node snap tolerance (m)" or "Node snap tolerance (cm)".
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="controls">3. Settings and Controls</h2>
+
+                <h3>3.1 Settings Card (Main Sidebar)</h3>
+                <table>
+                    <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
+                    <tr><td>Node snap tolerance</td><td>0.1 (display unit)</td><td>Distance threshold below which two nearby points are treated as the same physical node. Directly controls I/Y/X classification sensitivity. Committed on <kbd>Enter</kbd> or focus-loss; triggers a full recompute.</td></tr>
+                    <tr><td>Include boundary I-nodes</td><td>Off (excluded)</td><td>When off, isolated (I) endpoints lying on the bounding box of the mapped area are removed before counting — they are artefacts of the finite sample window rather than genuine fracture tips. When on, every I endpoint is retained. Always forces a full recompute.</td></tr>
+                    <tr><td>Show node labels</td><td>Off</td><td>Overlays a small text label (e.g. "I3", "Y12", "X1") beside every plotted node on the spatial map. Cosmetic only; does not trigger recomputation.</td></tr>
+                    <tr><td>↻ Recalculate</td><td>—</td><td>Forces an explicit, user-initiated recompute; shows the global loading overlay while the O(n²) intersection search runs.</td></tr>
+                </table>
+
+                <div class="tip-box">
+                    <strong>Tip:</strong> the Node Snap Tolerance help icon (?) opens a floating card explaining
+                    the physical meaning of the parameter. It recommends setting the tolerance to approximately
+                    the size of the largest visible gap between fracture tips that should be treated as touching.
+                </div>
+
+                <h3>3.2 I-Y-X Summary Card</h3>
+                <table>
+                    <tr><th>Label</th><th>Symbol</th><th>Source</th></tr>
+                    <tr><td>I Nodes</td><td>N_I</td><td><code>result.n_i</code> — count of isolated fracture tips</td></tr>
+                    <tr><td>Y Nodes</td><td>N_Y</td><td><code>result.n_y</code> — count of abutting (T-shaped) intersections</td></tr>
+                    <tr><td>X Nodes</td><td>N_X</td><td><code>result.n_x</code> — count of crossing (X-shaped) intersections</td></tr>
+                    <tr><td>Total Nodes</td><td>N</td><td><code>result.total_nodes</code> = N_I + N_Y + N_X</td></tr>
+                    <tr><td>Branches</td><td>N_B</td><td><code>result.branch_count</code> = n_ii + n_ic + n_cc</td></tr>
+                    <tr><td>Connected Fraction</td><td>CF</td><td><code>result.connected_fraction</code> = (N_Y + N_X) / N</td></tr>
+                    <tr><td>Connections / Branch</td><td>C̄</td><td><code>result.connections_per_branch</code> = (N_Y + 2N_X) / N_B</td></tr>
+                    <tr><td>B22</td><td>B₂₂</td><td><code>result.dimensionless_intensity</code> = L²_total / A</td></tr>
+                </table>
+
+                <h3>3.3 Branch Topology Card</h3>
+                <table>
+                    <tr><th>Label</th><th>Symbol</th><th>Source</th></tr>
+                    <tr><td>I-I Branches</td><td>N_II</td><td><code>result.n_ii</code> — branches with both endpoints isolated</td></tr>
+                    <tr><td>I-C Branches</td><td>N_IC</td><td><code>result.n_ic</code> — branches with one isolated, one connected endpoint</td></tr>
+                    <tr><td>C-C Branches</td><td>N_CC</td><td><code>result.n_cc</code> — branches with both endpoints connected</td></tr>
+                    <tr><td>C_L</td><td>C_L</td><td>Connections per line, recomputed locally in <code>_update_branch_stats</code></td></tr>
+                    <tr><td>C_B</td><td>C_B</td><td>Connections per branch, recomputed locally in <code>_update_branch_stats</code></td></tr>
+                </table>
+
+                <h3>3.4 Display Settings Sidebar</h3>
+                <p>
+                    Clicking "⚙ Settings" hides the main sidebar and reveals a second sidebar of identical width,
+                    headed by a "⬅ Back" button and the title "Display Settings". This sidebar exposes cosmetic
+                    and stylistic controls that do not affect the underlying topological computation — only how the
+                    results are rendered.
+                </p>
+
+                <h4>3.4.1 Display Options</h4>
+                <table>
+                    <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
+                    <tr><td>Ternary plot heading</td><td>blank (automatic)</td><td>Custom title overriding the automatic heading on all four ternary diagrams.</td></tr>
+                </table>
+
+                <h4>3.4.2 Plot Elements</h4>
+                <table>
+                    <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
+                    <tr><td>Outer background</td><td>theme background</td><td>Figure-level (canvas) background colour for all five diagrams.</td></tr>
+                    <tr><td>Plot background</td><td>theme panel</td><td>Axes-level background colour.</td></tr>
+                    <tr><td>Grid colour</td><td>theme grid</td><td>Colour of gridlines on the map and ternary reference grids.</td></tr>
+                    <tr><td>I-Node colour</td><td>#DC2626 (red)</td><td>Marker colour for isolated nodes on the spatial map and in ternary vertex labels.</td></tr>
+                    <tr><td>Y-Node colour</td><td>#16A34A (green)</td><td>Marker colour for abutting (Y) nodes.</td></tr>
+                    <tr><td>X-Node colour</td><td>#2563EB (blue)</td><td>Marker colour for crossing (X) nodes.</td></tr>
+                    <tr><td>Border colour</td><td>#475569</td><td>Colour of axis spines / plot borders.</td></tr>
+                    <tr><td>Border width</td><td>1.0</td><td>Line width (pt) of axis spines, applied via <code>palette['border_lw']</code>.</td></tr>
+                    <tr><td>Base Node Size</td><td>36</td><td>Base marker area (Matplotlib <code>s</code> parameter, in points²) for I, Y, and X node scatter markers on the spatial map.</td></tr>
+                    <tr><td>Show grid lines</td><td>Off</td><td>Toggles gridlines on all diagrams.</td></tr>
+                    <tr><td>Grid line width</td><td>0.6</td><td>Line width (pt) of gridlines when shown.</td></tr>
+                </table>
+
+                <h4>3.4.3 Background Image</h4>
+                <table>
+                    <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
+                    <tr><td>Show real photo behind nodes</td><td>Off</td><td>Enables a calibrated photograph drawn behind the spatial node map only (the four ternary diagrams do not use a background image). If no image path is yet known, automatically prompts a file browser or reuses an image already calibrated elsewhere in the project.</td></tr>
+                    <tr><td>Change Image…</td><td>—</td><td>Opens a file dialog to (re)select the background photograph.</td></tr>
+                    <tr><td>Image opacity (0–1)</td><td>1.0</td><td>Alpha blending factor applied to the background image via Matplotlib's <code>imshow(alpha=...)</code>.</td></tr>
+                </table>
+
+                <h4>3.4.4 Reset Defaults</h4>
+                <p>
+                    Restores every colour, size, and toggle in the Display Settings sidebar to its factory value
+                    and triggers a cosmetic-only redraw. Background-image settings and the underlying
+                    tolerance/boundary-inclusion settings are not affected by this reset.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="maths">4. Mathematical Background</h2>
+                <p>
+                    Let S = {s₁, …, s_n} be the set of digitised segments, each defined by two endpoints (x1, y1)
+                    and (x2, y2) belonging to a parent trace.
+                </p>
+
+                <h3>4.1 Node Classes</h3>
+                <p>
+                    Following the terminology introduced for fracture network topology (Manzocchi, 2002; Sanderson
+                    &amp; Nixon, 2015), every distinct point where the network terminates or crosses itself is
+                    classified into exactly one of three mutually exclusive categories:
+                </p>
+                <table>
+                    <tr><th>Symbol</th><th>Name</th><th>Geometric Definition</th><th>Geological Meaning</th></tr>
+                    <tr><td><strong>I</strong></td><td>Isolated node</td><td>A trace endpoint that does not lie within snap tolerance of any other trace or interior crossing.</td><td>A fracture tip that terminates in intact rock — propagation stopped without linking to another fracture.</td></tr>
+                    <tr><td><strong>Y</strong></td><td>Abutting node</td><td>An intersection point where one trace terminates against another; the intersection coincides with an endpoint of at least one of the two segments involved.</td><td>One fracture terminated against an earlier through-going fracture — the classic "T" intersection recording a relative age relationship.</td></tr>
+                    <tr><td><strong>X</strong></td><td>Crossing node</td><td>An interior intersection point lying strictly within both intersecting segments, not coincident with either endpoint.</td><td>Two fractures crossed each other, implying both were open/active at the time of intersection or that a younger fracture propagated straight through an older one.</td></tr>
+                </table>
+
+                <h3>4.2 Node-Level Statistics</h3>
+                <div class="formula-block">
+N  = N_I + N_Y + N_X            (total node count)
+
+CF = (N_Y + N_X) / N            (connected fraction)
+
+C̄  = (N_Y + 2·N_X) / N_B       (average connections per branch)</div>
+                <p>
+                    The connected fraction CF expresses what proportion of all identified nodes actually represent
+                    a connection between two or more fractures, as opposed to a dead end. It ranges from 0 (a
+                    network of entirely isolated fractures) to 1 (every node is a connection). Because a crossing
+                    (X) node links four branch ends while an abutting (Y) node links three, the X contribution is
+                    weighted by 2 relative to Y in the connections-per-branch statistic.
+                </p>
+
+                <h3>4.3 Dimensionless Intensity (B₂₂)</h3>
+                <div class="formula-block">
+B₂₂ = L_total² / A</div>
+                <p>
+                    B₂₂ is the square of the cumulative trace length L_total divided by the sample bounding-box
+                    area A. It is a scale-independent measure of overall fracture density that can be compared
+                    directly between outcrops of different sizes, following the P₂₂ dimensionless-intensity
+                    convention used throughout the structural-geology fracture-intensity literature.
+                </p>
+
+                <h3>4.4 Branch Classification</h3>
+                <p>
+                    A raw digitised segment is not itself a topological branch whenever it is crossed by another
+                    segment partway along its length. The module explicitly splits every segment at each of its
+                    interior (X-type) crossings before classification. For each resulting sub-segment (branch),
+                    both endpoints are tested for proximity to any accepted X-node or Y-node position and labelled
+                    C (connected) or I (isolated):
+                </p>
+                <table>
+                    <tr><th>Class</th><th>Endpoint Pattern</th><th>Symbol</th><th>Meaning</th></tr>
+                    <tr><td>I–I</td><td>isolated – isolated</td><td><code>n_ii</code></td><td>A fully isolated strand that neither terminates against nor is crossed by any other fracture at either end.</td></tr>
+                    <tr><td>I–C</td><td>isolated – connected</td><td><code>n_ic</code></td><td>A branch that dangles freely at one end but connects to the network at the other — a "dead-end spur".</td></tr>
+                    <tr><td>C–C</td><td>connected – connected</td><td><code>n_cc</code></td><td>A branch connected to the rest of the network at both ends — the fully connected, fluid-conducting portion of the fracture set.</td></tr>
+                </table>
+                <div class="formula-block">
+N_B = N_II + N_IC + N_CC</div>
+
+                <h3>4.5 Line- and Branch-Density Ratios (C_L and C_B)</h3>
+                <div class="formula-block">
+N_L  = (N_I + N_Y) / 2               C_L = 2·(N_X + N_Y) / N_L
+
+N_Br = (N_I + 3·N_Y + 4·N_X) / 2    C_B = (3·N_Y + 4·N_X) / N_Br</div>
+                <p>
+                    N_L is an estimate of the number of discrete "lines" (through-going fracture traces) implied by
+                    the node population, and C_L (connections per line) expresses how many connections, on average,
+                    each such line participates in. N_Br and C_B serve as independently cross-checkable companions
+                    to the <code>connections_per_branch</code> property derived from the explicit branch-split
+                    procedure, providing an internal consistency check.
+                </p>
+
+                <h3>4.6 Ternary (Barycentric) Coordinates</h3>
+                <p>
+                    Each of the four ternary diagrams plots a data point inside an equilateral triangle using
+                    standard barycentric-to-Cartesian conversion. For any three proportions p_bl, p_br, p_apex
+                    that sum to 1, the Cartesian plotting position within a unit-height triangle is:
+                </p>
+                <div class="formula-block">
+bx = p_br + 0.5 · p_apex
+by = (√3 / 2) · p_apex</div>
+                <p>
+                    For the I-Y-X ternary, the vertex assignment is bottom-left = Y fraction, bottom-right = X
+                    fraction, apex = I fraction (i.e. p_i = N_I/N, p_y = N_Y/N, p_x = N_X/N). For the Branch
+                    Topology ternary, the three proportions are the I-I, I-C, and C-C branch fractions: p_ii at
+                    the apex, p_cc at bottom-right, p_ic at bottom-left.
+                </p>
+
+                <h3>4.7 Theoretical Random-Network Locus (Branch Topology Ternary)</h3>
+                <p>
+                    The Branch Topology diagram overlays a reference curve corresponding to the theoretical
+                    relationship expected for a network where node connectivity follows a simple binomial (random)
+                    model. Parameterising by C_B ∈ [0, 2] and setting p_C = C_B / 2:
+                </p>
+                <div class="formula-block">
+p_II = (1 − p_C)²        p_CC = p_C²        p_IC = 2·p_C·(1 − p_C)</div>
+                <p>
+                    The locus is plotted as a smooth blue curve with tick marks at C_B = 0.0, 0.5, 1.0, 1.5, 2.0,
+                    giving the analyst an immediate visual reference for how far the observed network departs from a
+                    purely random connectivity structure. Real fracture networks are typically displaced toward the
+                    C-C corner relative to this random-model curve.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="algorithms">5. Algorithms</h2>
+                <p>
+                    The complete node-classification and branch-typing pipeline is implemented in
+                    <code>core/branch_counter.py</code>, function <code>count_iyx_nodes()</code>, and is called
+                    from the GUI layer only when a recompute is actually required (Section 10).
+                </p>
+
+                <h3>5.1 Pre-processing and Validation</h3>
+                <p>
+                    If the results table is empty or missing any of the required geometry columns (Trace, Segment,
+                    X1, Y1, X2, Y2), the function immediately returns an all-zero
+                    <code>ConnectivityResult</code>. All coordinate columns are coerced to numeric
+                    (<code>pandas.to_numeric, errors='coerce'</code>); rows that fail conversion are dropped.
+                    Segments shorter than 1×10⁻¹² are discarded as degenerate. The tolerance is clamped to be
+                    non-negative (<code>max(tolerance, 0.0)</code>). The bounding box of surviving endpoints is
+                    computed, anchoring both the boundary-exclusion test and the B₂₂ statistic.
+                </p>
+
+                <h3>5.2 Pairwise Segment Intersection</h3>
+                <p>
+                    For every distinct pair of segments belonging to different traces (segments sharing the same
+                    Trace identifier are never tested against each other), the module solves the standard 2-D
+                    parametric line intersection system:
+                </p>
+                <div class="formula-block">
+P = A₁ + u₁·(A₂ − A₁) = B₁ + u₂·(B₂ − B₁)
+
+denominator = dy₂·dx₁ − dx₂·dy₁
+
+If |denominator| &lt; 1×10⁻¹² → segments are parallel; no intersection recorded.
+
+Otherwise solve for u₁ (ua) and u₂ (ub) algebraically.
+If both u₁, u₂ ∈ [0, 1] (±1×10⁻¹⁰ tolerance) → intersection accepted.</div>
+                <p>The accepted intersection point (x, y) is computed by substitution back into the first segment's parametric equation.</p>
+
+                <h3>5.3 Classifying the Intersection: Abutment vs Crossing</h3>
+                <p>
+                    Each accepted intersection is tested by <code>_near_any_endpoint()</code>: the intersection
+                    point is compared, using Euclidean distance and the user-specified tolerance, against all four
+                    endpoints of the two participating segments. If the intersection lies within tolerance of any
+                    one of those four endpoints, it is classified as an abutting (Y) candidate. Otherwise, provided
+                    u₁ and u₂ both lie strictly within the open interval (0, 1), it is classified as a crossing
+                    (X) candidate.
+                </p>
+
+                <h3>5.4 Endpoint (I-node) Extraction and Boundary Exclusion</h3>
+                <p>
+                    Independently of the pairwise intersection search, the true endpoints of every trace are
+                    extracted by <code>_trace_endpoints()</code>: segments are grouped by Trace and sorted by
+                    Segment, and the first coordinate of the first segment and the second coordinate of the last
+                    segment in each trace are taken as the two trace-tip candidates — correctly handling
+                    multi-segment traces even though the trace is stored as a chain of individual straight segments.
+                </p>
+                <p>
+                    If "Include boundary I-nodes" is off (the default), every candidate tip lying within tolerance
+                    of any side of the sample bounding box is discarded by <code>_on_boundary()</code>. This
+                    censoring correction reflects the fact that a trace exiting the mapped area is not truly an
+                    isolated fracture tip — it is an artefact of the finite digitisation window.
+                </p>
+
+                <h3>5.5 Point Clustering</h3>
+                <p>
+                    Because floating-point intersection arithmetic and independently listed endpoint candidates can
+                    produce several near-duplicate points representing the same physical node, all raw candidate
+                    points of a given class are merged by <code>_cluster_points()</code> using a greedy single-pass
+                    algorithm: each new candidate point is compared, in the order encountered, against the running
+                    centroid of every cluster created so far. If it lies within tolerance of an existing cluster
+                    centroid, it is merged and the centroid is updated as the incremental running mean; otherwise a
+                    new cluster is started.
+                </p>
+
+                <h3>5.6 Priority-Ordered De-duplication Across Classes</h3>
+                <p>
+                    After clustering, three independent point sets exist. Any Y candidate also matching an X cluster
+                    is removed via <code>_remove_points_near()</code> (a true crossing takes priority over a
+                    coincidental abutment). Any I candidate matching an X or Y cluster is removed (a genuine
+                    intersection always takes priority over an apparent near-miss endpoint). This produces the
+                    strict, mutually exclusive priority ordering X &gt; Y &gt; I, ensuring every physical location
+                    is counted exactly once in its most topologically significant category.
+                </p>
+
+                <h3>5.7 Branch Splitting and Classification</h3>
+                <p>
+                    The final stage (<code>_classify_branches</code>) re-runs the pairwise intersection search,
+                    retaining only interior (X-type) crossings, and records for every original segment the ordered
+                    list of parametric u-values at which it is crossed. Each segment is split into sub-segments at
+                    these u-positions (sorted ascending), and each resulting sub-segment (branch) has both
+                    endpoints tested for membership in the final merged X∪Y node set via
+                    <code>is_connected()</code>. The branch is assigned to the I-I, I-C, or C-C class according
+                    to the connectivity of its two endpoints.
+                </p>
+
                 <div class="code-window">
                     <div class="code-header">
                         <span class="code-lang">python</span>
                         <button class="copy-btn">Copy</button>
                     </div>
-                    <pre><code class="language-python">
-                        DEMO OF CODE SNIPPET
-                    </code></pre>
+                    <pre><code class="language-python">def count_iyx_nodes(results_df, tolerance=0.1, include_boundary_i=False):
+    """Main entry point: classify I/Y/X nodes and I-I/I-C/C-C branches."""
+    if results_df is None or results_df.empty:
+        return _empty_result()
+
+    # Coerce coordinate columns; discard degenerate rows
+    for col in ("X1", "Y1", "X2", "Y2"):
+        results_df[col] = pd.to_numeric(results_df[col], errors="coerce")
+    results_df = results_df.dropna(subset=["X1", "Y1", "X2", "Y2"])
+    lengths = np.hypot(results_df.X2 - results_df.X1, results_df.Y2 - results_df.Y1)
+    results_df = results_df[lengths > 1e-12]
+    tolerance = max(tolerance, 0.0)
+
+    # Pairwise intersection search (O(n^2), cross-trace pairs only)
+    x_raw, y_raw = [], []
+    for (row_i, row_j) in cross_trace_pairs(results_df):
+        pt, ua, ub = _segment_intersection(row_i, row_j)
+        if pt is None:
+            continue
+        if _near_any_endpoint(pt, row_i, row_j, tolerance):
+            y_raw.append(pt)            # abutting (Y) candidate
+        elif 0 < ua < 1 and 0 < ub < 1:
+            x_raw.append(pt)            # crossing (X) candidate
+
+    # Cluster, then de-duplicate with priority X > Y > I
+    x_nodes = _cluster_points(x_raw, tolerance)
+    y_nodes  = _cluster_points(
+        _remove_points_near(y_raw, x_nodes, tolerance), tolerance)
+    i_tips   = _trace_endpoints(results_df)
+    if not include_boundary_i:
+        i_tips = [p for p in i_tips if not _on_boundary(p, results_df, tolerance)]
+    i_nodes  = _cluster_points(
+        _remove_points_near(i_tips, x_nodes + y_nodes, tolerance), tolerance)
+
+    # Branch split and classify into I-I / I-C / C-C
+    n_ii, n_ic, n_cc = _classify_branches(
+        results_df, x_nodes, y_nodes, tolerance)
+
+    return ConnectivityResult(
+        i_nodes=np.array(i_nodes), y_nodes=np.array(y_nodes),
+        x_nodes=np.array(x_nodes), n_ii=n_ii, n_ic=n_ic, n_cc=n_cc,
+        total_length=lengths.sum(),
+        sample_area=_bounding_box_area(results_df),
+    )</code></pre>
                 </div>
+
+                <h3>5.8 Algorithm Complexity Summary</h3>
+                <table>
+                    <tr><th>Stage</th><th>Complexity</th><th>Notes</th></tr>
+                    <tr><td>Pairwise intersection search (first pass)</td><td>O(n²)</td><td>n = number of segments; every cross-trace pair is tested once.</td></tr>
+                    <tr><td>Point clustering</td><td>O(k²) per class</td><td>k = raw candidate count for that node class, typically ≪ n².</td></tr>
+                    <tr><td>Boundary exclusion</td><td>O(m)</td><td>m = number of trace-tip candidates (2 per trace).</td></tr>
+                    <tr><td>Branch split &amp; classify (second pass)</td><td>O(n²)</td><td>Repeats the interior-crossing search to build the per-segment split table.</td></tr>
+                </table>
+                <p>
+                    The dominant cost is quadratic in the number of segments. For very dense SVG traces (many
+                    thousands of short curve-sampled segments), this can become the single most expensive
+                    computation in the entire Static Analyzer workspace.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="statistics">6. Statistical Methods</h2>
+                <p>
+                    Unlike the Histogram or CDF tabs, the Connectivity module does not perform inferential
+                    statistics. Its statistical content is entirely descriptive and topological: it counts,
+                    classifies, and ratios discrete network elements. All reported quantities are deterministic
+                    functions of the digitised geometry and the two user-controlled parameters (snap tolerance,
+                    boundary-I-node inclusion). No sampling error or estimator variance is associated with these
+                    numbers in the classical statistical sense.
+                </p>
+                <table>
+                    <tr><th>Quantity</th><th>Type</th><th>Range</th><th>Interpretation</th></tr>
+                    <tr><td>N_I, N_Y, N_X</td><td>Count (integer)</td><td>≥ 0</td><td>Absolute abundance of each node class.</td></tr>
+                    <tr><td>N (total nodes)</td><td>Count (integer)</td><td>≥ 0</td><td>Sum of all node classes.</td></tr>
+                    <tr><td>Connected Fraction CF</td><td>Proportion</td><td>[0, 1]</td><td>Higher = more of the network participates in genuine connections rather than dead ends.</td></tr>
+                    <tr><td>Connections / Branch C̄</td><td>Ratio (dimensionless)</td><td>≥ 0</td><td>Average branch-end connectivity, weighted 1× for Y and 2× for X.</td></tr>
+                    <tr><td>B₂₂</td><td>Dimensionless intensity</td><td>≥ 0</td><td>Scale-independent overall fracture density (P₂₂-style intensity metric).</td></tr>
+                    <tr><td>N_II, N_IC, N_CC</td><td>Count (integer)</td><td>≥ 0</td><td>Branch population by connectivity class.</td></tr>
+                    <tr><td>C_L</td><td>Ratio (dimensionless)</td><td>typically 0–4</td><td>Connections per fracture line.</td></tr>
+                    <tr><td>C_B</td><td>Ratio (dimensionless)</td><td>typically 0–2</td><td>Connections per branch; theoretical random-network bound is exactly 2.</td></tr>
+                    <tr><td>Barycentric ternary position</td><td>Composition (proportion triple)</td><td>simplex</td><td>Visual, compositional summary of any of the three-part classifications above.</td></tr>
+                </table>
+                <p>
+                    The principal sources of uncertainty are (a) digitisation error in the original trace map, (b)
+                    sensitivity to the chosen snap tolerance, and (c) truncation/censoring at the edges of the
+                    mapped domain.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="visualization">7. Visualization &amp; Figure Components</h2>
+                <p>
+                    Five complementary Matplotlib diagrams are available, switchable instantly from the Plots
+                    navigation card. All share the workspace's global font-size, font-weight, and font-colour
+                    settings (<code>matplotlib.rcParams</code>) and honour the Display Settings colour/size
+                    overrides described in Section 3.4.
+                </p>
+
+                <h3>7.1 I-Y-X Connectivity Nodes (Spatial Map)</h3>
+                <p>
+                    This is the only diagram drawn in true map (X, Y) coordinates. Every digitised segment is
+                    rendered as a thin line (<code>LineCollection</code>, using the theme's spine/border colour),
+                    and the three node classes are overlaid as coloured scatter points: red for I, green for Y,
+                    blue for X by default. Marker size follows the "Base Node Size" setting. If "Show node
+                    labels" is enabled, each node receives a small text label (e.g. "X7") numbering it within its
+                    class. A legend with three columns is drawn beneath the plot. The axes are scaled equal (1:1
+                    aspect) and padded by 5% of the bounding-box extent on each side.
+                </p>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="put_your_img_here.png" alt="I-Y-X Connectivity Nodes spatial map with red I, green Y, and blue X markers" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 7.1</strong> — I-Y-X Connectivity Nodes map: spatial fracture-trace network with red circles at isolated (I) tips, green circles at abutting (Y) junctions, and blue circles at crossing (X) junctions. Legend below the plot.</span>
+                </figure>
+
+                <h3>7.2 I-Y-X Ternary Connectivity</h3>
+                <p>
+                    An equilateral-triangle ternary diagram with vertices labelled Y (bottom-left), X
+                    (bottom-right), and I (apex). A single orange marker plots the network's (p_i, p_y, p_x)
+                    composition using the barycentric transform of Section 4.6, annotated with a text callout
+                    reporting all three fractions to two decimal places (e.g. "I 0.32 &nbsp; Y 0.41 &nbsp; X 0.27").
+                    A point sitting close to the Y-X base edge indicates a well-connected network dominated by
+                    terminations and crossings rather than dead ends.
+                </p>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="put_your_img_here.png" alt="I-Y-X Ternary Connectivity diagram with annotated data point" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 7.2</strong> — I-Y-X Ternary Connectivity diagram. The data point (orange) is annotated with the fractions of I, Y, and X nodes.</span>
+                </figure>
+
+                <h3>7.3 Connections per Line (C_L)</h3>
+                <p>
+                    The same Y/X/I ternary frame, overlaid with a family of iso-C_L contour lines drawn for
+                    C_L = 1, 2, 3, 4, 6, 8, 10, 20, plus a distinguished dashed contour at the frequently cited
+                    threshold C_L = 3.57 — the value associated with the transition to well-connected, likely-
+                    percolating networks in several published topological classifications. The observed data point
+                    is plotted as an amber marker with an annotated C_L value.
+                </p>
+
+                <h3>7.4 Connections per Branch (C_B)</h3>
+                <p>
+                    Structurally identical to the C_L diagram but contoured for C_B = 0.5, 1.0, 1.3, 1.5, 1.7,
+                    1.8, 1.9, 1.95, plus the fixed C_B = 2.0 contour, which coincides exactly with the bottom
+                    (Y–X) edge of the triangle since C_B = 2 is the theoretical maximum (every branch fully
+                    connected at both ends, i.e. zero I-nodes). The observed point is plotted as a cyan marker
+                    with an annotated C_B value.
+                </p>
+
+                <h3>7.5 Branch Topology (I-I · I-C · C-C)</h3>
+                <p>
+                    A ternary diagram with vertices I-C (bottom-left), C-C (bottom-right), and I-I (apex),
+                    overlaid with the theoretical random-network locus described in Section 4.7 (blue curve with
+                    C_B tick labels at 0.0–2.0) and the observed branch-population point plotted as a white marker
+                    with a dark outline, annotated with its independently computed C_B value derived from the
+                    I-I/I-C/C-C proportions.
+                </p>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="put_your_img_here.png" alt="Branch Topology ternary diagram with random-network locus and observed data point" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 7.3</strong> — Branch Topology (I-I · I-C · C-C) ternary diagram showing the theoretical random-network locus (blue curve with C_B tick marks) and the observed branch-population point (white marker).</span>
+                </figure>
+
+                <h3>7.6 Empty and Loading States</h3>
+                <p>
+                    When no data is loaded, when the data source lacks real map geometry, or while a recomputation
+                    is pending but the tab is not the active one, all five axes are cleared and a single centred,
+                    muted-colour text message is drawn by <code>_fluid_empty_state()</code> explaining the reason.
+                    All sidebar statistic labels are simultaneously reset to "–".
+                </p>
+
+                <h3>7.7 Global Styling Controls</h3>
+                <p>
+                    Every diagram observes the same background/foreground/grid/border colour variables and the same
+                    border line width and grid line width entries, so the five diagrams present a visually
+                    consistent, publication-ready style suite. Corner labels and axis titles automatically scale
+                    with the workspace's global font-size control (<code>mpl.rcParams['axes.titlesize']</code>).
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="workflow">8. Step-by-Step Example Workflows</h2>
+
+                <h3>8.1 Assessing Reservoir Connectivity from an Outcrop Trace Map</h3>
+                <ol class="step-list">
+                    <li>Load an SVG trace map (or a spatial Excel/CSV) into the Static Analyzer and confirm the Fracture Map tab renders correctly with calibrated scale.</li>
+                    <li>Open the Connectivity tab. Because the data is new, the tab is marked stale and an automatic lazy computation runs immediately with the default 0.1-unit tolerance.</li>
+                    <li>Inspect the I-Y-X Connectivity Nodes map. Visually confirm that crossing (blue) markers sit at genuine X-shaped intersections, and abutting (green) markers at T-shaped terminations. If many genuinely touching fracture tips are coloured red (I), the snap tolerance is too small relative to digitisation precision; if unrelated nearby fractures are merged into a single node, the tolerance is too large.</li>
+                    <li>Adjust "Node snap tolerance" as needed (e.g. from 0.1 m to 0.25 m for coarse digitisation) and press "↻ Recalculate".</li>
+                    <li>Decide on boundary I-nodes: use exclusion (the default) for an arbitrary rectangular crop of a larger fracture field; use inclusion if fracture tips genuinely terminate at a natural geological boundary such as a bounding fault.</li>
+                    <li>Read the I-Y-X Summary card: for example, I = 42, Y = 118, X = 76, Total = 236, Branches = 310, CF = 0.822, C̄ = 0.877, B₂₂ = 4.6.</li>
+                    <li>Switch to the I-Y-X Ternary diagram — a point sitting close to the Y-X edge (away from the I apex) indicates a well-connected network.</li>
+                    <li>Switch to the C_L diagram — a point to the right of the dashed C_L = 3.57 contour indicates a topologically well-connected, likely-percolating regime.</li>
+                    <li>Switch to the Branch Topology diagram — a point displaced toward the C-C corner relative to the random-network locus suggests connectivity in excess of a purely random linking process, consistent with mechanically controlled fracture growth.</li>
+                    <li>Use "⬇ Save Image" on each diagram of interest to export 300 dpi PNGs to the project's <code>FracSTAT_plot_exports</code> folder for inclusion in a report or publication.</li>
+                </ol>
+
+                <h3>8.2 Worked Numerical Example</h3>
+                <p>
+                    Consider a network reporting I = 10, Y = 20, X = 10 (N = 40 nodes) and, after branch splitting,
+                    N_II = 4, N_IC = 12, N_CC = 14 (N_B = 30 branches). The connectivity statistics are:
+                </p>
+                <div class="formula-block">
+CF  = (20 + 10) / 40 = 0.75
+
+C̄   = (20 + 2·10) / 30 = 40/30 ≈ 1.33
+
+N_L = (10 + 20) / 2 = 15
+C_L = 2·(10 + 20) / 15 = 4.0
+
+N_Br = (10 + 3·20 + 4·10) / 2 = 55
+C_B  = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82</div>
+                <p>
+                    With C_B = 1.82 exceeding the well-connected reference value of 1.7–1.8 commonly cited in
+                    topological classifications, and C_L = 4.0 exceeding the 3.57 percolation-related threshold,
+                    this hypothetical network would be characterised as well connected and likely to behave as an
+                    effective fluid-flow pathway network.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="interpretation">9. Geological Interpretation</h2>
+
+                <h4>9.1 Connectivity Statistics and Fluid Flow</h4>
+                <p>
+                    Fracture connectivity, not fracture density alone, is frequently the controlling factor in
+                    whether a naturally fractured reservoir, aquifer, or rock mass behaves as an effective flow or
+                    mechanical system. Two intervals with identical fracture intensity (P10, P21, or B₂₂) can have
+                    dramatically different bulk permeability if one is dominated by isolated fractures (high
+                    I-node fraction, low CF) while the other forms an interconnected lattice (high X/Y-node
+                    fraction, high CF).
+                </p>
+
+                <h4>9.2 Node-Type Ratios and Network Maturity</h4>
+                <p>
+                    Increasing abundance of crossing (X) nodes relative to abutting (Y) nodes is often associated
+                    with a more mature, multiply-reactivated fracture system where successive fracture sets have
+                    propagated through pre-existing fractures rather than systematically terminating against them.
+                    Conversely, a network dominated by Y-nodes frequently records a clear relative-age sequence,
+                    with younger, shorter fractures terminating against an earlier, more continuous fracture set —
+                    a pattern common in systematically jointed sedimentary sequences with a dominant
+                    bedding-perpendicular joint set.
+                </p>
+
+                <h4>9.3 Percolation and Effective Connectivity Thresholds</h4>
+                <p>
+                    The C_L = 3.57 and C_B ≈ 2 reference values on the ternary diagrams derive from
+                    topological/percolation-theory studies of two-dimensional fracture networks (see Section 13,
+                    References), where networks below the threshold are statistically unlikely to form a fully
+                    connected percolating cluster spanning the sample domain, while networks above typically do.
+                    These are heuristic reference values rather than universal physical constants: the true
+                    percolation threshold for any specific network depends on the fracture-length distribution,
+                    orientation distribution, and aperture/permeability contrast, quantified separately in other
+                    FracSTAT tabs.
+                </p>
+
+                <h4>9.4 Dead-End Branches (I-C) and Hydraulic Significance</h4>
+                <p>
+                    A large I-C (dead-end spur) fraction indicates that a substantial portion of the mapped
+                    fracture length — while nominally connected to the main network at one end — terminates in
+                    intact rock at the other and cannot itself provide a through-going flow path. Distinguishing
+                    the C-C (fully connected, potentially conductive) branch population from the I-C and I-I
+                    populations is therefore directly relevant when the Connectivity results are combined with
+                    permeability up-scaling or discrete-fracture-network flow simulation performed outside FracSTAT.
+                </p>
+
+                <h4>9.5 Scale Dependence and Sampling Considerations</h4>
+                <p>
+                    Connectivity statistics are not fully scale-invariant: the observed I-node fraction is
+                    sensitive to the size of the mapped domain relative to the mean fracture length, because a
+                    larger domain captures more complete fracture traces (fewer artificial edge terminations). The
+                    boundary-I-node exclusion option partially corrects for this effect, but analysts should still
+                    be cautious when comparing connectivity statistics computed from maps of substantially
+                    different physical size or aspect ratio.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="performance">10. Performance Optimization</h2>
+                <p>
+                    Because the underlying topological computation is O(n²) in the number of digitised segments,
+                    the Connectivity tab is deliberately engineered to run this computation as rarely as possible
+                    while still guaranteeing that displayed statistics are always correct and current.
+                </p>
+
+                <h3>10.1 Result Caching</h3>
+                <p>
+                    The single <code>ConnectivityResult</code> object produced by the most recent successful call
+                    to <code>count_iyx_nodes()</code> is retained in <code>self._fluid_connectivity</code> for
+                    the lifetime of the workspace session. Every cosmetic redraw (colour change, grid toggle,
+                    node-label toggle, pan, zoom, Reset View) reuses this cached object directly rather than
+                    recomputing it.
+                </p>
+
+                <h3>10.2 Lazy, On-Demand Computation</h3>
+                <p>
+                    The tab is only ever computed when it is both (a) marked stale by a genuine geometry change
+                    and (b) actually the currently visible tab (or explicitly forced via Recalculate or a settings
+                    change that mandates recomputation). If the analyst never opens the Connectivity tab, the
+                    expensive computation never runs at all, regardless of how many files are loaded or how many
+                    times the profile scale is changed elsewhere in the workspace.
+                </p>
+
+                <h3>10.3 Geometric Fingerprinting</h3>
+                <p>
+                    Every time <code>refresh_static_fluidflow()</code> is called, it computes a cheap fingerprint
+                    of the current results table — the tuple (row count, rounded total segment length). The
+                    fingerprint is O(1) to compare and O(n) to compute, several orders of magnitude cheaper than
+                    the O(n²) computation it guards. It changes only when the underlying digitised geometry itself
+                    has changed, remaining completely insensitive to purely cosmetic changes such as colour, font,
+                    or grid visibility.
+                </p>
+
+                <h3>10.4 Deferred Execution and UI Responsiveness</h3>
+                <p>
+                    Because the algorithm can take perceptible wall-clock time for dense digitisations, every user
+                    action that may trigger a recompute is scheduled through Tkinter's <code>after(100, …)</code>
+                    mechanism rather than executed synchronously. This 100 ms delay is sufficient for the global
+                    loading overlay to be physically painted to the screen before the main thread blocks on the
+                    O(n²) search, so the application never appears to freeze without explanation.
+                </p>
+
+                <h3>10.5 Single-Figure-per-Diagram Construction</h3>
+                <p>
+                    All five Matplotlib Figure/Axes/Canvas triples are constructed exactly once at tab-build time
+                    and simply shown/hidden thereafter. This avoids the overhead of destroying and rebuilding
+                    Matplotlib canvases every time the analyst switches between the five available diagrams, at the
+                    modest cost of holding five figures in memory simultaneously.
+                </p>
+
+                <h3>10.6 Recommended Practice for Large Data Sets</h3>
+                <p>
+                    For SVG traces exceeding several thousand segments, consider increasing the Curve step (px)
+                    parameter when loading the SVG to reduce the number of straight-line segments used to
+                    approximate curved traces. Adjust the snap tolerance thoughtfully before pressing Recalculate
+                    rather than repeatedly nudging it — each change re-triggers the full O(n²) computation. Leave
+                    "Show node labels" off for very dense networks, as densely overlapping text labels can
+                    noticeably slow down canvas rendering and obscure the spatial map.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="advanced">11. Advanced Features</h2>
+
+                <h3>11.1 Interactive Pan and Zoom</h3>
+                <p>
+                    All five canvases share a common pair of mouse-driven navigation handlers connected at
+                    tab-build time. The scroll wheel (<code>_on_scroll_zoom</code>) zooms in or out by a fixed
+                    1.2× factor per click, centred exactly on the cursor position so that the data-space
+                    coordinate under the cursor is held fixed while the axis limits are rescaled around it.
+                    Left-click drag (<code>_on_mouse_press</code> / <code>_on_mouse_drag</code> /
+                    <code>_on_mouse_release</code>) pans the active diagram by translating both axis limits by the
+                    same data-space displacement as the cursor. "↺ Reset View" restores the default extent
+                    without any recomputation.
+                </p>
+
+                <h3>11.2 Custom Colour Picker</h3>
+                <p>
+                    Every colour swatch in the Display Settings sidebar opens the shared FracSTAT colour-picker
+                    dialog (<code>_StaticColorButton</code>), which presents a curated 8×5 matrix of 40
+                    professionally chosen preset swatches spanning eight hue families at five lightness levels,
+                    plus a free-form hex-code entry field with a live preview patch. Selecting a preset or typing
+                    a valid hex code and pressing "Apply" immediately re-fires the connectivity redraw callback
+                    bound to that colour variable.
+                </p>
+
+                <h3>11.3 Calibrated Background Photograph Overlay</h3>
+                <p>
+                    The Connectivity tab supports overlaying a real, scale-calibrated photograph of the outcrop
+                    behind the spatial node map (the four ternary diagrams do not use a background image). The
+                    implementation (<code>_autodetect_fluid_bg_image_path()</code>) searches in priority order:
+                    (1) an image path already stored in this tab's own StringVar; (2) the Fracture Map tab's own
+                    calibrated background image variable, if set; (3) a sidecar PNG automatically saved alongside
+                    a traced SVG by the Trace Map tool (named <code>&lt;svg-basename&gt;_bg.png</code>). The
+                    chosen path is cached in memory so repeated redraws do not re-read the file from disk. The
+                    image is drawn with <code>imshow</code>, its extent locked to the bounding box of the current
+                    fracture geometry, and its opacity controlled by the Image opacity entry.
+                </p>
+
+                <h3>11.4 Module Architecture</h3>
+                <table>
+                    <tr><th>File</th><th>Responsibility</th></tr>
+                    <tr><td><code>core/branch_counter.py</code></td><td>Pure, GUI-independent geometry/topology engine: <code>ConnectivityResult</code> dataclass and <code>count_iyx_nodes()</code> plus all private helper functions (<code>_segment_intersection</code>, <code>_near_any_endpoint</code>, <code>_trace_endpoints</code>, <code>_cluster_points</code>, <code>_remove_points_near</code>, <code>_on_boundary</code>, <code>_classify_branches</code>, <code>_empty_result</code>).</td></tr>
+                    <tr><td><code>static_analyzer/tabs/static_connectivity_tab.py</code></td><td>GUI mixin class <code>StaticFluidFlowTab</code>: sidebar and settings construction, the five Matplotlib diagrams and their drawing routines, caching/staleness logic, background-image handling, pan/zoom interaction, and sidebar statistics refresh.</td></tr>
+                </table>
+                <p>
+                    <code>StaticFluidFlowTab</code> is one of eight sibling tab mixins combined via Python
+                    multiple inheritance into the single <code>StaticAnalyzerApp</code> class. This design lets
+                    each tab's construction and drawing logic live in its own file while sharing a single
+                    <code>self</code>, so the Connectivity tab can freely read <code>self.results</code>,
+                    <code>self.segments</code>, <code>self._static_data_source</code>, and the Fracture Map tab's
+                    own scale/unit variables without any explicit inter-tab messaging.
+                </p>
+
+                <h3>11.5 Numerical Tolerances Reference</h3>
+                <table>
+                    <tr><th>Constant</th><th>Value</th><th>Purpose</th></tr>
+                    <tr><td>Segment length floor</td><td>1×10⁻¹²</td><td>Discards degenerate, zero-length segments before intersection testing.</td></tr>
+                    <tr><td>Parallel-line determinant floor</td><td>1×10⁻¹²</td><td>Below this, two segments are treated as parallel and no intersection is attempted.</td></tr>
+                    <tr><td>Parametric interval slack</td><td>±1×10⁻¹⁰</td><td>Admits intersections numerically just outside [0, 1] due to floating-point rounding.</td></tr>
+                    <tr><td>Minimum clustering threshold</td><td>1×10⁻⁹</td><td>Floor applied to the user-supplied tolerance to avoid division-by-zero-like degeneracies when tolerance is set to exactly 0.</td></tr>
+                </table>
+
+                <!-- ================================================= -->
+                <h2 id="limitations">12. Limitations</h2>
+                <table>
+                    <tr><th>Limitation</th><th>Description</th></tr>
+                    <tr><td>Requires genuine spatial geometry</td><td>Orientation-only Excel/CSV formats (legacy Strike/Dip tables, Trend/Plunge pole tables) cannot be analysed, since they carry no real map position.</td></tr>
+                    <tr><td>O(n²) computation cost</td><td>For very dense digitisations (tens of thousands of segments), computation time can become noticeable even with the caching strategy, since a genuine geometry change still requires a full recomputation.</td></tr>
+                    <tr><td>Greedy point-clustering</td><td>The order-dependent greedy clustering algorithm can produce weakly order-dependent cluster centroids in rare pathological configurations of closely spaced, nearly-collinear candidate points. In practice, at sensible tolerances, this has negligible effect on reported statistics.</td></tr>
+                    <tr><td>Two-dimensional only</td><td>The module operates purely on the projected trace map and does not account for fractures that appear to intersect in map view but are vertically offset (non-intersecting) in three dimensions — a limitation inherent to any 2-D trace-map analysis.</td></tr>
+                    <tr><td>No uncertainty quantification</td><td>Node classification and branch typing are entirely deterministic given the digitised geometry, tolerance, and boundary setting. No Monte Carlo resampling of tolerance or digitisation error is currently implemented within this module.</td></tr>
+                    <tr><td>Heuristic reference contours</td><td>The C_L = 3.57 and C_B ≈ 2 reference contours are values drawn from the published topological fracture-network literature and are not dynamically recalculated for the specific length or orientation distribution of the loaded data set.</td></tr>
+                    <tr><td>Rectangular boundary assumption</td><td>Boundary I-node exclusion uses the simple rectangular bounding box of all digitised endpoints as the sample-domain boundary. For irregularly shaped mapped areas, this can over- or under-exclude genuine edge-truncated tips relative to the true panel boundary.</td></tr>
+                    <tr><td>Main-thread computation</td><td>All fitting and intersection computation runs on the main UI thread since Matplotlib's TkAgg backend is not safe to drive concurrently from a worker thread. Very large networks will therefore block interaction until the computation completes, mitigated only by the loading overlay.</td></tr>
+                </table>
+
+                <!-- ================================================= -->
+                <h2 id="references">13. References</h2>
+                <p>Manzocchi, T. (2002). The connectivity of two-dimensional networks of spatially correlated fractures. <em>Water Resources Research</em>, 38(9), 1162.</p>
+                <p>Sanderson, D. J. &amp; Nixon, C. W. (2015). The use of topology in fracture network characterization. <em>Journal of Structural Geology</em>, 72, 55–66.</p>
+                <p>Sanderson, D. J. &amp; Nixon, C. W. (2018). Topology, connectivity and percolation in fracture networks. <em>Journal of Structural Geology</em>, 115, 167–177.</p>
+                <p>Mauldon, M., Dunne, W. M. &amp; Rohrbaugh, M. B. (2001). Circular scanlines and circular windows: new tools for characterizing the geometry of fracture traces. <em>Journal of Structural Geology</em>, 23(2–3), 247–258.</p>
+                <p>Odling, N. E. et al. (1999). Variations in fracture system geometry and their implications for fluid flow in fractured hydrocarbon reservoirs. <em>Petroleum Geoscience</em>, 5(4), 373–384.</p>
+                <p>National Research Council (1996). <em>Rock Fractures and Fluid Flow: Contemporary Understanding and Applications</em>. National Academies Press, Washington, D.C.</p>
+
                 <!-- Pagination Navigation -->
                 <div class="pagination-nav">
-                    <!-- PREVIOUS BUTTON -->
                     <a href="docs_static_stereonet.html" class="nav-btn">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
                         Previous: Static Stereonet Tab
                     </a>
-                    <!-- NEXT BUTTON -->
                     <a href="docs_static_intensity.html" class="nav-btn">
                         Next: Static Intensity Tab
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </a>
                 </div>
+
             </div>
         </main>
     </div>

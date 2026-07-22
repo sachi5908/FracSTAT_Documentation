@@ -28,13 +28,13 @@
             </li>
         </ul>
     </nav>
-    
+
     <div class="docs-layout">
         <!-- ==========================================
              MASTER ACCORDION SIDEBAR
              ========================================== -->
         <aside class="docs-sidebar" id="docsSidebar">
-            
+
             <div class="sidebar-section open">
                 <button class="sidebar-toggle">
                     Getting Started
@@ -42,7 +42,7 @@
                 </button>
                 <ul class="sidebar-links">
                     <li><a href="introduction.html">Introduction</a></li>
-                    <li><a href="installation.html" class="active">Installation Guide</a></li>
+                    <li><a href="installation.html">Installation Guide</a></li>
                     <li><a href="launcher.html">FracSTAT Home Page</a></li>
                 </ul>
             </div>
@@ -61,7 +61,7 @@
                     <li><a href="docs_static_connectivity.html">Connectivity Tab</a></li>
                     <li><a href="docs_static_intensity.html">Intensity Tab</a></li>
                     <li><a href="docs_static_profile.html">Profile Tab</a></li>
-                    <li><a href="docs_static_results.html">Results Tab</a></li>
+                    <li><a href="docs_static_results.html" class="active">Results Tab</a></li>
                 </ul>
             </div>
 
@@ -97,16 +97,826 @@
         <main class="docs-content">
             <div class="docs-content-inner">
                 <h1>Static Results Tab</h1>
-                
+                <p>
+                    Located at <code>static_analyzer/tabs/static_results_tab.py</code>, the <strong>Results</strong>
+                    tab (implemented as the mixin class <code>StaticResultsTab</code>) is the terminal reporting
+                    stage of the Static Analyzer workspace. Whereas the Fracture Map, Histogram, CDF, Rose Plot,
+                    Stereonet, Connectivity, and Intensity &amp; Density tabs each perform a specialised geometric
+                    or statistical analysis on a loaded fracture network, the Results tab aggregates the outputs of
+                    every one of those analyses into a single, coherent scientific record. It serves three
+                    complementary purposes: <strong>consolidation</strong> — collecting geometry, length,
+                    orientation, connectivity/topology, intensity/density, and probability-distribution-fitting
+                    results into one unified dashboard; <strong>verification</strong> — exposing every derived
+                    quantity side by side so an analyst can sanity-check the network before it is carried into
+                    downstream engineering work; and <strong>reporting and dissemination</strong> — exporting the
+                    same figures into portable PDF, Word, plain-text, Excel, and CSV formats suitable for a report
+                    or publication, without requiring the recipient to have FracSTAT installed.
+                </p>
+                <p>
+                    The Results tab performs no geometric or statistical computation of its own; it is a read-only
+                    presentation-and-export layer. Every numeric value shown originates from calculations already
+                    performed by sibling tabs — principally the Fracture Map tab for geometry, the Histogram tab
+                    for length/mode statistics, the Connectivity tab for I-Y-X topology, the Intensity &amp;
+                    Density tab for P21/P20 circular-scanline intensity, and the CDF tab for maximum-likelihood
+                    distribution fitting. This design keeps the expensive statistical machinery implemented in
+                    exactly one place, while the Results tab is responsible only for formatting, tabulating, and
+                    exporting whatever those other tabs have already produced.
+                </p>
+
+                <div class="toc-box">
+                    <p>On this page</p>
+                    <ul>
+                        <li><a href="#purpose">1. Purpose and Scope</a></li>
+                        <li><a href="#interface-overview">2. Interface Overview</a></li>
+                        <li><a href="#data-input">3. Data Input and Dependencies</a></li>
+                        <li><a href="#controls">4. Settings and Controls</a></li>
+                        <li><a href="#maths">5. Mathematical Background</a></li>
+                        <li><a href="#algorithms">6. Algorithms</a></li>
+                        <li><a href="#workflow">7. Internal Workflow</a></li>
+                        <li><a href="#statistics">8. Statistical Methods</a></li>
+                        <li><a href="#visualization">9. Visualization</a></li>
+                        <li><a href="#advanced">10. Advanced Features</a></li>
+                        <li><a href="#performance">11. Performance Optimization</a></li>
+                        <li><a href="#examples">12. Practical Examples</a></li>
+                        <li><a href="#interpretation">13. Geological Interpretation</a></li>
+                        <li><a href="#implementation">14. Implementation Notes</a></li>
+                        <li><a href="#limitations">15. Limitations</a></li>
+                        <li><a href="#references">16. References</a></li>
+                    </ul>
+                </div>
+
+                <!-- ================================================= -->
+                <h2 id="purpose">1. Purpose and Scope</h2>
+                <p>
+                    The Results tab is where geometry, length, orientation, connectivity, intensity/density, and
+                    distribution-fitting results computed elsewhere in the Static Analyzer are brought together into
+                    one screen. It exists so a user never has to visit every individual tab to assemble a full
+                    characterisation of a fracture network, and so that the finished characterisation can be
+                    exported for use outside FracSTAT entirely.
+                </p>
+                <ol class="step-list">
+                    <li><strong>Consolidation</strong> — collects every derived quantity computed across the
+                    workspace into one unified dashboard.</li>
+                    <li><strong>Verification</strong> — lets an analyst sanity-check node counts, connectivity
+                    indices, distribution parameters, and goodness-of-fit statistics side by side before the
+                    results are used in downstream geomechanical work (e.g. slip-tendency analysis in the Dynamic
+                    Analyzer).</li>
+                    <li><strong>Reporting and dissemination</strong> — exports the same figures used inside
+                    FracSTAT into portable, shareable, and archivable document formats (PDF, Word, plain text,
+                    Excel, CSV) suitable for a technical report, thesis, or publication.</li>
+                </ol>
+
+                <!-- ================================================= -->
+                <h2 id="interface-overview">2. Interface Overview</h2>
+                <p>
+                    The Results tab occupies the ninth (rightmost) position in the Static Analyzer's main
+                    CTkTabview, alongside Fracture Map, Histogram, CDF, Rose Plot, Stereonet Plot, Connectivity, and
+                    Intensity &amp; Density. Its layout follows the same two-column convention used throughout the
+                    Static Analyzer: a narrow, scrollable left-hand sidebar containing action controls, and a wide
+                    right-hand content panel containing the report itself.
+                </p>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="put_your_img_here.png" alt="Overall layout of the Results tab showing the sidebar and the Summary/Raw Segment Data content panel" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 2.1</strong> — Overall layout of the Results tab: left sidebar with Export Summary Data, Export Raw Segment Data, and Refresh cards; right panel with the Summary / Raw Segment Data inner tab view.</span>
+                </figure>
+
+                <h3>2.1 Sidebar (Left Panel)</h3>
+                <p>The sidebar is a vertically scrollable <code>CTkScrollableFrame</code> containing three stacked cards:</p>
+                <table>
+                    <tr><th>Card</th><th>Purpose</th></tr>
+                    <tr><td>Export Summary Data</td><td>Three buttons that generate a formatted, human-readable report (PDF, Word, or plain text) summarising every statistic computed for the current fracture network.</td></tr>
+                    <tr><td>Export Raw Segment Data</td><td>Three buttons that export the underlying per-segment table (Excel workbook, CSV, or tab-delimited text) rather than the aggregated statistics.</td></tr>
+                    <tr><td>Refresh</td><td>A single button that forces an immediate recomputation and redraw of both inner tabs, bypassing the lazy-loading mechanism described in Section 7.</td></tr>
+                </table>
+
+                <h3>2.2 Content Panel (Right Panel)</h3>
+                <p>The content panel hosts an inner <code>CTkTabview</code> ("Analyzer Summary") with two pages:</p>
+                <table>
+                    <tr><th>Page</th><th>Contents</th></tr>
+                    <tr><td>Summary</td><td>A dashboard of thirteen colour-coded statistic cards arranged in a responsive three-column grid, covering geometry, length statistics, connectivity, orientation, intensity/density, data provenance, and the full suite of CDF distribution-fitting results, plus a dynamically rendered Model Comparison table when applicable.</td></tr>
+                    <tr><td>Raw Segment Data</td><td>A sortable, scrollable spreadsheet-style table (a <code>ttk.Treeview</code> widget) listing every computed segment or fracture-plane record with format-appropriate columns.</td></tr>
+                </table>
+
+                <!-- ================================================= -->
+                <h2 id="data-input">3. Data Input and Dependencies</h2>
+                <p>
+                    The Results tab has no independent file-loading controls; it consumes state already populated
+                    in the shared <code>StaticAnalyzerApp</code> instance by other tabs after an SVG trace map or
+                    Excel/CSV orientation table has been loaded. The principal upstream data structures it reads
+                    are summarised below.
+                </p>
+                <table>
+                    <tr><th>Attribute</th><th>Populated by</th><th>Description</th></tr>
+                    <tr><td><code>self.results</code> (DataFrame)</td><td><code>run_static_calculations()</code> in <code>static_app.py</code> / <code>static_map_tab.py</code></td><td>One row per computed segment or fracture plane, holding ID, Trace, Segment, X1/Y1/X2/Y2, StrikeDeg, DipDeg, Length_m, Aperture, TraceLengthM, and (for focal-mechanism data) Lat, Lon, EventLabel, PlaneName, Region, BeachballURL.</td></tr>
+                    <tr><td><code>self.segments</code> (list[Segment])</td><td>SVG or Excel/CSV loader</td><td>Raw parsed segment/plane objects; used to detect whether the source data carries genuine map geometry (<code>_has_map_geometry</code>) for column-set and export-column selection.</td></tr>
+                    <tr><td><code>self._fluid_connectivity</code></td><td>Connectivity tab (<code>count_iyx_nodes</code>)</td><td>A <code>ConnectivityResult</code> object exposing I/Y/X node arrays, branch counts, and the I-I/I-C/C-C branch classification used for the Connectivity (I-Y-X) statistics block.</td></tr>
+                    <tr><td><code>self.p21_stats_labels</code></td><td>Intensity &amp; Density tab</td><td>Live CTkLabel widgets already showing the global P21 and P20 values and the scan-circle grid layout; the Results tab reads their displayed text directly rather than recomputing them.</td></tr>
+                    <tr><td><code>self.current_stats</code></td><td>CDF tab (<code>_draw_static_cdf</code>)</td><td>A flat, ordered dictionary of descriptive and model-fit statistics, including section markers (e.g. "── Power-law ──") used to reconstruct the origin distribution of each entry.</td></tr>
+                    <tr><td><code>self._cdf_fit_cache</code> / <code>self._cdf_bootstrap_cache</code></td><td>CDF tab</td><td>Internal caches of the most recently computed <code>powerlaw.Fit</code> object and bootstrap confidence-interval/goodness-of-fit results, keyed by a data-and-settings fingerprint; the Results tab reads the most recent entry to backfill every distribution's parameters simultaneously (Section 6.4).</td></tr>
+                    <tr><td><code>self.project</code></td><td>Project launcher</td><td>Project metadata (name, location, save directory) embedded in exported report headers.</td></tr>
+                </table>
+                <p>
+                    Because the Results tab is purely a consumer of upstream state, no validation of the source
+                    SVG/Excel file occurs here; all format detection, coordinate-system handling, and column
+                    validation happens in the SVG/Excel loaders and the Fracture Map tab before any data reaches
+                    this module.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="controls">4. Settings and Controls</h2>
+                <p>
+                    Unlike the plotting tabs, the Results tab exposes no numeric parameters, colour pickers, or
+                    sliders — its "settings" are entirely action buttons that trigger export or refresh operations.
+                </p>
+
+                <h3>4.1 Sidebar Controls</h3>
+                <table>
+                    <tr><th>Control</th><th>Card</th><th>Action</th></tr>
+                    <tr><td>Export to PDF (.pdf)</td><td>Export Summary Data</td><td>Invokes <code>_export_pdf()</code>: renders every statistic section as a two-column ReportLab table inside a formatted A4 document, including the dynamically parsed Model Comparison table when a CDF multi-model comparison has been run.</td></tr>
+                    <tr><td>Export to Word (.docx)</td><td>Export Summary Data</td><td>Invokes <code>_export_word()</code>: builds an equivalent report using python-docx, with native Word heading styles, coloured title text, and Word tables for each statistic section and the comparison table.</td></tr>
+                    <tr><td>Export to Text (.txt)</td><td>Export Summary Data</td><td>Invokes <code>_export_txt()</code>: writes a monospaced, fixed-width plain-text report using the same section ordering, suitable for archiving or diffing between analysis runs.</td></tr>
+                    <tr><td>Export to Excel (.xlsx)</td><td>Export Raw Segment Data</td><td>Invokes <code>_export_excel()</code>: writes the full per-segment/per-plane results DataFrame (after unit-aware column renaming) to a single-sheet .xlsx workbook via openpyxl.</td></tr>
+                    <tr><td>Export to CSV (.csv)</td><td>Export Raw Segment Data</td><td>Invokes <code>_export_csv()</code>: writes the same DataFrame to a comma-separated file using <code>pandas.DataFrame.to_csv</code>.</td></tr>
+                    <tr><td>Export to Text (.txt)</td><td>Export Raw Segment Data</td><td>Invokes <code>_export_raw_txt()</code>: writes the same DataFrame tab-delimited, for import into legacy or non-spreadsheet tools.</td></tr>
+                    <tr><td>↻ Refresh Results</td><td>Refresh</td><td>Invokes <code>refresh_static_results(force=True)</code>, forcing an immediate recompute-and-redraw of both inner tabs even if the tab is not currently visible and no underlying data change has been detected.</td></tr>
+                </table>
+
+                <h3>4.2 Inner Tab Controls</h3>
+                <p>
+                    The Summary and Raw Segment Data pages are selected via a standard CTkTabview segmented control
+                    at the top of the content panel. No additional filtering, sorting, or display controls are
+                    provided on the Summary page; every statistic card is always shown in full. The Raw Segment
+                    Data page's <code>ttk.Treeview</code> supports native column-header click-to-sort behaviour and
+                    independent horizontal/vertical scrollbars, but exposes no FracSTAT-specific filtering controls.
+                </p>
+
+                <h3>4.3 Lazy-Loading Behaviour</h3>
+                <p>
+                    The Results tab is registered with a wrapped CTkTabview command handler so that the
+                    (potentially expensive) work of populating the dashboard and raw-data table is deferred until
+                    the user actually clicks the Results tab, rather than being recomputed on every geometry change
+                    elsewhere in the workspace. A boolean flag, <code>self._results_stale</code>, is set whenever
+                    <code>refresh_static_results()</code> is called from elsewhere in the application (for example
+                    after loading a new file or changing the profile scale); the flag is only cleared once the tab
+                    is actually visited and <code>_load_results_with_loader()</code> has completed.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="maths">5. Mathematical Background</h2>
+                <p>
+                    This section defines, with full mathematical notation, every quantity computed or re-derived
+                    inside the Results module. Quantities that are computed upstream (in the Histogram,
+                    Connectivity, Intensity &amp; Density, or CDF tabs) and simply displayed here are also defined,
+                    since the Results tab is where a user most commonly encounters them assembled together for the
+                    first time.
+                </p>
+
+                <h3>5.1 Geometry and Length Statistics</h3>
+                <p>
+                    Let the fracture network consist of n<sub>s</sub> segments grouped into n<sub>t</sub> traces.
+                    For each segment i, let L<sub>i</sub> denote its length in the project's display unit (m, cm,
+                    mm, or km, selected on the Fracture Map tab).
+                </p>
+                <div class="formula-block">
+Total Length = Σ Lᵢ  (i = 1 … nₛ)
+Mean Segment Length = (1/nₛ) · Σ Lᵢ</div>
+                <p>Trace length is the sum of the constituent segment lengths for each trace; per-trace totals are stored in the <code>TraceLengthM</code> column of the results table (or computed on demand as a group-wise sum).</p>
+                <div class="formula-block">Trace Lengthⱼ = Σ Lᵢ  for all segments i belonging to trace j</div>
+                <p>
+                    For both the segment-length and trace-length populations, the Results tab reports the maximum,
+                    minimum, median, sample standard deviation (using Bessel's correction, ddof = 1), and the
+                    statistical mode. Because fracture lengths are continuous, the mode is estimated from a
+                    histogram (Section 6.1) rather than from an exact value count.
+                </p>
+
+                <h3>5.2 Circular (Axial) Orientation Statistics</h3>
+                <p>
+                    Fracture strikes are axial data — a fracture measured at azimuth θ is physically
+                    indistinguishable from one measured at θ + 180°. Ordinary (linear) circular statistics would
+                    therefore be biased; the module instead uses the doubled-angle method of Mardia and Jupp for
+                    axial data. Each strike θᵢ (already folded into 0°–180°) is doubled to 2θᵢ, mapped onto the
+                    full circle, and averaged as a set of unit vectors:
+                </p>
+                <div class="formula-block">
+C̄ = (1/n) Σ cos(2θᵢ)       S̄ = (1/n) Σ sin(2θᵢ)       R = √(C̄² + S̄²)
+
+Circular Mean = ½ · atan2(S̄, C̄)  (mod 180°)
+Circular Std. Dev. = ½ · √(−2 ln R)  (in degrees, after conversion from radians)</div>
+                <p>
+                    R (the mean resultant length, 0 ≤ R ≤ 1) measures the concentration of the strike population: R
+                    close to 1 indicates a strongly preferred orientation (a single dominant fracture set), while R
+                    close to 0 indicates near-uniform, poorly organised orientations. The Dominant Orientation
+                    statistic reported alongside the circular mean is instead the histogram-modal bin centre
+                    (Section 6.1) — it can differ from the circular mean whenever the strike distribution is
+                    multi-modal (e.g. two conjugate fracture sets), since the circular mean of two symmetric peaks
+                    straddling a gap is not itself a peak.
+                </p>
+
+                <h3>5.3 Connectivity and Topology (I-Y-X Node Theory)</h3>
+                <p>
+                    The connectivity statistics implement the standard structural-geology I-Y-X node classification
+                    (Sanderson &amp; Nixon, 2015 and related literature). Every fracture-trace endpoint or
+                    intersection is classified as one of three node types:
+                </p>
+                <table>
+                    <tr><th>Node Type</th><th>Symbol</th><th>Geological Meaning</th></tr>
+                    <tr><td>Isolated</td><td>I</td><td>A free-standing fracture tip that terminates without abutting or crossing another fracture; contributes nothing to fluid connectivity at that point.</td></tr>
+                    <tr><td>Abutting</td><td>Y</td><td>One fracture terminates against the side of another (a T- or Y-shaped junction); a single-sided hydraulic connection.</td></tr>
+                    <tr><td>Crossing</td><td>X</td><td>Two fractures cross one another, each continuing beyond the intersection; a fully connected, four-way hydraulic junction.</td></tr>
+                </table>
+                <p>Let N_I, N_Y, N_X denote the counts of each node type. Two derived connectivity indices are computed:</p>
+                <div class="formula-block">
+Connections per Line:    N_L = (N_I + N_Y) / 2         C_L = 2(N_X + N_Y) / N_L
+Connections per Branch:  N_B = (N_I + 3N_Y + 4N_X) / 2  C_B = (3N_Y + 4N_X) / N_B</div>
+                <p>
+                    C_L and C_B are Sanderson-style average-connections-per-line and average-connections-per-branch
+                    indices; both increase toward their theoretical maxima (4 for C_L on a fully crossing network,
+                    2 for C_B) as the network becomes progressively better connected. The Connected Fraction
+                    reported in the summary is (N_Y + N_X) / (N_I + N_Y + N_X), i.e. the proportion of nodes that
+                    are not simply dead-end tips.
+                </p>
+                <p>
+                    A branch is the segment of trace lying between two adjacent nodes (of any type). Every branch
+                    is further classified by the type of node at each of its two ends into one of three topological
+                    classes: I-I (isolated at both ends), I-C (isolated at one end, connected — Y or X — at the
+                    other), and C-C (connected at both ends). Their counts, n<sub>II</sub>, n<sub>IC</sub>,
+                    n<sub>CC</sub>, are reported directly, and feed the branch-topology (Sanderson) ternary diagram
+                    on the Connectivity tab. The Dimensionless Intensity, B22, follows the standard normalisation
+                    of fracture intensity by the characteristic sampling-area length scale:
+                </p>
+                <div class="formula-block">B22 = (Total Length)² / Sample Area</div>
+
+                <h3>5.4 Fracture Intensity and Density (P21, P20)</h3>
+                <p>
+                    The Intensity &amp; Density tab implements the Mauldon circular-scanline method for unbiased
+                    areal estimation of one- and zero-dimensional intensity measures, and the Results tab
+                    reproduces its two headline outputs verbatim:
+                </p>
+                <div class="formula-block">
+P21 (areal fracture intensity) = Total trace length within sampled circles / (4 × r)   [units: length⁻¹]
+P20 (areal fracture density)   = Number of trace endpoints within sampled circles / (2π × r²)   [units: length⁻²]</div>
+                <p>
+                    where r is the scan-circle radius. P21 and P20 are classic Mauldon (2001) circular-window
+                    intensity/density estimators; they are unbiased with respect to fracture orientation, unlike
+                    simple scanline counts, because a circular sampling window intersects fractures of every strike
+                    with equal probability.
+                </p>
+
+                <h3>5.5 Probability Distribution Fitting (CDF Backfill)</h3>
+                <p>
+                    The Results tab reproduces the parameters, information criteria, and goodness-of-fit statistics
+                    of every maximum-likelihood distribution model fitted on the CDF tab: Power-law, Exponential,
+                    Log-normal, Weibull (implemented as a stretched exponential), and Truncated Power-law. The
+                    complete mathematical derivation of these fits (log-likelihood construction, AIC/AICc/BIC,
+                    Kolmogorov–Smirnov statistics, bootstrap confidence intervals, and the parametric bootstrap
+                    goodness-of-fit p-value) is the responsibility of the CDF tab and is documented there; the
+                    Results tab's role is purely to surface the cached fit object's parameters into the dashboard.
+                    For completeness, the defining forms of each survival function P(L&gt;x) for x ≥ x_min are:
+                </p>
+                <div class="formula-block">
+Power-law:                 P(L&gt;x) = (x / x_min)^(−α+1)
+Exponential:                P(L&gt;x) = exp(−λx)
+Log-normal:                 P(L&gt;x) = ½·erfc[(ln x − μ) / (σ√2)]
+Weibull (stretched exp.):   P(L&gt;x) = exp[−(λx)^β]
+Truncated Power-law:        P(L&gt;x) = C · x^(−α+1) · exp(−λx)</div>
+
+                <!-- ================================================= -->
+                <h2 id="algorithms">6. Algorithms</h2>
+
+                <h3>6.1 Histogram-Based Mode Estimation</h3>
+                <p>
+                    Because fracture segment/trace lengths and strike angles are continuous quantities, the module
+                    estimates the statistical mode by binning the data with <code>numpy.histogram</code> using the
+                    same bin count as the Histogram tab's own control (falling back to 20 bins if that control has
+                    not yet been built), then returning the centre of whichever bin holds the highest count. If the
+                    data range degenerates to a single value (max equals min), that value is returned directly.
+                    This histogram-derived mode is reused for three quantities: Segment Mode Length, Trace Mode
+                    Length, and the Dominant Orientation (Strike) bin centre.
+                </p>
                 <div class="code-window">
                     <div class="code-header">
                         <span class="code-lang">python</span>
                         <button class="copy-btn">Copy</button>
                     </div>
-                    <pre><code class="language-python">
-                        DEMO OF CODE SNIPPET
-                    </code></pre>
+                    <pre><code class="language-python">def _histogram_mode(values_arr: np.ndarray, n_bins: int) -> float:
+    if values_arr.size == 0:
+        return 0.0
+    v_min, v_max = float(values_arr.min()), float(values_arr.max())
+    if v_min == v_max:
+        return v_min
+    step = (v_max - v_min) / n_bins
+    centres = np.arange(v_min, v_max + step / 2, step)
+    edges = np.concatenate([[centres[0] - step / 2], centres + step / 2])
+    counts, _ = np.histogram(values_arr, bins=edges)
+    if counts.size == 0:
+        return v_min
+    return float(centres[int(np.argmax(counts))])</code></pre>
                 </div>
+                <p class="ph-caption" style="text-align:left; margin: -1rem 0 1.5rem 0;">The <code>_histogram_mode()</code> helper, shared by the Segment Mode Length, Trace Mode Length, and Dominant Orientation statistics.</p>
+
+                <h3>6.2 Dynamic Column-Set Resolution for Raw Data Export</h3>
+                <p>
+                    Because FracSTAT accepts several structurally different input formats (SVG trace geometry,
+                    spatial Excel/CSV tables, legacy orientation-only fracture-plane tables, and Global CMT-style
+                    focal-mechanism tables), the Results tab cannot assume a fixed set of columns exists in
+                    <code>self.results</code>. The <code>_raw_data_column_set()</code> algorithm inspects the
+                    loaded segment objects to determine which of three column templates applies:
+                </p>
+                <table>
+                    <tr><th>Detected Format</th><th>Detection Rule</th><th>Displayed / Exported Columns</th></tr>
+                    <tr><td>Focal mechanism</td><td>Lat column present and at least one non-null value</td><td>ID, Trace, PlaneName, EventLabel, Region, Lat, Lon, StrikeDeg, DipDeg, Rake</td></tr>
+                    <tr><td>Orientation-only</td><td><code>segments[0]._has_map_geometry</code> is False</td><td>ID, Trace, Segment, StrikeDeg, DipDeg, Length_m, Aperture</td></tr>
+                    <tr><td>Spatial (SVG or coordinate-bearing Excel)</td><td>default / has_geometry True</td><td>ID, Trace, Segment, X1, Y1, X2, Y2, Length_m, Aperture, StrikeDeg, TraceLengthM</td></tr>
+                </table>
+                <div class="code-window">
+                    <div class="code-header">
+                        <span class="code-lang">python</span>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">def _raw_data_column_set(self, df):
+    segs = getattr(self, "segments", None)
+    has_geometry = getattr(segs[0], "_has_map_geometry", True) if segs else True
+    has_latlon = "Lat" in df.columns and df["Lat"].notna().any()
+
+    if has_latlon:
+        candidates = ["ID", "Trace", "PlaneName", "EventLabel", "Region",
+                      "Lat", "Lon", "StrikeDeg", "DipDeg", "Rake"]
+    elif not has_geometry:
+        candidates = ["ID", "Trace", "Segment", "StrikeDeg", "DipDeg",
+                      "Length_m", "Aperture"]
+    else:
+        candidates = ["ID", "Trace", "Segment", "X1", "Y1", "X2", "Y2",
+                      "Length_m", "Aperture", "StrikeDeg", "TraceLengthM"]
+
+    display_cols = [c for c in candidates if c in df.columns]
+    if not display_cols:
+        display_cols = [c for c in df.columns if c != "Color"]
+    return display_cols</code></pre>
+                </div>
+                <p>
+                    Only columns that are actually present in the DataFrame are retained; if none of the candidate
+                    columns exist (an unexpected edge case) the routine falls back to displaying every column
+                    except the internal Color field. The same three-way branching, together with a DipDeg-drop rule
+                    (removing the DipDeg column entirely when every value is the default 90° placeholder) and a
+                    geometry-column drop for orientation-only data, is applied a second time inside
+                    <code>_get_export_df()</code> before Excel/CSV/Text export, so the exported spreadsheet never
+                    contains meaningless placeholder geometry.
+                </p>
+
+                <h3>6.3 Unit-Aware Column Renaming</h3>
+                <p>
+                    Before both on-screen display and file export, length-bearing columns are renamed to embed the
+                    currently selected display unit, e.g. <code>Length_m</code> becomes <code>Length_cm</code> when
+                    the user has selected centimetres on the Fracture Map tab's unit selector, and
+                    <code>TraceLengthM</code> becomes <code>TraceLength_km</code> for kilometres. This prevents
+                    ambiguity when a user changes units mid-session or shares an exported file with a collaborator.
+                </p>
+
+                <h3>6.4 CDF Model Backfill from the Fit Cache</h3>
+                <p>
+                    Rather than re-running the (potentially slow) maximum-likelihood fitting procedure,
+                    <code>_collect_cdf_summary_values()</code> reads the most recently computed entry from the CDF
+                    tab's internal fit cache (<code>self._cdf_fit_cache</code>) — a dictionary keyed by a
+                    fingerprint of the input data and the active fitting settings — and extracts the
+                    <code>powerlaw.Fit</code> object's five sub-model attributes (<code>power_law</code>,
+                    <code>exponential</code>, <code>lognormal</code>, <code>stretched_exponential</code>,
+                    <code>truncated_power_law</code>) directly. From that single cached fit, the algorithm
+                    reconstructs, for every one of the five distributions simultaneously, its fitted parameter(s),
+                    95% (or user-selected level) bootstrap confidence interval (if a bootstrap run has been
+                    performed), tail sample size and percentage, log-likelihood, AIC, BIC, the powerlaw library's
+                    native Kolmogorov–Smirnov D statistic, an independently computed SciPy asymptotic KS statistic
+                    and p-value, and — if available — the parametric-bootstrap goodness-of-fit p-value. This
+                    backfill approach means the Results tab always shows every candidate distribution's statistics
+                    side by side, even though the CDF tab's own plot only ever actively displays the single model
+                    currently selected in its dropdown.
+                </p>
+
+                <h3>6.5 Textual current_stats Parsing</h3>
+                <p>
+                    A second pass over the CDF tab's <code>self.current_stats</code> dictionary (an ordered, flat
+                    dictionary populated live as the CDF tab redraws) recovers information that is not part of the
+                    cached Fit object itself: the raw descriptive statistics block, any manually overridden
+                    Truncated Power-law parameters (α, λ fixed by the user rather than found by MLE), bootstrap
+                    confidence-interval strings, and — when present — the full Model Comparison / Auto Best Fit
+                    narrative text and pairwise likelihood-ratio table. Section markers in the dictionary (keys
+                    formatted as "── SectionName ──") are used to prefix subsequent keys with their originating
+                    distribution name (e.g. turning a bare "xmin" key into "Power-law xmin"), except for the
+                    Descriptive, Auto Best Fit, and Model Comparison sections, whose keys are already
+                    self-describing and are left unprefixed.
+                </p>
+
+                <h3>6.6 Dynamic Comparison-Table Rendering</h3>
+                <p>
+                    When a CDF Model Comparison or Auto Best Fit run has been performed, its result is a
+                    pipe-delimited (|) plain-text table embedded as a single multi-line string value under the key
+                    "Comparison Table". The Results tab's <code>_render_comparison_table()</code> parses this
+                    string line by line: lines containing at least one pipe character are split into cells and
+                    rendered as a horizontally scrollable grid (alternating row shading, bold header row); lines
+                    without a pipe character (dashed separators are skipped, footnote/interpretation lines are
+                    kept) are rendered as italicised note paragraphs beneath the grid. The identical parsing logic
+                    is duplicated, with format-appropriate output primitives, inside the PDF export (ReportLab
+                    Table/Paragraph objects) and the Word export (python-docx table rows) so that the printed
+                    report matches the on-screen dashboard exactly.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="workflow">7. Internal Workflow</h2>
+                <p>
+                    The Results tab participates in the application-wide tab-change and dirty-tracking machinery
+                    already used by the other Static Analyzer tabs, extended with its own staleness flag so that
+                    its two moderately expensive population routines — <code>_populate_summary()</code> and
+                    <code>_populate_raw_data()</code> — are only ever run when actually needed.
+                </p>
+
+                <h3>7.1 Construction Sequence</h3>
+                <ol class="step-list">
+                    <li><code>_build_static_results_tab()</code> is called once, during workspace start-up, after
+                    every other tab has been built. It constructs the sidebar cards, the inner Summary/Raw Segment
+                    Data tabview, and every statistic-card label placeholder (each pre-populated with the em-dash
+                    "—" as a not-yet-computed sentinel).</li>
+                    <li>It then wraps the outer CTkTabview's existing on-tab-change command (which already performs
+                    autosave and other bookkeeping for the other tabs) with an additional check: if the newly
+                    selected tab is "Results" and <code>self._results_stale</code> is True,
+                    <code>_load_results_with_loader()</code> is invoked.</li>
+                    <li><code>self._results_stale</code> is initialised to True, so the very first visit to the
+                    Results tab always performs a full population, regardless of whether any data has been loaded
+                    yet (in which case the population routines simply render their respective empty states).</li>
+                </ol>
+                <div class="code-window">
+                    <div class="code-header">
+                        <span class="code-lang">python</span>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">self._results_stale = True
+
+existing_cmd = self.tabs.cget("command")
+def _on_tab_click():
+    if existing_cmd:
+        existing_cmd()
+    if self.tabs.get() == "Results" and getattr(self, "_results_stale", False):
+        self._load_results_with_loader()
+
+self.tabs.configure(command=_on_tab_click)</code></pre>
+                </div>
+                <p class="ph-caption" style="text-align:left; margin: -1rem 0 1.5rem 0;">The wrapped tab-change command installed at the end of <code>_build_static_results_tab()</code>, chaining onto whatever command the CTkTabview already had.</p>
+
+                <h3>7.2 Staleness Propagation</h3>
+                <p>
+                    <code>refresh_static_results(force=False)</code> is the single external entry point other
+                    parts of the workspace call whenever underlying data changes (e.g. at the end of the
+                    multi-step <code>refresh_all_tabs()</code> chain in <code>static_app.py</code>, itself
+                    triggered after loading a new SVG/Excel file, changing the profile scale, or editing the
+                    Y-axis azimuth). It always sets <code>self._results_stale = True</code>. If
+                    <code>force=True</code> (used by the explicit Refresh button) or the Results tab already
+                    happens to be the active tab, it immediately calls <code>_load_results_with_loader()</code>;
+                    otherwise it only updates a small status label ("Data changed. Click tab to load.") and clears
+                    the raw-data table, deferring the actual work until the user next clicks the tab.
+                </p>
+
+                <h3>7.3 Loader Routine</h3>
+                <p>
+                    <code>_load_results_with_loader()</code> shows the shared global loading overlay ("Compiling
+                    Results Data…"), then — after a short <code>after()</code> delay so the overlay has a chance
+                    to paint before the main thread is blocked — calls <code>_populate_summary()</code> followed
+                    by <code>_populate_raw_data()</code>, clears the stale flag, and hides the overlay. Both
+                    population routines run synchronously on the Tkinter main thread; no background threading is
+                    used for the Results tab itself (unlike the SVG/Excel loaders in the Fracture Map tab, which do
+                    use worker threads for the geometry recomputation that feeds this tab).
+                </p>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="put_your_img_here.png" alt="Sequence diagram showing the tab-click to loading-overlay to populate-summary and populate-raw-data workflow" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 7.1</strong> — Sequence diagram: user clicks the Results tab → wrapped tab-change handler checks <code>_results_stale</code> → loading overlay shown → <code>_populate_summary()</code> and <code>_populate_raw_data()</code> run → overlay hidden.</span>
+                </figure>
+
+                <h3>7.4 Summary Population</h3>
+                <p>
+                    <code>_populate_summary()</code> calls <code>_collect_all_summary_values()</code> to build a
+                    single flat dictionary of every statistic (merging the geometry/connectivity/intensity
+                    computations described in Section 6 with the CDF backfill dictionary from
+                    <code>_collect_cdf_summary_values()</code>), then walks every pre-built label reference in
+                    <code>self._summary_section_refs</code>, looking up and writing the corresponding formatted
+                    string (or the em-dash placeholder if the key is absent for the current dataset). Finally, it
+                    clears and, if applicable, rebuilds the dynamic Model Comparison table beneath the main grid of
+                    cards.
+                </p>
+
+                <h3>7.5 Raw Data Population</h3>
+                <p>
+                    <code>_populate_raw_data()</code> first tears down any previously built <code>ttk.Treeview</code>
+                    (since the column set can legitimately change between loads — e.g. switching from an SVG file
+                    to a focal-mechanism Excel table), determines the appropriate column set via
+                    <code>_raw_data_column_set()</code> (Section 6.2), configures ttk.Style Treeview colours to
+                    track the current CustomTkinter light/dark appearance, and inserts one row per DataFrame record
+                    with values pre-formatted by <code>_raw_fmt_value()</code> (four-significant-figure formatting
+                    for floats, an em-dash for missing values, and unmodified strings otherwise).
+                </p>
+                <div class="code-window">
+                    <div class="code-header">
+                        <span class="code-lang">python</span>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">def _raw_fmt_value(val):
+    if isinstance(val, float):
+        if pd.isna(val):
+            return "—"
+        return f"{val:.4g}"
+    if val is None or (isinstance(val, str) and not val.strip()):
+        return "—"
+    return str(val)</code></pre>
+                </div>
+                <p class="ph-caption" style="text-align:left; margin: -1rem 0 1.5rem 0;">The value-formatting helper used for every cell inserted into the Raw Segment Data Treeview.</p>
+
+                <!-- ================================================= -->
+                <h2 id="statistics">8. Statistical Methods</h2>
+                <p>
+                    The Results tab presents statistics from four broad families: descriptive geometry statistics,
+                    circular orientation statistics, discrete topological (graph-theoretic) connectivity
+                    statistics, and parametric probability-distribution fitting statistics for the tail of the
+                    fracture-length distribution. The table below inventories every statistical quantity shown on
+                    the Summary dashboard, its source, and its interpretation.
+                </p>
+                <table>
+                    <tr><th>Card</th><th>Field</th><th>Statistical Meaning</th></tr>
+                    <tr><td>Geometry Overview</td><td>Traces / Segments / Total Nodes</td><td>Sample sizes: number of distinct fracture traces, constituent straight segments, and I+Y+X topological nodes.</td></tr>
+                    <tr><td>Length Statistics</td><td>Max / Min / Median / Mode / Std Dev</td><td>Univariate descriptive statistics of the segment-length and trace-length distributions (Section 5.1).</td></tr>
+                    <tr><td>Angle / Strike Statistics</td><td>Circular Mean / Circular Std Dev / Dominant Orientation</td><td>Axial circular statistics of the doubled-angle strike distribution (Section 5.2).</td></tr>
+                    <tr><td>Connectivity (I-Y-X)</td><td>Connected Fraction / C_L / C_B / B22 / Branch classes</td><td>Topological connectivity indices from I-Y-X node theory (Section 5.3).</td></tr>
+                    <tr><td>Fracture Intensity &amp; Density</td><td>Global P21 / Global P20 / Map Area / Scan Circle Radius</td><td>Mauldon circular-scanline intensity and density estimators (Section 5.4).</td></tr>
+                    <tr><td>CDF: Descriptive Statistics</td><td>n, Min, Q1, Median, Q3, Max, IQR, Mean, Std Dev, Variance, CV, Skewness, Kurtosis</td><td>Standard order statistics and unbiased higher-moment shape statistics of the fracture-length sample.</td></tr>
+                    <tr><td>CDF: Power-law / Exponential / Log-normal / Weibull / Truncated Power-law</td><td>α, λ, μ, σ, β, xmin, n_tail, Log-likelihood, AIC, BIC, KS statistic, KS p-value, bootstrap CI, GOF p-value</td><td>Maximum-likelihood fit parameters and model-adequacy diagnostics for each of the five candidate tail distributions (Section 5.5).</td></tr>
+                    <tr><td>CDF: Model Comparison / Best Fit</td><td>Final Recommendation, Recommended Models, Model-Averaging Support, Selection Basis, Selection Warning</td><td>Outcome of the CDF tab's multi-criterion model-selection procedure (agreement of AIC/AICc, BIC, KS rank, and pairwise likelihood-ratio tests) as computed and cached by the CDF tab.</td></tr>
+                </table>
+                <p>
+                    All AIC values use the small-sample-corrected AICc form when the ratio of tail sample size to
+                    number of free parameters falls below 40, matching the recommendation of Burnham and Anderson
+                    (2002) for model selection with limited data; this correction and the underlying rationale are
+                    implemented and documented in the CDF tab, and simply reported verbatim here.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="visualization">9. Visualization</h2>
+
+                <h3>9.1 Summary Dashboard Layout</h3>
+                <p>
+                    The Summary page uses a three-column, uniform-width CTkScrollableFrame grid. Each statistic
+                    family is rendered as an independently bordered, rounded-corner "card" containing a bold
+                    section header, a thin divider rule, and a two-column key/value grid with alternating subtle
+                    row shading for readability. Card placement follows a fixed (row, column, column-span) layout:
+                    the Geometry Overview, Length Statistics, and Connectivity cards occupy the first row (one card
+                    per column); Angle/Strike Statistics, Fracture Intensity &amp; Density, and Data Source occupy
+                    the second row; the CDF Descriptive Statistics card spans the full three-column width in the
+                    third row (reflecting its larger field count); and the five per-distribution CDF cards plus the
+                    Model Comparison/Best Fit card occupy the fourth and fifth rows.
+                </p>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="put_your_img_here.png" alt="Summary dashboard showing the Geometry Overview, Length Statistics, and Connectivity cards side by side" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 9.1</strong> — Summary dashboard: three-column card grid showing Geometry Overview, Length Statistics, and Connectivity (I-Y-X) side by side, illustrating the alternating-row key/value styling.</span>
+                </figure>
+
+                <p>
+                    Every key/value row is bound to a <code>&lt;Configure&gt;</code> event that recomputes
+                    wraplength for both the field-name and value labels proportionally to the row's live pixel
+                    width, so that long field names (e.g. "Truncated Power-law GOF p-value (bootstrap, refit KS)")
+                    remain fully readable at any window size without being clipped or overlapping the adjacent
+                    value column.
+                </p>
+
+                <h3>9.2 Comparison Table Widget</h3>
+                <p>
+                    When rendered, the dynamic Model Comparison table (Section 6.6) appears beneath the main card
+                    grid inside its own bordered card, using a horizontally scrollable CTkScrollableFrame so that
+                    wide multi-column comparison tables (Distribution, k, Log-Likelihood, KS, KS p, AIC, ΔAIC,
+                    AICc, BIC, ΔBIC, Akaike weight, BIC weight, LRT R, LRT p, Rank, Recommendation — sixteen
+                    columns) remain fully navigable without shrinking individual cell text below legibility.
+                </p>
+
+                <h3>9.3 Raw Segment Data Table</h3>
+                <p>
+                    The Raw Segment Data page renders a native <code>ttk.Treeview</code> configured with a
+                    65-pixel row height (tall enough to display two-line wrapped text where needed), synchronized
+                    vertical and horizontal <code>ttk.Scrollbar</code> widgets, and Treeview/Treeview.Heading
+                    ttk.Style rules that adapt background, foreground, and selection-highlight colours to the
+                    current CustomTkinter appearance mode. Column widths are set individually per field (130 px for
+                    text-heavy fields such as EventLabel, PlaneName, and Region; 90 px for numeric fields), and
+                    column headings display the unit-qualified name for length fields.
+                </p>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="put_your_img_here.png" alt="Raw Segment Data table showing a sortable spreadsheet-style view of per-segment geometry and orientation values" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 9.2</strong> — Raw Segment Data table: sortable spreadsheet-style view of per-segment geometry and orientation values with unit-qualified column headers.</span>
+                </figure>
+
+                <!-- ================================================= -->
+                <h2 id="advanced">10. Advanced Features</h2>
+
+                <h3>10.1 Multi-Format Report Generation</h3>
+                <p>
+                    The three summary-export routines (<code>_export_pdf</code>, <code>_export_word</code>,
+                    <code>_export_txt</code>) all draw from the identical section/field ordering list, guaranteeing
+                    that a PDF, Word, and plain-text export of the same analysis session are structurally identical
+                    in content and section order, differing only in their native formatting idioms (ReportLab
+                    flowables and TableStyle for PDF; python-docx Heading/Table objects with RGBColor-styled runs
+                    for Word; fixed-width padded strings for text). This consistency is a deliberate design choice
+                    so that a laboratory or consultancy can standardise on any one of the three formats without
+                    losing information relative to the others.
+                </p>
+
+                <h3>10.2 Condensed Comparison-Table Typography for PDF</h3>
+                <p>
+                    Because the Model Comparison table can carry up to sixteen columns, the PDF exporter uses a
+                    markedly smaller (5.5 pt) Paragraph-wrapped font for its cells (versus the 9–10 pt body font
+                    used elsewhere in the same document) and lets ReportLab auto-size column widths, so that the
+                    full comparison table fits within an A4 page without truncation. The Word exporter applies an
+                    equivalent reduction (6.5 pt) together with centre-aligned cell paragraphs for the same reason.
+                </p>
+
+                <h3>10.3 Unicode Superscript Normalisation</h3>
+                <p>
+                    Several statistics (notably the P21/P20 intensity and density units, e.g. "m⁻¹" and "m⁻²") are
+                    rendered with true Unicode superscript characters for on-screen display, since CustomTkinter
+                    labels support arbitrary Unicode glyphs. Both the PDF and text/Word exporters proactively
+                    replace these Unicode superscripts with ASCII-safe equivalents ("^-1", "^-2", "^2") before
+                    writing them into the exported document, avoiding missing-glyph rendering issues in some PDF
+                    viewers or older Word installations.
+                </p>
+                <div class="code-window">
+                    <div class="code-header">
+                        <span class="code-lang">python</span>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python"># Clean unicode superscripts for safe Word rendering
+raw_val = str(summary.get(f, "—"))
+clean_val = raw_val.replace("⁻¹", "^-1").replace("⁻²", "^-2").replace("²", "^2")
+row_cells[1].text = clean_val</code></pre>
+                </div>
+                <p class="ph-caption" style="text-align:left; margin: -1rem 0 1.5rem 0;">Excerpt from <code>_export_word()</code> showing the superscript-normalisation step applied to every value cell.</p>
+
+                <h3>10.4 Fingerprint-Based Change Detection</h3>
+                <p>
+                    To avoid unnecessary recomputation, several upstream tabs (most notably the CDF tab, whose MLE
+                    fitting is the single most expensive computation in the whole workspace) use a lightweight
+                    fingerprint — typically (row count, rounded sum of a key numeric column, active setting values)
+                    — to decide whether a data-dependent cache entry is still valid. The Results tab's backfill
+                    logic in Section 6.4 relies on, and benefits from, this same caching discipline: it never
+                    triggers a new distribution fit itself, so opening the Results tab is always fast, but it
+                    always reflects whatever the most recent CDF computation produced.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="performance">11. Performance Optimization</h2>
+                <table>
+                    <tr><th>Technique</th><th>Where Applied</th><th>Effect</th></tr>
+                    <tr><td>Lazy tab population</td><td>Whole module (Section 7)</td><td>Avoids running <code>_populate_summary()</code>/<code>_populate_raw_data()</code> on every keystroke or data change elsewhere in the workspace; work happens only when the user actually views the Results tab.</td></tr>
+                    <tr><td>Global loading overlay with deferred <code>after()</code> call</td><td><code>_load_results_with_loader()</code></td><td>Gives the Tkinter event loop one paint cycle to render the overlay before the (synchronous) population routines run, so the UI never appears to freeze without feedback.</td></tr>
+                    <tr><td>Reuse of the CDF tab's fit and bootstrap caches</td><td><code>_collect_cdf_summary_values()</code></td><td>Backfills five complete distribution-fit summaries without invoking <code>powerlaw.Fit</code> a second time; the expensive MLE optimisation (and, if enabled, the n-bootstrap-resample CI/GOF loop) is computed exactly once regardless of how many times the Results tab is refreshed.</td></tr>
+                    <tr><td>Treeview full teardown/rebuild only on population</td><td><code>_populate_raw_data()</code></td><td>The Treeview is destroyed and recreated only when the tab is actually repopulated (not on every resize or scroll), keeping the raw-data view responsive for networks with hundreds to low thousands of segments.</td></tr>
+                    <tr><td>Row-capped display convention elsewhere in the app is not applied here</td><td>Raw Segment Data table</td><td>Unlike the Dynamic Analyzer's Table tab (which caps rows at 1000 for interactivity), the Results tab's raw-data export and display are intended as a complete scientific record and are not truncated; very large networks may therefore take longer to populate this tab than the interactive plotting tabs.</td></tr>
+                </table>
+
+                <!-- ================================================= -->
+                <h2 id="examples">12. Practical Examples</h2>
+
+                <h3>12.1 Example 1 — Verifying a Newly Loaded SVG Trace Map</h3>
+                <ol class="step-list">
+                    <li>Load an SVG fracture trace map via the Fracture Map tab's Load SVG button, and confirm the map renders as expected.</li>
+                    <li>Open the Connectivity tab once to trigger its (independently lazy) I-Y-X computation, since the Results tab's Connectivity card depends on that cache being populated.</li>
+                    <li>Click the Results tab. Confirm the Geometry Overview card's Traces and Segments counts match the number of distinct traces visible on the map, and that Total Nodes (I+Y+X) is a sensible fraction of twice the segment count (each segment contributes two endpoints, some of which coincide at shared nodes).</li>
+                    <li>Inspect the Length Statistics card: an unexpectedly large Segment Max Length relative to the Median often indicates a digitising error (e.g. two traces that should have been separate objects were accidentally merged into one long path during SVG creation).</li>
+                    <li>Export the summary as a PDF for inclusion in a field-mapping QC report using Export to PDF (.pdf).</li>
+                </ol>
+
+                <h3>12.2 Example 2 — Selecting a Length Distribution Model for Reporting</h3>
+                <ol class="step-list">
+                    <li>On the CDF tab, set Distribution Fit Model to Auto Best Fit and, optionally, enable Bootstrap CI &amp; GOF with a chosen resample count.</li>
+                    <li>Switch to the Results tab. The CDF: Power-law, CDF: Exponential, CDF: Log-normal, CDF: Weibull, and CDF: Truncated Power-law cards will all be populated simultaneously from the single cached fit, letting every candidate model's AIC, BIC, and KS statistic be compared at a glance without switching the CDF tab's dropdown five times.</li>
+                    <li>Read the CDF: Model Comparison / Best Fit card's Final Recommendation and Selection Warning fields to determine whether the automatic procedure found a statistically unambiguous winner or whether several models remain practically indistinguishable (in which case the recommended approach is to report the model-averaged parameter estimates shown under Model-Averaging Support rather than a single "best" model).</li>
+                    <li>Scroll to the dynamically rendered Comparison Table beneath the card grid for the full pairwise likelihood-ratio evidence underlying that recommendation, then export the whole page to Word for inclusion in a manuscript's supplementary materials.</li>
+                </ol>
+
+                <h3>12.3 Example 3 — Exporting Raw Data for External GIS or Statistical Software</h3>
+                <ol class="step-list">
+                    <li>Switch to the Raw Segment Data inner tab and confirm the displayed column set matches the loaded data format (spatial X1/Y1/X2/Y2 columns for SVG data; Lat/Lon/PlaneName for a focal-mechanism table).</li>
+                    <li>Use Export to CSV (.csv) in the sidebar to produce a file directly importable into GIS software (e.g. QGIS) for spatial cross-referencing against other datasets, or Export to Excel (.xlsx) for further manual analysis in a spreadsheet.</li>
+                </ol>
+
+                <!-- ================================================= -->
+                <h2 id="interpretation">13. Geological Interpretation</h2>
+                <p>
+                    The Results dashboard is designed to answer, in one screen, the questions a structural geologist
+                    or reservoir engineer typically asks of a digitised fracture network.
+                </p>
+
+                <h4>13.1 Is the network well connected?</h4>
+                <p>
+                    High values of Connected Fraction and C_L/C_B, together with a large proportion of X and C-C
+                    nodes relative to I nodes, indicate a network capable of supporting significant fluid or gas
+                    through-flow — relevant to reservoir permeability, contaminant transport, and slope-stability
+                    seepage analysis. A network dominated by I nodes and I-I branches, by contrast, behaves closer
+                    to a set of isolated, disconnected discontinuities.
+                </p>
+
+                <h4>13.2 Is the network scale-invariant (fractal) or does it have a characteristic length?</h4>
+                <p>
+                    A Power-law fit with a low AIC/BIC relative to the Exponential and Log-normal alternatives,
+                    combined with a high KS p-value, supports treating the fracture-length population as
+                    approximately scale-invariant over the sampled range — a common finding for tectonic joint sets
+                    and consistent with self-similar brittle deformation processes. An Exponential or Log-normal
+                    preference instead suggests a characteristic length scale exists, often associated with
+                    mechanical layer thickness control on fracture propagation (bed-confined jointing) or a
+                    specific genetic mechanism with a finite driving-stress range.
+                </p>
+
+                <h4>13.3 Does the network show a preferred orientation, and how strong is it?</h4>
+                <p>
+                    A low Circular Std. Dev. paired with a Dominant Orientation close to the Circular Mean
+                    indicates a single, tectonically controlled fracture set (e.g. joints formed under a consistent
+                    regional stress field). A high circular standard deviation, or a Dominant Orientation that
+                    diverges substantially from the circular mean, is a signature of either two conjugate sets or a
+                    poorly organised, possibly non-tectonic (e.g. cooling-joint or weathering-related) fracture
+                    population — best confirmed by cross-checking against the Rose Plot tab.
+                </p>
+
+                <h4>13.4 How intense is fracturing, and is it representative of the true rock mass?</h4>
+                <p>
+                    P21 and P20 provide areal-density measures directly comparable across different outcrops,
+                    scanlines, or digital elevation models, because the Mauldon circular-scanline method removes
+                    the orientation bias inherent in straight-line scanline sampling (the classical Terzaghi
+                    correction problem). Comparing P21 values between multiple mapped domains within the same
+                    project is a standard way to identify structural domains or damage zones associated with
+                    faults.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="implementation">14. Implementation Notes</h2>
+                <ul>
+                    <li>The module is implemented as a Python mixin class (<code>StaticResultsTab</code>) intended
+                    to be combined via multiple inheritance with <code>StaticAnalyzerApp</code> and its sibling tab
+                    mixins; it therefore freely reads and writes attributes (<code>self.results</code>,
+                    <code>self.segments</code>, <code>self._fluid_connectivity</code>, <code>self.current_stats</code>,
+                    and others) that are defined by those sibling classes rather than by itself.</li>
+                    <li>All numeric formatting in the Summary dashboard uses Python's general (<code>%.4g</code>) or
+                    fixed-precision (<code>%.4f</code>, <code>%.3f</code>) format specifiers chosen per-field to
+                    balance readability against precision; users requiring full machine precision should use the
+                    raw-data or CDF-tab-native exports rather than the formatted Summary text.</li>
+                    <li>PDF export depends on the <code>reportlab</code> package; Word export depends on
+                    <code>python-docx</code>; both are optional dependencies and their absence is caught and
+                    reported to the user via a friendly "Missing library" message box rather than a raw stack
+                    trace.</li>
+                    <li>Excel export depends on <code>openpyxl</code>, again with a graceful ImportError message.</li>
+                    <li>The export file-save dialog defaults its initial directory to the application-wide
+                    configured export path (Settings page → Export → Default export directory) when one has been
+                    configured and still exists on disk, falling back to the operating system's default save
+                    location otherwise.</li>
+                    <li>Because the CDF backfill (<code>_collect_cdf_summary_values</code>) reads only the most
+                    recently cached fit-cache entry, switching the CDF tab's data source (e.g. from Segment Lengths
+                    to Trace Total Lengths) or its fitting cutoff (x_min mode) and then immediately visiting the
+                    Results tab without letting the CDF tab redraw first can momentarily show statistics computed
+                    under the previous settings; visiting the CDF tab at least once after any such change ensures
+                    the cache — and therefore the Results tab — reflects the new settings.</li>
+                </ul>
+
+                <!-- ================================================= -->
+                <h2 id="limitations">15. Limitations</h2>
+                <table>
+                    <tr><th>Limitation</th><th>Description</th></tr>
+                    <tr><td>No independent CDF computation</td><td>The Results tab performs no independent statistical computation for the CDF distribution-fitting section; it is entirely dependent on the CDF tab having been visited (so that its fit cache is populated) at least once during the current session. If no CDF fit has ever been run, the five per-distribution cards remain blank (em-dash placeholders).</td></tr>
+                    <tr><td>No row cap on raw data</td><td>The raw-data table and all raw-data exports are not row-capped, unlike some other FracSTAT tables; extremely large fracture networks (tens of thousands of segments) may take a perceptible amount of time to populate and scroll smoothly.</td></tr>
+                    <tr><td>Mode estimates are bin-count sensitive</td><td>Histogram-derived mode estimates (Section 6.1) are sensitive to the chosen bin count; because that bin count is shared with the Histogram tab's own control, changing it there will change the reported Mode values here on the next refresh, which is expected behaviour but can surprise users unaware of the shared setting.</td></tr>
+                    <tr><td>Single active dataset</td><td>The module assumes a single, currently active fracture-network dataset; it has no facility for comparing or exporting statistics across multiple loaded projects simultaneously.</td></tr>
+                    <tr><td>No intensity/density for geographic data</td><td>Geographic (Lat/Lon, focal-mechanism) datasets do not populate the Map Area, Scan Circle Radius, or P21/P20 fields, since circular-scanline intensity/density estimation is only meaningful for planar, metrically-scaled trace geometry.</td></tr>
+                </table>
+
+                <!-- ================================================= -->
+                <h2 id="references">16. References</h2>
+                <p>Clauset, A., Shalizi, C. R., &amp; Newman, M. E. J. (2009). Power-law distributions in empirical data. <em>SIAM Review</em>, 51(4), 661–703.</p>
+                <p>Sanderson, D. J., &amp; Nixon, C. W. (2015). The use of topology in fracture network characterization. <em>Journal of Structural Geology</em>, 72, 55–66.</p>
+                <p>Mauldon, M., Dunne, W. M., &amp; Rohrbaugh, M. B. (2001). Circular scanlines and circular windows: new tools for characterizing the geometry of fracture traces. <em>Journal of Structural Geology</em>, 23(2–3), 247–258.</p>
+                <p>Mardia, K. V., &amp; Jupp, P. E. (2000). <em>Directional Statistics</em>. John Wiley &amp; Sons.</p>
+                <p>Burnham, K. P., &amp; Anderson, D. R. (2002). <em>Model Selection and Multimodel Inference: A Practical Information-Theoretic Approach</em> (2nd ed.). Springer.</p>
+
                 <!-- Pagination Navigation -->
                 <div class="pagination-nav">
                     <!-- PREVIOUS BUTTON -->

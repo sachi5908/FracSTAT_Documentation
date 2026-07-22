@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Method Tab | FracSTAT Docs</title>
@@ -96,16 +97,258 @@
         <main class="docs-content">
             <div class="docs-content-inner">
                 <h1>Dynamic Method Tab</h1>
-                
+                <p>
+                    Located at <code>dynamic_analyzer/tabs/dynamic_method_tab.py</code>, the <strong>Method</strong>
+                    tab (implemented as the mixin class <code>MethodTab</code>) is the Dynamic Analyzer's built-in,
+                    read-only reference sheet. Unlike every other tab in the Dynamic Analyzer, it consumes no
+                    project data and produces no plot — it exists purely to document, in one place, the exact
+                    geometric and stress-mechanical formulas that the Map, Rose, Mohr, and Table tabs apply to every
+                    loaded fracture segment. It is the single source of truth a user can check to confirm precisely
+                    how a reported stress angle, slip tendency, or Coulomb failure state was derived.
+                </p>
+
+                <div class="toc-box">
+                    <p>On this page</p>
+                    <ul>
+                        <li><a href="#interface-overview">1. Interface Overview</a></li>
+                        <li><a href="#purpose">2. Purpose and Scope</a></li>
+                        <li><a href="#controls">3. Content Structure and Typography</a></li>
+                        <li><a href="#maths">4. Mathematical Background</a></li>
+                        <li><a href="#algorithms">5. Implementation: How the Text Is Built</a></li>
+                        <li><a href="#focal">6. Focal-Mechanism Mode</a></li>
+                        <li><a href="#relationship">7. Relationship to Other Dynamic Analyzer Tabs</a></li>
+                    </ul>
+                </div>
+
+                <!-- ================================================= -->
+                <h2 id="interface-overview">1. Interface Overview</h2>
+                <p>
+                    The Method tab occupies the full width of its workspace tab with a single scrollable
+                    <code>CTkTextbox</code> widget, padded 20&nbsp;px on every side to give the text a clean,
+                    card-like appearance. There is no sidebar, no plot canvas, and no interactive control of any
+                    kind — the widget is explicitly locked to a read-only (<code>state="disabled"</code>) state
+                    immediately after its content is inserted, so the tab behaves purely as documentation rendered
+                    inside the application itself rather than as an analysis surface.
+                </p>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="put_your_img_here.png" alt="Dynamic Analyzer Method tab showing the read-only formula reference textbox" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 1.1</strong> — The Dynamic Analyzer's Method tab, showing the titled sections, inline mathematical formulas, and subscripted symbol notation rendered inside the read-only reference textbox.</span>
+                </figure>
+
+                <!-- ================================================= -->
+                <h2 id="purpose">2. Purpose and Scope</h2>
+                <p>
+                    Every other tab in the Dynamic Analyzer — Map, Rose, Mohr, Stereonet, and Table — resolves
+                    stress onto fracture planes and reports derived quantities such as slip tendency, dilation
+                    tendency, susceptibility, and Coulomb failure state, but none of them re-explain the underlying
+                    formulas at the point of use. The Method tab exists to close that gap: it is a static,
+                    in-application reference that a user can open at any time to see, in order, exactly how raw SVG
+                    geometry is turned into a scaled fracture network, how that network's strikes are corrected to
+                    true North, how the stress angle to each fracture is computed, how normal and shear stress are
+                    resolved via the 2-D Mohr transformation, and how each of the tendency and failure metrics
+                    reported elsewhere in the workspace is defined.
+                </p>
+                <p>
+                    Because the tab performs no calculation of its own — it only documents calculations performed
+                    by other tabs — it has no data-input requirements, no settings, and no redraw logic. Its entire
+                    behaviour is determined once, at tab-build time, by the sequence of <code>text.insert()</code>
+                    calls in <code>_build_method_tab()</code>.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="controls">3. Content Structure and Typography</h2>
+                <p>
+                    The tab uses Tkinter text-widget tags to give the reference sheet a typographic hierarchy
+                    without resorting to a rich-text or HTML rendering engine. Four fonts and five tags are defined
+                    once at build time and then applied selectively as each line is inserted.
+                </p>
+                <table>
+                    <tr><th>Tag</th><th>Font</th><th>Role</th></tr>
+                    <tr><td><code>title</code></td><td>Roboto, 22&nbsp;pt, bold, centred</td><td>The single page heading, "Calculation Method".</td></tr>
+                    <tr><td><code>header</code></td><td>Roboto, 16&nbsp;pt, bold</td><td>Section headings (Geometry, Profile Scaling, Stress Angle, Resolved Stress, Tendency Metrics, Plots, Focal-Mechanism Mode).</td></tr>
+                    <tr><td><code>body</code></td><td>Roboto, 13&nbsp;pt, regular</td><td>Explanatory prose beneath each section heading.</td></tr>
+                    <tr><td><code>math</code></td><td>Consolas, 14&nbsp;pt monospace, left-indented</td><td>Inline formula lines, indented 30&nbsp;px from both margins for visual separation from prose.</td></tr>
+                    <tr><td><code>sub</code></td><td>Consolas, 10&nbsp;pt monospace, vertical offset −4&nbsp;px</td><td>Combined with <code>math</code> to render a subscripted symbol (e.g. the "s" in T<sub>s</sub>) at reduced size and lowered baseline within an otherwise monospaced formula line.</td></tr>
+                </table>
+                <div class="note-box">
+                    <strong>Note:</strong> because a plain <code>CTkTextbox</code> cannot mix a smaller, baseline-shifted
+                    run of characters into the middle of a single inserted string, every subscripted symbol used in
+                    the Tendency Metrics section (T<sub>s</sub>, T<sub>d</sub>, S<sub>f</sub>) is built from three
+                    separate <code>insert()</code> calls — the base letter tagged <code>math</code>, the subscript
+                    character tagged with the combined <code>("math", "sub")</code> tuple, and the remainder of the
+                    formula tagged <code>math</code> again — rather than from one call carrying the whole line.
+                </div>
+
+                <!-- ================================================= -->
+                <h2 id="maths">4. Mathematical Background</h2>
+                <p>
+                    The reference sheet proceeds through five formula-bearing sections, in the same order every
+                    other Dynamic Analyzer tab implicitly relies on: geometry construction, profile scaling and
+                    strike correction, the stress angle definition, the resolved-stress transformation, and the
+                    tendency/failure metrics computed from that resolved stress.
+                </p>
+
+                <h3>4.1 Geometry</h3>
+                <p>
+                    Every digitised SVG trace is converted into one or more straight fracture segments before any
+                    stress calculation begins. A line primitive in the source SVG becomes exactly one segment;
+                    curved primitives are sampled into a series of shorter straight segments according to the
+                    workspace's Curve step setting, exactly mirroring the tessellation approach used by the Static
+                    Analyzer's geometry engine. Every resulting segment — whether from an originally straight or
+                    originally curved trace — is treated identically and calculated independently by every
+                    downstream stage.
+                </p>
+
+                <h3>4.2 Profile Scaling and Strike Correction</h3>
+                <p>
+                    Raw SVG coordinates exist only in arbitrary digitiser pixel units. FracSTAT rescales the full
+                    coordinate extent of the loaded trace map onto the physical Profile Width and Profile Length
+                    supplied by the user, in metres, so that every plotted X/Y coordinate and every reported segment
+                    length is expressed in the currently selected display unit rather than in raw pixels. Because
+                    the horizontal and vertical scale factors are computed independently from the profile width and
+                    length respectively, non-square profiles (where width and length differ) are still handled
+                    correctly — the rescaling is not assumed to be uniform in both directions.
+                </p>
+                <p>
+                    Segment strike, as measured directly from the SVG geometry, is referenced to the image's own Y
+                    axis rather than to true geographic North. The Image Y-axis azimuth setting, θ, records how far
+                    that image Y axis is rotated away from true North, and every raw image strike is corrected by
+                    this offset before it is used anywhere else in the workspace:
+                </p>
+                <div class="formula-block">strike_N = image strike + θ</div>
+
+                <h3>4.3 Stress Angle</h3>
+                <p>
+                    The maximum principal stress σ₁ is supplied as an azimuth measured from true North. FracSTAT
+                    does not resolve stress directly onto the fracture plane's strike direction; it resolves stress
+                    onto the plane's pole (its outward normal), which by definition sits 90° from the corrected
+                    strike. The stress angle α used in every subsequent Mohr transformation is therefore the
+                    angular difference between that normal direction and the σ₁ azimuth:
+                </p>
+                <div class="formula-block">α = strike_N + 90° − azimuth_N(σ₁)</div>
+
+                <h3>4.4 Resolved Stress</h3>
+                <p>
+                    With α defined relative to the fracture normal, the normal stress σₙ and shear stress τ acting
+                    on the fracture plane follow directly from the standard two-dimensional Mohr stress
+                    transformation:
+                </p>
+                <div class="formula-block">
+σₙ = ½(σ₁ + σ₂) + ½(σ₁ − σ₂)·cos(2α)
+τ  = | −½(σ₁ − σ₂)·sin(2α) |</div>
+                <div class="tip-box">
+                    <strong>Sign convention:</strong> the σₙ equation carries a <em>plus</em> sign on its second term
+                    because α is measured to the fracture normal, not to the fracture plane itself. Formulas quoted
+                    elsewhere in the structural-geology literature that instead define the angle relative to the
+                    fracture plane will show this same cosine term with a minus sign — the two conventions are
+                    equivalent once the 90° offset between plane and normal is accounted for, but they are not
+                    interchangeable term-for-term.
+                </div>
+
+                <h3>4.5 Tendency Metrics</h3>
+                <p>
+                    Four derived quantities, each computed directly from the resolved σₙ and τ of Section 4.4, are
+                    reported throughout the Dynamic Analyzer's Map, Rose, and Table tabs:
+                </p>
+                <table>
+                    <tr><th>Symbol</th><th>Name</th><th>Formula</th></tr>
+                    <tr><td>T<sub>s</sub></td><td>Slip tendency</td><td>T<sub>s</sub> = τ / σₙ</td></tr>
+                    <tr><td>T<sub>d</sub></td><td>Dilation tendency</td><td>T<sub>d</sub> = (σ₁ − σₙ) / (σ₁ − σ₂)</td></tr>
+                    <tr><td>S<sub>f</sub></td><td>Susceptibility / fracture stability margin</td><td>S<sub>f</sub> = σₙ − Pᶠ − (τ − C₀) / μ</td></tr>
+                    <tr><td>CSF</td><td>Critical stress flag</td><td>True where τ ≥ μ(σₙ − Pᶠ) + C₀</td></tr>
+                </table>
+                <p>
+                    Here Pᶠ is pore-fluid pressure, C₀ is cohesion, and μ is the coefficient of friction — the same
+                    three Coulomb failure-envelope parameters used to draw the failure line on the Mohr diagram.
+                    Slip tendency T<sub>s</sub> is the ratio of resolved shear to resolved normal stress and
+                    increases toward frictional failure; dilation tendency T<sub>d</sub> measures how close a
+                    fracture's normal stress sits to the least principal stress σ₂, with values near 1 indicating a
+                    fracture oriented favourably for opening-mode dilation; the susceptibility/stability margin
+                    S<sub>f</sub> and the boolean CSF flag both express distance from, or crossing of, the
+                    effective-stress Coulomb failure envelope.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="algorithms">5. Implementation: How the Text Is Built</h2>
+                <p>
+                    <code>_build_method_tab()</code> runs once, when the Method tab is constructed, and performs no
+                    further work afterward — there are no callbacks, no variable bindings, and no redraw path,
+                    since nothing on the tab can be edited or reconfigured by the user.
+                </p>
+                <ol class="step-list">
+                    <li>Grid-configure the tab's single row and column to expand, and place one <code>CTkTextbox</code> with 20&nbsp;px internal padding so the text reads as a padded card rather than touching the tab's edges.</li>
+                    <li>Construct the four named <code>CTkFont</code> objects (title, header, body, math) plus the smaller subscript font, all in the Roboto family for prose and Consolas for formulas.</li>
+                    <li>Register five tags on the textbox's underlying Tkinter <code>Text</code> widget (<code>text._textbox</code>), each carrying its own font, spacing, indentation, and (for <code>title</code>) centre justification.</li>
+                    <li>Insert the page title, then each section heading and its body/formula content in sequence, using the appropriate tag or tag-tuple for every inserted run of text.</li>
+                    <li>For the three subscripted tendency-metric symbols, insert the base letter, the subscript character, and the remainder of the line as three separate calls so the subscript renders at reduced size and lowered baseline.</li>
+                    <li>Call <code>text.configure(state="disabled")</code> as the final step, permanently locking the widget against further editing while leaving it fully scrollable and selectable for copying.</li>
+                </ol>
                 <div class="code-window">
                     <div class="code-header">
                         <span class="code-lang">python</span>
                         <button class="copy-btn">Copy</button>
                     </div>
-                    <pre><code class="language-python">Test no 5
+                    <pre><code class="language-python">text._textbox.tag_config("math", font=font_math, lmargin1=30, lmargin2=30, spacing1=5, spacing3=15)
+text._textbox.tag_config("sub", offset="-4", font=font_math_sub)
 
-</code></pre>
+# T_s, rendered as three separate inserts so the "s" renders as a
+# smaller, baseline-shifted subscript within an otherwise monospaced line
+text.insert("end", "T", "math")
+text.insert("end", "s", ("math", "sub"))
+text.insert("end", " = τ / σₙ\n", "math")
+
+# Lock the widget once every section has been inserted
+text.configure(state="disabled")</code></pre>
                 </div>
+                <p class="ph-caption" style="text-align:left; margin: -1rem 0 1.5rem 0;">Excerpt from <code>_build_method_tab()</code> showing the tag configuration for formula text and the three-part insert pattern used to render a subscripted symbol.</p>
+
+                <!-- ================================================= -->
+                <h2 id="focal">6. Focal-Mechanism Mode</h2>
+                <p>
+                    The final section of the reference sheet documents a distinct data pathway that the rest of the
+                    Dynamic Analyzer treats transparently: Excel/CSV files carrying Lat, Lon, FP1 Strike/Dip and,
+                    optionally, FP1/FP2 Slip columns are recognised as earthquake focal-mechanism data rather than
+                    digitised fracture traces. Each supplied nodal plane becomes its own segment, after which the
+                    Map tab plots the event at its true Lat/Lon location and can display the corresponding
+                    GlobalCMT-style beachball diagram, fetched from the file's Beachball URL column, for whichever
+                    event is currently selected.
+                </p>
+                <p>
+                    When a Slip (rake) value is supplied for a nodal plane, FracSTAT goes beyond simple stress
+                    resolution: it projects the resolved shear traction onto the true three-dimensional slip vector
+                    constructed from that plane's strike, dip, and rake, following the Wallace–Bott hypothesis that
+                    slip occurs parallel to the resolved shear stress on the fault plane. The angular difference
+                    between the observed slip direction and the direction the entered stress tensor predicts is
+                    reported as the <strong>Rake Misfit</strong> — a low misfit indicates that the assumed stress
+                    state is kinematically consistent with the recorded earthquake, while a high misfit suggests the
+                    entered principal stress orientation and/or ratio should be reconsidered.
+                </p>
+                <div class="note-box">
+                    <strong>Backward compatibility:</strong> older two-column focal-mechanism files containing only
+                    ID, Strike, and Dip continue to load and function exactly as before; the loader auto-detects
+                    which of the two schemas a given file uses without requiring any action from the user.
+                </div>
+
+                <!-- ================================================= -->
+                <h2 id="relationship">7. Relationship to Other Dynamic Analyzer Tabs</h2>
+                <p>
+                    The Method tab's content is descriptive of, and consistent with, exactly what the rest of the
+                    workspace computes and displays:
+                </p>
+                <table>
+                    <tr><th>Dynamic Analyzer Tab</th><th>What it uses from the Method tab's formulas</th></tr>
+                    <tr><td>Map Tab</td><td>Colours every segment by whichever tendency/failure metric (T<sub>s</sub>, T<sub>d</sub>, S<sub>f</sub>, or CSF) is currently selected, computed via Sections 4.3–4.5.</td></tr>
+                    <tr><td>Rose Tab</td><td>Builds a length-weighted, 10° binned, square-root (equal-area) polar histogram of the same corrected strike_N values described in Section 4.2, mirroring 0–180° strikes into the 180–360° half for full-circle display.</td></tr>
+                    <tr><td>Mohr Tab</td><td>Plots total stress (σₙ, τ), effective stress shifted by pore pressure Pᶠ, individual segment points, and the Coulomb failure envelope τ = C₀ + μσₙ′ using exactly the resolved-stress formulas of Section 4.4; Mohr-diagram point numbers correspond directly to each segment's ID in the Table tab. The quantity Δτ = τ − [C₀ + μ(σₙ − Pᶠ)] is positive wherever a segment's Mohr point touches or crosses the failure envelope.</td></tr>
+                    <tr><td>Table Tab</td><td>Tabulates the per-segment numeric results (strike_N, α, σₙ, τ, T<sub>s</sub>, T<sub>d</sub>, S<sub>f</sub>, CSF) produced by the same pipeline documented here.</td></tr>
+                </table>
+
                 <!-- Pagination Navigation -->
                 <div class="pagination-nav">
                     <!-- PREVIOUS BUTTON -->
@@ -123,43 +366,5 @@
         </main>
     </div>
     <script src="script.js"></script>
-<!-- Code injected by live-server -->
-<script>
-	// <![CDATA[  <-- For SVG support
-	if ('WebSocket' in window) {
-		(function () {
-			function refreshCSS() {
-				var sheets = [].slice.call(document.getElementsByTagName("link"));
-				var head = document.getElementsByTagName("head")[0];
-				for (var i = 0; i < sheets.length; ++i) {
-					var elem = sheets[i];
-					var parent = elem.parentElement || head;
-					parent.removeChild(elem);
-					var rel = elem.rel;
-					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
-						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
-						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
-					}
-					parent.appendChild(elem);
-				}
-			}
-			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
-			var address = protocol + window.location.host + window.location.pathname + '/ws';
-			var socket = new WebSocket(address);
-			socket.onmessage = function (msg) {
-				if (msg.data == 'reload') window.location.reload();
-				else if (msg.data == 'refreshcss') refreshCSS();
-			};
-			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
-				console.log('Live reload enabled.');
-				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
-			}
-		})();
-	}
-	else {
-		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
-	}
-	// ]]>
-</script>
-
-</body></html>
+</body>
+</html>

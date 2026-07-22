@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Table Tab | FracSTAT Docs</title>
@@ -27,13 +28,13 @@
             </li>
         </ul>
     </nav>
-    
+
     <div class="docs-layout">
         <!-- ==========================================
              MASTER ACCORDION SIDEBAR
              ========================================== -->
         <aside class="docs-sidebar" id="docsSidebar">
-            
+
             <div class="sidebar-section open">
                 <button class="sidebar-toggle">
                     Getting Started
@@ -95,17 +96,812 @@
 
         <main class="docs-content">
             <div class="docs-content-inner">
+
                 <h1>Dynamic Table Tab</h1>
-                
+                <p>
+                    Located at <code>dynamic_analyzer/tabs/dynamic_table_tab.py</code>, the <strong>Table</strong> tab (implemented as the
+                    mixin class <code>TableTab</code>) is one of six coordinated views within the Dynamic Analyzer
+                    workspace of FracSTAT (the others being Map, Rose, Mohr, Stereonet, and Method). Where the Map,
+                    Rose, Mohr, and Stereonet tabs render the results of a stress-resolution calculation
+                    graphically, the Table Tab presents the identical per-segment result set in a searchable,
+                    sortable-by-inspection, row-and-column format. It is mixed into the top-level
+                    <code>SlipTendencyApp</code> window alongside the other tab mixins
+                    (<code>MapTab</code>, <code>RoseTab</code>, <code>MohrTab</code>, <code>MethodTab</code>,
+                    <code>StereonetTab</code>).
+                </p>
+                <p>
+                    The scientific purpose of the Table Tab is threefold. First, it provides an auditable numerical
+                    record of every quantity the Dynamic Analyzer computes for every input fracture segment or
+                    fracture plane — orientation, resolved stress, and the four principal geomechanical attributes
+                    (slip tendency, dilation tendency, fracture susceptibility, and the Coulomb critical-stress
+                    flag) — so results can be verified, spot-checked against hand calculations, or cross-referenced
+                    with the underlying reference implementation in <code>calculator.py</code>. Second, it acts as
+                    the authoritative tabular export source: the "Export Excel" action writes the same DataFrame
+                    that populates the table directly to a Microsoft Excel workbook for use in external reporting,
+                    statistical post-processing, or inclusion in a technical report. Third, and importantly for the
+                    interactive character of the workspace, the Table Tab functions as a <strong>selection
+                    hub</strong>: clicking a row highlights the corresponding fracture segment simultaneously on the
+                    Map, in the Mohr diagram, and on the Stereonet, letting the analyst move fluidly between an
+                    abstract stress-space representation and its concrete geometric counterpart.
+                </p>
+
+                <div class="toc-box">
+                    <p>On this page</p>
+                    <ul>
+                        <li><a href="#position">1. Position within the FracSTAT Architecture</a></li>
+                        <li><a href="#interface-overview">2. Interface Overview</a></li>
+                        <li><a href="#data-input">3. Data Input and Underlying Data Model</a></li>
+                        <li><a href="#controls">4. Settings and Controls</a></li>
+                        <li><a href="#columns">5. Column Reference and Symbol Table</a></li>
+                        <li><a href="#maths">6. Mathematical Background</a></li>
+                        <li><a href="#algorithms">7. Algorithms and Internal Workflow</a></li>
+                        <li><a href="#sync">8. Cross-Tab Selection Synchronisation</a></li>
+                        <li><a href="#statistics">9. Statistical Content and Sidebar Relationship</a></li>
+                        <li><a href="#performance">10. Performance Optimisation</a></li>
+                        <li><a href="#export">11. Export Functionality</a></li>
+                        <li><a href="#examples">12. Practical Examples</a></li>
+                        <li><a href="#interpretation">13. Geological and Geomechanical Interpretation</a></li>
+                        <li><a href="#implementation">14. Implementation Notes</a></li>
+                        <li><a href="#limitations">15. Limitations</a></li>
+                        <li><a href="#references">16. References</a></li>
+                    </ul>
+                </div>
+
+                <!-- ================================================= -->
+                <h2 id="position">1. Position within the FracSTAT Architecture</h2>
+                <p>
+                    FracSTAT is organised around a Launcher/Home screen (<code>launcher.py</code>) that hosts two
+                    principal analytical workspaces embedded as CustomTkinter frames: the Static Analyzer (geometric
+                    fracture-network characterisation) and the Dynamic Analyzer (stress-based slip-tendency
+                    analysis, implemented in <code>dynamic_app.py</code> as the <code>SlipTendencyApp</code> class).
+                    A third, Uncertainty Analyzer module is present as an under-construction placeholder. The Table
+                    Tab belongs exclusively to the Dynamic Analyzer workspace.
+                </p>
+                <p>
+                    Within <code>SlipTendencyApp</code>, six named <code>CTkTabview</code> tabs are constructed in a
+                    fixed order — Map, Rose, Mohr, Stereonet, Table, Method — each built by a dedicated
+                    <code>_build_*_tab</code> method contributed by its mixin class. All six tabs read from two
+                    shared, workspace-level attributes maintained by <code>SlipTendencyApp</code>:
+                </p>
+                <ul>
+                    <li><code>self.results</code> — a pandas DataFrame produced by
+                    <code>calculator.run_calculation()</code>, containing one row per fracture segment
+                    (SVG-derived) or per fracture plane (Excel/CSV-derived), refreshed every time the user presses
+                    Calculate or edits an input that triggers recomputation.</li>
+                    <li><code>self.selected_segment_id</code> — an integer (or <code>None</code>) identifying the
+                    segment currently highlighted across every tab, mutated by
+                    <code>SlipTendencyApp.select_segment()</code> and <code>SlipTendencyApp.clear_selection()</code>.</li>
+                </ul>
+                <p>
+                    The Table Tab reads <code>self.results</code> to populate its rows and reads/writes
+                    <code>self.selected_segment_id</code> indirectly through the shared <code>select_segment()</code>
+                    method, making it functionally symmetrical with the picking/selection logic already present in
+                    the Map, Mohr, and Stereonet tabs (each of which also supports row/point selection that calls
+                    the same <code>select_segment()</code> entry point).
+                </p>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="put_your_img_here.png" alt="Dynamic Analyzer tab bar showing the six tabs with Table active" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 1.1</strong> — The six-tab CTkTabview strip (Map · Rose · Mohr · Stereonet · Table · Method) as it appears at the top of the Dynamic Analyzer main content area, with "Table" the active selection.</span>
+                </figure>
+
+                <!-- ================================================= -->
+                <h2 id="interface-overview">2. Interface Overview</h2>
+                <p>
+                    The Table Tab occupies the full main-content region of the Dynamic Analyzer window beneath the
+                    shared workspace header (font/colour controls, Load SVG/Load Excel, Save Project, Move Elements,
+                    Scale, Switch Mode, Back) and to the right of the collapsible sidebar (Profile &amp; Units,
+                    Stress &amp; Orientation, Display, Actions, Results summary, Selected Segment panel — all shared
+                    with the other tabs). The tab's own layout consists of three stacked regions arranged on a
+                    two-column, three-row Tk grid:
+                </p>
+                <ul>
+                    <li><strong>Row 0 — Toolbar:</strong> a transparent frame containing the section label "Segment
+                    results" (left-aligned, bold) and an "Export Excel" button (right-aligned).</li>
+                    <li><strong>Row 2 — Data grid:</strong> a <code>ttk.Treeview</code> widget (columns-only view,
+                    i.e. no expandable tree hierarchy) occupying column 0, paired with a vertical
+                    <code>ttk.Scrollbar</code> in column 1.</li>
+                    <li>(Row 1 is intentionally left empty as spacing in the underlying grid definition.)</li>
+                </ul>
+                <p>
+                    The Treeview is configured with row weight 1 on grid row 2 and column weight 1 on grid column 0,
+                    so the table area expands to fill all available vertical and horizontal space as the window is
+                    resized; only the scrollbar column remains fixed-width.
+                </p>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="put_your_img_here.png" alt="Full view of the Table Tab showing the toolbar and the fifteen column results grid" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 2.1</strong> — Screenshot of the Table Tab: toolbar with "Segment results" label and "Export Excel" button at top; the fifteen-column results grid below, with the currently selected row highlighted and scrolled into view.</span>
+                </figure>
+
+                <!-- ================================================= -->
+                <h2 id="data-input">3. Data Input and Underlying Data Model</h2>
+                <p>
+                    The Table Tab performs no calculation of its own. It is a pure presentation layer over
+                    <code>self.results</code>, the DataFrame assembled by
+                    <code>calculator.run_calculation()</code> every time <code>SlipTendencyApp.calculate()</code>
+                    executes (triggered by pressing "Calculate", pressing Enter in a sidebar field, loading a new
+                    SVG or Excel/CSV file, changing the profile scale, or applying a dip-override file). The
+                    DataFrame's construction pathway differs depending on the data source:
+                </p>
+                <ul>
+                    <li><strong>SVG source</strong> — segments are read by <code>svg_loader.read_svg_segments()</code>,
+                    converted from SVG pixel coordinates to physical (metre-equivalent) coordinates using the
+                    profile width/length calibration, and their strike is derived from segment geometry via
+                    <code>models.segment_strike()</code> and north-corrected via
+                    <code>models.north_corrected_strike()</code>.</li>
+                    <li><strong>Excel/CSV source</strong> — segments are read by
+                    <code>excel_loader.read_excel_segments()</code>, which auto-detects one of five input schemas
+                    (raw XY segment coordinates, legacy Strike/Dip fracture planes, Trend/Plunge pole data,
+                    focal-mechanism nodal-plane tables, or FracSTAT's own exported results format) and populates
+                    the Segment dataclass's <code>_preset_strike</code>/<code>_preset_dip</code> fields directly,
+                    bypassing pixel geometry entirely.</li>
+                </ul>
+                <p>
+                    Regardless of source, every row passed through <code>calculator.run_calculation()</code> is
+                    resolved against the current principal-stress tensor (σ1, σ2, σ3), its orientation mode
+                    (Andersonian or fully general 3-D), and the Mohr–Coulomb failure parameters (cohesion C₀, pore
+                    pressure Pf, friction coefficient μ) that are set in the sidebar's Stress and Orientation card.
+                    The resulting DataFrame therefore couples pure geometry (position, strike, dip, length) with the
+                    outcome of a specific stress-field hypothesis; re-running Calculate with different stress inputs
+                    regenerates <code>self.results</code> and the Table Tab automatically reflects the new numbers
+                    on its next refresh.
+                </p>
+
+                <h3 id="provenance">3.1 Column Provenance Table</h3>
+                <table>
+                    <tr><th>DataFrame Field</th><th>Origin</th><th>Present For</th></tr>
+                    <tr><td>ID</td><td>Sequential row index assigned in <code>calculator.run_calculation()</code></td><td>All sources</td></tr>
+                    <tr><td>Trace / Segment</td><td><code>Segment.trace_id</code> / <code>Segment.segment_id</code></td><td>All sources</td></tr>
+                    <tr><td>StrikeDeg</td><td><code>models.segment_strike()</code> + <code>models.north_corrected_strike()</code> (SVG) or <code>Segment._preset_strike</code> (Excel)</td><td>All sources</td></tr>
+                    <tr><td>DipDeg</td><td>Sidebar "Default Dip" or per-row dip-override file (SVG) / <code>Segment._preset_dip</code> (Excel)</td><td>All sources</td></tr>
+                    <tr><td>Length / Length_m</td><td>Physical segment length after profile-scale conversion, or <code>Segment._preset_length</code> for legacy Excel rows</td><td>All sources (0 for orientation-only Excel formats)</td></tr>
+                    <tr><td>AlphaDeg, SigmaN, Tau</td><td><code>stress_on_plane_3d()</code> / <code>stress_on_plane_3d_general()</code> in <code>models.py</code></td><td>All sources</td></tr>
+                    <tr><td>SlipTendency, SlipTendencyNorm</td><td><code>calculator.py</code>; normalised by the closed-form theoretical maximum</td><td>All sources</td></tr>
+                    <tr><td>DilationTendency</td><td><code>calculator.py</code></td><td>All sources</td></tr>
+                    <tr><td>FractureSusceptibility, FractureSusceptibilityLegacy</td><td><code>calculator.py</code>, two historical MATLAB formula variants</td><td>All sources</td></tr>
+                    <tr><td>CriticalStress, CriticalStressValue</td><td><code>calculator.py</code> Coulomb comparison</td><td>All sources</td></tr>
+                </table>
+
+                <!-- ================================================= -->
+                <h2 id="controls">4. Settings and Controls</h2>
+                <p>
+                    The Table Tab exposes a deliberately minimal control surface: unlike the Map, Rose, Mohr, and
+                    Stereonet tabs — each of which carries an extensive colour/geometry/typography settings panel
+                    — the Table Tab has no cosmetic settings of its own. Its only interactive controls are the
+                    Export Excel button, the column headers (for visual reference; the Treeview widget used here
+                    does not implement interactive column sorting), row selection via mouse click, and the vertical
+                    scrollbar. This design choice keeps the tab focused on its role as a neutral, complete numerical
+                    record rather than a further stylable visualisation.
+                </p>
+
+                <h3>4.1 Toolbar Controls</h3>
+                <table>
+                    <tr><th>Control</th><th>Type</th><th>Behaviour</th></tr>
+                    <tr><td>"Segment results"</td><td>Static label (bold, 13 pt)</td><td>Section heading; no interactivity.</td></tr>
+                    <tr><td>Export Excel</td><td>CTkButton, 120×30 px</td><td>Invokes <code>SlipTendencyApp.export_excel()</code>, which writes <code>self.results</code> to a user-chosen .xlsx workbook (sheet "Segment results") via a native Save dialog. If <code>self.results</code> is empty, an error dialog ("Nothing to export — Run a calculation first.") is shown instead. On success, the status bar and a confirmation dialog report the saved row count and file path.</td></tr>
+                </table>
+
+                <h3>4.2 Data Grid Controls</h3>
+                <table>
+                    <tr><th>Control</th><th>Type</th><th>Behaviour</th></tr>
+                    <tr><td>Column headers (×15)</td><td>ttk.Treeview "heading" cells</td><td>Display the fixed column captions (see Section 5). The "Length" heading is dynamically rewritten on every refresh to embed the active display unit, e.g. "Length (m)", "Length (cm)".</td></tr>
+                    <tr><td>Row selection</td><td>ttk.Treeview single-row click / arrow-key navigation</td><td>Selecting a row fires the <code>&lt;&lt;TreeviewSelect&gt;&gt;</code> virtual event, handled by <code>on_table_select()</code>, which drives cross-tab highlighting (Section 8).</td></tr>
+                    <tr><td>Vertical scrollbar</td><td>ttk.Scrollbar, orient="vertical"</td><td>Bound bidirectionally to the Treeview's <code>yview</code>; scrolls through all loaded rows (subject to the 1000-row rendering cap, Section 10).</td></tr>
+                </table>
+
+                <!-- ================================================= -->
+                <h2 id="columns">5. Column Reference and Symbol Table</h2>
+                <p>
+                    Fifteen fixed columns are defined at build time and never added to or removed from at runtime;
+                    only their contents are refreshed. Each column has a physical width of 90 px and centre-anchored
+                    text. The table below gives the internal DataFrame field, the on-screen heading (including any
+                    Unicode mathematical symbol used), the physical unit or dimensionless status, the numeric
+                    formatting applied, and a one-line description of geomechanical meaning.
+                </p>
+                <p>
+                    The Unicode symbols α, σₙ, τ, and the subscripted Tₛ are rendered directly as heading text (the
+                    mixin imports no external font glyphs for this purpose beyond the system font already in use);
+                    this mirrors the same symbol set defined centrally in <code>constants.py</code>
+                    (<code>SIGMA_N</code>, <code>TAU</code>, <code>T_S</code>, <code>T_D</code>, <code>S_F</code>,
+                    <code>C_0</code>, <code>P_F</code>) and used consistently across the Mohr, Stereonet, and
+                    sidebar Failure-Criteria controls, so that a value bearing the same symbol always means the same
+                    physical quantity throughout the application.
+                </p>
+                <table>
+                    <tr><th>#</th><th>Column key</th><th>Heading shown</th><th>Format</th><th>Unit</th><th>Meaning</th></tr>
+                    <tr><td>1</td><td>ID</td><td>ID</td><td>integer</td><td>—</td><td>Sequential row identifier assigned during calculation; used as the Treeview row iid and as the cross-tab selection key.</td></tr>
+                    <tr><td>2</td><td>Trace</td><td>Trace</td><td>integer</td><td>—</td><td>Parent trace/fracture-plane group identifier (multiple segments can share one trace for SVG-derived polylines).</td></tr>
+                    <tr><td>3</td><td>Segment</td><td>Segment</td><td>integer</td><td>—</td><td>Index of this segment within its parent trace.</td></tr>
+                    <tr><td>4</td><td>Strike</td><td>Strike</td><td>0.0 (1 dp)</td><td>degrees</td><td>North-referenced strike azimuth of the fracture plane, StrikeDeg.</td></tr>
+                    <tr><td>5</td><td>Dip</td><td>Dip°</td><td>0.0 (1 dp)</td><td>degrees</td><td>Dip angle of the fracture plane, DipDeg (0–90°).</td></tr>
+                    <tr><td>6</td><td>Length</td><td>Length (unit)</td><td>0.00 (2 dp)</td><td>active display unit</td><td>Physical segment length; heading unit updates live with the sidebar's unit selector.</td></tr>
+                    <tr><td>7</td><td>Alpha</td><td>α</td><td>0.0 (1 dp)</td><td>degrees</td><td>Angle between the fracture-plane normal and the σ1 direction, AlphaDeg — governs how strongly the plane is loaded by the maximum principal stress.</td></tr>
+                    <tr><td>8</td><td>SigmaN</td><td>σₙ</td><td>0.00 (2 dp)</td><td>MPa</td><td>Total resolved normal stress on the plane, SigmaN.</td></tr>
+                    <tr><td>9</td><td>Tau</td><td>τ</td><td>0.00 (2 dp)</td><td>MPa</td><td>Resolved shear stress on the plane, Tau.</td></tr>
+                    <tr><td>10</td><td>Ts</td><td>Tₛ (raw)</td><td>0.000 (3 dp)</td><td>dimensionless</td><td>Raw (non-normalised) slip tendency τ/σₙ for this specific plane.</td></tr>
+                    <tr><td>11</td><td>TsNorm</td><td>Tₛ (norm)</td><td>0.000 (3 dp) or "—"</td><td>dimensionless, 0–1</td><td>Slip tendency normalised by the theoretical maximum over all possible orientations for the current stress tensor; shown as an em-dash if the column is absent from self.results.</td></tr>
+                    <tr><td>12</td><td>Td</td><td>Td</td><td>0.000 (3 dp)</td><td>dimensionless, 0–1</td><td>Dilation tendency, DilationTendency.</td></tr>
+                    <tr><td>13</td><td>Sf</td><td>S_f (Pf-corr.)</td><td>0.00 (2 dp)</td><td>MPa</td><td>Fracture susceptibility including pore-pressure and cohesion correction, FractureSusceptibility.</td></tr>
+                    <tr><td>14</td><td>SfLegacy</td><td>S_f (legacy)</td><td>0.00 (2 dp) or "—"</td><td>MPa</td><td>Original (pre-correction) MATLAB-formula fracture susceptibility, FractureSusceptibilityLegacy; shown as an em-dash if absent.</td></tr>
+                    <tr><td>15</td><td>CSF</td><td>CSF</td><td>"Yes" / "No"</td><td>boolean</td><td>Whether the segment is critically stressed under the active Mohr–Coulomb failure envelope, CriticalStress.</td></tr>
+                </table>
+
                 <div class="code-window">
                     <div class="code-header">
                         <span class="code-lang">python</span>
                         <button class="copy-btn">Copy</button>
                     </div>
-                    <pre><code class="language-python">
-                        DEMO OF CODE SNIPPET
-                    </code></pre>
+                    <pre><code class="language-python">columns = ("ID", "Trace", "Segment", "Strike", "Dip", "Length",
+           "Alpha", "SigmaN", "Tau", "Ts", "TsNorm", "Td", "Sf",
+           "SfLegacy", "CSF")
+self.table = ttk.Treeview(tab, columns=columns, show="headings")
+headings = {
+    "ID": "ID", "Trace": "Trace", "Segment": "Segment",
+    "Strike": "Strike", "Dip": "Dip°", "Length": "Length",
+    "Alpha": "α", "SigmaN": "σₙ", "Tau": "τ",
+    "Ts": "Tₛ (raw)", "TsNorm": "Tₛ (norm)",
+    "Td": "Td",
+    "Sf": "S_f (Pf-corr.)", "SfLegacy": "S_f (legacy)",
+    "CSF": "CSF",
+}
+for col in columns:
+    self.table.heading(col, text=headings[col])
+    self.table.column(col, width=90, anchor="center")</code></pre>
                 </div>
+                <p class="ph-caption" style="text-align:left; margin: -1rem 0 1.5rem 0;">Column and heading construction excerpted from <code>_build_table_tab()</code>, showing the fixed fifteen-column definition and the fixed-width, centre-anchored layout applied to every column.</p>
+
+                <!-- ================================================= -->
+                <h2 id="maths">6. Mathematical Background</h2>
+                <p>
+                    Although the Table Tab performs no arithmetic itself, correct interpretation of its columns
+                    requires the exact formulas used upstream in <code>calculator.py</code> and
+                    <code>models.py</code>. This section reproduces those formulas with variable definitions so
+                    that the table's numbers can be manually verified or compared against independent reference
+                    calculations (e.g. legacy MATLAB slip-tendency scripts).
+                </p>
+
+                <h3>6.1 Symbol Definitions</h3>
+                <table>
+                    <tr><th>Symbol</th><th>Description</th><th>Units</th></tr>
+                    <tr><td>σ1, σ2, σ3</td><td>Maximum, intermediate, and minimum principal stress magnitudes (σ1 ≥ σ2 ≥ σ3)</td><td>MPa</td></tr>
+                    <tr><td>azimuth / σ1 trend</td><td>Compass bearing of σ1 (Andersonian mode) or of the general 3-D σ1 axis</td><td>degrees from North</td></tr>
+                    <tr><td>strike, dip</td><td>North-referenced strike and dip of the fracture plane</td><td>degrees</td></tr>
+                    <tr><td>α</td><td>Angle between the plane's pole (normal) and the resolved σ1 axis component</td><td>degrees</td></tr>
+                    <tr><td>σₙ</td><td>Normal stress resolved onto the plane</td><td>MPa</td></tr>
+                    <tr><td>τ</td><td>Shear stress resolved onto the plane (magnitude of the in-plane traction component)</td><td>MPa</td></tr>
+                    <tr><td>C₀</td><td>Cohesion, the rock's inherent shear strength at zero effective normal stress</td><td>MPa</td></tr>
+                    <tr><td>Pf</td><td>Pore fluid pressure acting within the fracture</td><td>MPa</td></tr>
+                    <tr><td>μ</td><td>Coefficient of friction governing the Mohr–Coulomb failure envelope slope</td><td>dimensionless</td></tr>
+                    <tr><td>Ts, Ts,max</td><td>Raw slip tendency and its theoretical maximum over all orientations</td><td>dimensionless</td></tr>
+                    <tr><td>Td</td><td>Dilation tendency</td><td>dimensionless, 0–1</td></tr>
+                    <tr><td>Sf</td><td>Fracture susceptibility (pore-pressure corrected)</td><td>MPa</td></tr>
+                </table>
+
+                <h3>6.2 Stress Resolution (σₙ, τ, α)</h3>
+                <p>
+                    For a plane of given strike and dip, the outward unit normal is constructed from the pole
+                    azimuth (strike + 90°) and the dip angle. In Andersonian mode (σ1 horizontal along the entered
+                    azimuth, σ2 vertical, σ3 horizontal-perpendicular), or in the fully general 3-D mode (σ1, σ2, σ3
+                    each independently oriented from trend/plunge inputs and combined via
+                    <code>principal_stress_axes_fracstat()</code>), the normal is projected onto each principal
+                    axis to obtain direction cosines c0, c1, c2. The resolved normal and shear stresses are then:
+                </p>
+                <div class="formula-block">
+σₙ = σ1·c0² + σ2·c1² + σ3·c2²
+τ  = √( σ1²·c0² + σ2²·c1² + σ3²·c2² − σₙ² )
+α  = arccos( |c0| )
+                </div>
+                <p>
+                    This is the standard Cauchy stress-resolution equation for a plane in a principal-axis
+                    coordinate frame: σₙ is the diagonal (normal) component of the traction vector and τ is the
+                    magnitude of its orthogonal in-plane component, obtained by subtracting σₙ² from the total
+                    squared traction magnitude. σₙ is floored at 1×10⁻¹² MPa in the implementation to avoid
+                    division-by-zero downstream.
+                </p>
+
+                <h3>6.3 Slip Tendency (Ts, TsNorm)</h3>
+                <p>
+                    Slip tendency, following Morris, Ferrill &amp; Henderson (1996), expresses how close a plane is
+                    to frictional sliding under the resolved stress state, independent of any assumed cohesion or
+                    pore pressure:
+                </p>
+                <div class="formula-block">Ts = τ / σₙ</div>
+                <p>
+                    The normalised column TsNorm divides this raw value by the theoretical maximum slip tendency
+                    attainable by any plane orientation under the same stress tensor. For a diagonal (principal-axis)
+                    stress state this maximum has the closed-form solution derived from the tangent line from the
+                    origin to the outer σ1–σ3 Mohr circle:
+                </p>
+                <div class="formula-block">Ts,max = (σ1 − σ3) / ( 2·√(σ1·σ3) )</div>
+                <p>
+                    This closed-form expression depends only on σ1 and σ3 (not on σ2, the principal-axis
+                    orientation, or which fracture planes happen to be loaded), and reproduces exactly the legacy
+                    MATLAB script's TsMax, which is computed there by a dense numerical grid-scan over all φ/θ
+                    orientation pairs. TsNorm therefore always lies in the interval [0, 1], with 1 corresponding to
+                    the single, optimally oriented plane for the given stress tensor. A superseded implementation
+                    normalised instead by the maximum Ts found only among the loaded segments; this silently
+                    disagreed with the reference value whenever the input dataset did not happen to include a
+                    near-optimal plane, and has been replaced by the closed-form calculation above.
+                </p>
+
+                <h3>6.4 Dilation Tendency (Td)</h3>
+                <div class="formula-block">Td = (σ1 − σₙ) / (σ1 − σ3)</div>
+                <p>
+                    Dilation tendency (Ferrill et al., 1999) measures the propensity of a fracture to open (dilate)
+                    rather than slip, and is highest for planes whose normal is closely aligned with σ3 (minimum
+                    compressive stress), where the clamping normal stress is smallest relative to the overall
+                    stress differential.
+                </p>
+
+                <h3>6.5 Fracture Susceptibility (Sf, SfLegacy)</h3>
+                <p>
+                    Two historically distinct MATLAB reference formulas exist for fracture susceptibility,
+                    differing by exactly the pore-pressure and cohesion terms. The Table Tab reports both
+                    simultaneously as separate columns so that either can be matched against whichever legacy
+                    script produced a comparison dataset:
+                </p>
+                <div class="formula-block">
+Sf       (updated / current)  =  σₙ − Pf − (τ − C₀) / μ
+SfLegacy (original)           =  σₙ − τ / μ
+                </div>
+                <p>
+                    Algebraically, SfLegacy = Sf + Pf whenever C₀ = 0, since the only structural difference between
+                    the two formulas is the presence of the pore-pressure subtraction and the cohesion offset
+                    inside the friction term. A lower Sf value indicates a plane closer to, or past, the failure
+                    envelope; Sf can be negative for critically or super-critically stressed planes.
+                </p>
+
+                <h3>6.6 Coulomb Critical-Stress Flag (CSF)</h3>
+                <p>The Mohr–Coulomb failure criterion used throughout FracSTAT is:</p>
+                <div class="formula-block">τ ≥ μ·(σₙ − Pf) + C₀   ⇒   plane is critically stressed</div>
+                <p>
+                    The CSF column reports "Yes" when this inequality holds for the row's resolved (σₙ, τ) pair,
+                    and "No" otherwise. This is exactly the boolean condition drawn as the shaded Coulomb failure
+                    envelope on the Mohr tab and reflected in the map/rose colour scale when "Critical fractures" is
+                    the selected attribute.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="algorithms">7. Algorithms and Internal Workflow</h2>
+
+                <h3>7.1 Tab Construction — <code>_build_table_tab()</code></h3>
+                <p>
+                    Executed once, during <code>SlipTendencyApp._build_layout()</code>, after the tab's Tk container
+                    frame has been created by the CTkTabview. The method performs, in order:
+                </p>
+                <ol class="step-list">
+                    <li><strong>Grid configuration</strong> — row 2 (the data grid row) and column 0 are given
+                    weight 1 so the table stretches to fill the tab.</li>
+                    <li><strong>Theme application</strong> — <code>configure_table_style()</code> is invoked
+                    immediately so the Treeview's ttk style exists before any rows are inserted (see Section 7.3).</li>
+                    <li><strong>Toolbar construction</strong> — a transparent CTkFrame with the "Segment results"
+                    label and Export Excel button, gridded at row 0.</li>
+                    <li><strong>Column and heading setup</strong> — the fifteen-element columns tuple is used both
+                    to instantiate the <code>ttk.Treeview(columns=columns, show="headings")</code> (note:
+                    <code>show="headings"</code> suppresses the default first "#0" tree column, so the widget
+                    behaves as a flat, non-hierarchical grid) and to populate each column's heading text from the
+                    headings dictionary and a fixed 90 px, centre-anchored column width.</li>
+                    <li><strong>Scrollbar wiring</strong> — a <code>ttk.Scrollbar</code> is created with
+                    <code>command=self.table.yview</code> and the Treeview's <code>yscrollcommand</code> is bound
+                    back to the scrollbar, establishing the standard bidirectional Tk scroll contract.</li>
+                    <li><strong>Event binding</strong> — the Treeview's <code>&lt;&lt;TreeviewSelect&gt;&gt;</code>
+                    virtual event (fired by Tk whenever the widget's selection changes, whether by mouse or
+                    keyboard) is bound to <code>on_table_select</code>.</li>
+                </ol>
+                <p>
+                    No rows are inserted at build time; the table remains empty until the first
+                    <code>refresh_table()</code> call, which normally follows the first successful calculation.
+                </p>
+
+                <h3>7.2 Selection Handling — <code>on_table_select()</code></h3>
+                <p>
+                    This callback fires on every change to the Treeview's internal selection, including selections
+                    made programmatically by <code>refresh_table()</code> itself when it restores a previously
+                    highlighted row after a redraw. To avoid a feedback loop or redundant recomputation, the
+                    handler follows this short-circuit sequence:
+                </p>
+                <ol class="step-list">
+                    <li>Read <code>self.table.selection()</code> — a tuple of currently selected item identifiers
+                    (iids). If empty (e.g. the user clicked empty space below the last row), the handler returns
+                    immediately.</li>
+                    <li>Parse the first selected iid as an integer with <code>int(selection[0])</code>. The iid
+                    was set at insertion time to <code>str(int(row.ID))</code>, so this recovers the numeric
+                    segment ID. If parsing fails (defensive — should not occur given how iids are always assigned),
+                    the handler returns silently.</li>
+                    <li>Compare the parsed ID against <code>self.selected_segment_id</code>. If they are already
+                    equal — for example because <code>refresh_table()</code> just re-selected the same row the user
+                    had previously picked — the handler returns without further action, preventing an unnecessary
+                    cascade of redraws across the Map, Mohr, and Stereonet tabs.</li>
+                    <li>Otherwise, call <code>self.select_segment(segment_id)</code>, the shared cross-tab
+                    selection routine defined on <code>SlipTendencyApp</code> itself (see Section 8).</li>
+                </ol>
+
+                <div class="code-window">
+                    <div class="code-header">
+                        <span class="code-lang">python</span>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">def on_table_select(self, _event=None):
+    selection = self.table.selection()
+    if not selection:
+        return
+    try:
+        segment_id = int(selection[0])
+    except ValueError:
+        return
+    if segment_id == self.selected_segment_id:
+        return
+    self.select_segment(segment_id)</code></pre>
+                </div>
+                <p class="ph-caption" style="text-align:left; margin: -1rem 0 1.5rem 0;"><code>on_table_select()</code> in full — the short-circuit guards prevent a redundant cascade of redraws whenever the incoming selection already matches the current cross-tab selection.</p>
+
+                <h3>7.3 Theming — <code>configure_table_style()</code></h3>
+                <p>
+                    ttk widgets (unlike CustomTkinter widgets) do not automatically follow FracSTAT's light/dark
+                    colour tokens, so this method explicitly configures a <code>ttk.Style</code> object every time
+                    it is called. It first forces the "clam" ttk theme (chosen because it is the most reliably
+                    cross-platform themeable base theme for customising Treeview colours; the default platform
+                    themes on Windows/macOS often ignore background-colour overrides). It then branches on
+                    <code>self.appearance_var.get()</code>:
+                </p>
+                <table>
+                    <tr><th>Element</th><th>Light mode</th><th>Dark mode</th></tr>
+                    <tr><td>Treeview background / field background</td><td>#FFFFFF</td><td>#111821</td></tr>
+                    <tr><td>Treeview foreground (row text)</td><td>#1F2933</td><td>#E6EDF3</td></tr>
+                    <tr><td>Row height</td><td>26 px</td><td>26 px</td></tr>
+                    <tr><td>Border width</td><td>0 (flat)</td><td>0 (flat)</td></tr>
+                    <tr><td>Heading background</td><td>#2563EB</td><td>#1F6AA5</td></tr>
+                    <tr><td>Heading foreground</td><td>white</td><td>white</td></tr>
+                    <tr><td>Selected-row background</td><td>#DBEAFE</td><td>#255B7D</td></tr>
+                    <tr><td>Selected-row foreground</td><td>#1F2933</td><td>#FFFFFF</td></tr>
+                </table>
+                <div class="note-box">
+                    <strong>Note:</strong> <code>configure_table_style()</code> is called both at tab construction
+                    and whenever <code>SlipTendencyApp.change_appearance()</code> runs, ensuring the Treeview's
+                    colours stay synchronised even though FracSTAT's Dynamic Analyzer is presently fixed to a
+                    single light theme at the application level (<code>change_appearance()</code> always forces
+                    "Light"); the dark-mode branch remains implemented and reachable should the appearance toggle
+                    be re-enabled.
+                </div>
+
+                <h3>7.4 Refresh Algorithm — <code>refresh_table()</code></h3>
+                <p>
+                    <code>refresh_table()</code> is the workhorse of the tab and is called every time
+                    <code>self.results</code> changes (after <code>calculate()</code>, after
+                    <code>select_segment()</code>, and after <code>clear_selection()</code>). Its steps are:
+                </p>
+                <ol class="step-list">
+                    <li><strong>Clear existing rows:</strong> <code>self.table.delete(*self.table.get_children())</code>
+                    removes every currently displayed row unconditionally, regardless of how many there are.</li>
+                    <li><strong>Empty-result guard:</strong> if <code>self.results.empty</code>, the method returns
+                    immediately, leaving the table blank — this is the state shown before any file has been loaded
+                    or calculated.</li>
+                    <li><strong>Dynamic unit relabelling:</strong>
+                    <code>self.table.heading("Length", text=f"Length ({self.unit_label()})")</code> rewrites the
+                    Length column's heading text to reflect whatever display unit (m, cm, mm, km) is currently
+                    active in the sidebar, so the heading never becomes stale after a unit-conversion action.</li>
+                    <li><strong>Optional-column detection:</strong> <code>has_ts_norm</code> and
+                    <code>has_sf_legacy</code> are booleans testing whether "SlipTendencyNorm" and
+                    "FractureSusceptibilityLegacy" exist as columns in <code>self.results</code>. Because
+                    <code>calculator.run_calculation()</code> always adds both columns in the current
+                    implementation, these guards are defensive — they protect the table from raising an
+                    <code>AttributeError</code> if it is ever driven by an older or externally supplied results
+                    DataFrame that lacks one of the derived columns, substituting the placeholder character "—"
+                    (em dash) instead.</li>
+                    <li><strong>Row insertion loop:</strong>
+                    <code>self.results.head(1000).itertuples(index=False)</code> iterates at most the first 1000
+                    rows of the results DataFrame (see Section 10 for the rationale). For each row, the displayed
+                    values are formatted (see Section 5's Format column) and inserted with
+                    <code>self.table.insert("", "end", iid=str(int(row.ID)), values=(...))</code>. Using the
+                    segment's own ID as the Tk item identifier is what allows <code>on_table_select()</code> to
+                    recover the numeric ID directly from the widget's selection state without a separate lookup
+                    table.</li>
+                    <li><strong>Selection restoration:</strong> if <code>self.selected_segment_id is not None</code>
+                    and its string form exists among the freshly inserted children, the method calls
+                    <code>self.table.selection_set(selected_iid)</code> followed by
+                    <code>self.table.see(selected_iid)</code>. This re-applies the previously active selection
+                    (which was necessarily cleared by step 1's blanket delete) and scrolls the view so the selected
+                    row is visible, giving the appearance of a persistent highlight across recalculations even
+                    though the underlying Tk items were fully destroyed and rebuilt.</li>
+                </ol>
+
+                <figure class="figure-block">
+                    <div class="figure-img-wrap">
+                        <img src="put_your_img_here.png" alt="Sequence diagram of the calculate to refresh_table workflow across the Dynamic Analyzer tabs" loading="lazy">
+                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <span class="ph-caption"><strong>Figure 7.1</strong> — Sequence diagram showing calculate() → run_calculation() → self.results update → refresh_table() → row deletion, insertion, and selection restoration, running alongside the equivalent refresh calls on the Map, Rose, Mohr, and Stereonet tabs.</span>
+                </figure>
+
+                <!-- ================================================= -->
+                <h2 id="sync">8. Cross-Tab Selection Synchronisation</h2>
+                <p>
+                    The Table Tab does not maintain its own notion of "the selected segment"; it defers entirely to
+                    <code>SlipTendencyApp.select_segment(segment_id)</code>, the single shared routine also invoked
+                    by mouse-picking on the Map (<code>on_map_pick</code>), point-picking on the Mohr diagram
+                    (<code>on_mohr_pick</code>), and pole-picking on the Stereonet
+                    (<code>on_stereonet_pick</code>). When a Table Tab row is clicked, the following chain
+                    executes:
+                </p>
+                <ol class="step-list">
+                    <li><code>on_table_select()</code> resolves the clicked row's ID and calls
+                    <code>self.select_segment(segment_id)</code>.</li>
+                    <li><code>select_segment()</code> looks up the matching row in <code>self.results</code>, sets
+                    <code>self.selected_segment_id</code>, updates the sidebar's "Selected Segment" text panel
+                    (<code>segment_info_text()</code>) with a full geometric/orientation/stress/tendency summary,
+                    updates the Mohr diagram's information panel and coloured status badge (Critical / Near
+                    envelope / Stable, based on CoulombMargin and a 5%-of-max-τ tolerance band), and updates the
+                    Stereonet's pole-inspector text.</li>
+                    <li><code>select_segment()</code> then calls <code>self.refresh_table()</code> itself, so the
+                    Table Tab's own view re-synchronises its highlighted row even when the selection originated
+                    elsewhere (e.g. clicking a point on the Mohr diagram highlights the same segment's row in the
+                    Table Tab automatically).</li>
+                    <li>Finally, <code>select_segment()</code> triggers preserve-view redraws of the Map
+                    (<code>_draw_map(preserve_view=True)</code>), Mohr
+                    (<code>_draw_mohr(preserve_view=True)</code>), and Stereonet
+                    (<code>_draw_stereonet()</code>) so the selected segment is visually emphasised (halo/outline
+                    markers, annotation labels) everywhere simultaneously.</li>
+                </ol>
+                <p>
+                    This design means the Table Tab is both a consumer and a producer of selection state: any tab's
+                    picking interaction is reflected in the Table Tab's highlighted row, and clicking a Table Tab
+                    row is reflected everywhere else. The optional <code>switch_to_map</code> parameter of
+                    <code>select_segment()</code> (used by the Mohr and Stereonet tabs' "Show in Map" buttons) is
+                    not exercised from the Table Tab itself, which never forces a tab switch.
+                </p>
+                <p>
+                    Clearing the selection — via the Mohr or Stereonet tabs' "Clear Selection" buttons, which call
+                    <code>SlipTendencyApp.clear_selection()</code> — sets <code>self.selected_segment_id</code>
+                    back to <code>None</code> and calls <code>refresh_table()</code>, which then finds no matching
+                    iid in step 6 of Section 7.4 and leaves the table with no row highlighted.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="statistics">9. Statistical Content and Relationship to the Sidebar Summary</h2>
+                <p>
+                    The Table Tab itself performs no aggregation; the workspace-level statistical summary (traces,
+                    segments, Max Tₛ, Mean Tₛ, total length, and critical-fracture count) is computed separately in
+                    <code>SlipTendencyApp.refresh_summary()</code> and displayed in the sidebar's "Results" card,
+                    not inside the Table Tab. However, because the Table Tab exposes every underlying row value, it
+                    is the natural tool for verifying those aggregate statistics manually: for instance, the
+                    sidebar's "Max Tₛ" / "Mean Tₛ" tiles are computed over whichever attribute (SlipTendency,
+                    SlipTendencyNorm, DilationTendency, FractureSusceptibility(Norm), or CriticalStressValue) is
+                    currently selected in the "Map Display" dropdown, and the exact numeric contributors to that
+                    maximum or mean can be located, sorted by eye, and cross-checked row-by-row in the Table Tab.
+                </p>
+
+                <h3>9.1 Interpreting Column Distributions</h3>
+                <table>
+                    <tr><th>Observation in the Table Tab</th><th>Geomechanical interpretation</th></tr>
+                    <tr><td>Many rows with CSF = "Yes"</td><td>The current stress tensor is close to, or exceeds, the assumed failure envelope for a large fraction of the fracture population — indicative of a critically stressed fracture network with elevated potential for fluid flow along reactivated planes.</td></tr>
+                    <tr><td>TsNorm clustered near 1.0 for a subset of rows</td><td>Those planes are oriented close to the theoretically optimal slip-prone orientation for the current σ1–σ3 differential; in an Andersonian regime this typically corresponds to strikes sub-parallel to σ1 with dip near the frictional-lock angle (~30° from σ1 for μ ≈ 0.6).</td></tr>
+                    <tr><td>Td consistently higher than Ts for the same rows</td><td>Planes are more prone to opening-mode dilation than to frictional slip under the current stress state — relevant when assessing which fractures are more likely to act as open conduits versus shear-reactivated conduits.</td></tr>
+                    <tr><td>Sf and SfLegacy diverging substantially</td><td>Indicates a non-trivial pore-pressure (Pf) or cohesion (C₀) input; the magnitude of the divergence is, by construction, approximately equal to Pf when C₀ = 0 (Section 6.5).</td></tr>
+                </table>
+
+                <!-- ================================================= -->
+                <h2 id="performance">10. Performance Optimisation</h2>
+                <p>
+                    The Table Tab includes two deliberate performance safeguards, both aimed at keeping the Tk main
+                    loop responsive when <code>self.results</code> contains a very large number of segments (dense
+                    SVG trace networks with fine curve-tessellation settings can readily produce several thousand
+                    to tens of thousands of rows):
+                </p>
+                <ul>
+                    <li><strong>Row cap</strong> — <code>refresh_table()</code> iterates only
+                    <code>self.results.head(1000)</code>, i.e. at most the first one thousand rows in DataFrame
+                    order, regardless of the true row count. <code>ttk.Treeview</code> inserts are individually
+                    expensive Tk operations, and inserting tens of thousands of rows synchronously on the main GUI
+                    thread would visibly freeze the interface for a period proportional to row count. Capping at
+                    1000 keeps the insertion loop's wall-clock cost small and bounded irrespective of dataset size.
+                    This cap affects only the Table Tab's on-screen display and selection restoration; it has no
+                    effect on the Map, Rose, Mohr, Stereonet, or Excel-export pathways, all of which continue to
+                    operate on the full, uncapped <code>self.results</code> DataFrame.</li>
+                    <li><strong>Full-clear-and-rebuild rather than incremental diffing</strong> — every refresh
+                    deletes all existing rows before reinserting, rather than attempting to compute a minimal diff
+                    against the previous state. This trades a theoretically larger amount of Tk work per refresh
+                    for substantially simpler, more robust code with no risk of stale rows, orphaned iids, or
+                    column-value drift; given the 1000-row cap, the practical cost of full deletion-and-reinsertion
+                    is small.</li>
+                </ul>
+                <p>
+                    No caching layer, background thread, or asynchronous loading is used for the Table Tab
+                    specifically (contrast with, for example, the Static Analyzer's asynchronous SVG/Excel loaders
+                    or the Connectivity tab's lazy, tab-click-triggered recomputation) — the table's own render
+                    cost is low enough, given the row cap, that synchronous execution on the main thread does not
+                    perceptibly delay the interface.
+                </p>
+
+                <h3>10.1 Practical Implication of the 1000-Row Cap</h3>
+                <p>
+                    When a dataset exceeds 1000 segments, the on-screen table displays only the first 1000 in
+                    DataFrame order (which is the order segments were produced during loading/calculation —
+                    typically grouped by trace for SVG sources, or by input-file row order for Excel/CSV sources).
+                    Analysts working with very dense networks should rely on the Export Excel action to obtain the
+                    complete, uncapped dataset for full-population statistical analysis, and should not assume the
+                    visible table represents the entire fracture population once the row count exceeds one
+                    thousand.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="export">11. Export Functionality</h2>
+                <p>
+                    The Export Excel button is the Table Tab's only outward data-transfer control; it delegates to
+                    <code>SlipTendencyApp.export_excel()</code>, a method shared at the workspace level (the Table
+                    Tab does not implement its own export logic). The behaviour is:
+                </p>
+                <ol class="step-list">
+                    <li><strong>Guard:</strong> if <code>self.results.empty</code>, an error dialog ("Nothing to
+                    export" / "Run a calculation first.") is shown and the method returns without opening a file
+                    dialog.</li>
+                    <li><strong>Default directory resolution:</strong> the method attempts to read a configured
+                    default export path from the application's persisted settings
+                    (<code>pages.settings_page.load_app_settings()</code>); if unavailable or invalid, no initial
+                    directory is pre-selected and the OS default is used.</li>
+                    <li><strong>Save dialog:</strong> a native "Save As" dialog is presented with a .xlsx default
+                    extension and an "Excel workbook" file-type filter.</li>
+                    <li><strong>Write:</strong>
+                    <code>self.results.to_excel(filename, index=False, sheet_name="Segment results")</code> writes
+                    the complete (uncapped) DataFrame — every row and every column, including any columns not
+                    rendered in the on-screen table — to a single-sheet workbook. This means the exported file is a
+                    strict superset of what is visually displayed, and is the recommended path for any downstream
+                    analysis requiring the full dataset.</li>
+                    <li><strong>Confirmation:</strong> the workspace status bar is updated with the number of
+                    exported rows and file path, and a confirmation dialog displays the saved path.</li>
+                </ol>
+                <div class="tip-box">
+                    <strong>Tip:</strong> a companion CSV export (<code>export_csv()</code>, triggered from the
+                    sidebar's "Export CSV" action button rather than from within the Table Tab) is available at
+                    the workspace level using the same underlying <code>self.results</code> DataFrame and the same
+                    empty-result guard, for workflows that prefer a plain-text tabular format over a native Excel
+                    workbook.
+                </div>
+
+                <!-- ================================================= -->
+                <h2 id="examples">12. Practical Examples</h2>
+
+                <h3>12.1 Example 1 — Verifying a Slip-Tendency Calculation by Hand</h3>
+                <p>
+                    An analyst loads an SVG fracture-trace map, sets σ1 = 104.7 MPa, σ2 = 60.3 MPa, σ3 = 47.1 MPa in
+                    Andersonian mode with azimuth 0°, and presses Calculate. To manually verify the reported Tₛ
+                    (norm) value for segment ID 12, the analyst locates row ID = 12 in the Table Tab (using the
+                    scrollbar or, for large datasets, exporting to Excel and using a spreadsheet find function),
+                    reads off StrikeDeg, DipDeg, σₙ, and τ, and reproduces α, σₙ, τ using the equations of Section
+                    6.2, then Ts and TsNorm using Section 6.3's formulas — including the closed-form Ts,max —
+                    confirming the value shown in the Tₛ (norm) column.
+                </p>
+
+                <h3>12.2 Example 2 — Cross-Referencing a Critical Segment Between Table and Mohr Diagram</h3>
+                <p>
+                    After calculation, the analyst scans the CSF column in the Table Tab for rows marked "Yes",
+                    identifying the subset of the fracture population predicted to be critically stressed under the
+                    current stress hypothesis. Clicking one such row (say ID = 47) immediately re-draws the Mohr
+                    tab with segment 47's point highlighted with a bold outline and "ID 47" annotation sitting on or
+                    beyond the shaded failure envelope, and simultaneously highlights the same segment on the Map
+                    and Stereonet tabs — allowing the analyst to confirm both the stress-space position (Mohr) and
+                    the real-world geometric position and orientation (Map/Stereonet) of that specific fracture in
+                    one interactive step.
+                </p>
+
+                <h3>12.3 Example 3 — Comparing Legacy and Corrected Fracture Susceptibility</h3>
+                <p>
+                    When importing results intended to reproduce an older MATLAB workflow that used the original
+                    Sf = σₙ − τ/μ formula (no pore-pressure correction), the analyst compares the Sf (Pf-corr.) and
+                    Sf (legacy) columns directly in the Table Tab. If the two differ by a near-constant offset
+                    across all rows and the sidebar's Pore press. (MPa) field is non-zero, this offset is expected
+                    and equals approximately Pf (Section 6.5); a non-constant offset instead flags a non-zero
+                    cohesion input interacting with the two formulas differently and should prompt the analyst to
+                    check the Failure Criteria card's Cohesion (MPa) field.
+                </p>
+
+                <h3>12.4 Example 4 — Exporting Full Results for a Technical Report</h3>
+                <p>
+                    For inclusion of a complete segment-level results appendix in a technical report, the analyst
+                    clicks Export Excel, saves the workbook, and opens it in Excel or an equivalent spreadsheet
+                    application; every row of <code>self.results</code> — not merely the 1000 rows visible in the
+                    on-screen table for a large network — is present, including columns (such as raw pixel
+                    coordinates, RawX1/RawY1/RawX2/RawY2, or focal-mechanism metadata for geographic datasets) that
+                    are not shown in the Table Tab's fifteen-column view at all.
+                </p>
+
+                <!-- ================================================= -->
+                <h2 id="interpretation">13. Geological and Geomechanical Interpretation</h2>
+                <p>
+                    The Table Tab's numerical content supports several standard structural-geology and
+                    reservoir-geomechanics interpretation workflows built on the Wallace–Bott hypothesis (that slip
+                    on a pre-existing fracture occurs in the direction of maximum resolved shear traction) and its
+                    slip/dilation-tendency derivatives:
+                </p>
+                <ul>
+                    <li><strong>Fault/fracture reactivation risk assessment</strong> — rows with high TsNorm and
+                    CSF = "Yes" identify the subset of a mapped fracture network most susceptible to shear
+                    reactivation under the assumed in-situ or induced stress state, directly informing
+                    induced-seismicity risk screening around injection or production operations.</li>
+                    <li><strong>Fluid-flow pathway prediction</strong> — high-Td fractures are preferentially
+                    interpreted as open, dilated conduits, whereas high-Ts, low-Td fractures are better candidates
+                    for shear-enhanced (but not necessarily dilated) permeability; comparing the Td and Ts (norm)
+                    columns row-by-row across a population supports discriminating between these two
+                    permeability-enhancement mechanisms.</li>
+                    <li><strong>Wellbore-stability and completion design</strong> — the Sf column's sign and
+                    magnitude for fractures intersecting a planned or existing wellbore trajectory is a standard
+                    input into whether a given natural fracture is likely to be a fluid-loss zone or a slip hazard
+                    during drilling or stimulation.</li>
+                    <li><strong>Stress-tensor sensitivity testing</strong> — because every column updates
+                    immediately after a recalculation, an analyst can iterate the σ1/σ2/σ3 magnitudes or
+                    orientation inputs and observe, row-by-row in the Table Tab, how sensitive the
+                    critically-stressed subset (CSF) and the slip/dilation-tendency rankings are to the assumed
+                    stress state — a standard uncertainty-bracketing exercise given that in-situ stress magnitudes
+                    and orientations are rarely known with high precision.</li>
+                </ul>
+
+                <!-- ================================================= -->
+                <h2 id="implementation">14. Implementation Notes</h2>
+                <ul>
+                    <li><strong>Mixin architecture</strong> — <code>TableTab</code> is a bare Python mixin class
+                    (it does not inherit from <code>ctk.CTkFrame</code> or any Tk widget); its methods assume the
+                    presence of <code>self.tabs</code>, <code>self.results</code>,
+                    <code>self.selected_segment_id</code>, <code>self.appearance_var</code>,
+                    <code>self.unit_label()</code>, and <code>self.select_segment()</code>, all of which are
+                    supplied by <code>SlipTendencyApp</code> at composition time via Python's standard
+                    multiple-inheritance MRO (<code>SlipTendencyApp(WorkspaceHeaderMixin, MapTab, RoseTab, MohrTab,
+                    TableTab, MethodTab, StereonetTab, ctk.CTkFrame)</code>).</li>
+                    <li><strong>Widget technology</strong> — the Table Tab is the only tab in the Dynamic Analyzer
+                    that uses the standard <code>tkinter.ttk.Treeview</code>/<code>Scrollbar</code> widgets rather
+                    than CustomTkinter equivalents (CustomTkinter has no built-in multi-column tabular widget); this
+                    is why it requires its own explicit ttk.Style theming rather than relying on CustomTkinter's
+                    automatic light/dark colour tuples.</li>
+                    <li><strong>Item identifiers (iids)</strong> — using <code>str(int(row.ID))</code> as the
+                    Treeview iid, rather than Tk's default auto-incrementing internal iid, is what allows O(1)
+                    mapping between a clicked row and its underlying segment ID, and what allows selection
+                    restoration (Section 7.4, step 6) to work by simple string containment testing ("in
+                    self.table.get_children()") without maintaining a separate lookup dictionary.</li>
+                    <li><strong>Row-value construction</strong> is done with pandas'
+                    <code>itertuples(index=False)</code>, which is significantly faster than
+                    <code>iterrows()</code> for this row count and, unlike <code>iterrows()</code>, preserves each
+                    column's native dtype as an attribute (<code>row.ID</code>, <code>row.StrikeDeg</code>, etc.)
+                    rather than boxing every value into a single mixed-type Series per row.</li>
+                    <li><strong>No sorting state is persisted or implemented</strong> — clicking a column heading
+                    does not resort the Treeview in the current implementation; the table always reflects
+                    <code>self.results</code>' native row order (segment ID order).</li>
+                    <li><strong>Thread safety</strong> — <code>refresh_table()</code> and
+                    <code>on_table_select()</code> are both expected to run exclusively on the Tk main thread,
+                    consistent with the rest of the Dynamic Analyzer; no locking or thread-marshalling is
+                    implemented because no other thread ever mutates <code>self.results</code> or
+                    <code>self.selected_segment_id</code> concurrently with the Table Tab's own execution.</li>
+                </ul>
+
+                <!-- ================================================= -->
+                <h2 id="limitations">15. Limitations</h2>
+                <table>
+                    <tr><th>Limitation</th><th>Description</th></tr>
+                    <tr><td>Row cap</td><td>Only the first 1000 rows of self.results are ever rendered on screen (Section 10); very large fracture networks require the Export Excel action to inspect the full dataset.</td></tr>
+                    <tr><td>No interactive sorting or filtering</td><td>The Table Tab cannot resort by column value, filter by threshold, or search by ID directly within the application; such operations require exporting to Excel/CSV first.</td></tr>
+                    <tr><td>No in-place editing</td><td>All fifteen displayed columns are read-only; the Table Tab cannot be used to manually override a segment's dip, strike, or any derived attribute (dip overrides must instead be supplied via a separate CSV/Excel dip-override file loaded through the sidebar).</td></tr>
+                    <tr><td>No multi-row selection semantics for cross-tab highlighting</td><td>Although ttk.Treeview technically supports multi-row selection, on_table_select() only ever reads selection()[0], so highlighting a batch of rows simultaneously across the Map/Mohr/Stereonet tabs is not supported.</td></tr>
+                    <tr><td>Column set is fixed</td><td>The fifteen columns cannot be reconfigured, reordered, hidden, or extended with additional derived quantities (e.g. Rake, TauRake, PredictedRake, RakeMisfit for focal-mechanism datasets, or Lat/Lon for geographic data) from within the tab itself, even though these fields exist in self.results and are exported to Excel.</td></tr>
+                    <tr><td>Number formatting is fixed</td><td>Decimal-place precision (1, 2, or 3 dp depending on column) is hardcoded and cannot be adjusted by the user from within the Table Tab.</td></tr>
+                    <tr><td>Dark-mode styling is implemented but currently unreachable in normal use</td><td>Since SlipTendencyApp.change_appearance() always forces the Light theme at the application level.</td></tr>
+                </table>
+
+                <!-- ================================================= -->
+                <h2 id="references">16. References</h2>
+                <p>Morris, A., Ferrill, D.A., Henderson, D.B. (1996). Slip-tendency analysis and fault reactivation. <em>Geology</em>, 24(3), 275–278.</p>
+                <p>Ferrill, D.A., Winterle, J., Wittmeyer, G., Sims, D., Colton, S., Armstrong, A., Morris, A.P. (1999). Stressed rock strains groundwater at Yucca Mountain, Nevada. <em>GSA Today</em>, 9(5), 1–8.</p>
+                <p>Jaeger, J.C., Cook, N.G.W., Zimmerman, R.W. (2007). <em>Fundamentals of Rock Mechanics</em>, 4th ed. Blackwell Publishing. (Mohr–Coulomb failure criterion and stress-transformation equations.)</p>
+
                 <!-- Pagination Navigation -->
                 <div class="pagination-nav">
                     <!-- PREVIOUS BUTTON -->
@@ -123,5 +919,5 @@
         </main>
     </div>
     <script src="script.js"></script>
-
-</body></html>
+</body>
+</html>
