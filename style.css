@@ -673,8 +673,12 @@ body {
     }
 
     /* Docs mobile view: show only the GitHub icon, no "GitHub" text
-       label, at every mobile width (not just very small phones). */
-    .docs-navbar .github-link {
+       label, at every mobile width (not just very small phones).
+       Selector must be at least as specific as ".docs-navbar .nav-links a"
+       above (2 classes + 1 element) or that rule's font-size wins instead
+       and the text stays visible — hence "a.github-link" here, not just
+       ".github-link". */
+    .docs-navbar .nav-links a.github-link {
         gap: 0;
         font-size: 0;
     }
