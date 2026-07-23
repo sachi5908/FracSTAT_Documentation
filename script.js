@@ -206,8 +206,17 @@ document.addEventListener("DOMContentLoaded", () => {
             // Replace the content
             document.querySelector(".docs-content-inner").innerHTML = newContent.innerHTML;
 
-            // Scroll back to top
+            // Scroll back to top.
+            // On desktop, .docs-content is its own scrolling box, so
+            // resetting its scrollTop is what matters. On mobile
+            // (<=900px), a media query makes .docs-content non-scrolling
+            // and the page/window scrolls instead — so we also have to
+            // reset the window/document scroll position, or the mobile
+            // view stays wherever it was on the previous page.
             contentContainer.scrollTo(0, 0);
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
 
             // Fade back in
             contentContainer.style.opacity = '1';
