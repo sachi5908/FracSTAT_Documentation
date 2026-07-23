@@ -1,3 +1,15 @@
+// Mobile browsers (iOS Safari, Chrome for Android) automatically try to
+// restore the scroll position associated with a history entry whenever
+// history.pushState/replaceState/popstate fires. Since this site swaps
+// page content via JS instead of doing a real navigation, that automatic
+// restoration fights with our own "scroll to top on page change" logic
+// below and silently wins on mobile (desktop browsers are far less
+// aggressive about this, which is why the bug was mobile-only). Turning
+// it off hands scroll position entirely back to our own code.
+if ("scrollRestoration" in history) {
+    history.scrollRestoration = "manual";
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     // ---------------------------------------------------------
     // 1. Basic Setup & Mobile Toggle
@@ -210,13 +222,30 @@ document.addEventListener("DOMContentLoaded", () => {
             // On desktop, .docs-content is its own scrolling box, so
             // resetting its scrollTop is what matters. On mobile
             // (<=900px), a media query makes .docs-content non-scrolling
-            // and the page/window scrolls instead — so we also have to
-            // reset the window/document scroll position, or the mobile
-            // view stays wherever it was on the previous page.
-            contentContainer.scrollTo(0, 0);
-            window.scrollTo(0, 0);
-            document.documentElement.scrollTop = 0;
-            document.body.scrollTop = 0;
+            // and the page/window scrolls instead — so we also reset the
+            // window/document scroll position, or the mobile view stays
+            // wherever it was on the previous page.
+            //
+            // Using .scrollTop = 0 (rather than .scrollTo(0, 0)) is
+            // deliberate: .docs-content has `scroll-behavior: smooth` in
+            // CSS, so scrollTo() would animate the reset instead of
+            // jumping instantly, and that animation can be cut short by
+            // the layout shifting underneath it (see below) — leaving
+            // the page stopped partway instead of at the very top.
+            const resetScrollToTop = () => {
+                contentContainer.scrollTop = 0;
+                (document.scrollingElement || document.documentElement).scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+                document.body.scrollTop = 0;
+            };
+            resetScrollToTop();
+            // Re-apply after layout settles: lazy-loaded figure images
+            // (and the CSS shimmer placeholders they replace) change
+            // height as they resolve, which can nudge mobile browsers'
+            // scroll position away from 0 a moment after our first reset.
+            requestAnimationFrame(resetScrollToTop);
+            setTimeout(resetScrollToTop, 60);
+            setTimeout(resetScrollToTop, 350);
 
             // Fade back in
             contentContainer.style.opacity = '1';
