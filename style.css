@@ -672,6 +672,18 @@ body {
         font-size: 0.92rem;
     }
 
+    /* Docs mobile view: show only the GitHub icon, no "GitHub" text
+       label, at every mobile width (not just very small phones). */
+    .docs-navbar .github-link {
+        gap: 0;
+        font-size: 0;
+    }
+
+    .docs-navbar .github-link svg {
+        width: 22px;
+        height: 22px;
+    }
+
     .docs-layout {
         /* Recompute against the now-variable navbar height instead of the
            hard-coded 70px used on desktop. */
@@ -694,13 +706,6 @@ body {
 
     .docs-navbar .nav-links a {
         font-size: 0.85rem;
-    }
-
-    /* Collapse "GitHub" down to just its icon so the three nav items
-       never wrap onto a second, awkward line on very small phones. */
-    .docs-navbar .github-link {
-        gap: 0;
-        font-size: 0;
     }
 
     .docs-navbar .github-link svg {
