@@ -345,6 +345,112 @@
         border: none;
         background: #fff;
     }
+
+    /* ---------- RESPONSIVE / MOBILE ---------- */
+    @media (max-width: 900px) {
+        .dashboard-body { padding: 1.5rem; }
+        .file-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+    }
+
+    @media (max-width: 720px) {
+        /* Login screen */
+        #loginScreen { padding: 1rem; }
+        .login-card { padding: 1.75rem 1.5rem; max-width: 100%; }
+        .login-card h1 { font-size: 1.2rem; }
+
+        /* Dashboard header */
+        .admin-header {
+            flex-wrap: wrap;
+            row-gap: 0.6rem;
+            padding: 0.85rem 1rem;
+        }
+        .admin-header h1 { font-size: 0.95rem; }
+        .admin-header .logout-btn { padding: 0.45rem 0.8rem; font-size: 0.78rem; }
+
+        .dashboard-body { padding: 1.1rem; }
+        .dashboard-body > p.intro { font-size: 0.92rem; margin-bottom: 1.5rem; }
+        .file-section h2 { font-size: 0.76rem; }
+        .file-grid { grid-template-columns: 1fr; gap: 0.7rem; }
+        .file-card { padding: 1rem; }
+
+        /* Editor toolbar: title takes its own full-width row, action
+           buttons become a horizontally-scrollable strip so nothing
+           gets clipped or forces the page to zoom out on a phone. */
+        .editor-toolbar {
+            padding: 0.65rem 0.85rem;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .editor-toolbar .back-btn {
+            order: 1;
+            font-size: 0.78rem;
+            padding: 0.45rem 0.7rem;
+        }
+        .editor-toolbar .et-title {
+            order: 3;
+            flex-basis: 100%;
+            margin-right: 0;
+            font-size: 0.85rem;
+            white-space: normal;
+            word-break: break-word;
+        }
+        .editor-toolbar .et-actions {
+            order: 4;
+            flex-basis: 100%;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 0.2rem;
+            scrollbar-width: thin;
+        }
+        .editor-toolbar .et-actions button.action {
+            flex: 0 0 auto;
+            white-space: nowrap;
+            font-size: 0.76rem;
+            padding: 0.45rem 0.7rem;
+        }
+        .editor-toolbar .et-status {
+            order: 5;
+            font-size: 0.75rem;
+        }
+
+        /* Format toolbar: horizontally scrollable, hide the long hint
+           text that doesn't fit on a phone screen. */
+        .format-toolbar {
+            padding: 0.5rem 0.85rem;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .format-toolbar .fmt-label:last-child { display: none; }
+        .fmt-btn { flex: 0 0 auto; min-width: 32px; height: 32px; }
+
+        #editorFrame { min-height: 0; }
+    }
+
+    @media (max-width: 480px) {
+        .login-card { padding: 1.5rem 1.1rem; }
+        .login-card h1 { font-size: 1.05rem; }
+        .login-btn { padding: 0.7rem; font-size: 0.9rem; }
+
+        .admin-header h1 svg { display: none; }
+        .admin-header h1 { font-size: 0.85rem; }
+
+        .file-card .fc-title { font-size: 0.9rem; }
+        .file-card .fc-name { font-size: 0.72rem; }
+        .file-card .fc-edit { font-size: 0.78rem; padding: 0.35rem 0.7rem; }
+
+        .editor-toolbar .back-btn span,
+        .editor-toolbar .back-btn { font-size: 0.74rem; }
+    }
+
+    /* Larger, easier-to-tap hit areas on touch devices */
+    @media (hover: none) and (pointer: coarse) {
+        .fc-edit, .logout-btn, .back-btn, button.action, .fmt-btn,
+        .password-toggle-btn, .login-btn {
+            min-height: 40px;
+        }
+    }
 </style>
 </head>
 <body>
@@ -832,7 +938,22 @@
             ".admin-insert-menu button { display: flex; align-items: center; text-align: left; border: none; background: transparent; padding: 7px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; cursor: pointer; color: #0f172a; }" +
             ".admin-insert-menu button .svg-icon { margin-right: 0.5em; width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }" +
             ".admin-insert-menu button:hover { background: #eff6ff; color: #2563eb; }" +
-            ".admin-hover-blocker { position: fixed; inset: 0; z-index: 45; background: transparent; }";
+            ".admin-hover-blocker { position: fixed; inset: 0; z-index: 45; background: transparent; }" +
+            /* Touch devices have no :hover, so block toolbars and the
+               image-replace overlay must stay reachable via a tap
+               instead of only appearing on mouse-hover. Buttons are
+               also enlarged to a comfortable 44px tap target. */
+            "@media (hover: none) and (pointer: coarse) {" +
+            "  .admin-block-toolbar { opacity: 0.92; pointer-events: auto; top: -18px; }" +
+            "  .admin-block-toolbar button { width: 30px; height: 30px; }" +
+            "  .admin-img-overlay { opacity: 1; pointer-events: auto; background: rgba(15,23,42,0.35); }" +
+            "  .admin-insert-plus { width: 30px; height: 30px; font-size: 18px; }" +
+            "  .admin-table-toolbar button { padding: 8px 12px; }" +
+            "}" +
+            "@media (max-width: 600px) {" +
+            "  .admin-insert-menu { min-width: 160px; max-width: min(240px, 90vw); }" +
+            "  .admin-table-toolbar { gap: 8px; }" +
+            "}";
         doc.head.appendChild(style);
 
         var container = doc.querySelector(".docs-content-inner") || doc.body;
