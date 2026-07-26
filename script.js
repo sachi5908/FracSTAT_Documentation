@@ -55,8 +55,7 @@ const SIDEBAR_SECTIONS = [
         links: [
             { href: "docs_uncertainty_montecarlo.html", label: "Monte Carlo Tab" },
             { href: "docs_uncertainty_lhs.html", label: "LHS Tab" },
-            { href: "docs_uncertainty_pce.html", label: "PCE Tab" },
-            { href: "docs_demo.html", label: "demo" }
+            { href: "docs_uncertainty_pce.html", label: "PCE Tab" }
         ]
     }
 ];
@@ -129,8 +128,7 @@ const PAGE_ORDER = [
 
     { href: "docs_uncertainty_montecarlo.html", label: "Uncertainty Monte Carlo Tab" },
     { href: "docs_uncertainty_lhs.html", label: "Uncertainty LHS Tab" },
-    { href: "docs_uncertainty_pce.html", label: "Uncertainty PCE Tab" },
-    { href: "docs_demo.html", label: "demo" }
+    { href: "docs_uncertainty_pce.html", label: "Uncertainty PCE Tab" }
 ];
 
 function renderPaginationNav() {
