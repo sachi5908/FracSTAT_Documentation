@@ -56,6 +56,8 @@ const SIDEBAR_SECTIONS = [
             { href: "docs_uncertainty_montecarlo.html", label: "Monte Carlo Tab" },
             { href: "docs_uncertainty_lhs.html", label: "LHS Tab" },
             { href: "docs_uncertainty_pce.html", label: "PCE Tab" }
+        ,
+            { href: "docs_demo.html", label: "demo" }
         ]
     }
 ];
