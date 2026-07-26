@@ -4,24 +4,48 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FracSTAT Docs — Admin Panel</title>
+<link rel="icon" type="image/png" href="https://res.cloudinary.com/hcaqjcqf/image/upload/v1784441772/akioq6cgnbsigsemtf0f.png">
+
 <style>
     :root {
-        --primary: #2563eb;
-        --primary-dark: #1d4ed8;
-        --ink: #0f172a;
-        --ink-light: #475569;
-        --bg: #f1f5f9;
+        --primary: #6366f1;
+        --primary-light: #818cf8;
+        --primary-dark: #4338ca;
+        --accent: #06b6d4;
+        --accent-warm: #f472b6;
+        --ink: #0f1117;
+        --ink-soft: #1a1d2b;
+        --ink-light: #64748b;
+        --bg: #f4f5fb;
         --card-bg: #ffffff;
-        --border: #e2e8f0;
-        --danger: #dc2626;
+        --border: #e7e9f3;
+        --danger: #ef4444;
+        --success: #10b981;
+        --shadow-sm: 0 1px 2px rgba(15, 17, 23, 0.05);
+        --shadow-md: 0 8px 24px -8px rgba(67, 56, 202, 0.18);
+        --shadow-lg: 0 24px 48px -16px rgba(15, 17, 23, 0.22);
+        --radius: 16px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
-    body { background: var(--bg); color: var(--ink); min-height: 100vh; }
+    body {
+        background:
+            radial-gradient(1100px 600px at 8% -10%, rgba(99,102,241,0.14) 0%, rgba(99,102,241,0) 60%),
+            radial-gradient(900px 500px at 105% 10%, rgba(6,182,212,0.14) 0%, rgba(6,182,212,0) 55%),
+            var(--bg);
+        color: var(--ink);
+        min-height: 100vh;
+    }
 
     /* ---------- shared bits ---------- */
     .hidden { display: none !important; }
     button { cursor: pointer; font-family: inherit; }
-    
+    ::selection { background: rgba(99,102,241,0.25); }
+
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd1e6; border-radius: 8px; }
+    ::-webkit-scrollbar-thumb:hover { background: #aab1cf; }
+
     .svg-icon {
         display: inline-block;
         width: 1.1em;
@@ -41,50 +65,83 @@
         align-items: center;
         justify-content: center;
         padding: 1.5rem;
-        background: radial-gradient(circle at 50% 0%, rgba(37,99,235,0.12) 0%, rgba(241,245,249,0) 60%), var(--bg);
+        position: relative;
+        overflow: hidden;
+    }
+    #loginScreen::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(700px 420px at 15% 20%, rgba(99,102,241,0.20), transparent 60%),
+            radial-gradient(600px 380px at 85% 80%, rgba(244,114,182,0.16), transparent 60%),
+            radial-gradient(500px 320px at 90% 10%, rgba(6,182,212,0.16), transparent 55%);
+        z-index: 0;
     }
     .login-card {
+        position: relative;
+        z-index: 1;
         width: 100%;
-        max-width: 360px;
-        background: var(--card-bg);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        padding: 2.25rem 2rem;
-        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+        max-width: 380px;
+        background: rgba(255,255,255,0.85);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border: 1px solid rgba(255,255,255,0.6);
+        border-radius: 20px;
+        padding: 2.5rem 2.25rem;
+        box-shadow: var(--shadow-lg);
+        animation: cardIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes cardIn {
+        from { opacity: 0; transform: translateY(14px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
     }
     .login-card h1 {
-        font-size: 1.4rem;
-        margin-bottom: 0.35rem;
+        font-size: 1.5rem;
+        margin-bottom: 0.4rem;
         letter-spacing: -0.02em;
         display: flex;
         align-items: center;
-        gap: 0.4rem;
+        gap: 0.55rem;
+        color: var(--ink);
+    }
+    .login-card h1 svg {
+        width: 1.3em; height: 1.3em;
+        padding: 6px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        stroke: #fff;
+        box-shadow: 0 6px 16px -4px rgba(99,102,241,0.5);
     }
     .login-card p.sub {
         color: var(--ink-light);
-        font-size: 0.9rem;
-        margin-bottom: 1.75rem;
+        font-size: 0.92rem;
+        margin-bottom: 2rem;
     }
-    .field { margin-bottom: 1.1rem; }
+    .field { margin-bottom: 1.2rem; }
     .field label {
         display: block;
-        font-size: 0.82rem;
-        font-weight: 600;
+        font-size: 0.8rem;
+        font-weight: 700;
         color: var(--ink-light);
-        margin-bottom: 0.35rem;
+        margin-bottom: 0.4rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
     }
     .field input {
         width: 100%;
-        padding: 0.65rem 0.8rem;
-        border: 1px solid var(--border);
-        border-radius: 8px;
+        padding: 0.75rem 0.9rem;
+        border: 1.5px solid var(--border);
+        border-radius: 10px;
         font-size: 0.95rem;
         outline: none;
-        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        background: #fbfbfe;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
     }
     .field input:focus {
         border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(99,102,241,0.14);
     }
     .password-wrap {
         position: relative;
@@ -105,13 +162,13 @@
         padding: 0;
         border: none;
         background: transparent;
-        border-radius: 6px;
+        border-radius: 8px;
         color: var(--ink-light);
         transition: color 0.15s ease, background-color 0.15s ease;
     }
     .password-toggle-btn:hover {
         color: var(--primary);
-        background-color: rgba(37,99,235,0.08);
+        background-color: rgba(99,102,241,0.1);
     }
     .password-toggle-btn svg {
         width: 18px;
@@ -124,29 +181,32 @@
     }
     .login-btn {
         width: 100%;
-        padding: 0.75rem;
+        padding: 0.8rem;
         border: none;
-        border-radius: 8px;
-        background: var(--primary);
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
         color: #fff;
         font-weight: 700;
-        font-size: 0.95rem;
-        margin-top: 0.4rem;
-        transition: background-color 0.15s ease;
+        font-size: 0.98rem;
+        margin-top: 0.5rem;
+        box-shadow: 0 10px 22px -8px rgba(67,56,202,0.55);
+        transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
     }
-    .login-btn:hover { background: var(--primary-dark); }
+    .login-btn:hover { transform: translateY(-1px); filter: brightness(1.06); box-shadow: 0 14px 28px -8px rgba(67,56,202,0.6); }
+    .login-btn:active { transform: translateY(0); }
     #loginError {
         color: var(--danger);
         font-size: 0.85rem;
-        margin-top: 0.85rem;
+        margin-top: 0.9rem;
         min-height: 1.1em;
+        font-weight: 600;
     }
     .login-hint {
-        margin-top: 1.5rem;
-        padding-top: 1.1rem;
+        margin-top: 1.6rem;
+        padding-top: 1.2rem;
         border-top: 1px solid var(--border);
         font-size: 0.78rem;
-        color: #94a3b8;
+        color: #9aa1b5;
         line-height: 1.5;
     }
 
@@ -156,69 +216,98 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 1.1rem 2rem;
-        background: var(--ink);
+        padding: 1.15rem 2rem;
+        background: linear-gradient(120deg, #12142a 0%, #1c1f3a 55%, #241a3d 100%);
         color: #fff;
+        box-shadow: 0 2px 18px rgba(15,17,23,0.18);
+        position: sticky;
+        top: 0;
+        z-index: 30;
     }
     .admin-header h1 {
-        font-size: 1.1rem;
+        font-size: 1.12rem;
         font-weight: 700;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.6rem;
+        letter-spacing: -0.01em;
+    }
+    .admin-header h1 svg {
+        width: 1.25em; height: 1.25em;
+        padding: 5px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        stroke: #fff;
     }
     .admin-header .logout-btn {
         background: rgba(255,255,255,0.08);
         color: #e2e8f0;
-        border: 1px solid rgba(255,255,255,0.15);
-        padding: 0.5rem 0.9rem;
-        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.16);
+        padding: 0.55rem 1rem;
+        border-radius: 9px;
         font-size: 0.82rem;
-        font-weight: 600;
-        transition: background-color 0.15s ease;
+        font-weight: 700;
+        transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
     }
-    .admin-header .logout-btn:hover { background: rgba(255,255,255,0.18); }
+    .admin-header .logout-btn:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.3); transform: translateY(-1px); }
 
-    .dashboard-body { padding: 2rem; max-width: 1100px; margin: 0 auto; }
+    .dashboard-body { padding: 2.25rem; max-width: 1160px; margin: 0 auto; }
     .dashboard-body > p.intro {
         color: var(--ink-light);
-        margin-bottom: 2rem;
-        max-width: 640px;
-        line-height: 1.55;
+        margin-bottom: 2.25rem;
+        max-width: 680px;
+        line-height: 1.6;
+        font-size: 0.98rem;
     }
 
-    .file-section { margin-bottom: 2.25rem; }
+    .file-section { margin-bottom: 2.5rem; }
     .file-section h2 {
-        font-size: 0.82rem;
+        font-size: 0.8rem;
         text-transform: uppercase;
-        letter-spacing: 0.06em;
-        color: #64748b;
-        font-weight: 700;
-        margin-bottom: 0.9rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 1px solid var(--border);
+        letter-spacing: 0.08em;
+        color: var(--primary-dark);
+        font-weight: 800;
+        margin-bottom: 1rem;
+        padding-bottom: 0.6rem;
+        border-bottom: 2px solid transparent;
+        border-image: linear-gradient(90deg, var(--primary), var(--accent), transparent) 1;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
     .file-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-        gap: 0.9rem;
+        gap: 1rem;
     }
     .file-card {
         background: var(--card-bg);
         border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 1.1rem 1.2rem;
+        border-radius: 14px;
+        padding: 1.2rem 1.25rem;
         display: flex;
         flex-direction: column;
-        gap: 0.6rem;
-        transition: box-shadow 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+        gap: 0.65rem;
+        position: relative;
+        overflow: hidden;
+        transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+    }
+    .file-card::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary), var(--accent));
+        opacity: 0;
+        transition: opacity 0.2s ease;
     }
     .file-card:hover {
-        box-shadow: 0 10px 20px rgba(15,23,42,0.07);
-        transform: translateY(-2px);
-        border-color: rgba(37,99,235,0.25);
+        box-shadow: var(--shadow-md);
+        transform: translateY(-3px);
+        border-color: rgba(99,102,241,0.3);
     }
-    .file-card .fc-title { font-weight: 700; font-size: 0.98rem; }
+    .file-card:hover::before { opacity: 1; }
+    .file-card .fc-title { font-weight: 700; font-size: 1rem; color: var(--ink); }
     .file-card .fc-name {
         font-size: 0.78rem;
         color: #94a3b8;
@@ -226,72 +315,87 @@
         word-break: break-all;
     }
     .file-card .fc-edit {
-        margin-top: 0.3rem;
+        margin-top: 0.35rem;
         align-self: flex-start;
-        padding: 0.4rem 0.85rem;
+        padding: 0.45rem 0.95rem;
         border: none;
-        border-radius: 7px;
-        background: #eff6ff;
-        color: var(--primary);
-        font-weight: 600;
+        border-radius: 8px;
+        background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(6,182,212,0.12));
+        color: var(--primary-dark);
+        font-weight: 700;
         font-size: 0.82rem;
         display: flex;
         align-items: center;
-        gap: 0.3rem;
-        transition: background-color 0.15s ease, color 0.15s ease;
+        gap: 0.35rem;
+        transition: background 0.18s ease, color 0.18s ease, transform 0.15s ease;
     }
-    .file-card .fc-edit:hover { background: var(--primary); color: #fff; }
+    .file-card .fc-edit:hover {
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        color: #fff;
+        transform: translateY(-1px);
+    }
 
     .fc-draft-badge {
         align-self: flex-start;
         font-size: 0.72rem;
-        font-weight: 700;
-        color: #b45309;
-        background: #fef3c7;
-        padding: 2px 8px;
-        border-radius: 6px;
+        font-weight: 800;
+        color: #92400e;
+        background: linear-gradient(135deg, #fef3c7, #fde68a);
+        padding: 3px 9px;
+        border-radius: 999px;
+        box-shadow: var(--shadow-sm);
     }
 
     /* ---------- CREATE NEW PAGE CARD ---------- */
+    #createPageSection {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.5rem 1.6rem 1.75rem 1.6rem;
+        box-shadow: var(--shadow-sm);
+    }
+    #createPageSection h2 { border: none; padding-bottom: 0; margin-bottom: 1.1rem; }
     .create-page-form {
         display: flex;
         flex-direction: column;
         gap: 0.9rem;
-        max-width: 460px;
+        max-width: 480px;
     }
     .cp-field label {
         display: block;
         font-size: 0.78rem;
-        font-weight: 600;
+        font-weight: 700;
         color: var(--ink-light);
         margin-bottom: 0.35rem;
     }
     .cp-field input, .cp-field select {
         width: 100%;
-        padding: 0.6rem 0.75rem;
-        border: 1px solid var(--border);
-        border-radius: 8px;
+        padding: 0.65rem 0.8rem;
+        border: 1.5px solid var(--border);
+        border-radius: 9px;
         font-size: 0.9rem;
         outline: none;
-        background: #fff;
+        background: #fbfbfe;
         transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
     .cp-field input:focus, .cp-field select:focus {
         border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+        box-shadow: 0 0 0 4px rgba(99,102,241,0.14);
+        background: #fff;
     }
     #cpCreateBtn {
         align-self: flex-start;
-        padding: 0.6rem 1.2rem;
+        padding: 0.65rem 1.3rem;
         border: none;
-        border-radius: 8px;
-        background: var(--primary);
+        border-radius: 9px;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
         color: #fff;
         font-weight: 700;
         font-size: 0.85rem;
-        transition: background-color 0.15s ease;
+        box-shadow: 0 10px 20px -8px rgba(67,56,202,0.5);
+        transition: transform 0.15s ease, filter 0.15s ease;
     }
-    #cpCreateBtn:hover { background: var(--primary-dark); }
+    #cpCreateBtn:hover { transform: translateY(-1px); filter: brightness(1.07); }
     .cp-status {
         font-size: 0.85rem;
         color: var(--ink-light);
@@ -305,97 +409,102 @@
         display: flex;
         align-items: center;
         gap: 0.85rem;
-        padding: 0.85rem 1.5rem;
-        background: var(--ink);
+        padding: 0.9rem 1.5rem;
+        background: linear-gradient(120deg, #12142a 0%, #1c1f3a 55%, #241a3d 100%);
         color: #fff;
         flex-wrap: wrap;
+        box-shadow: 0 2px 18px rgba(15,17,23,0.18);
     }
     .editor-toolbar .back-btn {
         background: rgba(255,255,255,0.08);
-        border: 1px solid rgba(255,255,255,0.15);
+        border: 1px solid rgba(255,255,255,0.16);
         color: #e2e8f0;
-        padding: 0.5rem 0.85rem;
-        border-radius: 8px;
+        padding: 0.55rem 0.9rem;
+        border-radius: 9px;
         font-size: 0.82rem;
-        font-weight: 600;
+        font-weight: 700;
         display: flex;
         align-items: center;
         gap: 0.3rem;
+        transition: background-color 0.15s ease, transform 0.15s ease;
     }
-    .editor-toolbar .back-btn:hover { background: rgba(255,255,255,0.18); }
+    .editor-toolbar .back-btn:hover { background: rgba(255,255,255,0.16); transform: translateX(-2px); }
     .editor-toolbar .et-title {
         font-weight: 700;
         font-size: 0.95rem;
         margin-right: auto;
+        color: #f1f5f9;
     }
     .editor-toolbar .et-status {
         font-size: 0.8rem;
-        color: #94a3b8;
+        color: #a5adc6;
         flex-basis: 100%;
     }
-    .editor-toolbar .et-actions { display: flex; gap: 0.5rem; }
+    .editor-toolbar .et-actions { display: flex; gap: 0.55rem; }
     .editor-toolbar button.action {
         border: none;
-        border-radius: 8px;
-        padding: 0.5rem 0.9rem;
+        border-radius: 9px;
+        padding: 0.55rem 0.95rem;
         font-weight: 700;
         font-size: 0.82rem;
         display: flex;
         align-items: center;
-        gap: 0.3rem;
+        gap: 0.35rem;
+        transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
     }
-    .btn-save { background: var(--primary); color: #fff; }
-    .btn-save:hover { background: var(--primary-dark); }
-    
-    /* New GitHub Button Styles */
-    .btn-github { background: #24292e; color: #fff; border: 1px solid #1b1f23; }
-    .btn-github:hover { background: #000; border-color: #000; }
-    
-    .btn-discard { background: #334155; color: #e2e8f0; }
-    .btn-discard:hover { background: #475569; }
+    .editor-toolbar button.action:hover { transform: translateY(-1px); }
+    .btn-save { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; box-shadow: 0 8px 18px -8px rgba(99,102,241,0.6); }
+    .btn-save:hover { filter: brightness(1.08); }
 
-    .btn-addsidebar { background: #7c3aed; color: #fff; }
-    .btn-addsidebar:hover { background: #6d28d9; }
-    .btn-undo, .btn-redo { background: #1e293b; color: #e2e8f0; }
-    .btn-undo:hover, .btn-redo:hover { background: #334155; }
-    .btn-undo:disabled, .btn-redo:disabled { opacity: 0.4; cursor: not-allowed; }
-    .btn-undo:disabled:hover, .btn-redo:disabled:hover { background: #1e293b; }
+    /* New GitHub Button Styles */
+    .btn-github { background: #1b1f27; color: #fff; border: 1px solid #2c313d; }
+    .btn-github:hover { background: #05070c; border-color: #05070c; }
+
+    .btn-discard { background: #2a2f45; color: #e2e8f0; }
+    .btn-discard:hover { background: #363c58; }
+
+    .btn-addsidebar { background: linear-gradient(135deg, var(--accent-warm), #a855f7); color: #fff; box-shadow: 0 8px 18px -8px rgba(168,85,247,0.55); }
+    .btn-addsidebar:hover { filter: brightness(1.08); }
+    .btn-undo, .btn-redo { background: #202538; color: #e2e8f0; }
+    .btn-undo:hover, .btn-redo:hover { background: #2c324a; }
+    .btn-undo:disabled, .btn-redo:disabled { opacity: 0.35; cursor: not-allowed; }
+    .btn-undo:disabled:hover, .btn-redo:disabled:hover { background: #202538; }
 
     /* ---------- FORMAT TOOLBAR ---------- */
     .format-toolbar {
         display: flex;
         align-items: center;
-        gap: 0.4rem;
-        padding: 0.55rem 1.5rem;
-        background: #1e293b;
-        border-top: 1px solid #334155;
+        gap: 0.45rem;
+        padding: 0.6rem 1.5rem;
+        background: #171a2c;
+        border-top: 1px solid #2b2f45;
         flex-wrap: wrap;
     }
     .format-toolbar .fmt-label {
-        color: #94a3b8;
+        color: #8b93b0;
         font-size: 0.75rem;
-        font-weight: 700;
+        font-weight: 800;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.06em;
         margin-right: 0.3rem;
     }
     .fmt-btn {
         min-width: 34px;
         height: 34px;
-        padding: 0 0.6rem;
-        border: 1px solid #475569;
-        border-radius: 7px;
-        background: #0f172a;
+        padding: 0 0.65rem;
+        border: 1px solid #33395a;
+        border-radius: 8px;
+        background: #12142a;
         color: #e2e8f0;
         font-size: 0.88rem;
-        font-weight: 600;
-        transition: background-color 0.15s ease, border-color 0.15s ease;
+        font-weight: 700;
+        transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
     }
-    .fmt-btn:hover { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .fmt-btn:hover { background: linear-gradient(135deg, var(--primary), var(--accent)); border-color: transparent; color: #fff; transform: translateY(-1px); }
     .fmt-sep {
         width: 1px;
         height: 22px;
-        background: #334155;
+        background: #33395a;
         margin: 0 0.3rem;
     }
 
@@ -415,8 +524,8 @@
     @media (max-width: 720px) {
         /* Login screen */
         #loginScreen { padding: 1rem; }
-        .login-card { padding: 1.75rem 1.5rem; max-width: 100%; }
-        .login-card h1 { font-size: 1.2rem; }
+        .login-card { padding: 1.85rem 1.5rem; max-width: 100%; }
+        .login-card h1 { font-size: 1.25rem; }
 
         /* Dashboard header */
         .admin-header {
@@ -490,7 +599,7 @@
 
     @media (max-width: 480px) {
         .login-card { padding: 1.5rem 1.1rem; }
-        .login-card h1 { font-size: 1.05rem; }
+        .login-card h1 { font-size: 1.1rem; }
         .login-btn { padding: 0.7rem; font-size: 0.9rem; }
 
         .admin-header h1 svg { display: none; }
@@ -552,7 +661,7 @@
             <button class="logout-btn" id="logoutBtn">Log Out</button>
         </div>
         <div class="dashboard-body">
-            <p class="intro">
+            <!-- <p class="intro">
                 Pick a page below to open it for editing. You'll be able to click directly
                 into any paragraph, heading, table cell, code snippet, or note/tip box to
                 change its text, and hover an image to replace it. Hover any block to
@@ -562,7 +671,7 @@
                 directly above or below the code snippet area. Tables get their own
                 "+ Row / − Row / + Col / − Col" controls. When you're done, use
                 "Download Page" to export the updated file and upload it back to your site.
-            </p>
+            </p>  -->
             <div class="file-section" id="createPageSection">
                 <h2>Create New Page</h2>
                 <div class="create-page-form">
@@ -1055,6 +1164,96 @@
         }
     }
 
+    // Finds the PAGE_ORDER array literal inside script.js and inserts a new
+    // { href, label } entry for the given page. Unlike SIDEBAR_SECTIONS
+    // (grouped into titled sections), PAGE_ORDER is one flat array in linear
+    // reading order — used by renderPaginationNav() in script.js to build
+    // the Previous/Next buttons at the bottom of every docs page. Without an
+    // entry here, a freshly created page's <div class="pagination-nav">
+    // placeholder is left empty forever. The new entry is inserted right
+    // after the last existing entry belonging to the same sidebar section
+    // (falling back to appending at the very end if no sibling from that
+    // section is found), so a new page lands in a sensible reading-order
+    // position without requiring the user to hand-place it.
+    function patchScriptJsPageOrderSource(src, sectionTitle, file, label) {
+        var startIdx = src.indexOf("const PAGE_ORDER");
+        if (startIdx === -1) startIdx = src.indexOf("var PAGE_ORDER");
+        if (startIdx === -1) return null;
+        var arrStart = src.indexOf("[", startIdx);
+        if (arrStart === -1) return null;
+
+        var depth = 0, arrEnd = -1;
+        for (var i = arrStart; i < src.length; i++) {
+            if (src[i] === "[") depth++;
+            else if (src[i] === "]") { depth--; if (depth === 0) { arrEnd = i; break; } }
+        }
+        if (arrEnd === -1) return null;
+
+        var arrText = src.substring(arrStart, arrEnd + 1);
+        if (arrText.indexOf('"' + file + '"') !== -1) return null; // already listed
+
+        var newEntry = '{ href: "' + file + '", label: "' + String(label).replace(/"/g, '\\"') + '" }';
+
+        var section = null;
+        for (var s = 0; s < FILE_SECTIONS.length; s++) {
+            if (FILE_SECTIONS[s].title === sectionTitle) { section = FILE_SECTIONS[s]; break; }
+        }
+
+        // Try to insert right after the last sibling page (by this file's
+        // sidebar section) that already appears in PAGE_ORDER, so the new
+        // page lands near its logical neighbours instead of always at the
+        // very end of the whole documentation set.
+        var insertAfterIdx = -1;
+        if (section) {
+            for (var f = 0; f < section.files.length; f++) {
+                var needle = '"' + section.files[f].file + '"';
+                var pos = arrText.lastIndexOf(needle);
+                if (pos === -1) continue;
+                var braceEnd = arrText.indexOf("}", pos);
+                if (braceEnd !== -1 && braceEnd > insertAfterIdx) insertAfterIdx = braceEnd + 1;
+            }
+        }
+
+        var newArrText;
+        if (insertAfterIdx !== -1) {
+            newArrText = arrText.substring(0, insertAfterIdx) + ",\n    " + newEntry + arrText.substring(insertAfterIdx);
+        } else {
+            var inner = arrText.substring(1, arrText.length - 1).replace(/\s*$/, "");
+            newArrText = "[" + inner + ",\n    " + newEntry + "\n]";
+        }
+
+        return src.substring(0, arrStart) + newArrText + src.substring(arrEnd + 1);
+    }
+
+    // Combines the SIDEBAR_SECTIONS patch and the PAGE_ORDER patch into ONE
+    // read-patch-patch-return pass over script.js, so both changes land in
+    // the same file content (and the same GitHub commit) instead of one
+    // silently overwriting the other if computed independently and pushed
+    // as two separate script.js updates. Use this instead of
+    // computeSidebarPatch() wherever a newly created page is being
+    // registered, so it always gets both a sidebar link AND working
+    // Previous/Next pagination buttons in a single pass.
+    async function computeScriptJsPatch(targetFile) {
+        var meta = findFileMeta(targetFile);
+        if (!meta) return null;
+        try {
+            var localRes = await fetchFresh("script.js");
+            if (!localRes.ok) throw new Error("fetch script.js failed: " + localRes.status);
+            var rawJs = await localRes.text();
+
+            var afterSidebar = patchScriptJsSidebarSource(rawJs, meta.section, targetFile, meta.label);
+            var working = afterSidebar !== null ? afterSidebar : rawJs;
+
+            var afterPageOrder = patchScriptJsPageOrderSource(working, meta.section, targetFile, meta.label);
+            var finalText = afterPageOrder !== null ? afterPageOrder : working;
+
+            return (finalText !== rawJs) ? finalText : null;
+        } catch (err) {
+            console.error("Failed to compute script.js patch (sidebar + page order):", err);
+            return null;
+        }
+    }
+
     function populateSectionDropdown() {
         var sel = document.getElementById("cpSection");
         if (!sel) return;
@@ -1398,8 +1597,8 @@
         try {
             var filesToCommit = {};
 
-            var sidebarPatch = await computeSidebarPatch(currentFile);
-            if (sidebarPatch !== null) filesToCommit["script.js"] = sidebarPatch;
+            var scriptPatch = await computeScriptJsPatch(currentFile);
+            if (scriptPatch !== null) filesToCommit["script.js"] = scriptPatch;
 
             var adminPatch = await computeAdminHtmlPatch(currentFile, meta.label, meta.section);
             if (adminPatch !== null) filesToCommit["admin.html"] = adminPatch;
@@ -1412,7 +1611,7 @@
             editorStatus.textContent = "Pushing a single combined commit to GitHub…";
             await commitMultipleFilesToGithub(
                 filesToCommit,
-                "Add " + currentFile + " to shared sidebar + admin registry (via Admin Panel)"
+                "Add " + currentFile + " to shared sidebar + page order + admin registry (via Admin Panel)"
             );
             editorStatus.textContent = "Done in one commit — " + currentFile + " now appears on every page's navigation. " +
                 "(Allow 1-2 minutes for the live site to redeploy.)";
@@ -2328,9 +2527,10 @@
             if (isNewFile) NEW_PAGES[currentFile].html = outHtml;
 
             if (isNewFile) {
-                // A brand-new page also needs script.js (sidebar) and
-                // admin.html (FILE_SECTIONS) updated so it actually shows up
-                // in navigation. Rather than pushing the page, then script.js,
+                // A brand-new page also needs script.js (sidebar + page
+                // order, for Previous/Next pagination) and admin.html
+                // (FILE_SECTIONS) updated so it actually shows up in
+                // navigation. Rather than pushing the page, then script.js,
                 // then admin.html as three separate commits (= three separate
                 // GitHub Pages deployments queued back to back), compute all
                 // three file contents first and publish them together in one
@@ -2340,8 +2540,8 @@
                 var filesToCommit = {};
                 filesToCommit[filePath] = outHtml;
 
-                var sidebarPatch = await computeSidebarPatch(currentFile);
-                if (sidebarPatch !== null) filesToCommit["script.js"] = sidebarPatch;
+                var scriptPatch = await computeScriptJsPatch(currentFile);
+                if (scriptPatch !== null) filesToCommit["script.js"] = scriptPatch;
 
                 if (meta) {
                     var adminPatch = await computeAdminHtmlPatch(currentFile, meta.label, meta.section);
@@ -2410,6 +2610,44 @@
         }
     }
 })();
+</script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
 </script>
 </body>
 </html>

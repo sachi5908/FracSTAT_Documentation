@@ -86,6 +86,94 @@ function renderSidebar() {
             </div>`;
     }).join("");
 }
+
+// ---------------------------------------------------------
+// Auto-generated Previous/Next pagination — bottom of the reading
+// content only. This is deliberately its OWN ordered list, kept
+// separate from SIDEBAR_SECTIONS above: the sidebar groups pages by
+// section/category for navigation, while pagination cares only about
+// linear reading order, and the two don't have to be edited together.
+// PAGE_ORDER is the single place to add, remove, or reorder a page's
+// position in the Previous/Next chain.
+//
+// Every docs page previously hand-coded its own
+// <div class="pagination-nav">...</div> at the bottom of the content
+// with hard-wired hrefs/labels — meaning inserting a page required
+// manually re-editing the links inside two *other* files too. Now
+// that div only ever needs to exist (even empty); renderPaginationNav()
+// finds it inside .docs-content-inner (i.e. below the reading content,
+// never touching the sidebar) and fills in whichever buttons belong
+// there for the current page, rebuilding it on every navigation.
+// ---------------------------------------------------------
+const PAGE_ORDER = [
+    { href: "introduction.html", label: "Introduction" },
+    { href: "installation.html", label: "Installation Guide" },
+    { href: "launcher.html", label: "FracSTAT Home Page" },
+
+    { href: "docs_static_map.html", label: "Static Map Tab" },
+    { href: "docs_static_histogram.html", label: "Static Histogram Tab" },
+    { href: "docs_static_cdf.html", label: "Static CDF Tab" },
+    { href: "docs_static_rose.html", label: "Static Rose Tab" },
+    { href: "docs_static_stereonet.html", label: "Static Stereonet Tab" },
+    { href: "docs_static_connectivity.html", label: "Static Connectivity Tab" },
+    { href: "docs_static_intensity.html", label: "Static Intensity Tab" },
+    { href: "docs_static_profile.html", label: "Static Profile Tab" },
+    { href: "docs_static_results.html", label: "Static Results Tab" },
+
+    { href: "docs_dynamic_map.html", label: "Dynamic Map Tab" },
+    { href: "docs_dynamic_rose.html", label: "Dynamic Rose Tab" },
+    { href: "docs_dynamic_mohr.html", label: "Dynamic Mohr Tab" },
+    { href: "docs_dynamic_stereonet.html", label: "Dynamic Stereonet Tab" },
+    { href: "docs_dynamic_table.html", label: "Dynamic Table Tab" },
+    { href: "docs_dynamic_method.html", label: "Dynamic Method Tab" },
+
+    { href: "docs_uncertainty_montecarlo.html", label: "Uncertainty Monte Carlo Tab" },
+    { href: "docs_uncertainty_lhs.html", label: "Uncertainty LHS Tab" },
+    { href: "docs_uncertainty_pce.html", label: "Uncertainty PCE Tab" },
+    { href: "docs_demo.html", label: "demo" }
+];
+
+function renderPaginationNav() {
+    // Look only inside the reading content, never the sidebar.
+    const container = document.querySelector(".docs-content-inner");
+    if (!container) return; // not a docs page (e.g. index.html)
+
+    const currentPage = window.location.pathname.split("/").pop() || "introduction.html";
+    const idx = PAGE_ORDER.findIndex(function (p) { return p.href === currentPage; });
+
+    // Page isn't part of the documented reading order (admin.html, a
+    // brand-new unregistered draft page, etc.) — leave any existing
+    // markup untouched rather than guessing.
+    if (idx === -1) return;
+
+    const prev = idx > 0 ? PAGE_ORDER[idx - 1] : null;
+    const next = idx < PAGE_ORDER.length - 1 ? PAGE_ORDER[idx + 1] : null;
+
+    const prevHtml = prev
+        ? '<a href="' + prev.href + '" class="nav-btn">' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
+            "Previous: " + prev.label +
+            "</a>"
+        : "<div></div>";
+
+    const nextHtml = next
+        ? '<a href="' + next.href + '" class="nav-btn">' +
+            "Next: " + next.label +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
+            "</a>"
+        : "<div></div>";
+
+    // Only ever inserted below the reading content (appended to
+    // .docs-content-inner), and only if the page doesn't already have
+    // a pagination-nav div — this function never touches #docsSidebar.
+    let nav = container.querySelector(".pagination-nav");
+    if (!nav) {
+        nav = document.createElement("div");
+        nav.className = "pagination-nav";
+        container.appendChild(nav);
+    }
+    nav.innerHTML = prevHtml + nextHtml;
+}
 document.addEventListener("DOMContentLoaded", () => {
     // ---------------------------------------------------------
     // 1. Basic Setup & Mobile Toggle
@@ -106,6 +194,10 @@ document.addEventListener("DOMContentLoaded", () => {
     function initDynamicBehaviors() {
     // Rebuild the sidebar for whichever page is now current
     renderSidebar();
+
+    // Rebuild the Previous/Next buttons for whichever page is now
+    // current, from the same SIDEBAR_SECTIONS order used above.
+    renderPaginationNav();
 
     // A. Bind Copy Buttons
     document.querySelectorAll(".copy-btn").forEach(button => {
