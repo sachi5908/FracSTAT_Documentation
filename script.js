@@ -10,6 +10,81 @@ if ("scrollRestoration" in history) {
     history.scrollRestoration = "manual";
 }
 
+// ---------------------------------------------------------
+// Single source of truth for the sidebar — edit this array only.
+// Every page's <aside id="docsSidebar"></aside> gets its contents
+// generated from here, so adding/renaming/reordering a page in the
+// docs only requires one edit instead of touching every HTML file.
+// ---------------------------------------------------------
+const SIDEBAR_SECTIONS = [
+    {
+        title: "Getting Started",
+        links: [
+            { href: "introduction.html", label: "Introduction" },
+            { href: "installation.html", label: "Installation Guide" },
+            { href: "launcher.html", label: "FracSTAT Home Page" }
+        ]
+    },
+    {
+        title: "Static Analyzer",
+        links: [
+            { href: "docs_static_map.html", label: "Map Tab" },
+            { href: "docs_static_histogram.html", label: "Histogram Tab" },
+            { href: "docs_static_cdf.html", label: "CDF Tab" },
+            { href: "docs_static_rose.html", label: "Rose Tab" },
+            { href: "docs_static_stereonet.html", label: "Stereonet Tab" },
+            { href: "docs_static_connectivity.html", label: "Connectivity Tab" },
+            { href: "docs_static_intensity.html", label: "Intensity Tab" },
+            { href: "docs_static_profile.html", label: "Profile Tab" },
+            { href: "docs_static_results.html", label: "Results Tab" }
+        ]
+    },
+    {
+        title: "Dynamic Analyzer",
+        links: [
+            { href: "docs_dynamic_map.html", label: "Map Tab" },
+            { href: "docs_dynamic_rose.html", label: "Rose Tab" },
+            { href: "docs_dynamic_mohr.html", label: "Mohr Tab" },
+            { href: "docs_dynamic_stereonet.html", label: "Stereonet Tab" },
+            { href: "docs_dynamic_table.html", label: "Table Tab" },
+            { href: "docs_dynamic_method.html", label: "Method Tab" }
+        ]
+    },
+    {
+        title: "Uncertainty Analyzer",
+        links: [
+            { href: "docs_uncertainty_montecarlo.html", label: "Monte Carlo Tab" },
+            { href: "docs_uncertainty_lhs.html", label: "LHS Tab" },
+            { href: "docs_uncertainty_pce.html", label: "PCE Tab" }
+        ]
+    }
+];
+
+const CHEVRON_SVG = '<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+
+function renderSidebar() {
+    const sidebar = document.getElementById("docsSidebar");
+    if (!sidebar) return;
+
+    const currentPage = window.location.pathname.split("/").pop() || "introduction.html";
+
+    sidebar.innerHTML = SIDEBAR_SECTIONS.map(section => {
+        const containsActive = section.links.some(l => l.href === currentPage);
+        const linksHtml = section.links.map(l => {
+            const activeCls = l.href === currentPage ? ' class="active"' : "";
+            return `<li><a href="${l.href}"${activeCls}>${l.label}</a></li>`;
+        }).join("");
+
+        return `
+            <div class="sidebar-section${containsActive ? " open" : ""}">
+                <button class="sidebar-toggle">
+                    ${section.title}
+                    ${CHEVRON_SVG}
+                </button>
+                <ul class="sidebar-links">${linksHtml}</ul>
+            </div>`;
+    }).join("");
+}
 document.addEventListener("DOMContentLoaded", () => {
     // ---------------------------------------------------------
     // 1. Basic Setup & Mobile Toggle
@@ -23,31 +98,16 @@ document.addEventListener("DOMContentLoaded", () => {
         mobileToggle.addEventListener("click", () => docsSidebar.classList.toggle("show"));
     }
 
-    // ---------------------------------------------------------
-    // 2. Accordion Sidebar Logic (Exclusive Open)
-    // ---------------------------------------------------------
-    const sidebarToggles = document.querySelectorAll(".sidebar-toggle");
-    sidebarToggles.forEach(toggle => {
-        toggle.addEventListener("click", () => {
-            const parentSection = toggle.parentElement;
-            
-            // Close all other sections before toggling this one
-            document.querySelectorAll(".sidebar-section").forEach(section => {
-                if (section !== parentSection) {
-                    section.classList.remove("open");
-                }
-            });
-
-            parentSection.classList.toggle("open");
-        });
-    });
 
     // ---------------------------------------------------------
     // 3. Dynamic Functions (Needs to be re-run on page load)
     // ---------------------------------------------------------
     function initDynamicBehaviors() {
-        // A. Bind Copy Buttons
-        document.querySelectorAll(".copy-btn").forEach(button => {
+    // Rebuild the sidebar for whichever page is now current
+    renderSidebar();
+
+    // A. Bind Copy Buttons
+    document.querySelectorAll(".copy-btn").forEach(button => {
             // Remove old listener to prevent duplicates
             const newBtn = button.cloneNode(true);
             button.parentNode.replaceChild(newBtn, button);
@@ -66,25 +126,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-        // B. Update Sidebar Active State
-        const currentPage = window.location.pathname.split("/").pop() || "docs_intro.html";
-        
-        // Force close all sections on page load/navigation
-        document.querySelectorAll(".sidebar-section").forEach(section => {
-            section.classList.remove("open");
-        });
-
-        document.querySelectorAll(".sidebar-links a").forEach(link => {
-            const linkHref = link.getAttribute("href");
-            if (linkHref === currentPage) {
-                link.classList.add("active");
-                // Open only the parent accordion of the active link
-                const parentSection = link.closest(".sidebar-section");
-                if (parentSection) parentSection.classList.add("open");
-            } else {
-                link.classList.remove("active");
-            }
-        });
 
         // C. Skeleton-loading shimmer for figure images.
         // Each .figure-img-wrap starts with a shimmering placeholder (CSS);
@@ -265,29 +306,20 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Intercept clicks on Sidebar Links and Pagination Buttons
+    // ---------------------------------------------------------
+    // 2. Accordion Sidebar Logic (Exclusive Open) — delegated so it
+    //    keeps working after renderSidebar() rebuilds the sidebar's
+    //    innerHTML on every page load/navigation.
+    // ---------------------------------------------------------
     document.addEventListener("click", (e) => {
-        const link = e.target.closest(".sidebar-links a, .nav-btn");
-        
-        if (link) {
-            const url = link.getAttribute("href");
-            
-            // Ignore empty links or external links
-            if (!url || url === "#" || url.startsWith("http")) return;
+        const toggle = e.target.closest(".sidebar-toggle");
+        if (!toggle) return;
 
-            e.preventDefault(); // Stop the browser from doing a hard reload
-            
-            // Change the URL in the browser address bar
-            window.history.pushState({ path: url }, "", url);
-            
-            // Load the content smoothly
-            loadPage(url);
-            
-            // On mobile, close the sidebar after clicking
-            if (window.innerWidth <= 900 && docsSidebar.classList.contains("show")) {
-                docsSidebar.classList.remove("show");
-            }
-        }
+        const parentSection = toggle.parentElement;
+        document.querySelectorAll(".sidebar-section").forEach(section => {
+            if (section !== parentSection) section.classList.remove("open");
+        });
+        parentSection.classList.toggle("open");
     });
 
     // Handle Browser Back/Forward buttons
@@ -386,4 +418,43 @@ document.addEventListener("DOMContentLoaded", () => {
 
         openLightbox(img.src, img.alt, captionEl ? captionEl.textContent.trim() : "");
     });
+
+    // ---------------------------------------------------------
+    // 7. Intercept internal <a> clicks and route them through the
+    //    SPA loader instead of letting the browser hard-reload.
+    //    This is what actually eliminates the sidebar flicker and
+    //    makes the top progress bar show up for normal navigation,
+    //    not just Back/Forward.
+    // ---------------------------------------------------------
+    document.addEventListener("click", (e) => {
+        // Only docs pages have the AJAX-swappable content area; on
+        // marketing pages like index.html, fall back to normal navigation.
+        if (!contentContainer) return;
+
+        // Let modifier-clicks (new tab, etc.) behave normally
+        if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+        const anchor = e.target.closest("a");
+        if (!anchor) return;
+
+        const href = anchor.getAttribute("href");
+        if (!href) return;
+
+        // Skip hash links (handled by the TOC smooth-scroll listener),
+        // external links, mail links, new-tab links, and downloads
+        if (href.startsWith("#") || href.startsWith("http") || href.startsWith("mailto:")) return;
+        if (anchor.target === "_blank" || anchor.hasAttribute("download")) return;
+        if (!href.endsWith(".html")) return;
+
+        const currentPage = window.location.pathname.split("/").pop() || "introduction.html";
+        if (href === currentPage) { e.preventDefault(); return; }
+
+        e.preventDefault();
+        history.pushState({}, "", href);
+        loadPage(href);
+
+        // Close the mobile sidebar drawer after navigating
+        if (docsSidebar) docsSidebar.classList.remove("show");
+    });
+
 });

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Rose Tab | FracSTAT Docs</title>
@@ -29,69 +30,8 @@
     </nav>
 
     <div class="docs-layout">
-        <!-- ==========================================
-             MASTER ACCORDION SIDEBAR
-             ========================================== -->
-        <aside class="docs-sidebar" id="docsSidebar">
 
-            <div class="sidebar-section open">
-                <button class="sidebar-toggle">
-                    Getting Started
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="introduction.html">Introduction</a></li>
-                    <li><a href="installation.html" class="active">Installation Guide</a></li>
-                    <li><a href="launcher.html">FracSTAT Home Page</a></li>
-                </ul>
-            </div>
-
-            <div class="sidebar-section">
-                <button class="sidebar-toggle">
-                    Static Analyzer
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="docs_static_map.html">Map Tab</a></li>
-                    <li><a href="docs_static_histogram.html">Histogram Tab</a></li>
-                    <li><a href="docs_static_cdf.html">CDF Tab</a></li>
-                    <li><a href="docs_static_rose.html">Rose Tab</a></li>
-                    <li><a href="docs_static_stereonet.html">Stereonet Tab</a></li>
-                    <li><a href="docs_static_connectivity.html">Connectivity Tab</a></li>
-                    <li><a href="docs_static_intensity.html">Intensity Tab</a></li>
-                    <li><a href="docs_static_profile.html">Profile Tab</a></li>
-                    <li><a href="docs_static_results.html">Results Tab</a></li>
-                </ul>
-            </div>
-
-            <div class="sidebar-section">
-                <button class="sidebar-toggle">
-                    Dynamic Analyzer
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="docs_dynamic_map.html">Map Tab</a></li>
-                    <li><a href="docs_dynamic_rose.html">Rose Tab</a></li>
-                    <li><a href="docs_dynamic_mohr.html">Mohr Tab</a></li>
-                    <li><a href="docs_dynamic_stereonet.html">Stereonet Tab</a></li>
-                    <li><a href="docs_dynamic_table.html">Table Tab</a></li>
-                    <li><a href="docs_dynamic_method.html">Method Tab</a></li>
-                </ul>
-            </div>
-
-            <div class="sidebar-section">
-                <button class="sidebar-toggle">
-                    Uncertainty Analyzer
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="docs_uncertainty_montecarlo.html">Monte Carlo Tab</a></li>
-                    <li><a href="docs_uncertainty_lhs.html">LHS Tab</a></li>
-                    <li><a href="docs_uncertainty_pce.html">PCE Tab</a></li>
-                <li><a href="docs_demo.html">demo</a></li><li><a href="docs_demo2.html">demo2</a></li></ul>
-            </div>
-
-        </aside>
+        <aside class="docs-sidebar" id="docsSidebar"></aside>
 
         <main class="docs-content">
             <div class="docs-content-inner">
@@ -159,7 +99,7 @@
                     exposes a defined contract of shared attributes and helper methods, listed below.
                 </p>
                 <table>
-                    <tbody><tr><th>Shared attribute / method</th><th>Origin</th><th>Role for the Rose Tab</th></tr>
+                    <tr><th>Shared attribute / method</th><th>Origin</th><th>Role for the Rose Tab</th></tr>
                     <tr><td><code>self.tabs</code></td><td><code>SlipTendencyApp._build_layout</code></td><td>CTkTabview hosting the "Rose" pane into which the tab's widgets are placed.</td></tr>
                     <tr><td><code>self.results</code></td><td><code>calculator.run_calculation()</code></td><td>Per-segment DataFrame of geometry, orientation, and resolved-stress columns; the sole data source for the diagram.</td></tr>
                     <tr><td><code>self.current_stress</code></td><td><code>SlipTendencyApp.calculate()</code></td><td>Dict of the active stress-tensor parameters, consulted only when drawing the σ1 azimuth reference line.</td></tr>
@@ -167,7 +107,7 @@
                     <tr><td><code>self._selected_attribute()</code></td><td><code>SlipTendencyApp</code></td><td>Resolves the user's chosen colour-by metric (Map Display dropdown) to a (column, axis label, title fragment) triple.</td></tr>
                     <tr><td><code>self.attribute_colormap_and_norm()</code></td><td><code>SlipTendencyApp</code></td><td>Returns the (colormap, Normalize/BoundaryNorm, is_critical) triple used consistently by the Map, Rose, and Mohr tabs.</td></tr>
                     <tr><td><code>self.save_plot_image()</code></td><td><code>SlipTendencyApp</code></td><td>Serialises the current Matplotlib Figure to a PNG in the project's export directory.</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>1.2 Intended Audience</h3>
                 <p>
@@ -214,14 +154,14 @@
                     confirmed in the picker dialog.
                 </p>
                 <table>
-                    <tbody><tr><th>Card</th><th>Controls contained</th></tr>
+                    <tr><th>Card</th><th>Controls contained</th></tr>
                     <tr><td>Data &amp; Bins</td><td>Bins, Weight by, Angle unit, Custom title, Half rose toggle</td></tr>
                     <tr><td>Petals</td><td>Petal gap fraction, Petal edge colour</td></tr>
                     <tr><td>Reference Circles</td><td>Show circles, show angular labels, show compass, show radial grid, circle line width, circle colour</td></tr>
                     <tr><td>σ1 Azimuth Line</td><td>Show line, line style, line width, line colour</td></tr>
                     <tr><td>Background Colours</td><td>Outer (figure) background, inner (axes) background, boundary colour, boundary line width</td></tr>
                     <tr><td>Colour Bar</td><td>Position, length fraction, show plot title toggle</td></tr>
-                </tbody></table>
+                </table>
                 <p>
                     A "Reset to Defaults" button is docked at the bottom of the settings panel and restores every
                     control listed above to its factory value in a single action (see Section 4.8 for the precise
@@ -238,11 +178,11 @@
                     summarised below.
                 </p>
                 <table>
-                    <tbody><tr><th>Column</th><th>Type</th><th>Used for</th></tr>
+                    <tr><th>Column</th><th>Type</th><th>Used for</th></tr>
                     <tr><td><code>StrikeDeg</code></td><td>float, 0–360°</td><td>Base orientation of each segment/plane; folded to 0–180° before binning.</td></tr>
                     <tr><td><code>Length_m</code></td><td>float</td><td>Optional length weighting when Weight by = Length.</td></tr>
                     <tr><td>&lt;attribute column&gt;</td><td>float or bool</td><td>Whichever column <code>self._selected_attribute()</code> resolves to (SlipTendency[Norm], DilationTendency, FractureSusceptibility[Norm], or CriticalStressValue); used to colour each petal.</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>3.1 Data Provenance and Column Semantics</h3>
                 <p>
@@ -295,31 +235,31 @@
 
                 <h3>4.1 Data &amp; Bins Card</h3>
                 <table>
-                    <tbody><tr><th>Control</th><th>Variable</th><th>Type / Range</th><th>Default</th><th>Effect</th></tr>
+                    <tr><th>Control</th><th>Variable</th><th>Type / Range</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Bins</td><td><code>rose_bins_var</code></td><td>Dropdown: 10, 18, 24, 36, 45, 72, 90, 180</td><td>36</td><td>Number of equal-width angular bins spanning the 0–180° (half rose) or 0–360° (full rose) range. Clamped internally to [4, 360] even if a value were entered programmatically outside the dropdown list.</td></tr>
                     <tr><td>Weight by</td><td><code>rose_weight_var</code></td><td>Dropdown: Length, Count, Equal</td><td>Length</td><td>Selects the per-segment weight fed into the weighted histogram (see Section 6.2).</td></tr>
                     <tr><td>Angle unit</td><td><code>rose_angle_unit_var</code></td><td>Dropdown: Degrees, Radians, Gradians</td><td>Degrees</td><td>Controls the numeric format of the angular tick labels only; the underlying binning is always performed in radians and is unaffected.</td></tr>
                     <tr><td>Custom title (blank = auto)</td><td><code>rose_title_var</code></td><td>Free text</td><td>"" (empty)</td><td>When non-blank and Show plot title is enabled, overrides the automatically generated title string.</td></tr>
                     <tr><td>Half rose (0–180° only)</td><td><code>rose_half_rose_var</code></td><td>Checkbox</td><td>Off</td><td>Restricts the diagram to a semicircular 0–180° wedge instead of mirroring every strike into both 0–180° and 180–360°.</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>4.2 Petals Card</h3>
                 <table>
-                    <tbody><tr><th>Control</th><th>Variable</th><th>Range</th><th>Default</th><th>Effect</th></tr>
+                    <tr><th>Control</th><th>Variable</th><th>Range</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Gap between petals (0–1)</td><td><code>rose_petal_gap_var</code></td><td>0.1–1.0</td><td>0.92</td><td>Fraction of the full bin angular width actually drawn as the petal's bar width; the remainder appears as whitespace between adjacent petals. A value of 1.0 produces edge-to-edge petals; smaller values increase visual separation.</td></tr>
                     <tr><td>Petal edge colour</td><td><code>rose_petal_edge_color_var</code></td><td>Hex colour</td><td>#FFFFFF</td><td>Stroke colour applied to every petal's outline (linewidth fixed at 0.6&nbsp;pt in the drawing routine).</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>4.3 Reference Circles Card</h3>
                 <table>
-                    <tbody><tr><th>Control</th><th>Variable</th><th>Type</th><th>Default</th><th>Effect</th></tr>
+                    <tr><th>Control</th><th>Variable</th><th>Type</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Show reference circles</td><td><code>rose_show_circles_var</code></td><td>Checkbox</td><td>On</td><td>Toggles visibility of the polar axes' outer boundary spine (labelled "circles" in the UI, technically the <code>ax.spines['polar']</code> outline).</td></tr>
                     <tr><td>Show angular labels</td><td><code>rose_show_labels_var</code></td><td>Checkbox</td><td>Off</td><td>Toggles the numeric/compass tick labels around the circumference.</td></tr>
                     <tr><td>Show compass (N/E/S/W)</td><td><code>rose_show_compass_var</code></td><td>Checkbox</td><td>On</td><td>Draws bold N/E/S/W text annotations just outside the outermost petal radius; only rendered when the diagram is a full (not half) rose.</td></tr>
                     <tr><td>Show radial grid</td><td><code>rose_show_grid_var</code></td><td>Checkbox</td><td>Off</td><td>Toggles both the angular and radial (y-axis) gridlines inside the polar plot.</td></tr>
                     <tr><td>Circle line width</td><td><code>rose_circle_lw_var</code></td><td>Numeric text, pt</td><td>0.8</td><td>Line width applied to the radial/angular grid lines when Show radial grid is enabled.</td></tr>
                     <tr><td>Circle colour</td><td><code>rose_circle_color_var</code></td><td>Hex colour</td><td>#D9E2EC</td><td>Colour applied to the radial/angular grid lines.</td></tr>
-                </tbody></table>
+                </table>
                 <div class="note-box">
                     <strong>Note:</strong> "Show reference circles" governs the single bold outer boundary (the
                     polar spine), whereas "Show radial grid" governs the internal concentric/radial gridlines. Both
@@ -331,12 +271,12 @@
 
                 <h3>4.4 σ1 Azimuth Line Card</h3>
                 <table>
-                    <tbody><tr><th>Control</th><th>Variable</th><th>Type / Range</th><th>Default</th><th>Effect</th></tr>
+                    <tr><th>Control</th><th>Variable</th><th>Type / Range</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Show σ1 line</td><td><code>rose_show_sigma1_var</code></td><td>Checkbox</td><td>Off</td><td>Overlays a diametral reference line at the azimuth of the maximum horizontal principal stress, σ1.</td></tr>
                     <tr><td>Line style</td><td><code>rose_sigma1_style_var</code></td><td>Dropdown: Solid, Dashed, Dotted, Dash-dot</td><td>Solid</td><td>Matplotlib linestyle mapped internally to '-', '--', ':', '-.' respectively.</td></tr>
                     <tr><td>Line width</td><td><code>rose_sigma1_lw_var</code></td><td>Numeric text, pt</td><td>1.5</td><td>Stroke width of the σ1 line.</td></tr>
                     <tr><td>σ1 line colour</td><td><code>rose_sigma1_color_var</code></td><td>Hex colour</td><td>#1F2933</td><td>Colour of both the line and its "σ1" text label.</td></tr>
-                </tbody></table>
+                </table>
                 <p>
                     The σ1 azimuth is not re-derived by the Rose Tab; it is read directly from
                     <code>self.current_stress</code>, the dictionary populated by
@@ -348,20 +288,20 @@
 
                 <h3>4.5 Background Colours Card</h3>
                 <table>
-                    <tbody><tr><th>Control</th><th>Variable</th><th>Type</th><th>Default</th><th>Effect</th></tr>
+                    <tr><th>Control</th><th>Variable</th><th>Type</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Outer (figure) background</td><td><code>rose_outer_bg_var</code></td><td>Hex colour</td><td>#F5F7FA</td><td>Fills the Matplotlib Figure background, i.e. the area outside the circular plot but inside the plot card.</td></tr>
                     <tr><td>Inner (rose) background</td><td><code>rose_inner_bg_var</code></td><td>Hex colour</td><td>#FFFFFF</td><td>Fills the polar Axes background (the disc enclosed by the outer boundary).</td></tr>
                     <tr><td>Boundary colour</td><td><code>rose_boundary_color_var</code></td><td>Hex colour</td><td>#1F2933</td><td>Colour of the polar spine (outer circular boundary), when "Show reference circles" is enabled.</td></tr>
                     <tr><td>Boundary line width</td><td><code>rose_boundary_width_var</code></td><td>Numeric text, pt</td><td>1.5</td><td>Width of the outer boundary spine.</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>4.6 Colour Bar Card</h3>
                 <table>
-                    <tbody><tr><th>Control</th><th>Variable</th><th>Type / Range</th><th>Default</th><th>Effect</th></tr>
+                    <tr><th>Control</th><th>Variable</th><th>Type / Range</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Position</td><td><code>rose_colorbar_pos_var</code></td><td>Dropdown: Bottom, Top, Left, Right, None</td><td>Bottom</td><td>Selects which side of the plot the colour-bar legend is docked to, or hides it entirely (None).</td></tr>
                     <tr><td>Length (e.g., 0.72 for 72%)</td><td><code>rose_colorbar_length_var</code></td><td>Numeric text, 0.1–1.0</td><td>0.72</td><td>Fractional length of the colour bar relative to the available figure dimension along its long axis.</td></tr>
                     <tr><td>Show plot title</td><td><code>rose_show_title_var</code></td><td>Checkbox</td><td>On</td><td>Toggles rendering of the diagram's title text (auto-generated or custom, per Section 4.1).</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>4.7 Colour-by Metric (Controlled Elsewhere)</h3>
                 <p>
@@ -372,14 +312,14 @@
                     columns are listed below.
                 </p>
                 <table>
-                    <tbody><tr><th>Map Display selection</th><th>Normalised?</th><th>Resolved column</th><th>Colour-bar label</th></tr>
+                    <tr><th>Map Display selection</th><th>Normalised?</th><th>Resolved column</th><th>Colour-bar label</th></tr>
                     <tr><td>Slip tendency</td><td>Yes (default)</td><td><code>SlipTendencyNorm</code></td><td>Normalized slip tendency Tₛ</td></tr>
                     <tr><td>Slip tendency</td><td>No</td><td><code>SlipTendency</code></td><td>Slip tendency Tₛ</td></tr>
                     <tr><td>Dilation tendency</td><td>n/a</td><td><code>DilationTendency</code></td><td>Dilation tendency Td</td></tr>
                     <tr><td>Fracture susceptibility</td><td>Yes</td><td><code>FractureSusceptibilityNorm</code></td><td>Normalized fracture susceptibility</td></tr>
                     <tr><td>Fracture susceptibility</td><td>No</td><td><code>FractureSusceptibility</code></td><td>Fracture susceptibility Sf, MPa</td></tr>
                     <tr><td>Critical fractures</td><td>n/a</td><td><code>CriticalStressValue</code></td><td>Critically stressed: 0 no, 1 yes</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>4.8 Reset to Defaults</h3>
                 <p>
@@ -506,11 +446,11 @@
 
                 <h3>6.2 Weight Vector Construction</h3>
                 <table>
-                    <tbody><tr><th>Mode</th><th>Weight construction</th><th>Fallback condition</th></tr>
+                    <tr><th>Mode</th><th>Weight construction</th><th>Fallback condition</th></tr>
                     <tr><td>Length</td><td>w_i = Length_m_i (metres, or the active display unit)</td><td>If Length_m is absent, or every value is non-finite/≤0, w_i = 1.0 for all i (equal weighting).</td></tr>
                     <tr><td>Count</td><td>w_i = 1.0</td><td>None — always uniform.</td></tr>
                     <tr><td>Equal</td><td>w_i = 1.0</td><td>None — identical numerical result to Count in the current implementation.</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>6.3 Mirroring for Full-Rose Display</h3>
                 <p>
@@ -551,10 +491,10 @@ counts, edges = np.histogram(strikes, bins=bins, weights=weights)
 centers = (edges[:-1] + edges[1:]) / 2.0
 widths = np.diff(edges)
 
-# per-bin mean attribute value -&gt; petal colour
+# per-bin mean attribute value -> petal colour
 color_values = []
 for low, high in zip(edges[:-1], edges[1:]):
-    mask = (strikes &gt;= low) &amp; (strikes &lt; high)
+    mask = (strikes >= low) & (strikes < high)
     color_values.append(
         float(np.nanmean(attribute_values[mask])) if mask.any() else 0.0
     )
@@ -569,11 +509,11 @@ color_values = np.array(color_values)</code></pre>
                     supported unit modes reformat the same tick positions rather than recomputing them:
                 </p>
                 <table>
-                    <tbody><tr><th>Unit mode</th><th>Tick spacing used for labels</th><th>Label format</th></tr>
+                    <tr><th>Unit mode</th><th>Tick spacing used for labels</th><th>Label format</th></tr>
                     <tr><td>Degrees</td><td>10° (0, 10, 20, …, 350)</td><td>"{n}°"</td></tr>
                     <tr><td>Radians</td><td>30° (0, 30, …, 330)</td><td>Multiples of π expressed as a decimal fraction, e.g. "0.33π"; the origin is rendered as "0"</td></tr>
                     <tr><td>Gradians</td><td>10° (0, 10, …, 350)</td><td>Degrees converted via g = d × 400/360 and rendered as "{g}g"</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>6.6 Colour-Bar Layout Algorithm</h3>
                 <p>
@@ -585,13 +525,13 @@ color_values = np.array(color_values)</code></pre>
                     0–1).
                 </p>
                 <table>
-                    <tbody><tr><th>Position</th><th>Colour-bar rectangle [x0, y0, w, h]</th><th>Polar-axes rectangle [x0, y0, w, h]</th><th>Orientation</th></tr>
+                    <tr><th>Position</th><th>Colour-bar rectangle [x0, y0, w, h]</th><th>Polar-axes rectangle [x0, y0, w, h]</th><th>Orientation</th></tr>
                     <tr><td>Bottom</td><td>[(1−L)/2, 0.06, L, 0.030]</td><td>[0.15, 0.20, 0.70, 0.65]</td><td>Horizontal</td></tr>
                     <tr><td>Top</td><td>[(1−L)/2, 0.92, L, 0.030]</td><td>[0.15, 0.10, 0.70, 0.65]</td><td>Horizontal</td></tr>
                     <tr><td>Left</td><td>[0.03, (1−L)/2, 0.025, L]</td><td>[0.18, 0.15, 0.70, 0.70]</td><td>Vertical</td></tr>
                     <tr><td>Right</td><td>[0.93, (1−L)/2, 0.025, L]</td><td>[0.10, 0.15, 0.70, 0.70]</td><td>Vertical</td></tr>
                     <tr><td>None</td><td>(hidden)</td><td>[0.15, 0.12, 0.70, 0.75]</td><td>n/a</td></tr>
-                </tbody></table>
+                </table>
                 <p>
                     L denotes the user-supplied colour-bar length fraction (<code>rose_colorbar_length_var</code>),
                     clamped to [0.1, 1.0]. This deterministic, closed-form layout avoids the layout-engine
@@ -812,14 +752,14 @@ color_values = np.array(color_values)</code></pre>
                 <!-- ================================================= -->
                 <h2 id="performance">11. Performance Optimization</h2>
                 <table>
-                    <tbody><tr><th>Technique</th><th>Where applied</th><th>Benefit</th></tr>
+                    <tr><th>Technique</th><th>Where applied</th><th>Benefit</th></tr>
                     <tr><td>Vectorised NumPy histogram</td><td>Section 6.2/6.4, <code>np.histogram(weights=...)</code></td><td>O(n) weighted binning without an explicit Python loop over segments.</td></tr>
                     <tr><td>Single <code>ax.bar()</code> call for all petals</td><td>Section 9.2</td><td>Avoids per-bin matplotlib artist creation overhead; scales to the maximum supported 360 bins without perceptible lag.</td></tr>
                     <tr><td><code>draw_idle()</code> rather than <code>draw()</code></td><td>End of <code>_draw_rose</code></td><td>Defers the actual canvas repaint to Tkinter's event loop, coalescing rapid successive setting changes (e.g., a slider or rapid typing) into fewer physical repaints.</td></tr>
                     <tr><td>Deterministic closed-form colour-bar layout</td><td>Section 6.6</td><td>Avoids the per-frame cost of matplotlib's automatic constrained/tight layout solvers.</td></tr>
                     <tr><td>Idempotent variable initialisation</td><td>Section 7.1, <code>hasattr</code> guards in <code>_rose_init_vars</code></td><td>Prevents redundant Tkinter variable churn if the tab-build path is ever invoked more than once.</td></tr>
                     <tr><td>Shared colormap/normalisation resolution</td><td>Section 10.1</td><td>Colour-scale computation logic lives in one place (SlipTendencyApp) rather than being duplicated per tab, reducing both code size and the chance of visual inconsistency.</td></tr>
-                </tbody></table>
+                </table>
                 <p>
                     No caching layer is applied to the Rose Tab's own computation, because the weighted-histogram
                     and colour-aggregation steps are computationally inexpensive (typically well under a few
@@ -945,19 +885,19 @@ color_values = np.array(color_values)</code></pre>
 
                 <h3>14.5 Dependency Summary</h3>
                 <table>
-                    <tbody><tr><th>Library</th><th>Role</th></tr>
+                    <tr><th>Library</th><th>Role</th></tr>
                     <tr><td><code>numpy</code></td><td>Weighted histogram binning, angular array manipulation, trigonometric conversions.</td></tr>
                     <tr><td><code>matplotlib</code> (pyplot Figure/Axes API)</td><td>Polar plot rendering, colour mapping (ScalarMappable), colour-bar construction.</td></tr>
                     <tr><td><code>matplotlib.backends.backend_tkagg</code></td><td>Embeds the Matplotlib Figure inside the CustomTkinter canvas widget (FigureCanvasTkAgg).</td></tr>
                     <tr><td><code>customtkinter</code> (ctk)</td><td>All settings-panel widgets: frames, labels, entries, checkboxes, option menus, buttons.</td></tr>
                     <tr><td><code>core.constants</code></td><td>Supplies the SIGMA_1 Unicode symbol string used for the σ1 line's on-plot label.</td></tr>
                     <tr><td><code>ui_common.ui_widgets</code></td><td>Supplies <code>_StaticColorButton</code>, the shared swatch/hex colour-picker widget.</td></tr>
-                </tbody></table>
+                </table>
 
                 <!-- ================================================= -->
                 <h2 id="limitations">15. Limitations</h2>
                 <table>
-                    <tbody><tr><th>Limitation</th><th>Description</th></tr>
+                    <tr><th>Limitation</th><th>Description</th></tr>
                     <tr><td>No significance testing</td><td>The Rose Tab performs no independent statistical significance testing of preferred orientations (e.g., no Rayleigh test for circular uniformity, no von Mises distribution fitting); it is a purely descriptive/exploratory visualisation tool.</td></tr>
                     <tr><td>Unweighted colour aggregation</td><td>Per-bin colour aggregation uses a simple arithmetic mean with no weighting by segment length or count, which can make small-population bins visually as prominent in colour intensity as large, statistically robust bins; users must cross-reference petal size when interpreting colour.</td></tr>
                     <tr><td>σ1 line is a horizontal projection only</td><td>The σ1 azimuth line, in General 3D orientation mode, displays only the horizontal-projection trend of σ1 and does not indicate its plunge; for steeply plunging principal stresses the two-dimensional rose diagram cannot fully represent the three-dimensional stress geometry.</td></tr>
@@ -965,7 +905,7 @@ color_values = np.array(color_values)</code></pre>
                     <tr><td>No numeric export of binned data</td><td>No support exists for exporting the underlying per-bin numeric table (counts, weighted sums, mean attribute values) directly from the Rose Tab; users wishing to analyse the binned data numerically must currently do so via the Table tab's raw per-segment export or by replicating the binning logic externally.</td></tr>
                     <tr><td>Compass labels tied to Half rose toggle</td><td>The compass N/E/S/W annotations are suppressed for half-rose diagrams, which is an intentional design choice (the half rose only spans 0–180° and W/S annotations would be geometrically meaningless in that mode), but is not configurable independently of the Half rose toggle.</td></tr>
                     <tr><td>Fixed binary colour palette</td><td>Colour mapping for the binary Critical fractures metric always uses a fixed two-colour (muted/failure) palette regardless of the user's selected continuous colormap in the sidebar, which is intentional but may surprise users expecting their colormap choice to apply universally.</td></tr>
-                </tbody></table>
+                </table>
 
                 <!-- ================================================= -->
                 <h2 id="references">16. References</h2>
@@ -994,5 +934,5 @@ color_values = np.array(color_values)</code></pre>
         </main>
     </div>
     <script src="script.js"></script>
-
-</body></html>
+</body>
+</html>

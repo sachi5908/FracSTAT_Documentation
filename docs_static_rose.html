@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Static Rose Tab | FracSTAT Docs</title>
@@ -29,67 +30,7 @@
     </nav>
 
     <div class="docs-layout">
-        <aside class="docs-sidebar" id="docsSidebar">
-
-            <div class="sidebar-section open">
-                <button class="sidebar-toggle">
-                    Getting Started
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="introduction.html">Introduction</a></li>
-                    <li><a href="installation.html">Installation Guide</a></li>
-                    <li><a href="launcher.html">FracSTAT Home Page</a></li>
-                </ul>
-            </div>
-
-            <div class="sidebar-section">
-                <button class="sidebar-toggle">
-                    Static Analyzer
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="docs_static_map.html">Map Tab</a></li>
-                    <li><a href="docs_static_histogram.html">Histogram Tab</a></li>
-                    <li><a href="docs_static_cdf.html">CDF Tab</a></li>
-                    <li><a href="docs_static_rose.html">Rose Tab</a></li>
-                    <li><a href="docs_static_stereonet.html">Stereonet Tab</a></li>
-                    <li><a href="docs_static_connectivity.html">Connectivity Tab</a></li>
-                    <li><a href="docs_static_intensity.html">Intensity Tab</a></li>
-                    <li><a href="docs_static_profile.html">Profile Tab</a></li>
-                    <li><a href="docs_static_results.html">Results Tab</a></li>
-                </ul>
-            </div>
-
-            <div class="sidebar-section">
-                <button class="sidebar-toggle">
-                    Dynamic Analyzer
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="docs_dynamic_map.html">Map Tab</a></li>
-                    <li><a href="docs_dynamic_rose.html">Rose Tab</a></li>
-                    <li><a href="docs_dynamic_mohr.html">Mohr Tab</a></li>
-                    <li><a href="docs_dynamic_stereonet.html">Stereonet Tab</a></li>
-                    <li><a href="docs_dynamic_table.html">Table Tab</a></li>
-                    <li><a href="docs_dynamic_method.html">Method Tab</a></li>
-                </ul>
-            </div>
-
-            <div class="sidebar-section">
-                <button class="sidebar-toggle">
-                    Uncertainty Analyzer
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="docs_uncertainty_montecarlo.html">Monte Carlo Tab</a></li>
-                    <li><a href="docs_uncertainty_lhs.html">LHS Tab</a></li>
-                    <li><a href="docs_uncertainty_pce.html">PCE Tab</a></li>
-                <li><a href="docs_demo.html">demo</a></li><li><a href="docs_demo2.html">demo2</a></li></ul>
-            </div>
-
-        </aside>
-
+        <aside class="docs-sidebar" id="docsSidebar"></aside>
         <main class="docs-content">
             <div class="docs-content-inner">
                 <h1>Static Rose Tab</h1>
@@ -131,7 +72,7 @@
                     The Rose Plot tab uses a two-column layout: a fixed-width (290&nbsp;px), vertically scrollable
                     settings sidebar on the left, and an expandable polar plot canvas on the right hosting a
                     Matplotlib polar Axes embedded via <code>FigureCanvasTkAgg</code>. The Figure is sized
-                    9&nbsp;×&nbsp;7 inches at 100&nbsp;DPI and hosts one polar Axes
+                    9&nbsp;&times;&nbsp;7 inches at 100&nbsp;DPI and hosts one polar Axes
                     (<code>static_rose_ax</code>) plus one dedicated colorbar Axes
                     (<code>static_rose_cbar_ax</code>), whose position and visibility are recomputed on every
                     redraw according to the selected colorbar placement.
@@ -149,12 +90,12 @@
 
                 <h3>1.1 Sidebar Card Structure</h3>
                 <table>
-                    <tbody><tr><th>Card</th><th>Purpose</th><th>Key Widgets</th></tr>
+                    <tr><th>Card</th><th>Purpose</th><th>Key Widgets</th></tr>
                     <tr><td>Plot Mode</td><td>Selects the colouring scheme for the rose petals and, in Classic mode, the solid petal colour.</td><td>Style dropdown, Colormap dropdown + live preview swatch, Petal colour picker</td></tr>
                     <tr><td>Options</td><td>Controls the statistical construction of the diagram: binning, weighting, orientation range, and annotation of reference circles.</td><td>Custom title, Number of bins, Weight petals by, Colorbar position, Half rose switch, % reference circles switch, Update Rose button</td></tr>
                     <tr><td>Display Elements</td><td>Controls cosmetic rendering of plot background, grid, cardinal labelling, and plot boundary.</td><td>Outer BG / Plot BG / Grid Color pickers, Show grid lines / Show cardinal labels / Show N-S-E-W crosshairs checkboxes, Border Color picker, Border Width entry</td></tr>
                     <tr><td>Statistics</td><td>Read-only summary of the currently plotted dataset.</td><td>Segments, Mean Strike, Dominant Bin, Total Length labels</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>1.2 Plot Canvas and Toolbar</h3>
                 <p>
@@ -191,10 +132,10 @@
 
                 <h3>2.2 Required Columns</h3>
                 <table>
-                    <tbody><tr><th>Column</th><th>Type</th><th>Role in Rose Plot</th></tr>
+                    <tr><th>Column</th><th>Type</th><th>Role in Rose Plot</th></tr>
                     <tr><td><code>StrikeDeg</code></td><td>float, degrees, 0–360 (fully directed)</td><td>Source orientation value; folded to the 0–180° axial convention via <code>strikes % 180.0</code> before binning.</td></tr>
                     <tr><td><code>Length_m</code></td><td>float, project display units</td><td>Optional per-segment length used as the histogram weight when "Weight petals by" is set to Length.</td></tr>
-                </tbody></table>
+                </table>
 
                 <p>
                     If <code>StrikeDeg</code> is absent, the tab shows an explanatory empty-state message on the
@@ -231,15 +172,15 @@
 
                 <h3>3.1 Plot Mode Card</h3>
                 <table>
-                    <tbody><tr><th>Control</th><th>Default</th><th>Description</th></tr>
+                    <tr><th>Control</th><th>Default</th><th>Description</th></tr>
                     <tr><td>Style</td><td>strike colour</td><td>Chooses between two rendering modes: <em>strike colour</em> (FracSTAT mode — petals coloured by bin midpoint via a colormap) and <em>Classic (solid colour)</em> (all petals in a single user-selected colour). The selected mode dispatches to either <code>_draw_fracSTAT_rose()</code> or <code>_draw_classic_rose()</code>.</td></tr>
-                    <tr><td>Colormap</td><td>Viridis</td><td>Selects the Matplotlib colormap used in FracSTAT mode. A live 104×28&nbsp;px gradient swatch is redrawn on selection. The resolved Matplotlib identifier is cached in <code>static_rose_cmap_resolved</code> to avoid repeated lookups on every redraw.</td></tr>
+                    <tr><td>Colormap</td><td>Viridis</td><td>Selects the Matplotlib colormap used in FracSTAT mode. A live 104&times;28&nbsp;px gradient swatch is redrawn on selection. The resolved Matplotlib identifier is cached in <code>static_rose_cmap_resolved</code> to avoid repeated lookups on every redraw.</td></tr>
                     <tr><td>Petal colour (Classic mode)</td><td>#2563EB</td><td>Hex colour applied to every petal when Style is Classic. Exposed via the shared <code>_StaticColorButton</code> swatch/hex-entry widget.</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>3.2 Options Card</h3>
                 <table>
-                    <tbody><tr><th>Control</th><th>Default</th><th>Valid Range</th><th>Effect</th></tr>
+                    <tr><th>Control</th><th>Default</th><th>Valid Range</th><th>Effect</th></tr>
                     <tr><td>Custom title</td><td>"" (blank)</td><td>Free text</td><td>Overrides the auto-generated plot title (e.g. "Segment angles (equal area), n=…"). Leave blank to use the automatic title.</td></tr>
                     <tr><td>Number of bins</td><td>18</td><td>Integer, clamped [4, 180]</td><td>Number of equal-width azimuth classes spanning 0°–180°. Directly controls the angular resolution of the histogram. Out-of-range values are silently clamped and written back.</td></tr>
                     <tr><td>Weight petals by</td><td>Length</td><td>Length | Count</td><td>Whether each fracture contributes its measured <code>Length_m</code> (Length) or a uniform weight of 1 (Count) to its bin. For rows with missing or non-positive <code>Length_m</code>, a fallback weight of 1.0 is substituted.</td></tr>
@@ -247,20 +188,20 @@
                     <tr><td>Half rose (0–180° only)</td><td>Off</td><td>Boolean</td><td>When enabled, restricts the diagram to a semicircle spanning 0°–180°. When disabled, the histogram is mirrored into the 180°–360° half for the conventional full-circle axial rose.</td></tr>
                     <tr><td>Show % reference circles</td><td>Off</td><td>Boolean</td><td>Overlays three dashed concentric circles annotated with percentage-of-maximum labels calibrated to the equal-area (square-root) radius transform. See <a href="#maths">Section 4.5</a>.</td></tr>
                     <tr><td>Update Rose (button)</td><td>—</td><td>—</td><td>Manually forces a redraw; provided for consistency even though most controls already redraw automatically.</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>3.3 Display Elements Card</h3>
                 <table>
-                    <tbody><tr><th>Control</th><th>Default</th><th>Effect</th></tr>
+                    <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Outer BG</td><td>#FFFFFF</td><td>Figure (outer canvas) background colour.</td></tr>
                     <tr><td>Plot BG</td><td>#FFFFFF</td><td>Polar Axes (inner plot) background colour.</td></tr>
                     <tr><td>Grid Color</td><td>#D9E2EC</td><td>Colour of the radial/angular grid lines when enabled.</td></tr>
                     <tr><td>Show grid lines</td><td>Off</td><td>Toggles the Matplotlib polar grid.</td></tr>
                     <tr><td>Show cardinal labels (N/E)</td><td>On</td><td>Replaces the 0°/90°/180°/270° angular tick labels with N/E/S/W; all other ticks remain numeric.</td></tr>
-                    <tr><td>Show N-S / E-W crosshairs</td><td>Off</td><td>Draws faint radial spokes at the cardinal directions from the origin to 1.03&nbsp;× the maximum petal radius.</td></tr>
+                    <tr><td>Show N-S / E-W crosshairs</td><td>Off</td><td>Draws faint radial spokes at the cardinal directions from the origin to 1.03&nbsp;&times; the maximum petal radius.</td></tr>
                     <tr><td>Border Color</td><td>#475569</td><td>Colour of the polar spine (outer plot boundary circle).</td></tr>
                     <tr><td>Border Width</td><td>1.0</td><td>Line width, in points, of the polar spine.</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>3.4 Statistics Card (Read-Only)</h3>
                 <p>
@@ -269,12 +210,12 @@
                     discretised histogram — so its values are independent of the chosen Number of bins.
                 </p>
                 <table>
-                    <tbody><tr><th>Field</th><th>Description</th></tr>
+                    <tr><th>Field</th><th>Description</th></tr>
                     <tr><td>Segments</td><td>Count of valid (finite) strike observations included in the diagram after data validation. This is the <em>n</em> value shown in the auto-generated title.</td></tr>
                     <tr><td>Mean Strike</td><td>The weighted axial (circular) mean strike in degrees, computed via the doubled-angle method in <code>_static_axial_mean()</code> (see <a href="#statistics">Section 6.1</a>).</td></tr>
                     <tr><td>Dominant Bin</td><td>The midpoint azimuth of the histogram bin carrying the greatest weighted frequency. Sensitive to the chosen bin count.</td></tr>
                     <tr><td>Total Length</td><td>Sum of <code>Length_m</code> across all valid segments in the project's active display unit.</td></tr>
-                </tbody></table>
+                </table>
 
                 <!-- ================================================= -->
                 <h2 id="maths">4. Mathematical Background</h2>
@@ -313,7 +254,7 @@ w_i = 1      (Weight petals by = "Count")</div>
 e_k = k · (180° / B),    k = 0, 1, …, B</div>
                 <p>Each observation's folded strike is assigned to exactly one bin via NumPy's weighted histogram, producing bin totals and midpoints:</p>
                 <div class="formula-block">
-V_k = Σ_{i : e_k ≤ strike_i &lt; e_{k+1}} w_i
+V_k = Σ_{i : e_k ≤ strike_i < e_{k+1}} w_i
 m_k = (e_k + e_{k+1}) / 2</div>
 
                 <h3>4.4 Equal-Area (Square-Root) Radius Transform</h3>
@@ -392,7 +333,7 @@ Percentage_k = round( 100 · (k/3)² )</div>
 
                 <h3>5.2 FracSTAT-Mode Rendering Algorithm</h3>
                 <table>
-                    <tbody><tr><th>Step</th><th>Operation</th></tr>
+                    <tr><th>Step</th><th>Operation</th></tr>
                     <tr><td>1</td><td>Clear the polar Axes and colorbar Axes; apply outer/inner background colours.</td></tr>
                     <tr><td>2</td><td>Validate <code>self.results</code> is non-empty and contains <code>StrikeDeg</code>; otherwise show an empty-state message and abort.</td></tr>
                     <tr><td>3</td><td>Fold strikes to [0°, 180°) via modulo 180; discard non-finite values; abort with a message if none remain.</td></tr>
@@ -407,14 +348,14 @@ Percentage_k = round( 100 · (k/3)² )</div>
                     <tr><td>12</td><td>Build a <code>ScalarMappable</code> from the same colormap/normalisation and delegate colorbar placement to <code>_setup_rose_colorbar()</code>.</td></tr>
                     <tr><td>13</td><td>Compute and push Segments / Mean Strike / Dominant Bin / Total Length into the Statistics card via <code>_rose_update_stats()</code>.</td></tr>
                     <tr><td>14</td><td>Request an idle canvas redraw via <code>draw_idle()</code>.</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>5.3 Classic-Mode Rendering Algorithm</h3>
                 <p>
                     The Classic-mode algorithm mirrors steps 1–6 and 8–14 of the table above exactly, but omits
                     the colormap resolution and per-bin colour-array step. Every petal is rendered with the single
                     solid colour held in <code>static_rose_color_var</code>, a 90% opacity, and a petal angular
-                    width of 0.92&nbsp;× the full bin width to leave a visible gap between adjacent petals
+                    width of 0.92&nbsp;&times; the full bin width to leave a visible gap between adjacent petals
                     — a more traditional discretised rose-diagram appearance. Because Classic mode carries no
                     data-dependent colour mapping, the colorbar Axes is always suppressed regardless of the
                     selected Colorbar position, and the polar Axes expands to fill the reclaimed space.
@@ -422,16 +363,16 @@ Percentage_k = round( 100 · (k/3)² )</div>
 
                 <h3>5.4 Shared Polar Grid Formatting</h3>
                 <table>
-                    <tbody><tr><th>Step</th><th>Operation</th></tr>
+                    <tr><th>Step</th><th>Operation</th></tr>
                     <tr><td>1</td><td>Fix the polar orientation convention: 0° at geographic North (<code>set_theta_zero_location("N")</code>), angles increasing clockwise (<code>set_theta_direction(-1)</code>) — the standard geological azimuth convention.</td></tr>
                     <tr><td>2</td><td>If Half rose is active, restrict the visible angular sector to [0°, 180°] via <code>set_thetamin/thetamax</code>.</td></tr>
                     <tr><td>3</td><td>Generate angular tick positions every 30°; substitute N/E/S/W labels at 0°/90°/180°/270° when cardinal labels are enabled.</td></tr>
                     <tr><td>4</td><td>Hide radial tick labels (petal length is read qualitatively or via the optional percentage circles).</td></tr>
                     <tr><td>5</td><td>Style the polar spine using Border Color and Border Width settings.</td></tr>
-                    <tr><td>6</td><td>If crosshairs are enabled, draw faint radial spokes at the cardinal directions from the origin to 1.03&nbsp;× the maximum petal radius.</td></tr>
+                    <tr><td>6</td><td>If crosshairs are enabled, draw faint radial spokes at the cardinal directions from the origin to 1.03&nbsp;&times; the maximum petal radius.</td></tr>
                     <tr><td>7</td><td>Apply or suppress the angular/radial grid according to Show grid lines.</td></tr>
                     <tr><td>8</td><td>If % reference circles are enabled, delegate to the module-level helper <code>_pct_reference_circles()</code>.</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>5.5 Colorbar Placement Algorithm</h3>
                 <p>
@@ -451,7 +392,7 @@ Percentage_k = round( 100 · (k/3)² )</div>
                     </div>
                     <pre><code class="language-python">def _pct_reference_circles(ax, max_r, palette, n_circles=3):
     """Draw dashed percentage reference circles on a polar axis."""
-    if max_r &lt;= 0:
+    if max_r <= 0:
         return
     theta_ring = np.linspace(0, 2 * np.pi, 361)
     for k in range(1, n_circles + 1):
@@ -501,12 +442,12 @@ strike_mean = ½ · atan2(S, C)  (mod 180°)</div>
 
                 <h3>6.3 Summary of Reported Statistics</h3>
                 <table>
-                    <tbody><tr><th>Statistic</th><th>Formula / Method</th><th>Sensitive to Bin Count?</th><th>Sensitive to Weighting Mode?</th></tr>
+                    <tr><th>Statistic</th><th>Formula / Method</th><th>Sensitive to Bin Count?</th><th>Sensitive to Weighting Mode?</th></tr>
                     <tr><td>Segments (n)</td><td>Count of finite <code>StrikeDeg</code> values</td><td>No</td><td>No</td></tr>
                     <tr><td>Mean Strike</td><td>Doubled-angle weighted circular mean (§6.1)</td><td>No</td><td>Yes</td></tr>
                     <tr><td>Dominant Bin</td><td>argmax of weighted histogram</td><td>Yes</td><td>Yes</td></tr>
                     <tr><td>Total Length</td><td>Σ Length_m over all segments</td><td>No</td><td>No</td></tr>
-                </tbody></table>
+                </table>
 
                 <!-- ================================================= -->
                 <h2 id="visualization">7. Visualization &amp; Figure Components</h2>
@@ -758,7 +699,7 @@ strike_mean = ½ · atan2(S, C)  (mod 180°)</div>
                 <!-- ================================================= -->
                 <h2 id="limitations">12. Limitations</h2>
                 <table>
-                    <tbody><tr><th>Limitation</th><th>Description</th></tr>
+                    <tr><th>Limitation</th><th>Description</th></tr>
                     <tr><td>Axial data only</td><td>The module treats fracture strike strictly as axial (180°-periodic) data. It cannot represent or distinguish directional (0°–360°, polarity-sensitive) information such as dip direction or fault polarity. Users requiring dip-direction-sensitive visualisation should consult the Static Stereonet tab.</td></tr>
                     <tr><td>Dominant bin sensitivity</td><td>The Dominant Bin statistic is a discretised estimate dependent on the chosen Number of bins and on the fixed bin-edge alignment starting at 0°. It is not a continuous-distribution mode estimate (e.g. from kernel density estimation) and can shift between adjacent bins for small changes in bin count on noisy or sparse datasets.</td></tr>
                     <tr><td>No circular dispersion measures</td><td>No formal circular-statistics dispersion measure (e.g. circular variance, Rayleigh test for uniformity, von Mises concentration parameter) is computed or reported. Only the first-order mean direction and modal bin are provided.</td></tr>
@@ -766,7 +707,7 @@ strike_mean = ½ · atan2(S, C)  (mod 180°)</div>
                     <tr><td>Narrow-range colour contrast</td><td>Colour mapping in FracSTAT mode uses a fixed 0°–180° normalisation. Datasets whose entire fabric is confined to a narrow angular range will be rendered across only a narrow slice of the chosen colormap, which can reduce visual contrast between adjacent bins.</td></tr>
                     <tr><td>No Terzaghi correction</td><td>The module performs no automatic sampling-bias correction (e.g. Terzaghi weighting for scan-line orientation bias). Any such correction must be performed upstream, prior to import, if required.</td></tr>
                     <tr><td>Main-thread rendering</td><td>All rendering runs on the main UI thread since Matplotlib's TkAgg backend is not safe to drive concurrently. For very large datasets the redraw cost is bounded by Matplotlib's polar bar-collection rendering performance rather than by the NumPy histogram step.</td></tr>
-                </tbody></table>
+                </table>
 
                 <!-- Pagination Navigation -->
                 <div class="pagination-nav">
@@ -783,5 +724,5 @@ strike_mean = ½ · atan2(S, C)  (mod 180°)</div>
         </main>
     </div>
     <script src="script.js"></script>
-
-</body></html>
+</body>
+</html>

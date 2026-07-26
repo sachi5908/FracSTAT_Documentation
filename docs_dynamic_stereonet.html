@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Stereonet Tab | FracSTAT Docs</title>
@@ -29,69 +30,8 @@
     </nav>
     
     <div class="docs-layout">
-        <!-- ==========================================
-             MASTER ACCORDION SIDEBAR
-             ========================================== -->
-        <aside class="docs-sidebar" id="docsSidebar">
-            
-            <div class="sidebar-section open">
-                <button class="sidebar-toggle">
-                    Getting Started
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="introduction.html">Introduction</a></li>
-                    <li><a href="installation.html" class="active">Installation Guide</a></li>
-                    <li><a href="launcher.html">FracSTAT Home Page</a></li>
-                </ul>
-            </div>
 
-            <div class="sidebar-section">
-                <button class="sidebar-toggle">
-                    Static Analyzer
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="docs_static_map.html">Map Tab</a></li>
-                    <li><a href="docs_static_histogram.html">Histogram Tab</a></li>
-                    <li><a href="docs_static_cdf.html">CDF Tab</a></li>
-                    <li><a href="docs_static_rose.html">Rose Tab</a></li>
-                    <li><a href="docs_static_stereonet.html">Stereonet Tab</a></li>
-                    <li><a href="docs_static_connectivity.html">Connectivity Tab</a></li>
-                    <li><a href="docs_static_intensity.html">Intensity Tab</a></li>
-                    <li><a href="docs_static_profile.html">Profile Tab</a></li>
-                    <li><a href="docs_static_results.html">Results Tab</a></li>
-                </ul>
-            </div>
-
-            <div class="sidebar-section">
-                <button class="sidebar-toggle">
-                    Dynamic Analyzer
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="docs_dynamic_map.html">Map Tab</a></li>
-                    <li><a href="docs_dynamic_rose.html">Rose Tab</a></li>
-                    <li><a href="docs_dynamic_mohr.html">Mohr Tab</a></li>
-                    <li><a href="docs_dynamic_stereonet.html">Stereonet Tab</a></li>
-                    <li><a href="docs_dynamic_table.html">Table Tab</a></li>
-                    <li><a href="docs_dynamic_method.html">Method Tab</a></li>
-                </ul>
-            </div>
-
-            <div class="sidebar-section">
-                <button class="sidebar-toggle">
-                    Uncertainty Analyzer
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="docs_uncertainty_montecarlo.html">Monte Carlo Tab</a></li>
-                    <li><a href="docs_uncertainty_lhs.html">LHS Tab</a></li>
-                    <li><a href="docs_uncertainty_pce.html">PCE Tab</a></li>
-                <li><a href="docs_demo.html">demo</a></li><li><a href="docs_demo2.html">demo2</a></li></ul>
-            </div>
-
-        </aside>
+        <aside class="docs-sidebar" id="docsSidebar"></aside>
 
         <main class="docs-content">
             <div class="docs-content-inner">
@@ -183,11 +123,11 @@
                     header, three tiles summarise, at a glance, the current state of the plot:
                 </p>
                 <table>
-                    <tbody><tr><th>Tile</th><th>Displayed Value</th><th>Update Trigger</th></tr>
+                    <tr><th>Tile</th><th>Displayed Value</th><th>Update Trigger</th></tr>
                     <tr><td>Fracture poles</td><td>Count of segments/planes currently plotted (<code>len(self.results)</code>)</td><td>Every redraw of the stereonet</td></tr>
                     <tr><td>Active field</td><td>Name of the currently selected colour-by attribute (e.g. "Slip tendency")</td><td>Whenever the Mohr/Stereonet shared metric checkboxes change</td></tr>
                     <tr><td>Colour scale</td><td>Name of the selected Matplotlib colormap (e.g. "Plasma")</td><td>Whenever the colormap dropdown changes</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>1.2 Main Plot Canvas</h3>
                 <p>
@@ -211,11 +151,11 @@
 
                 <h3>1.4 Navigation and Selection Controls</h3>
                 <table>
-                    <tbody><tr><th>Control</th><th>Type</th><th>Action</th></tr>
+                    <tr><th>Control</th><th>Type</th><th>Action</th></tr>
                     <tr><td>Show in Map</td><td>Button</td><td>Switches the workspace to the Map tab with the same segment ID highlighted (<code>select_segment(..., switch_to_map=True)</code>).</td></tr>
                     <tr><td>Clear Selection</td><td>Button</td><td>Deselects the current pole across Map, Mohr, Table, and Stereonet simultaneously (<code>clear_selection()</code>).</td></tr>
                     <tr><td>Dip Override card</td><td>Composite widget</td><td>Shared control (built by <code>_build_dip_override_card</code>) for loading a CSV/Excel dip-override file; described in <a href="#controls">Section 5.6</a>.</td></tr>
-                </tbody></table>
+                </table>
 
                 <figure class="figure-block">
                     <div class="figure-img-wrap">
@@ -237,7 +177,7 @@
                     columns the Stereonet Tab reads are summarised below.
                 </p>
                 <table>
-                    <tbody><tr><th>Column</th><th>Source</th><th>Role in Stereonet Tab</th></tr>
+                    <tr><th>Column</th><th>Source</th><th>Role in Stereonet Tab</th></tr>
                     <tr><td><code>StrikeDeg</code></td><td>SVG geometry or preset Excel strike</td><td>Converted to pole trend (Section 3.2); read modulo 360° to preserve dip direction.</td></tr>
                     <tr><td><code>DipDeg</code></td><td>SVG default dip / Excel preset dip / per-ID override</td><td>Converted to pole plunge via the equal-area radius formula (Section 3.1).</td></tr>
                     <tr><td><code>ID</code></td><td>Row index assigned in <code>run_calculation()</code></td><td>Used for pole picking (<code>on_stereonet_pick</code>) and cross-tab selection.</td></tr>
@@ -246,7 +186,7 @@
                     <tr><td><code>FractureSusceptibility</code></td><td>σn − Pf − (τ − C0)/μ</td><td>One of four selectable colour-by metrics.</td></tr>
                     <tr><td><code>CriticalStressValue</code></td><td>Boolean Coulomb test cast to 0/1</td><td>One of four selectable colour-by metrics; forces a discrete two-colour scale.</td></tr>
                     <tr><td><code>EffectiveSigmaN, Tau</code></td><td>Resolved normal/shear stress at the current stress tensor</td><td>Displayed verbatim in the Pole Inspector card.</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>2.1 Dip Override Injection</h3>
                 <p>
@@ -369,12 +309,12 @@ nU = −cos(colat)</div>
                     as in the Mohr tab:
                 </p>
                 <table>
-                    <tbody><tr><th>Metric</th><th>Formula</th><th>Normalisation</th></tr>
+                    <tr><th>Metric</th><th>Formula</th><th>Normalisation</th></tr>
                     <tr><td>Slip tendency (normalised)</td><td>Ts = τ / max(σn, 10⁻¹²)</td><td>Divided by the maximum Ts found on the grid so the field spans 0–1.</td></tr>
                     <tr><td>Dilation tendency</td><td>Td = (σ1 − σn) / (σ1 − σ3)</td><td>Already dimensionless, 0–1 by construction.</td></tr>
                     <tr><td>Fracture susceptibility</td><td>Sf = σn − Pf − (τ − C0)/μ</td><td>Displayed in stress units (e.g. MPa); colour range set from data min/max.</td></tr>
                     <tr><td>Critical stress (binary)</td><td>1 if τ ≥ C0 + μ(σn − Pf), else 0</td><td>Two-colour discrete scale (stable / critical).</td></tr>
-                </tbody></table>
+                </table>
                 <p>
                     This same field-evaluation logic is shared with the Mohr tab's own contour computation,
                     ensuring the two diagrams are always mutually consistent for a given stress state — a
@@ -441,7 +381,7 @@ elif column == "DilationTendency":
 elif column == "FractureSusceptibility":
     field_values = sigma_n - stress["pore_pressure"] - (tau - stress["cohesion"]) / max(stress["friction"], 1e-12)
 else:
-    field_values = (tau &gt;= stress["cohesion"] + stress["friction"]*(sigma_n - stress["pore_pressure"])).astype(float)
+    field_values = (tau >= stress["cohesion"] + stress["friction"]*(sigma_n - stress["pore_pressure"])).astype(float)
 
 radius = np.sqrt(2) * np.sin(colatitude / 2)
 field_x, field_y = (radius*np.sin(trend)).ravel(), (radius*np.cos(trend)).ravel()</code></pre>
@@ -539,17 +479,17 @@ field_x, field_y = (radius*np.sin(trend)).ravel(), (radius*np.cos(trend)).ravel(
 
                 <h3>5.2 Settings Card — General Appearance</h3>
                 <table>
-                    <tbody><tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
+                    <tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Colour bar position</td><td>Dropdown</td><td>Bottom</td><td>Bottom / Top / Left / Right / None; repositions colour bar and rescales the main diagram (Section 4.4).</td></tr>
                     <tr><td>Outer BG</td><td>Colour swatch</td><td>#F8FAFC</td><td>Figure (outer canvas) background colour.</td></tr>
                     <tr><td>Inner BG</td><td>Colour swatch</td><td>#FFFFFF</td><td>Stereonet Axes background colour.</td></tr>
                     <tr><td>CBar Width</td><td>Numeric entry</td><td>0.03</td><td>Colour-bar thickness as a fraction of the figure.</td></tr>
                     <tr><td>CBar Length</td><td>Numeric entry</td><td>0.64</td><td>Colour-bar length as a fraction of the figure.</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>5.3 Settings Card — Pole and Border Styling</h3>
                 <table>
-                    <tbody><tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
+                    <tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Pole Color</td><td>Colour swatch</td><td>#FF0000</td><td>Fill colour of pole markers when solid-colour mode effectively applies (no metric selected uses this colour for the index; poles themselves are always coloured by the active field when a metric is chosen).</td></tr>
                     <tr><td>Pole Border</td><td>Colour swatch</td><td>#FF0000</td><td>Marker edge colour.</td></tr>
                     <tr><td>Border Width</td><td>Numeric entry</td><td>0.3</td><td>Marker edge line width, points.</td></tr>
@@ -560,16 +500,16 @@ field_x, field_y = (radius*np.sin(trend)).ravel(), (radius*np.cos(trend)).ravel(
                     <tr><td>Pole Size</td><td>Numeric entry</td><td>24</td><td>Marker area in points² (matplotlib scatter <code>s</code> parameter).</td></tr>
                     <tr><td>Diagram Scale</td><td>Numeric entry</td><td>1.0</td><td>Multiplicative scale factor applied to both width and height of the main Axes about its current centre (Section 4.4).</td></tr>
                     <tr><td>Custom Title</td><td>Text entry</td><td>(blank)</td><td>Overrides the auto-generated title "&lt;metric&gt; — fracture poles".</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>5.4 Settings Card — Toggles</h3>
                 <table>
-                    <tbody><tr><th>Toggle</th><th>Default</th><th>Effect</th></tr>
+                    <tr><th>Toggle</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Show N-S / E-W Lines</td><td>On</td><td>Draws the two crosshair diameters through the net centre.</td></tr>
                     <tr><td>Show Selected Plane</td><td>Off</td><td>Draws the great-circle trace of only the currently selected fracture, in the Selected Pole colour.</td></tr>
                     <tr><td>Show All Poles</td><td>On</td><td>Toggles visibility (and pickability) of the entire pole scatter collection; turning it off disables clicking to select a fracture from the stereonet.</td></tr>
                     <tr><td>Show All Planes</td><td>Off</td><td>Draws every loaded fracture's great-circle trace at low opacity (alpha = 0.25), useful for visualising the overall fabric of dipping surfaces rather than just their poles.</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>5.5 Reset Defaults</h3>
                 <p>
@@ -677,7 +617,7 @@ field_x, field_y = (radius*np.sin(trend)).ravel(), (radius*np.cos(trend)).ravel(
                 <!-- ================================================= -->
                 <h2 id="visualization">8. Visualization Components</h2>
                 <table>
-                    <tbody><tr><th>Component</th><th>Matplotlib Primitive</th><th>Purpose</th></tr>
+                    <tr><th>Component</th><th>Matplotlib Primitive</th><th>Purpose</th></tr>
                     <tr><td>Primitive circle</td><td><code>ax.plot</code> on a 361-point unit circle</td><td>Defines the projection boundary (equator of the lower hemisphere).</td></tr>
                     <tr><td>Grid rings / degree ticks</td><td><code>ax.plot</code> radial tick segments + <code>ax.text</code></td><td>Optional 30° azimuth reference marks around the perimeter, shown only when "Show Selected Plane" is enabled.</td></tr>
                     <tr><td>N-S / E-W crosshair</td><td><code>ax.plot</code> two diameters</td><td>Quick visual reference for cardinal directions.</td></tr>
@@ -688,7 +628,7 @@ field_x, field_y = (radius*np.sin(trend)).ravel(), (radius*np.cos(trend)).ravel(
                     <tr><td>Selected-pole halo</td><td>Two concentric <code>ax.scatter</code> rings + plus-marker</td><td>Draws attention to the currently selected fracture.</td></tr>
                     <tr><td>Symbols index</td><td>Custom <code>FancyBboxPatch</code> + text/markers</td><td>Draggable legend explaining every marker on the plot (Section 4.3).</td></tr>
                     <tr><td>Colour bar</td><td><code>fig.colorbar</code> bound to a <code>ScalarMappable</code></td><td>Quantitative scale for the active tendency metric.</td></tr>
-                </tbody></table>
+                </table>
 
                 <figure class="figure-block">
                     <div class="figure-img-wrap">
@@ -894,14 +834,14 @@ field_x, field_y = (radius*np.sin(trend)).ravel(), (radius*np.cos(trend)).ravel(
                 <!-- ================================================= -->
                 <h2 id="limitations">14. Limitations</h2>
                 <table>
-                    <tbody><tr><th>Limitation</th><th>Description</th></tr>
+                    <tr><th>Limitation</th><th>Description</th></tr>
                     <tr><td>Spatially uniform stress assumption</td><td>The continuous tendency field assumes the stress tensor is spatially uniform; it does not account for local stress perturbations near existing fractures, free surfaces, or heterogeneous lithology.</td></tr>
                     <tr><td>Visual clutter for dense datasets</td><td>Great-circle plane traces ("Show All Planes") can become visually cluttered for datasets with many hundreds of fractures; the fixed low alpha (0.25) mitigates but does not eliminate this.</td></tr>
                     <tr><td>Non-linear angular compression</td><td>The equal-area projection, while area-preserving, still compresses angular relationships non-linearly toward the primitive circle; visual judgements of "cluster tightness" should be corroborated with the quantitative statistics available on the Rose tab.</td></tr>
                     <tr><td>Dip clamping</td><td>Dip values are clipped to 0–90°; any input data implying an overturned or otherwise out-of-range dip will be silently clamped rather than rejected.</td></tr>
                     <tr><td>Symbols index position not persisted</td><td>The Symbols index drag-repositioning state is not currently persisted in the saved project session file, so it resets to its default anchor when a project is reopened.</td></tr>
                     <tr><td>No rake-misfit colour metric</td><td>Kinematic (Wallace–Bott) rake-misfit diagnostics for focal-mechanism data are available in the Table tab but are not exposed as a Stereonet colour-by metric.</td></tr>
-                </tbody></table>
+                </table>
 
                 <!-- ================================================= -->
                 <h2 id="references">15. References</h2>
@@ -929,5 +869,5 @@ field_x, field_y = (radius*np.sin(trend)).ravel(), (radius*np.cos(trend)).ravel(
         </main>
     </div>
     <script src="script.js"></script>
-
-</body></html>
+</body>
+</html>

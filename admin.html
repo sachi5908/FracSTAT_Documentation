@@ -606,7 +606,7 @@
                 <button class="action btn-discard" id="discardBtn"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-9.21l5.75 4.64"></path></svg> Reload (discard changes)</button>
                 <button class="action btn-save" id="saveBtn"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download Page</button>
                 <button class="action btn-github" id="githubBtn"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg> Update In Github</button>
-                <button class="action btn-addsidebar" id="addSidebarBtn" title="Add this page's link to the sidebar navigation on every other page"><svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Add to Sidebar</button>
+                <button class="action btn-addsidebar" id="addSidebarBtn" title="Register this page's link in the shared sidebar (script.js), so it appears in every page's navigation"><svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Add to Sidebar</button>
             </div>
             <div class="et-status" id="editorStatus"></div>
         </div>
@@ -701,10 +701,6 @@
             { file: "docs_uncertainty_montecarlo.html", label: "Monte Carlo Tab" },
             { file: "docs_uncertainty_lhs.html", label: "LHS Tab" },
             { file: "docs_uncertainty_pce.html", label: "PCE Tab" }
-        ,
-            { file: "docs_demo.html", label: "demo" }
-        ,
-            { file: "docs_demo2.html", label: "demo2" }
         ]}
     ];
 
@@ -753,32 +749,17 @@
         return result;
     }
 
-    // Builds the <aside id="docsSidebar"> inner markup (every section +
-    // link), matching the exact structure used across every docs page,
-    // with the section containing `activeFile` marked open and the
-    // matching link marked active.
-    function buildSidebarHtml(activeFile) {
-        var chevronSvg = '<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>';
-        var html = "";
-        FILE_SECTIONS.forEach(function (section) {
-            var containsActive = section.files.some(function (f) { return f.file === activeFile; });
-            html += '            <div class="sidebar-section' + (containsActive ? " open" : "") + '">\n';
-            html += '                <button class="sidebar-toggle">\n                    ' + escapeHtml(section.title) + '\n                    ' + chevronSvg + '\n                </button>\n';
-            html += '                <ul class="sidebar-links">\n';
-            section.files.forEach(function (f) {
-                var activeCls = (f.file === activeFile) ? ' class="active"' : "";
-                html += '                    <li><a href="' + f.file + '"' + activeCls + '>' + escapeHtml(f.label) + '</a></li>\n';
-            });
-            html += "                </ul>\n            </div>\n\n";
-        });
-        return html;
-    }
-
-    // Assembles a complete, brand-new docs page: same navbar/sidebar/script
-    // as every other page, with a starter H1 + placeholder paragraph the
-    // admin can then edit like any other block.
-    function buildNewPageHtml(title, activeFile) {
-        var sidebar = buildSidebarHtml(activeFile);
+    // Assembles a complete, brand-new docs page: same navbar/script as every
+    // other page, with a starter H1 + placeholder paragraph the admin can
+    // then edit like any other block.
+    //
+    // NOTE: the <aside id="docsSidebar"> is intentionally left EMPTY here.
+    // The sidebar is no longer baked into each page's static HTML — every
+    // docs page (see script.js) now renders its sidebar client-side at
+    // runtime from the single SIDEBAR_SECTIONS array defined in script.js
+    // (renderSidebar()). So a brand-new page automatically gets the full,
+    // up-to-date sidebar for free, and never needs its own copy patched in.
+    function buildNewPageHtml(title) {
         return "<!DOCTYPE html>\n" +
             '<html lang="en">\n' +
             "<head>\n" +
@@ -791,9 +772,7 @@
             '<body class="docs-body">\n' +
             NAVBAR_TEMPLATE + "\n" +
             '    <div class="docs-layout">\n' +
-            '        <aside class="docs-sidebar" id="docsSidebar">\n\n' +
-            sidebar +
-            "        </aside>\n\n" +
+            '        <aside class="docs-sidebar" id="docsSidebar"></aside>\n\n' +
             '        <main class="docs-content">\n' +
             '            <div class="docs-content-inner">\n' +
             "                <h1>" + escapeHtml(title) + "</h1>\n" +
@@ -804,49 +783,8 @@
             "        </main>\n" +
             "    </div>\n" +
             '    <script src="script.js"><' + "/script>\n" +
-        "</bo" + "dy>\n" + 
-        "</ht" + "ml>";
-}
-
-    // Inserts a sidebar <li> link for `targetFile` into a fetched page's raw
-    // HTML, creating the whole section block if `sectionTitle` doesn't yet
-    // exist on that page. Returns the updated full HTML string, or null if
-    // the link is already present (nothing to do).
-    function insertSidebarLink(rawHtml, targetFile, label, sectionTitle) {
-        var parser = new DOMParser();
-        var doc = parser.parseFromString(rawHtml, "text/html");
-        var aside = doc.getElementById("docsSidebar");
-        if (!aside) return null;
-
-        if (aside.querySelector('a[href="' + targetFile + '"]')) return null; // already linked
-
-        var targetSection = null;
-        aside.querySelectorAll(".sidebar-section").forEach(function (sec) {
-            var btn = sec.querySelector(".sidebar-toggle");
-            if (!btn) return;
-            var txt = (btn.childNodes[0] ? btn.childNodes[0].textContent : btn.textContent).trim();
-            if (txt.toLowerCase() === sectionTitle.toLowerCase()) targetSection = sec;
-        });
-
-        if (targetSection) {
-            var ul = targetSection.querySelector(".sidebar-links");
-            var li = doc.createElement("li");
-            var a = doc.createElement("a");
-            a.setAttribute("href", targetFile);
-            a.textContent = label;
-            li.appendChild(a);
-            if (ul) ul.appendChild(li);
-        } else {
-            var newSec = doc.createElement("div");
-            newSec.className = "sidebar-section";
-            newSec.innerHTML =
-                '<button class="sidebar-toggle">' + escapeHtml(sectionTitle) +
-                '<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></button>' +
-                '<ul class="sidebar-links"><li><a href="' + targetFile + '">' + escapeHtml(label) + "</a></li></ul>";
-            aside.appendChild(newSec);
-        }
-
-        return "<!DOCTYPE html>\n" + doc.documentElement.outerHTML;
+            "<" + "/body>\n" +
+            "<" + "/html>";
     }
 
     // Finds the FILE_SECTIONS array literal inside admin.html's own source
@@ -931,59 +869,109 @@
         }
     }
 
-    // Adds a sidebar link to `targetFile` on every other known page and
-    // pushes each updated page to GitHub. Pages that already link to it are
-    // skipped; individual failures are logged and counted but don't stop
-    // the rest of the batch.
-    async function propagateSidebarToAllPages(targetFile) {
+    // Finds the SIDEBAR_SECTIONS array literal inside script.js's own
+    // source and inserts a new { href, label } entry (or a whole new
+    // section) for the given page, using bracket-depth matching so it
+    // works regardless of formatting. Mirrors patchFileSectionsSource()
+    // above, but targets script.js's "links"/"href" naming rather than
+    // admin.html's own "files"/"file" naming.
+    function patchScriptJsSidebarSource(src, sectionTitle, file, label) {
+        var startIdx = src.indexOf("const SIDEBAR_SECTIONS");
+        if (startIdx === -1) startIdx = src.indexOf("var SIDEBAR_SECTIONS");
+        if (startIdx === -1) return null;
+        var arrStart = src.indexOf("[", startIdx);
+        if (arrStart === -1) return null;
+
+        var depth = 0, arrEnd = -1;
+        for (var i = arrStart; i < src.length; i++) {
+            if (src[i] === "[") depth++;
+            else if (src[i] === "]") { depth--; if (depth === 0) { arrEnd = i; break; } }
+        }
+        if (arrEnd === -1) return null;
+
+        var arrText = src.substring(arrStart, arrEnd + 1);
+
+        // Already linked? Don't add a duplicate entry.
+        if (arrText.indexOf('"' + file + '"') !== -1) return null;
+
+        var titleNeedle = 'title: "' + sectionTitle + '"';
+        var titleIdx = arrText.indexOf(titleNeedle);
+        var newEntry = '{ href: "' + file + '", label: "' + String(label).replace(/"/g, '\\"') + '" }';
+
+        var newArrText;
+        if (titleIdx !== -1) {
+            var linksIdx = arrText.indexOf("links: [", titleIdx);
+            if (linksIdx === -1) return null;
+            var lArrStart = arrText.indexOf("[", linksIdx);
+            var ldepth = 0, lArrEnd = -1;
+            for (var j = lArrStart; j < arrText.length; j++) {
+                if (arrText[j] === "[") ldepth++;
+                else if (arrText[j] === "]") { ldepth--; if (ldepth === 0) { lArrEnd = j; break; } }
+            }
+            if (lArrEnd === -1) return null;
+            var before = arrText.substring(0, lArrEnd);
+            var after = arrText.substring(lArrEnd);
+            newArrText = before + ",\n            " + newEntry + "\n        " + after;
+        } else {
+            var newSectionText = '{\n        title: "' + String(sectionTitle).replace(/"/g, '\\"') +
+                '",\n        links: [\n            ' + newEntry + "\n        ]\n    }";
+            var inner = arrText.substring(1, arrText.length - 1).replace(/\s*$/, "");
+            newArrText = "[" + inner + ",\n    " + newSectionText + "\n]";
+        }
+
+        return src.substring(0, arrStart) + newArrText + src.substring(arrEnd + 1);
+    }
+
+    // Registers `targetFile` in script.js's SIDEBAR_SECTIONS — the single
+    // shared source of truth every docs page now reads from at runtime
+    // (renderSidebar() in script.js) to build its own sidebar. This
+    // replaces the old approach of patching every individual page's static
+    // HTML: since the sidebar is rendered client-side from this one array,
+    // updating it here instantly puts the new page's link on every page's
+    // sidebar, with just one file to push to GitHub.
+    async function updateSidebarRegistry(targetFile) {
         var token = sessionStorage.getItem("github_token");
         if (!token) { alert("No GitHub token found. Please log in again."); return; }
 
         var meta = findFileMeta(targetFile);
         if (!meta) { alert("Could not determine this page's sidebar label/section."); return; }
 
-        var allFiles = [];
-        FILE_SECTIONS.forEach(function (s) { s.files.forEach(function (f) { allFiles.push(f.file); }); });
-        allFiles = allFiles.filter(function (f) { return f !== targetFile && !PENDING_NEW_FILES.has(f); });
+        editorStatus.textContent = "Updating shared sidebar (script.js)…";
+        try {
+            var localRes = await fetch("script.js");
+            if (!localRes.ok) throw new Error("fetch script.js failed: " + localRes.status);
+            var rawJs = await localRes.text();
 
-        var successCount = 0, failCount = 0;
-        for (var i = 0; i < allFiles.length; i++) {
-            var f = allFiles[i];
-            editorStatus.textContent = "Updating sidebar: " + f + " (" + (i + 1) + "/" + allFiles.length + ")";
-            try {
-                var localRes = await fetch(f);
-                if (!localRes.ok) throw new Error("fetch failed " + localRes.status);
-                var rawHtml = await localRes.text();
-
-                var updatedHtml = insertSidebarLink(rawHtml, targetFile, meta.label, meta.section);
-                if (updatedHtml === null) { successCount++; continue; }
-
-                var apiUrl = "https://api.github.com/repos/" + GITHUB_REPO_OWNER + "/" + GITHUB_REPO_NAME + "/contents/" + f;
-                var shaRes = await fetch(apiUrl, { headers: { "Authorization": "token " + token } });
-                var sha = null;
-                if (shaRes.ok) { var shaData = await shaRes.json(); sha = shaData.sha; }
-
-                var encoded = btoa(unescape(encodeURIComponent(updatedHtml)));
-                var putRes = await fetch(apiUrl, {
-                    method: "PUT",
-                    headers: { "Authorization": "token " + token, "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        message: "Add " + targetFile + " to sidebar (via Admin Panel)",
-                        content: encoded,
-                        sha: sha,
-                        branch: GITHUB_BRANCH
-                    })
-                });
-                if (!putRes.ok) throw new Error("GitHub PUT failed for " + f);
-                successCount++;
-            } catch (err) {
-                console.error("Sidebar update failed for", f, err);
-                failCount++;
+            var updatedJs = patchScriptJsSidebarSource(rawJs, meta.section, targetFile, meta.label);
+            if (updatedJs === null) {
+                editorStatus.textContent = "Sidebar already includes " + targetFile + " — nothing to update.";
+                return;
             }
-        }
 
-        editorStatus.textContent = "Sidebar update complete: " + successCount + " succeeded, " + failCount +
-            " failed. (Allow 1-2 minutes for the live site to redeploy.)";
+            var apiUrl = "https://api.github.com/repos/" + GITHUB_REPO_OWNER + "/" + GITHUB_REPO_NAME + "/contents/script.js";
+            var shaRes = await fetch(apiUrl, { headers: { "Authorization": "token " + token } });
+            var sha = null;
+            if (shaRes.ok) { var shaData = await shaRes.json(); sha = shaData.sha; }
+
+            var encoded = btoa(unescape(encodeURIComponent(updatedJs)));
+            var putRes = await fetch(apiUrl, {
+                method: "PUT",
+                headers: { "Authorization": "token " + token, "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    message: "Add " + targetFile + " to shared sidebar (via Admin Panel)",
+                    content: encoded,
+                    sha: sha,
+                    branch: GITHUB_BRANCH
+                })
+            });
+            if (!putRes.ok) throw new Error("GitHub PUT failed for script.js");
+
+            editorStatus.textContent = "Sidebar updated — " + targetFile + " now appears on every page's navigation. " +
+                "(Allow 1-2 minutes for the live site to redeploy.)";
+        } catch (err) {
+            console.error("Sidebar registry update failed:", err);
+            editorStatus.textContent = "Sidebar update failed: " + err.message;
+        }
     }
 
     function populateSectionDropdown() {
@@ -1203,7 +1191,7 @@
             section.files.push({ file: filename, label: sidebarLabel });
 
             NEW_PAGES[filename] = {
-                html: buildNewPageHtml(title, filename),
+                html: buildNewPageHtml(title),
                 label: sidebarLabel,
                 section: sectionTitle
             };
@@ -1214,7 +1202,7 @@
 
             cpStatus.innerHTML = "Created <b>" + filename + "</b> locally (not yet on GitHub). Click its " +
                 "<b>Edit Page</b> button below to add content, then use <b>Update In Github</b> inside the " +
-                "editor to publish it — that also offers to add it to every other page's sidebar automatically.";
+                "editor to publish it — that also offers to register it in the shared sidebar (script.js) automatically.";
 
             cpTitleInput.value = "";
             cpFilenameInput.value = "";
@@ -1323,8 +1311,8 @@
         if (!currentFile) return;
         var meta = findFileMeta(currentFile);
         if (!meta) { alert("Couldn't determine this page's sidebar section/label."); return; }
-        if (!confirm('Add "' + currentFile + '" (' + meta.label + ') to the sidebar on every other page, and push those changes to GitHub now?')) return;
-        propagateSidebarToAllPages(currentFile).then(function () {
+        if (!confirm('Add "' + currentFile + '" (' + meta.label + ') to the shared sidebar (script.js), and push that change to GitHub now? Every page reads its sidebar from this one file, so this single update is enough to make it appear everywhere.')) return;
+        updateSidebarRegistry(currentFile).then(function () {
             return updateAdminHtmlSource(currentFile, meta.label, meta.section);
         });
     });
@@ -2286,7 +2274,7 @@
                 if (propBtn) {
                     var meta = findFileMeta(currentFile);
                     propBtn.addEventListener("click", function () {
-                        propagateSidebarToAllPages(currentFile).then(function () {
+                        updateSidebarRegistry(currentFile).then(function () {
                             if (meta) return updateAdminHtmlSource(currentFile, meta.label, meta.section);
                         });
                     });

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Map Tab | FracSTAT Docs</title>
@@ -29,69 +30,8 @@
     </nav>
     
     <div class="docs-layout">
-        <!-- ==========================================
-             MASTER ACCORDION SIDEBAR
-             ========================================== -->
-        <aside class="docs-sidebar" id="docsSidebar">
-            
-            <div class="sidebar-section open">
-                <button class="sidebar-toggle">
-                    Getting Started
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="introduction.html">Introduction</a></li>
-                    <li><a href="installation.html" class="active">Installation Guide</a></li>
-                    <li><a href="launcher.html">FracSTAT Home Page</a></li>
-                </ul>
-            </div>
 
-            <div class="sidebar-section">
-                <button class="sidebar-toggle">
-                    Static Analyzer
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="docs_static_map.html">Map Tab</a></li>
-                    <li><a href="docs_static_histogram.html">Histogram Tab</a></li>
-                    <li><a href="docs_static_cdf.html">CDF Tab</a></li>
-                    <li><a href="docs_static_rose.html">Rose Tab</a></li>
-                    <li><a href="docs_static_stereonet.html">Stereonet Tab</a></li>
-                    <li><a href="docs_static_connectivity.html">Connectivity Tab</a></li>
-                    <li><a href="docs_static_intensity.html">Intensity Tab</a></li>
-                    <li><a href="docs_static_profile.html">Profile Tab</a></li>
-                    <li><a href="docs_static_results.html">Results Tab</a></li>
-                </ul>
-            </div>
-
-            <div class="sidebar-section">
-                <button class="sidebar-toggle">
-                    Dynamic Analyzer
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="docs_dynamic_map.html">Map Tab</a></li>
-                    <li><a href="docs_dynamic_rose.html">Rose Tab</a></li>
-                    <li><a href="docs_dynamic_mohr.html">Mohr Tab</a></li>
-                    <li><a href="docs_dynamic_stereonet.html">Stereonet Tab</a></li>
-                    <li><a href="docs_dynamic_table.html">Table Tab</a></li>
-                    <li><a href="docs_dynamic_method.html">Method Tab</a></li>
-                </ul>
-            </div>
-
-            <div class="sidebar-section">
-                <button class="sidebar-toggle">
-                    Uncertainty Analyzer
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="docs_uncertainty_montecarlo.html">Monte Carlo Tab</a></li>
-                    <li><a href="docs_uncertainty_lhs.html">LHS Tab</a></li>
-                    <li><a href="docs_uncertainty_pce.html">PCE Tab</a></li>
-                <li><a href="docs_demo.html">demo</a></li><li><a href="docs_demo2.html">demo2</a></li></ul>
-            </div>
-
-        </aside>
+        <aside class="docs-sidebar" id="docsSidebar"></aside>
 
         <main class="docs-content">
             <div class="docs-content-inner">
@@ -189,13 +129,13 @@
                 <h3>2.1 Toolbar</h3>
                 <p>A horizontal toolbar sits above the plot canvas and contains, from left to right:</p>
                 <table>
-                    <tbody><tr><th>Control</th><th>Type</th><th>Function</th></tr>
+                    <tr><th>Control</th><th>Type</th><th>Function</th></tr>
                     <tr><td>"Scroll to zoom" label</td><td>Static label</td><td>Hint text reminding the user that the mouse scroll wheel zooms the plot.</td></tr>
                     <tr><td>Zoom percentage label</td><td>Dynamic label</td><td>Displays the current zoom level as a percentage of the home (fit-to-data) view, e.g. "Zoom 100%".</td></tr>
                     <tr><td>↻ Reset View</td><td>Button</td><td>Restores the axis limits to the home view computed the last time the map was drawn from data.</td></tr>
                     <tr><td>⚙ Settings</td><td>Toggle button</td><td>Shows or hides the appearance/settings panel on the right-hand side of the tab.</td></tr>
                     <tr><td>Save Image</td><td>Button</td><td>Exports the current figure (including any layout edits) to a PNG file in the project's plot-export folder, at the DPI configured in application settings.</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>2.2 Plot Canvas</h3>
                 <p>
@@ -238,11 +178,11 @@
                     routine is used:
                 </p>
                 <table>
-                    <tbody><tr><th>Attribute</th><th>Origin</th><th>Role</th></tr>
+                    <tr><th>Attribute</th><th>Origin</th><th>Role</th></tr>
                     <tr><td><code>self.results</code></td><td><code>core.calculator.run_calculation()</code></td><td>Per-segment DataFrame; the sole data source for every plotted element.</td></tr>
                     <tr><td><code>self.data_source</code></td><td>"svg" or "excel"</td><td>Selected when a file is loaded; drives the top-level branch of the drawing dispatch.</td></tr>
                     <tr><td><code>self.segments[0]._has_map_geometry</code></td><td><code>core.models.Segment</code></td><td>Boolean flag distinguishing genuinely spatial data (True) from orientation-only legacy fracture-plane or Trend/Plunge tables (False).</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>3.1 Required and Optional Columns</h3>
                 <p>Depending on the branch selected, the following results columns are read:</p>
@@ -273,15 +213,15 @@
 
                 <h3>4.1 Display Options</h3>
                 <table>
-                    <tbody><tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
+                    <tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Line width (SVG/Geo)</td><td>Text entry</td><td>1.8</td><td>Sets the LineCollection stroke width (points) for Cartesian traces, and separately scales the marker size of focal-mechanism event points (base_size = 85 × value) and orientation-wheel tick width.</td></tr>
                     <tr><td>Custom title (blank = auto)</td><td>Text entry</td><td>(empty)</td><td>Overrides the automatically generated plot title. When blank, a descriptive title is automatically generated based on the map mode (e.g., "Slip tendency by fracture segment" for Cartesian maps, "Slip tendency — fracture orientation wheel" for legacy Excel files, or "Slip tendency — focal mechanism map" for geographic data).</td></tr>
                     <tr><td>Show compass (Wheel Map)</td><td>Checkbox</td><td>On</td><td>Toggles the N/E/S/W compass labels drawn around the orientation wheel. Has no visible effect in Cartesian or geographic modes.</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>4.2 Map Elements</h3>
                 <table>
-                    <tbody><tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
+                    <tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Outer BG</td><td>Colour swatch</td><td>#F5F7FA</td><td>Figure (outer canvas) background colour.</td></tr>
                     <tr><td>Plot BG</td><td>Colour swatch</td><td>#FFFFFF</td><td>Axes (inner plot) background colour.</td></tr>
                     <tr><td>Grid Color</td><td>Colour swatch</td><td>#D9E2EC</td><td>Colour of the gridlines, when shown.</td></tr>
@@ -289,23 +229,23 @@
                     <tr><td>Grid line width</td><td>Text entry</td><td>0.6</td><td>Line width (points) of gridlines; alpha is fixed internally at 0.6.</td></tr>
                     <tr><td>Boundary Color</td><td>Colour swatch</td><td>#1F2933</td><td>Colour applied to all four Axes spines (the plot border).</td></tr>
                     <tr><td>Boundary width</td><td>Text entry</td><td>1.0</td><td>Line width (points) of the plot border spines.</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>4.3 Colour Bar</h3>
                 <table>
-                    <tbody><tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
+                    <tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Position</td><td>Dropdown</td><td>Bottom</td><td>Bottom / Top / Left / Right / None. Determines where the colour bar is docked and how the main Axes is resized to make room for it (see <a href="#statistics">Section 8.4</a> for exact geometry).</td></tr>
                     <tr><td>Length (e.g., 0.8 for 80%)</td><td>Text entry</td><td>0.8</td><td>Fractional length of the colour bar relative to the corresponding figure dimension, clamped to [0.1, 1.0].</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>4.4 Background Image</h3>
                 <table>
-                    <tbody><tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
+                    <tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Show real photo behind traces</td><td>Checkbox</td><td>Off</td><td>Enables the calibrated background photograph overlay. If no image path is known, checking this box immediately opens a file-selection dialog; if the user cancels, the checkbox is reverted to off.</td></tr>
                     <tr><td>Status label</td><td>Read-only label</td><td>"No image set"</td><td>Displays the file name of the currently associated background image, or "No image set".</td></tr>
                     <tr><td>Change Image…</td><td>Button</td><td>—</td><td>Opens a file dialog (PNG/JPG/JPEG/BMP/TIFF/TIF/WEBP) to select or replace the background image; redraws immediately if the overlay is currently enabled.</td></tr>
                     <tr><td>Image opacity (0–1)</td><td>Text entry</td><td>1.0</td><td>Alpha blending factor applied to the background image via <code>imshow</code>, clamped to [0, 1].</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>4.5 Reset Map Defaults</h3>
                 <p>
@@ -330,12 +270,12 @@
                     title fragment is:
                 </p>
                 <table>
-                    <tbody><tr><th>Map Display Mode</th><th>Normalized column</th><th>Raw column</th><th>Formula</th></tr>
+                    <tr><th>Map Display Mode</th><th>Normalized column</th><th>Raw column</th><th>Formula</th></tr>
                     <tr><td>Slip tendency</td><td>SlipTendencyNorm</td><td>SlipTendency</td><td>Tₛ = τ / σₙ</td></tr>
                     <tr><td>Dilation tendency</td><td>— (always shown raw)</td><td>DilationTendency</td><td>T_d = (σ₁ − σₙ) / (σ₁ − σ₃)</td></tr>
                     <tr><td>Fracture susceptibility</td><td>FractureSusceptibilityNorm</td><td>FractureSusceptibility</td><td>S_f = σₙ − P_f − (τ − C₀) / μ</td></tr>
                     <tr><td>Critical fractures</td><td>CriticalStressValue (binary)</td><td>—</td><td>1 if τ ≥ μ(σₙ − P_f) + C₀, else 0</td></tr>
-                </tbody></table>
+                </table>
 
                 <h4>5.1.1 Definition of Terms</h4>
                 <ul>
@@ -446,13 +386,13 @@
                     mirrored in the table below, is evaluated in this priority order:
                 </p>
                 <table>
-                    <tbody><tr><th>Step</th><th>Condition Tested</th><th>Routine Invoked</th></tr>
+                    <tr><th>Step</th><th>Condition Tested</th><th>Routine Invoked</th></tr>
                     <tr><td>1</td><td><code>data_source == "excel"</code> and <code>segments[0]._has_map_geometry is False</code></td><td><code>_draw_map_no_geometry</code> — explanatory empty-state message</td></tr>
                     <tr><td>2</td><td><code>data_source == "excel"</code>, geometry present, and "Lat" column has at least one non-null value</td><td><code>_draw_map_geo</code> — geographic focal-mechanism map</td></tr>
                     <tr><td>3</td><td><code>data_source == "excel"</code>, geometry present, no Lat data, and "Length" column is not uniformly zero</td><td><code>_draw_map_svg</code> — Cartesian map using the genuine X/Y coordinates supplied by the spreadsheet</td></tr>
                     <tr><td>4</td><td><code>data_source == "excel"</code>, none of the above (legacy Strike/Dip table)</td><td><code>_draw_map_excel</code> — synthetic orientation wheel</td></tr>
                     <tr><td>5</td><td><code>data_source == "svg"</code> (default branch)</td><td><code>_draw_map_svg</code> — Cartesian map from digitized trace geometry</td></tr>
-                </tbody></table>
+                </table>
 
                 <div class="code-window">
                     <div class="code-header">
@@ -604,13 +544,13 @@
                     values in figure-fraction coordinates; L = user-configured colour-bar length fraction):
                 </p>
                 <table>
-                    <tbody><tr><th>Position</th><th>Colour-bar rectangle (left, bottom, width, height)</th><th>Main-axes rectangle (left, bottom, width, height)</th></tr>
+                    <tr><th>Position</th><th>Colour-bar rectangle (left, bottom, width, height)</th><th>Main-axes rectangle (left, bottom, width, height)</th></tr>
                     <tr><td>Bottom</td><td>(0.5 − L/2, 0.07, L, 0.03)</td><td>(0.08, 0.18, 0.88, 0.74)</td></tr>
                     <tr><td>Top</td><td>(0.5 − L/2, 0.92, L, 0.03)</td><td>(0.08, 0.06, 0.88, 0.78)</td></tr>
                     <tr><td>Left</td><td>(0.03, 0.5 − L/2, 0.02, L)</td><td>(0.12, 0.06, 0.84, 0.88)</td></tr>
                     <tr><td>Right</td><td>(0.94, 0.5 − L/2, 0.02, L)</td><td>(0.06, 0.06, 0.84, 0.88)</td></tr>
                     <tr><td>None</td><td>(colour bar hidden)</td><td>(0.08, 0.06, 0.88, 0.88)</td></tr>
-                </tbody></table>
+                </table>
                 <p><em>(Note: The exact fractional coordinates shown above reflect the Cartesian/SVG rendering mode. The Orientation Wheel and Geographic rendering modes utilize slightly adjusted docking rectangles to safely accommodate their unique radial and geographic axis labels.)</em></p>
                 <p>
                     For binary Critical Fractures colouring, the colour bar's tick marks are overridden to display
@@ -741,13 +681,13 @@
                 <!-- ================================================= -->
                 <h2 id="performance">11. Performance Optimization</h2>
                 <table>
-                    <tbody><tr><th>Technique</th><th>Applied To</th><th>Benefit</th></tr>
+                    <tr><th>Technique</th><th>Applied To</th><th>Benefit</th></tr>
                     <tr><td>Vectorized LineCollection / batched scatter</td><td>All fracture segments, orientation ticks, or focal-mechanism markers</td><td>A single collection object is added to the Axes per redraw instead of hundreds or thousands of individual <code>plot()</code> / <code>scatter()</code> calls, dramatically reducing Matplotlib artist-management overhead.</td></tr>
                     <tr><td><code>draw_idle()</code> instead of <code>draw()</code></td><td>Every redraw path</td><td>Matplotlib defers the actual repaint to the next Tk event-loop idle slot and coalesces rapid successive redraw requests (e.g. during a drag), avoiding redundant repaints.</td></tr>
                     <tr><td>Background-image pixel cache</td><td><code>_load_bg_image_array</code> via <code>_bg_image_cache</code> tuple (path, array)</td><td>The photograph is decoded from disk only once per unique path; repeated redraws (pan, zoom, cosmetic changes) reuse the cached NumPy array.</td></tr>
                     <tr><td>Threaded network I/O</td><td>Beachball image downloads</td><td>HTTP fetches (up to 8-second timeout each) run off the UI thread in a 4-worker pool, keeping the interface responsive while multiple diagrams load concurrently.</td></tr>
                     <tr><td><code>preserve_view</code> flag</td><td>All redraw call sites</td><td>Avoids unnecessarily recomputing and resetting the home view / axis limits on every cosmetic change, preserving the user's current pan/zoom position and avoiding a jarring view reset.</td></tr>
-                </tbody></table>
+                </table>
 
                 <!-- ================================================= -->
                 <h2 id="workflow-examples">12. Practical Examples</h2>
@@ -841,7 +781,7 @@
 
                 <h3>14.1 Key Instance Attributes</h3>
                 <table>
-                    <tbody><tr><th>Attribute</th><th>Description</th></tr>
+                    <tr><th>Attribute</th><th>Description</th></tr>
                     <tr><td><code>self.map_fig</code> / <code>self.map_ax</code> / <code>self.map_cbar_ax</code></td><td>The Matplotlib Figure and the two Axes objects (main plot and colour bar) that together constitute the Map Tab canvas.</td></tr>
                     <tr><td><code>self.map_canvas</code></td><td>The <code>FigureCanvasTkAgg</code> widget embedding <code>map_fig</code> inside the CustomTkinter window.</td></tr>
                     <tr><td><code>self._map_home_limits</code></td><td>The tight (pre-aspect-correction) data bounding box computed on the last full redraw; used by Reset View and the zoom-percentage indicator.</td></tr>
@@ -851,7 +791,7 @@
                     <tr><td><code>self._map_bg_image_cache</code></td><td>A (path, decoded-array) tuple caching the most recently loaded background photograph.</td></tr>
                     <tr><td><code>self._map_settings_open</code></td><td>Boolean flag tracking whether the settings panel is currently shown or hidden.</td></tr>
                     <tr><td><code>self._layout_drag_ax</code> / <code>self._layout_orig_pos</code></td><td>Used to track the Matplotlib Axes currently being repositioned and its original bounding box during Move Elements layout editing.</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>14.2 Design Notes and Caveats</h3>
                 <ul>
@@ -899,5 +839,5 @@
         </main>
     </div>
     <script src="script.js"></script>
-
-</body></html>
+</body>
+</html>

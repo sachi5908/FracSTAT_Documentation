@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Static Profile Tab | FracSTAT Docs</title>
@@ -29,69 +30,8 @@
     </nav>
 
     <div class="docs-layout">
-        <!-- ==========================================
-             MASTER ACCORDION SIDEBAR
-             ========================================== -->
-        <aside class="docs-sidebar" id="docsSidebar">
 
-            <div class="sidebar-section open">
-                <button class="sidebar-toggle">
-                    Getting Started
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="introduction.html">Introduction</a></li>
-                    <li><a href="installation.html" class="active">Installation Guide</a></li>
-                    <li><a href="launcher.html">FracSTAT Home Page</a></li>
-                </ul>
-            </div>
-
-            <div class="sidebar-section">
-                <button class="sidebar-toggle">
-                    Static Analyzer
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="docs_static_map.html">Map Tab</a></li>
-                    <li><a href="docs_static_histogram.html">Histogram Tab</a></li>
-                    <li><a href="docs_static_cdf.html">CDF Tab</a></li>
-                    <li><a href="docs_static_rose.html">Rose Tab</a></li>
-                    <li><a href="docs_static_stereonet.html">Stereonet Tab</a></li>
-                    <li><a href="docs_static_connectivity.html">Connectivity Tab</a></li>
-                    <li><a href="docs_static_intensity.html">Intensity Tab</a></li>
-                    <li><a href="docs_static_profile.html">Profile Tab</a></li>
-                    <li><a href="docs_static_results.html">Results Tab</a></li>
-                </ul>
-            </div>
-
-            <div class="sidebar-section">
-                <button class="sidebar-toggle">
-                    Dynamic Analyzer
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="docs_dynamic_map.html">Map Tab</a></li>
-                    <li><a href="docs_dynamic_rose.html">Rose Tab</a></li>
-                    <li><a href="docs_dynamic_mohr.html">Mohr Tab</a></li>
-                    <li><a href="docs_dynamic_stereonet.html">Stereonet Tab</a></li>
-                    <li><a href="docs_dynamic_table.html">Table Tab</a></li>
-                    <li><a href="docs_dynamic_method.html">Method Tab</a></li>
-                </ul>
-            </div>
-
-            <div class="sidebar-section">
-                <button class="sidebar-toggle">
-                    Uncertainty Analyzer
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="docs_uncertainty_montecarlo.html">Monte Carlo Tab</a></li>
-                    <li><a href="docs_uncertainty_lhs.html">LHS Tab</a></li>
-                    <li><a href="docs_uncertainty_pce.html">PCE Tab</a></li>
-                <li><a href="docs_demo.html">demo</a></li><li><a href="docs_demo2.html">demo2</a></li></ul>
-            </div>
-
-        </aside>
+        <aside class="docs-sidebar" id="docsSidebar"></aside>
 
         <main class="docs-content">
             <div class="docs-content-inner">
@@ -174,12 +114,12 @@
                     the profile scale is changed.
                 </p>
                 <table>
-                    <tbody><tr><th>Attribute</th><th>Role in the Profile Cross-section module</th></tr>
+                    <tr><th>Attribute</th><th>Role in the Profile Cross-section module</th></tr>
                     <tr><td><code>self.results</code></td><td>Master per-segment geometry/attribute table (X1, Y1, X2, Y2, Length_m, StrikeDeg, Trace, Segment, ID …) shared by every Static Analyzer tab.</td></tr>
                     <tr><td><code>self._static_map_unit_var</code></td><td>Currently selected display unit (m, cm, mm, km); used to label every distance axis and statistic in this module.</td></tr>
                     <tr><td><code>self.graph_fig</code> / <code>self.graph_map_ax</code> / <code>self.graph_plot_ax</code></td><td>The Matplotlib Figure and its two subplots — the reference-line map (left) and the derived cross-section plot (right).</td></tr>
                     <tr><td><code>self.graph_canvas</code></td><td>The Tkinter/Matplotlib canvas embedding the Figure and receiving mouse-click events for interactive endpoint selection.</td></tr>
-                </tbody></table>
+                </table>
                 <p>
                     Because the module reads directly from <code>self.results</code>, any change made elsewhere in
                     the Static Analyzer (e.g. recalibrating the map scale, reloading a fracture file, or editing the
@@ -279,12 +219,12 @@
                     requires the following columns to be present with genuine spatial content:
                 </p>
                 <table>
-                    <tbody><tr><th>Column</th><th>Description</th><th>Required for</th></tr>
+                    <tr><th>Column</th><th>Description</th><th>Required for</th></tr>
                     <tr><td><code>X1, Y1, X2, Y2</code></td><td>Real-world (scaled) segment endpoint coordinates, in the currently selected display unit.</td><td>Map rendering; all along-line and from-line calculations.</td></tr>
                     <tr><td><code>Trace</code></td><td>Integer trace (fracture) identifier grouping contiguous segments.</td><td>Trace length aggregation for "Trace length along/from".</td></tr>
                     <tr><td><code>Length_m</code></td><td>Per-segment length, always internally expressed in the base unit and re-labelled with the active display unit.</td><td>Segment length series; trace length aggregation; intensity/density normalisation.</td></tr>
                     <tr><td><code>StrikeDeg</code></td><td>North-referenced segment strike/azimuth in degrees.</td><td>Segment angle along/from series.</td></tr>
-                </tbody></table>
+                </table>
                 <p>
                     If the currently loaded dataset originates from an orientation-only spreadsheet format (legacy
                     Strike/Dip fracture-plane tables or Trend/Plunge pole tables) that carries no genuine spatial
@@ -306,36 +246,36 @@
 
                 <h3>4.1 Distance ALONG the Line (Info tab)</h3>
                 <table>
-                    <tbody><tr><th>Control</th><th>Type</th><th>Effect</th></tr>
+                    <tr><th>Control</th><th>Type</th><th>Effect</th></tr>
                     <tr><td>Trace length</td><td>Checkbox</td><td>Plots, for every fracture line-scan intersection, the total length of the parent trace against the along-line distance of that intersection (series label "Trace length along").</td></tr>
                     <tr><td>Segment length</td><td>Checkbox</td><td>Plots the length of the individual intersected segment against along-line distance ("Segment length along").</td></tr>
                     <tr><td>Segment angle</td><td>Checkbox</td><td>Plots the north-referenced strike of the intersected segment against along-line distance ("Segment angle along").</td></tr>
                     <tr><td>Estimated intensity, P21</td><td>Checkbox</td><td>Enables the Mauldon circular-scanline P21 (fracture length per unit area) series, sampled at evenly spaced windows along the line.</td></tr>
                     <tr><td>Estimated density, P20</td><td>Checkbox</td><td>Enables the companion P20 (fracture count per unit area) series from the same scan-window computation.</td></tr>
                     <tr><td>Number of scan circles</td><td>Numeric entry</td><td>Sets the count of circular sampling windows distributed along the reference line for the P21/P20 calculation; internally clamped to the range 2–200 (default 12).</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>4.2 Distance FROM the Line (Info tab)</h3>
                 <table>
-                    <tbody><tr><th>Control</th><th>Type</th><th>Effect</th></tr>
+                    <tr><th>Control</th><th>Type</th><th>Effect</th></tr>
                     <tr><td>Trace length</td><td>Checkbox</td><td>Plots each trace's total length against the perpendicular (signed) distance of that trace's length-weighted midpoint from the reference line ("Trace length from").</td></tr>
                     <tr><td>Segment length</td><td>Checkbox</td><td>Plots each segment's length against the perpendicular distance of the segment midpoint from the line ("Segment length from").</td></tr>
                     <tr><td>Segment angle</td><td>Checkbox</td><td>Plots each segment's strike against the perpendicular distance of the segment midpoint from the line ("Segment angle from").</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>4.3 Plot Options and Line End Points</h3>
                 <table>
-                    <tbody><tr><th>Control</th><th>Type</th><th>Effect</th></tr>
+                    <tr><th>Control</th><th>Type</th><th>Effect</th></tr>
                     <tr><td>Join Line</td><td>Checkbox</td><td>When enabled, every selected output series is connected with a thin line in addition to its scatter markers, ordered by ascending X value; the two intensity/density series are always joined regardless of this setting, since they represent a continuous sampled function rather than discrete fracture events.</td></tr>
                     <tr><td>X1 / Y1 / X2 / Y2</td><td>Numeric entries</td><td>Direct numeric specification of the two reference-line endpoints, in the current display unit. Editing any field and pressing Enter or moving focus away immediately redraws both the map and the derived plot.</td></tr>
                     <tr><td>Select end points</td><td>Button</td><td>Activates interactive on-map picking mode (see Section 10.1); the next two mouse clicks on the fracture map set Point 1 and Point 2 respectively and populate the four coordinate fields automatically.</td></tr>
                     <tr><td>Status label</td><td>Read-only text</td><td>Reports the current stage of interactive picking ("Step 1 of 2…", "Step 2 of 2…", or a confirmation once both points are set).</td></tr>
                     <tr><td>Update Graphs</td><td>Button</td><td>Forces an unconditional redraw of the map and output plot using the current settings; primarily a convenience action, since virtually every other control already triggers a redraw automatically.</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3>4.4 Settings Tab — Display and Appearance</h3>
                 <table>
-                    <tbody><tr><th>Control</th><th>Type</th><th>Effect</th></tr>
+                    <tr><th>Control</th><th>Type</th><th>Effect</th></tr>
                     <tr><td>Custom title (blank = auto)</td><td>Text entry</td><td>Overrides the automatically generated titles of both the map ("Selected Scan Line") and the output plot ("Selected Graphs") with a single user-supplied string.</td></tr>
                     <tr><td>Map (Legend) Position</td><td>Dropdown</td><td>Controls placement of the legend on the map subplot; options: best, upper right, upper left, lower left, lower right, center, Outside Right, Outside Bottom.</td></tr>
                     <tr><td>Plot (Legend) Position</td><td>Dropdown</td><td>Independently controls placement of the legend on the output-plot subplot, using the same option set.</td></tr>
@@ -352,7 +292,7 @@
                     <tr><td>Change Image…</td><td>Button</td><td>Opens a file-selection dialog to choose or replace the background photograph.</td></tr>
                     <tr><td>Image opacity (0–1)</td><td>Numeric entry</td><td>Alpha blending value applied to the background photograph.</td></tr>
                     <tr><td>Reset Defaults</td><td>Button</td><td>Restores every appearance/colour setting in this tab (title, legend positions, widths, and all six colours) to its factory default; background-image settings are not affected.</td></tr>
-                </tbody></table>
+                </table>
                 <div class="tip-box">
                     <strong>Tip:</strong> all numeric colour and width fields fail safely — an invalid entry (non-numeric text, or a malformed hex colour) is silently replaced by the previously valid default rather than raising an error, so a mistyped value can never crash the redraw.
                 </div>
@@ -539,7 +479,7 @@ P20 = N_end / (2πr)</div>
                         <button class="copy-btn">Copy</button>
                     </div>
                     <pre><code class="language-python">def _graphs_intensity_density_along(self, df, line):
-    """Utilizes circular scan windows along the line to calculate P21 &amp; P20."""
+    """Utilizes circular scan windows along the line to calculate P21 & P20."""
     centres, radius, distances = self._graphs_scan_circles(line)
     segs = df[["X1", "Y1", "X2", "Y2"]].to_numpy(dtype=float)
     intensity, density = [], []
@@ -549,8 +489,8 @@ P20 = N_end / (2πr)</div>
         n_endpoints = 0
 
         for x1, y1, x2, y2 in segs:
-            inside1 = math.hypot(x1 - cx, y1 - cy) &lt; radius
-            inside2 = math.hypot(x2 - cx, y2 - cy) &lt; radius
+            inside1 = math.hypot(x1 - cx, y1 - cy) < radius
+            inside2 = math.hypot(x2 - cx, y2 - cy) < radius
             n_endpoints += int(inside1) + int(inside2)
 
             if inside1 and inside2:
@@ -612,7 +552,7 @@ P20 = N_end / (2πr)</div>
                     to answer.
                 </p>
                 <table>
-                    <tbody><tr><th>Series</th><th>Horizontal axis</th><th>Vertical axis / units</th><th>Geological question addressed</th></tr>
+                    <tr><th>Series</th><th>Horizontal axis</th><th>Vertical axis / units</th><th>Geological question addressed</th></tr>
                     <tr><td>Trace length along</td><td>Distance along line</td><td>Trace length (display unit)</td><td>Do longer fractures cluster at particular positions along the transect (e.g. near a fault core)?</td></tr>
                     <tr><td>Segment length along</td><td>Distance along line</td><td>Segment length (display unit)</td><td>Is local fracture length variable at fine spatial resolution along the transect?</td></tr>
                     <tr><td>Segment angle along</td><td>Distance along line</td><td>Strike (degrees)</td><td>Does fracture orientation rotate systematically along the transect (e.g. across a fold hinge)?</td></tr>
@@ -621,7 +561,7 @@ P20 = N_end / (2πr)</div>
                     <tr><td>Trace length from</td><td>Perpendicular distance from line</td><td>Trace length (display unit)</td><td>Are longer fractures preferentially located on one side of a chosen reference feature (e.g. a bedding plane or fault)?</td></tr>
                     <tr><td>Segment length from</td><td>Perpendicular distance from line</td><td>Segment length (display unit)</td><td>Is segment length asymmetric about the reference line?</td></tr>
                     <tr><td>Segment angle from</td><td>Perpendicular distance from line</td><td>Strike (degrees)</td><td>Does fracture orientation differ systematically on either side of the reference line?</td></tr>
-                </tbody></table>
+                </table>
                 <p>
                     All along-line and from-line series are discrete point clouds, one point per fracture segment
                     (or per trace, for the trace-length variants); the P21/P20 series are, by contrast, smooth
@@ -862,13 +802,13 @@ P20 = N_end / (2πr)</div>
                 <!-- ================================================= -->
                 <h2 id="limitations">15. Limitations</h2>
                 <table>
-                    <tbody><tr><th>Limitation</th><th>Description</th></tr>
+                    <tr><th>Limitation</th><th>Description</th></tr>
                     <tr><td>Spatial data only</td><td>The module operates only on genuinely spatial data (SVG traces, or Excel/CSV files carrying real X1/Y1/X2/Y2 coordinates); orientation-only spreadsheet formats (legacy Strike/Dip fracture-plane tables, Trend/Plunge pole tables) cannot be profiled, since they carry no real map position.</td></tr>
                     <tr><td>Unvectorised circular-scan loop</td><td>The circular-scan intensity/density computation is an unvectorised, per-segment Python loop and therefore does not scale as efficiently as the equivalent grid-based Mauldon calculation in the dedicated Intensity &amp; Density tab; very large datasets combined with a high scan-circle count may notice a perceptible delay.</td></tr>
                     <tr><td>Infinite-line "distance from"</td><td>The "distance from" calculation treats the reference line as infinite in both directions, so points far outside the finite segment between the two chosen endpoints still contribute a perpendicular-distance value; this is by design (consistent with treating the line as an axis of reference) but should not be mistaken for a bounded corridor sample.</td></tr>
                     <tr><td>No formal statistical inference</td><td>No confidence intervals, uncertainty bounds, or theoretical-distribution fitting are provided for any series in this module; all outputs are raw or directly derived geometric measurements. Users requiring rigorous statistical inference on length or intensity distributions should additionally consult the CDF tab's maximum-likelihood fitting tools.</td></tr>
                     <tr><td>Planar assumption</td><td>The module assumes a two-dimensional, effectively planar fracture-trace map; no correction is applied for outcrop-surface curvature, oblique viewing angle, or true 3-D fracture orientation beyond what is already encoded in the loaded strike values.</td></tr>
-                </tbody></table>
+                </table>
 
                 <!-- ================================================= -->
                 <h2 id="references">16. References</h2>
@@ -893,5 +833,5 @@ P20 = N_end / (2πr)</div>
         </main>
     </div>
     <script src="script.js"></script>
-
-</body></html>
+</body>
+</html>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Method Tab | FracSTAT Docs</title>
@@ -29,69 +30,8 @@
     </nav>
     
     <div class="docs-layout">
-        <!-- ==========================================
-             MASTER ACCORDION SIDEBAR
-             ========================================== -->
-        <aside class="docs-sidebar" id="docsSidebar">
-            
-            <div class="sidebar-section open">
-                <button class="sidebar-toggle">
-                    Getting Started
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="introduction.html">Introduction</a></li>
-                    <li><a href="installation.html" class="active">Installation Guide</a></li>
-                    <li><a href="launcher.html">FracSTAT Home Page</a></li>
-                </ul>
-            </div>
 
-            <div class="sidebar-section">
-                <button class="sidebar-toggle">
-                    Static Analyzer
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="docs_static_map.html">Map Tab</a></li>
-                    <li><a href="docs_static_histogram.html">Histogram Tab</a></li>
-                    <li><a href="docs_static_cdf.html">CDF Tab</a></li>
-                    <li><a href="docs_static_rose.html">Rose Tab</a></li>
-                    <li><a href="docs_static_stereonet.html">Stereonet Tab</a></li>
-                    <li><a href="docs_static_connectivity.html">Connectivity Tab</a></li>
-                    <li><a href="docs_static_intensity.html">Intensity Tab</a></li>
-                    <li><a href="docs_static_profile.html">Profile Tab</a></li>
-                    <li><a href="docs_static_results.html">Results Tab</a></li>
-                </ul>
-            </div>
-
-            <div class="sidebar-section">
-                <button class="sidebar-toggle">
-                    Dynamic Analyzer
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="docs_dynamic_map.html">Map Tab</a></li>
-                    <li><a href="docs_dynamic_rose.html">Rose Tab</a></li>
-                    <li><a href="docs_dynamic_mohr.html">Mohr Tab</a></li>
-                    <li><a href="docs_dynamic_stereonet.html">Stereonet Tab</a></li>
-                    <li><a href="docs_dynamic_table.html">Table Tab</a></li>
-                    <li><a href="docs_dynamic_method.html">Method Tab</a></li>
-                </ul>
-            </div>
-
-            <div class="sidebar-section">
-                <button class="sidebar-toggle">
-                    Uncertainty Analyzer
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="docs_uncertainty_montecarlo.html">Monte Carlo Tab</a></li>
-                    <li><a href="docs_uncertainty_lhs.html">LHS Tab</a></li>
-                    <li><a href="docs_uncertainty_pce.html">PCE Tab</a></li>
-                <li><a href="docs_demo.html">demo</a></li><li><a href="docs_demo2.html">demo2</a></li></ul>
-            </div>
-
-        </aside>
+        <aside class="docs-sidebar" id="docsSidebar"></aside>
 
         <main class="docs-content">
             <div class="docs-content-inner">
@@ -168,13 +108,13 @@
                     once at build time and then applied selectively as each line is inserted.
                 </p>
                 <table>
-                    <tbody><tr><th>Tag</th><th>Font</th><th>Role</th></tr>
+                    <tr><th>Tag</th><th>Font</th><th>Role</th></tr>
                     <tr><td><code>title</code></td><td>Roboto, 22&nbsp;pt, bold, centred</td><td>The single page heading, "Calculation Method".</td></tr>
                     <tr><td><code>header</code></td><td>Roboto, 16&nbsp;pt, bold</td><td>Section headings (Geometry, Profile Scaling, Stress Angle, Resolved Stress, Tendency Metrics, Plots, Focal-Mechanism Mode).</td></tr>
                     <tr><td><code>body</code></td><td>Roboto, 13&nbsp;pt, regular</td><td>Explanatory prose beneath each section heading.</td></tr>
                     <tr><td><code>math</code></td><td>Consolas, 14&nbsp;pt monospace, left-indented</td><td>Inline formula lines, indented 30&nbsp;px from both margins for visual separation from prose.</td></tr>
                     <tr><td><code>sub</code></td><td>Consolas, 10&nbsp;pt monospace, vertical offset −4&nbsp;px</td><td>Combined with <code>math</code> to render a subscripted symbol (e.g. the "s" in T<sub>s</sub>) at reduced size and lowered baseline within an otherwise monospaced formula line.</td></tr>
-                </tbody></table>
+                </table>
                 <div class="note-box">
                     <strong>Note:</strong> because a plain <code>CTkTextbox</code> cannot mix a smaller, baseline-shifted
                     run of characters into the middle of a single inserted string, every subscripted symbol used in
@@ -256,12 +196,12 @@
                     reported throughout the Dynamic Analyzer's Map, Rose, and Table tabs:
                 </p>
                 <table>
-                    <tbody><tr><th>Symbol</th><th>Name</th><th>Formula</th></tr>
+                    <tr><th>Symbol</th><th>Name</th><th>Formula</th></tr>
                     <tr><td>T<sub>s</sub></td><td>Slip tendency</td><td>T<sub>s</sub> = τ / σₙ</td></tr>
                     <tr><td>T<sub>d</sub></td><td>Dilation tendency</td><td>T<sub>d</sub> = (σ₁ − σₙ) / (σ₁ − σ₂)</td></tr>
                     <tr><td>S<sub>f</sub></td><td>Susceptibility / fracture stability margin</td><td>S<sub>f</sub> = σₙ − Pᶠ − (τ − C₀) / μ</td></tr>
                     <tr><td>CSF</td><td>Critical stress flag</td><td>True where τ ≥ μ(σₙ − Pᶠ) + C₀</td></tr>
-                </tbody></table>
+                </table>
                 <p>
                     Here Pᶠ is pore-fluid pressure, C₀ is cohesion, and μ is the coefficient of friction — the same
                     three Coulomb failure-envelope parameters used to draw the failure line on the Mohr diagram.
@@ -341,12 +281,12 @@ text.configure(state="disabled")</code></pre>
                     workspace computes and displays:
                 </p>
                 <table>
-                    <tbody><tr><th>Dynamic Analyzer Tab</th><th>What it uses from the Method tab's formulas</th></tr>
+                    <tr><th>Dynamic Analyzer Tab</th><th>What it uses from the Method tab's formulas</th></tr>
                     <tr><td>Map Tab</td><td>Colours every segment by whichever tendency/failure metric (T<sub>s</sub>, T<sub>d</sub>, S<sub>f</sub>, or CSF) is currently selected, computed via Sections 4.3–4.5.</td></tr>
                     <tr><td>Rose Tab</td><td>Builds a length-weighted, 10° binned, square-root (equal-area) polar histogram of the same corrected strike_N values described in Section 4.2, mirroring 0–180° strikes into the 180–360° half for full-circle display.</td></tr>
                     <tr><td>Mohr Tab</td><td>Plots total stress (σₙ, τ), effective stress shifted by pore pressure Pᶠ, individual segment points, and the Coulomb failure envelope τ = C₀ + μσₙ′ using exactly the resolved-stress formulas of Section 4.4; Mohr-diagram point numbers correspond directly to each segment's ID in the Table tab. The quantity Δτ = τ − [C₀ + μ(σₙ − Pᶠ)] is positive wherever a segment's Mohr point touches or crosses the failure envelope.</td></tr>
                     <tr><td>Table Tab</td><td>Tabulates the per-segment numeric results (strike_N, α, σₙ, τ, T<sub>s</sub>, T<sub>d</sub>, S<sub>f</sub>, CSF) produced by the same pipeline documented here.</td></tr>
-                </tbody></table>
+                </table>
 
                 <!-- Pagination Navigation -->
                 <div class="pagination-nav">
@@ -365,5 +305,5 @@ text.configure(state="disabled")</code></pre>
         </main>
     </div>
     <script src="script.js"></script>
-
-</body></html>
+</body>
+</html>
