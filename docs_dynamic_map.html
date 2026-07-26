@@ -276,7 +276,7 @@
                 <table>
                     <tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Line width (SVG/Geo)</td><td>Text entry</td><td>1.8</td><td>Sets the LineCollection stroke width (points) for Cartesian traces, and separately scales the marker size of focal-mechanism event points (base_size = 85 × value) and orientation-wheel tick width.</td></tr>
-                    <tr><td>Custom title (blank = auto)</td><td>Text entry</td><td>(empty)</td><td>Overrides the automatically generated plot title. When blank, a descriptive title is generated from the active attribute (e.g. "Slip tendency by fracture segment").</td></tr>
+                    <tr><td>Custom title (blank = auto)</td><td>Text entry</td><td>(empty)</td><td>Overrides the automatically generated plot title. When blank, a descriptive title is automatically generated based on the map mode (e.g., "Slip tendency by fracture segment" for Cartesian maps, "Slip tendency — fracture orientation wheel" for legacy Excel files, or "Slip tendency — focal mechanism map" for geographic data).</td></tr>
                     <tr><td>Show compass (Wheel Map)</td><td>Checkbox</td><td>On</td><td>Toggles the N/E/S/W compass labels drawn around the orientation wheel. Has no visible effect in Cartesian or geographic modes.</td></tr>
                 </table>
 
@@ -612,6 +612,7 @@
                     <tr><td>Right</td><td>(0.94, 0.5 − L/2, 0.02, L)</td><td>(0.06, 0.06, 0.84, 0.88)</td></tr>
                     <tr><td>None</td><td>(colour bar hidden)</td><td>(0.08, 0.06, 0.88, 0.88)</td></tr>
                 </table>
+                <p><em>(Note: The exact fractional coordinates shown above reflect the Cartesian/SVG rendering mode. The Orientation Wheel and Geographic rendering modes utilize slightly adjusted docking rectangles to safely accommodate their unique radial and geographic axis labels.)</em></p>
                 <p>
                     For binary Critical Fractures colouring, the colour bar's tick marks are overridden to display
                     the text labels "Stable" and "Critical" at positions 0 and 1 respectively, in place of numeric
@@ -850,6 +851,7 @@
                     <tr><td><code>self._beachball_executor</code></td><td>The 4-worker <code>ThreadPoolExecutor</code> used for all beachball HTTP downloads.</td></tr>
                     <tr><td><code>self._map_bg_image_cache</code></td><td>A (path, decoded-array) tuple caching the most recently loaded background photograph.</td></tr>
                     <tr><td><code>self._map_settings_open</code></td><td>Boolean flag tracking whether the settings panel is currently shown or hidden.</td></tr>
+                    <tr><td><code>self._layout_drag_ax</code> / <code>self._layout_orig_pos</code></td><td>Used to track the Matplotlib Axes currently being repositioned and its original bounding box during Move Elements layout editing.</td></tr>
                 </table>
 
                 <h3>14.2 Design Notes and Caveats</h3>
@@ -857,7 +859,7 @@
                     <li>The orientation-wheel colour bar is constructed against the same mappable artist object used by the geographic-mode scatter plot (<code>self._map_geo_scatter</code>); in practice this mappable carries the correct colormap and normalization for the wheel's own data because <code>attribute_colormap_and_norm()</code> is recomputed immediately beforehand, but users inspecting the implementation should be aware that this is an internal artist-reuse detail rather than a dedicated wheel-specific mappable.</li>
                     <li>Direct click-to-select on the map canvas itself is currently implemented only for geographic (focal-mechanism) mode; in Cartesian and orientation-wheel modes, segment selection is driven from the Table, Mohr, or Stereonet tabs and reflected onto the map via the shared <code>select_segment()</code> mechanism.</li>
                     <li>The helper method <code>_expanded_map_limits()</code>, which computes an aspect-ratio-matched bounding box from the figure and Axes display geometry, is defined on the <code>MapTab</code> class for potential use in aspect-correction workflows but is not invoked by the drawing routines described in this document; it is retained as available shared logic.</li>
-                    <li>The Reverse Y-axis behaviour (SVG Y-axis points downward) is controlled by a Display-card checkbox on the shared sidebar rather than within the Map Tab itself, but directly affects the <code>home_ylim</code> orientation computed inside <code>_draw_map_svg()</code>.</li>
+                    <li>Axis flipping (both X and Y) is controlled by <code>map_flip_x_var</code> and <code>map_flip_y_var</code> tracked within the module. The flips are applied universally across all three rendering modes (SVG, Excel, and Geographic) via a dedicated <code>_apply_map_axis_flips()</code> method using Matplotlib's <code>invert_xaxis()</code> and <code>invert_yaxis()</code>, rather than manually modifying the axis limits.</li>
                 </ul>
 
                 <!-- ================================================= -->
