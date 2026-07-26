@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Static Map Tab | FracSTAT Docs</title>
@@ -89,7 +88,7 @@
                     <li><a href="docs_uncertainty_montecarlo.html">Monte Carlo Tab</a></li>
                     <li><a href="docs_uncertainty_lhs.html">LHS Tab</a></li>
                     <li><a href="docs_uncertainty_pce.html">PCE Tab</a></li>
-                </ul>
+                <li><a href="docs_demo.html">demo</a></li></ul>
             </div>
 
         </aside>
@@ -206,7 +205,7 @@
                     described in <a href="#maths">Section 8.1</a> — no rescaling to a profile box is applied.
                 </p>
                 <table class="excel-format-table">
-                    <tr>
+                    <tbody><tr>
                         <th class="opt">ID</th><th class="opt">Trace</th><th class="opt">Segment</th>
                         <th class="req">X1</th><th class="req">Y1</th><th class="req">X2</th><th class="req">Y2</th>
                         <th class="opt">Length_m</th>
@@ -221,12 +220,12 @@
                         <td class="req">12.5</td><td class="req">3.2</td><td class="req">21.0</td><td class="req">7.1</td>
                         <td class="opt">9.3</td>
                     </tr>
-                </table>
+                </tbody></table>
                 <table class="excel-meta-table">
-                    <tr><th>Required</th><td>X1, Y1, X2, Y2</td></tr>
+                    <tbody><tr><th>Required</th><td>X1, Y1, X2, Y2</td></tr>
                     <tr><th>Optional</th><td>ID, Trace, Segment, X1_m/Y1_m/X2_m/Y2_m, StrikeDeg, Length, TraceLengthM</td></tr>
                     <tr><th>Feeds</th><td>Map generation, rose diagrams, table data, fracture length statistics, exports</td></tr>
-                </table>
+                </tbody></table>
 
                 <h4>Format 2 — Fracture Plane Orientation (legacy)</h4>
                 <p>
@@ -237,7 +236,7 @@
                     Histogram, Rose, and Stereonet tabs normally.
                 </p>
                 <table class="excel-format-table">
-                    <tr>
+                    <tbody><tr>
                         <th class="req">ID</th><th class="opt">Trace</th><th class="req">Strike</th><th class="req">Dip</th>
                         <th class="opt">Dip Direction</th><th class="opt">Length_m</th><th class="opt">Aperture_mm</th>
                     </tr>
@@ -249,12 +248,12 @@
                         <td class="req">2</td><td class="opt">B</td><td class="req">128</td><td class="req">64</td>
                         <td class="opt">218</td><td class="opt">11.2</td><td class="opt">0.18</td>
                     </tr>
-                </table>
+                </tbody></table>
                 <table class="excel-meta-table">
-                    <tr><th>Required</th><td>ID, Strike, Dip</td></tr>
+                    <tbody><tr><th>Required</th><td>ID, Strike, Dip</td></tr>
                     <tr><th>Optional</th><td>Trace, Dip Direction, Length (any unit suffix: _m/_cm/_mm/_km), Aperture (same unit suffixes)</td></tr>
                     <tr><th>Feeds</th><td>Slip tendency, dilation tendency, susceptibility, Mohr stress spaces, histograms</td></tr>
-                </table>
+                </tbody></table>
                 <div class="note-box">
                     <strong>Note:</strong> Strike must be 0–360° and Dip must be 0–90°, or the whole file is
                     rejected with an error listing exactly which rows are out of range. Strike is <em>not</em>
@@ -271,15 +270,15 @@
                     Rose and Stereonet still work normally.
                 </p>
                 <table class="excel-format-table">
-                    <tr><th class="opt">ID</th><th class="opt">Trace</th><th class="req">Trend</th><th class="req">Plunge</th></tr>
+                    <tbody><tr><th class="opt">ID</th><th class="opt">Trace</th><th class="req">Trend</th><th class="req">Plunge</th></tr>
                     <tr><td class="opt">1</td><td class="opt">A</td><td class="req">045</td><td class="req">28</td></tr>
                     <tr><td class="opt">2</td><td class="opt">B</td><td class="req">214</td><td class="req">36</td></tr>
-                </table>
+                </tbody></table>
                 <table class="excel-meta-table">
-                    <tr><th>Required</th><td>Trend (0–360°), Plunge (−90° to 90°)</td></tr>
+                    <tbody><tr><th>Required</th><td>Trend (0–360°), Plunge (−90° to 90°)</td></tr>
                     <tr><th>Optional</th><td>ID, Trace</td></tr>
                     <tr><th>Feeds</th><td>Geometric conversion to strike/dip for global structural and regional stress analytics</td></tr>
-                </table>
+                </tbody></table>
                 <div class="tip-box">
                     <strong>Bonus format:</strong> a plain, headerless two‑column <code>.txt</code> file of
                     <em>Plunge Trend</em> values (whitespace‑separated, one pole per line, <code>#</code> lines
@@ -297,7 +296,7 @@
                     trace ID.
                 </p>
                 <table class="excel-format-table">
-                    <tr>
+                    <tbody><tr>
                         <th class="req">ID</th><th class="req">Lat</th><th class="req">Lon</th>
                         <th class="req">FP1 Strike</th><th class="req">FP1 Dip</th><th class="opt">FP1 Slip</th><th class="opt">Region</th>
                     </tr>
@@ -309,12 +308,12 @@
                         <td class="req">ev002</td><td class="req">33.88</td><td class="req">77.10</td>
                         <td class="req">118</td><td class="req">55</td><td class="opt">84</td><td class="opt">Ladakh</td>
                     </tr>
-                </table>
+                </tbody></table>
                 <table class="excel-meta-table">
-                    <tr><th>Required</th><td>ID, Lat, Lon, FP1 Strike, FP1 Dip</td></tr>
+                    <tbody><tr><th>Required</th><td>ID, Lat, Lon, FP1 Strike, FP1 Dip</td></tr>
                     <tr><th>Optional</th><td>FP1 Slip/Rake, FP2 Strike, FP2 Dip, FP2 Slip/Rake, Region, Beachball URL</td></tr>
                     <tr><th>Feeds</th><td>Nodal‑plane resolving stress matrices, spatial map pinning, structural records</td></tr>
-                </table>
+                </tbody></table>
                 <div class="note-box">
                     <strong>Note:</strong> Lat must be between −90° and 90°, and Lon between −180° and 360°.
                     When a slip/rake value is supplied, FracSTAT resolves the kinematically‑consistent shear stress
@@ -323,12 +322,12 @@
 
                 <h4>How each format appears on this tab</h4>
                 <table>
-                    <tr><th>Format</th><th>Has real coordinates?</th><th>What the Fracture Map tab shows</th></tr>
+                    <tbody><tr><th>Format</th><th>Has real coordinates?</th><th>What the Fracture Map tab shows</th></tr>
                     <tr><td>1 — Segment Coordinates</td><td>Yes (X/Y, 1:1 scale)</td><td>Standard fracture map, same as SVG data</td></tr>
                     <tr><td>2 — Fracture Plane Orientation</td><td>No</td><td>"No spatial coordinates" message — use Histogram/Rose/Stereonet instead</td></tr>
                     <tr><td>3 — Pole Orientation</td><td>No</td><td>"No spatial coordinates" message — use Histogram/Rose/Stereonet instead</td></tr>
                     <tr><td>4 — Focal Mechanism</td><td>Yes (Lat/Lon)</td><td>Geographic Lat/Lon map of event locations</td></tr>
-                </table>
+                </tbody></table>
 
                 <div class="tip-box">
                     <strong>Automatic unit detection:</strong> FracSTAT also scans column headers such as
@@ -376,7 +375,7 @@
 
                 <h3>2.1 Top toolbar</h3>
                 <table>
-                    <tr><th>Control</th><th>What it does</th></tr>
+                    <tbody><tr><th>Control</th><th>What it does</th></tr>
                     <tr><td>Open Image</td><td>Opens the field photograph or scanned image that will act as the digitizing reference.</td></tr>
                     <tr><td>Import SVG</td><td>Imports previously digitized traces (SVG) for further editing or refinement.</td></tr>
                     <tr><td>Export SVG</td><td>Exports the traced fracture network as a standard SVG file, for use in other vector/GIS software.</td></tr>
@@ -384,11 +383,11 @@
                     <tr><td>Undo / Redo</td><td>Reverses or restores the last editing operations.</td></tr>
                     <tr><td>Stroke Width</td><td>Adjusts the visual thickness of the digitized traces.</td></tr>
                     <tr><td>Include Image in SVG</td><td>Optionally embeds the reference image inside the exported SVG file.</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3>2.2 Left‑hand tool palette</h3>
                 <table>
-                    <tr><th>Tool</th><th>What it does</th></tr>
+                    <tbody><tr><th>Tool</th><th>What it does</th></tr>
                     <tr><td>Select Tool</td><td>Selects existing traces for editing, repositioning, or deletion.</td></tr>
                     <tr><td>Pen Tool</td><td>The primary digitizing tool — manually trace fracture segments over the reference image, following each fracture as faithfully as possible.</td></tr>
                     <tr><td>Erase Tool</td><td>Removes unwanted traces or portions of existing digitized features.</td></tr>
@@ -396,7 +395,7 @@
                     <tr><td>Crop Tool</td><td>Crops the reference image to the region of interest, improving mapping efficiency.</td></tr>
                     <tr><td>Image Settings</td><td>Adjusts brightness, contrast, or transparency of the reference image so traces are easier to see in different lighting.</td></tr>
                     <tr><td>Trace Colour</td><td>Assigns colours to traces — handy for distinguishing fracture sets, generations, lithological domains, or interpreters.</td></tr>
-                </table>
+                </tbody></table>
 
                 <div class="tip-box">
                     <strong>Beginner tip:</strong> zoom in with the Hand Tool before you start tracing with the Pen
@@ -445,11 +444,11 @@
                     quantitative analysis runs. The tab is organised into three regions:
                 </p>
                 <table>
-                    <tr><th>Region</th><th>Location</th><th>Description</th></tr>
+                    <tbody><tr><th>Region</th><th>Location</th><th>Description</th></tr>
                     <tr><td>Control Sidebar</td><td>Left panel (~290&nbsp;px)</td><td>A scrollable column of cards containing every display setting, colour option, overlay toggle, and export control.</td></tr>
                     <tr><td>Map Canvas</td><td>Centre (resizable)</td><td>The primary Matplotlib canvas. Shows the fracture network, optional background photo, scale/units, and title.</td></tr>
                     <tr><td>Toolbar &amp; Status</td><td>Top and bottom of the canvas</td><td>Shows pan/zoom hints, the current zoom percentage, and buttons to reset the view or save the current figure as an image.</td></tr>
-                </table>
+                </tbody></table>
                 <figure class="figure-block">
                     <div class="figure-img-wrap">
                         <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1784441816/gjelajmgxb5dnswmvzba.jpg" alt="Fracture Map interface showing the spatial layout of digitized fracture traces" loading="lazy">
@@ -488,33 +487,33 @@
 
                 <h3>5.3 Display Mode</h3>
                 <table>
-                    <tr><th>Control</th><th>What it does</th></tr>
+                    <tbody><tr><th>Control</th><th>What it does</th></tr>
                     <tr><td>Colour segments by</td><td>Chooses how fracture lines are coloured — <em>Traces</em>, <em>Segments by Strike</em>, <em>Segments by Length</em>, or <em>Traces by Length</em>. See <a href="#colour-modes">Section 6</a> for full detail.</td></tr>
                     <tr><td>Line width</td><td>Sets the rendered stroke width of every fracture line, in points.</td></tr>
                     <tr><td>Show segment nodes</td><td>Overlays a small marker at every segment endpoint (and at every calculated crossing point), useful for visually checking topology.</td></tr>
                     <tr><td>Flip X axis / Flip Y axis</td><td>Mirrors the map horizontally or vertically — handy if your source image was scanned or photographed with an unexpected orientation.</td></tr>
                     <tr><td>Rotate (° from X axis, CCW+)</td><td>Rotates the whole map counter‑clockwise by the given number of degrees.</td></tr>
                     <tr><td>Y‑axis azimuth from North (°)</td><td>Tells FracSTAT how the image's vertical (Y) axis relates to true geographic north, so strikes reported everywhere in the software are north‑referenced rather than image‑referenced. See <a href="#maths">Section 8.2</a>.</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3>5.4 Plot Options</h3>
                 <table>
-                    <tr><th>Control</th><th>What it does</th></tr>
+                    <tbody><tr><th>Control</th><th>What it does</th></tr>
                     <tr><td>Custom title</td><td>Overrides the automatic title (e.g. "Fracture segments coloured by strike") with your own text. Leave blank for the automatic title.</td></tr>
                     <tr><td>Colour scale</td><td>Chooses the colormap used whenever a continuous colour mode is active (Viridis, Plasma, Inferno, Parula, and more). A live swatch preview is shown next to the dropdown.</td></tr>
                     <tr><td>Colorbar position</td><td>Places the colour bar at the Bottom, Top, Left, or Right of the map, or hides it entirely ("None").</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3>5.5 Map Elements</h3>
                 <p>Fine‑tune the cosmetics of the figure without touching the underlying geometry:</p>
                 <table>
-                    <tr><th>Control</th><th>What it does</th></tr>
+                    <tbody><tr><th>Control</th><th>What it does</th></tr>
                     <tr><td>Trace Color</td><td>The single colour used when "Colour segments by" is set to <em>Traces</em>.</td></tr>
                     <tr><td>Outer BG</td><td>Background colour of the figure outside the plot area.</td></tr>
                     <tr><td>Plot BG</td><td>Background colour inside the plot axes.</td></tr>
                     <tr><td>Grid Color / Show grid lines</td><td>Colour and visibility of the coordinate grid behind the traces.</td></tr>
                     <tr><td>Border Color / Border Width</td><td>Colour and thickness of the axes border (spines).</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3>5.6 Background Image</h3>
                 <p>
@@ -542,7 +541,7 @@
                 <!-- ================================================= -->
                 <h2 id="colour-modes">6. Colour Modes Explained</h2>
                 <table>
-                    <tr><th>Mode</th><th>What is coloured</th><th>Best for</th></tr>
+                    <tbody><tr><th>Mode</th><th>What is coloured</th><th>Best for</th></tr>
                     <tr>
                         <td><strong>Traces</strong></td>
                         <td>Every segment drawn in a single, user‑chosen colour (the "Trace Color" swatch).</td>
@@ -563,7 +562,7 @@
                         <td>Every segment belonging to the same trace shares one colour, based on that trace's <em>total</em> length (all its segments summed together).</td>
                         <td>Understanding the true, full length of each fracture rather than its individual pieces.</td>
                     </tr>
-                </table>
+                </tbody></table>
                 <p>
                     Whenever a continuous colour mode is active, a colour bar is automatically added at the position
                     chosen in <strong>Plot Options → Colorbar position</strong>, labelled with the plotted quantity
@@ -667,12 +666,12 @@ y_rot = x' · sin(θ) + y' · cos(θ)
                     your fracture network is.
                 </p>
                 <table>
-                    <tr><th>Node type</th><th>How many segment ends meet there</th><th>Geological meaning</th></tr>
+                    <tbody><tr><th>Node type</th><th>How many segment ends meet there</th><th>Geological meaning</th></tr>
                     <tr><td><strong>I‑node</strong> (isolated)</td><td>1</td><td>A free‑standing fracture tip that doesn't touch any other fracture — an isolated or under‑sampled end.</td></tr>
                     <tr><td><strong>C‑node</strong> (continuation)</td><td>2</td><td>A simple joint between two segments — usually just a continuation point along a single digitized trace.</td></tr>
                     <tr><td><strong>Y‑node</strong> (abutting)</td><td>3</td><td>One fracture terminates against another (a T‑junction) — the terminating fracture is typically younger than, or arrested by, the host fracture.</td></tr>
                     <tr><td><strong>X‑node</strong> (crossing)</td><td>4 or more</td><td>Two (or more) fractures cross each other — suggesting they were active simultaneously, or sequentially with no mutual arrest.</td></tr>
-                </table>
+                </tbody></table>
                 <p>
                     The ratio of I : Y : X nodes is one of the best single indicators of network connectivity: a
                     network dominated by I‑nodes has low connectivity (fluid flow would be limited and tortuous),
@@ -735,7 +734,7 @@ y_rot = x' · sin(θ) + y' · cos(θ)
                 <!-- ================================================= -->
                 <h2 id="pitfalls">12. Common Pitfalls</h2>
                 <table>
-                    <tr><th>Pitfall</th><th>Description</th><th>How to avoid it</th></tr>
+                    <tbody><tr><th>Pitfall</th><th>Description</th><th>How to avoid it</th></tr>
                     <tr>
                         <td>Scale dependence</td>
                         <td>Patterns seen at outcrop scale may not represent patterns at reservoir or field scale.</td>
@@ -756,7 +755,7 @@ y_rot = x' · sin(θ) + y' · cos(θ)
                         <td>Switching display units without checking the converted profile width/length can silently change your calibration.</td>
                         <td>After switching units, glance at the Summary tiles to confirm the total length looks sensible.</td>
                     </tr>
-                </table>
+                </tbody></table>
 
                 <!-- ================================================= -->
                 <h2 id="workflow">13. Step‑by‑Step Example Workflow</h2>
@@ -810,5 +809,5 @@ y_rot = x' · sin(θ) + y' · cos(θ)
         </main>
     </div>
     <script src="script.js"></script>
-</body>
-</html>
+
+</body></html>
