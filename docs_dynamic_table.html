@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Table Tab | FracSTAT Docs</title>
@@ -89,7 +88,7 @@
                     <li><a href="docs_uncertainty_montecarlo.html">Monte Carlo Tab</a></li>
                     <li><a href="docs_uncertainty_lhs.html">LHS Tab</a></li>
                     <li><a href="docs_uncertainty_pce.html">PCE Tab</a></li>
-                </ul>
+                <li><a href="docs_demo.html">demo</a></li></ul>
             </div>
 
         </aside>
@@ -260,7 +259,7 @@
 
                 <h3 id="provenance">3.1 Column Provenance Table</h3>
                 <table>
-                    <tr><th>DataFrame Field</th><th>Origin</th><th>Present For</th></tr>
+                    <tbody><tr><th>DataFrame Field</th><th>Origin</th><th>Present For</th></tr>
                     <tr><td>ID</td><td>Sequential row index assigned in <code>calculator.run_calculation()</code></td><td>All sources</td></tr>
                     <tr><td>Trace / Segment</td><td><code>Segment.trace_id</code> / <code>Segment.segment_id</code></td><td>All sources</td></tr>
                     <tr><td>StrikeDeg</td><td><code>models.segment_strike()</code> + <code>models.north_corrected_strike()</code> (SVG) or <code>Segment._preset_strike</code> (Excel)</td><td>All sources</td></tr>
@@ -271,7 +270,7 @@
                     <tr><td>DilationTendency</td><td><code>calculator.py</code></td><td>All sources</td></tr>
                     <tr><td>FractureSusceptibility, FractureSusceptibilityLegacy</td><td><code>calculator.py</code>, two historical MATLAB formula variants</td><td>All sources</td></tr>
                     <tr><td>CriticalStress, CriticalStressValue</td><td><code>calculator.py</code> Coulomb comparison</td><td>All sources</td></tr>
-                </table>
+                </tbody></table>
 
                 <!-- ================================================= -->
                 <h2 id="controls">4. Settings and Controls</h2>
@@ -287,18 +286,18 @@
 
                 <h3>4.1 Toolbar Controls</h3>
                 <table>
-                    <tr><th>Control</th><th>Type</th><th>Behaviour</th></tr>
+                    <tbody><tr><th>Control</th><th>Type</th><th>Behaviour</th></tr>
                     <tr><td>"Segment results"</td><td>Static label (bold, 13 pt)</td><td>Section heading; no interactivity.</td></tr>
                     <tr><td>Export Excel</td><td>CTkButton, 120×30 px</td><td>Invokes <code>SlipTendencyApp.export_excel()</code>, which writes <code>self.results</code> to a user-chosen .xlsx workbook (sheet "Segment results") via a native Save dialog. If <code>self.results</code> is empty, an error dialog ("Nothing to export — Run a calculation first.") is shown instead. On success, the status bar and a confirmation dialog report the saved row count and file path.</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3>4.2 Data Grid Controls</h3>
                 <table>
-                    <tr><th>Control</th><th>Type</th><th>Behaviour</th></tr>
+                    <tbody><tr><th>Control</th><th>Type</th><th>Behaviour</th></tr>
                     <tr><td>Column headers (×15)</td><td>ttk.Treeview "heading" cells</td><td>Display the fixed column captions (see Section 5). The "Length" heading is dynamically rewritten on every refresh to embed the active display unit, e.g. "Length (m)", "Length (cm)".</td></tr>
                     <tr><td>Row selection</td><td>ttk.Treeview single-row click / arrow-key navigation</td><td>Selecting a row fires the <code>&lt;&lt;TreeviewSelect&gt;&gt;</code> virtual event, handled by <code>on_table_select()</code>, which drives cross-tab highlighting (Section 8).</td></tr>
                     <tr><td>Vertical scrollbar</td><td>ttk.Scrollbar, orient="vertical"</td><td>Bound bidirectionally to the Treeview's <code>yview</code>; scrolls through all loaded rows (subject to the 1000-row rendering cap, Section 10).</td></tr>
-                </table>
+                </tbody></table>
 
                 <!-- ================================================= -->
                 <h2 id="columns">5. Column Reference and Symbol Table</h2>
@@ -319,7 +318,7 @@
                     physical quantity throughout the application.
                 </p>
                 <table>
-                    <tr><th>#</th><th>Column key</th><th>Heading shown</th><th>Format</th><th>Unit</th><th>Meaning</th></tr>
+                    <tbody><tr><th>#</th><th>Column key</th><th>Heading shown</th><th>Format</th><th>Unit</th><th>Meaning</th></tr>
                     <tr><td>1</td><td>ID</td><td>ID</td><td>integer</td><td>—</td><td>Sequential row identifier assigned during calculation; used as the Treeview row iid and as the cross-tab selection key.</td></tr>
                     <tr><td>2</td><td>Trace</td><td>Trace</td><td>integer</td><td>—</td><td>Parent trace/fracture-plane group identifier (multiple segments can share one trace for SVG-derived polylines).</td></tr>
                     <tr><td>3</td><td>Segment</td><td>Segment</td><td>integer</td><td>—</td><td>Index of this segment within its parent trace.</td></tr>
@@ -335,7 +334,7 @@
                     <tr><td>13</td><td>Sf</td><td>S_f (Pf-corr.)</td><td>0.00 (2 dp)</td><td>MPa</td><td>Fracture susceptibility including pore-pressure and cohesion correction, FractureSusceptibility.</td></tr>
                     <tr><td>14</td><td>SfLegacy</td><td>S_f (legacy)</td><td>0.00 (2 dp) or "—"</td><td>MPa</td><td>Original (pre-correction) MATLAB-formula fracture susceptibility, FractureSusceptibilityLegacy; shown as an em-dash if absent.</td></tr>
                     <tr><td>15</td><td>CSF</td><td>CSF</td><td>"Yes" / "No"</td><td>boolean</td><td>Whether the segment is critically stressed under the active Mohr–Coulomb failure envelope, CriticalStress.</td></tr>
-                </table>
+                </tbody></table>
 
                 <div class="code-window">
                     <div class="code-header">
@@ -373,7 +372,7 @@ for col in columns:
 
                 <h3>6.1 Symbol Definitions</h3>
                 <table>
-                    <tr><th>Symbol</th><th>Description</th><th>Units</th></tr>
+                    <tbody><tr><th>Symbol</th><th>Description</th><th>Units</th></tr>
                     <tr><td>σ1, σ2, σ3</td><td>Maximum, intermediate, and minimum principal stress magnitudes (σ1 ≥ σ2 ≥ σ3)</td><td>MPa</td></tr>
                     <tr><td>azimuth / σ1 trend</td><td>Compass bearing of σ1 (Andersonian mode) or of the general 3-D σ1 axis</td><td>degrees from North</td></tr>
                     <tr><td>strike, dip</td><td>North-referenced strike and dip of the fracture plane</td><td>degrees</td></tr>
@@ -386,7 +385,7 @@ for col in columns:
                     <tr><td>Ts, Ts,max</td><td>Raw slip tendency and its theoretical maximum over all orientations</td><td>dimensionless</td></tr>
                     <tr><td>Td</td><td>Dilation tendency</td><td>dimensionless, 0–1</td></tr>
                     <tr><td>Sf</td><td>Fracture susceptibility (pore-pressure corrected)</td><td>MPa</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3>6.2 Stress Resolution (σₙ, τ, α)</h3>
                 <p>
@@ -556,7 +555,7 @@ SfLegacy (original)           =  σₙ − τ / μ
                     <code>self.appearance_var.get()</code>:
                 </p>
                 <table>
-                    <tr><th>Element</th><th>Light mode</th><th>Dark mode</th></tr>
+                    <tbody><tr><th>Element</th><th>Light mode</th><th>Dark mode</th></tr>
                     <tr><td>Treeview background / field background</td><td>#FFFFFF</td><td>#111821</td></tr>
                     <tr><td>Treeview foreground (row text)</td><td>#1F2933</td><td>#E6EDF3</td></tr>
                     <tr><td>Row height</td><td>26 px</td><td>26 px</td></tr>
@@ -565,7 +564,7 @@ SfLegacy (original)           =  σₙ − τ / μ
                     <tr><td>Heading foreground</td><td>white</td><td>white</td></tr>
                     <tr><td>Selected-row background</td><td>#DBEAFE</td><td>#255B7D</td></tr>
                     <tr><td>Selected-row foreground</td><td>#1F2933</td><td>#FFFFFF</td></tr>
-                </table>
+                </tbody></table>
                 <div class="note-box">
                     <strong>Note:</strong> <code>configure_table_style()</code> is called both at tab construction
                     and whenever <code>SlipTendencyApp.change_appearance()</code> runs, ensuring the Treeview's
@@ -685,12 +684,12 @@ SfLegacy (original)           =  σₙ − τ / μ
 
                 <h3>9.1 Interpreting Column Distributions</h3>
                 <table>
-                    <tr><th>Observation in the Table Tab</th><th>Geomechanical interpretation</th></tr>
+                    <tbody><tr><th>Observation in the Table Tab</th><th>Geomechanical interpretation</th></tr>
                     <tr><td>Many rows with CSF = "Yes"</td><td>The current stress tensor is close to, or exceeds, the assumed failure envelope for a large fraction of the fracture population — indicative of a critically stressed fracture network with elevated potential for fluid flow along reactivated planes.</td></tr>
                     <tr><td>TsNorm clustered near 1.0 for a subset of rows</td><td>Those planes are oriented close to the theoretically optimal slip-prone orientation for the current σ1–σ3 differential; in an Andersonian regime this typically corresponds to strikes sub-parallel to σ1 with dip near the frictional-lock angle (~30° from σ1 for μ ≈ 0.6).</td></tr>
                     <tr><td>Td consistently higher than Ts for the same rows</td><td>Planes are more prone to opening-mode dilation than to frictional slip under the current stress state — relevant when assessing which fractures are more likely to act as open conduits versus shear-reactivated conduits.</td></tr>
                     <tr><td>Sf and SfLegacy diverging substantially</td><td>Indicates a non-trivial pore-pressure (Pf) or cohesion (C₀) input; the magnitude of the divergence is, by construction, approximately equal to Pf when C₀ = 0 (Section 6.5).</td></tr>
-                </table>
+                </tbody></table>
 
                 <!-- ================================================= -->
                 <h2 id="performance">10. Performance Optimisation</h2>
@@ -886,7 +885,7 @@ SfLegacy (original)           =  σₙ − τ / μ
                 <!-- ================================================= -->
                 <h2 id="limitations">15. Limitations</h2>
                 <table>
-                    <tr><th>Limitation</th><th>Description</th></tr>
+                    <tbody><tr><th>Limitation</th><th>Description</th></tr>
                     <tr><td>Row cap</td><td>Only the first 1000 rows of self.results are ever rendered on screen (Section 10); very large fracture networks require the Export Excel action to inspect the full dataset.</td></tr>
                     <tr><td>No interactive sorting or filtering</td><td>The Table Tab cannot resort by column value, filter by threshold, or search by ID directly within the application; such operations require exporting to Excel/CSV first.</td></tr>
                     <tr><td>No in-place editing</td><td>All fifteen displayed columns are read-only; the Table Tab cannot be used to manually override a segment's dip, strike, or any derived attribute (dip overrides must instead be supplied via a separate CSV/Excel dip-override file loaded through the sidebar).</td></tr>
@@ -894,7 +893,7 @@ SfLegacy (original)           =  σₙ − τ / μ
                     <tr><td>Column set is fixed</td><td>The fifteen columns cannot be reconfigured, reordered, hidden, or extended with additional derived quantities (e.g. Rake, TauRake, PredictedRake, RakeMisfit for focal-mechanism datasets, or Lat/Lon for geographic data) from within the tab itself, even though these fields exist in self.results and are exported to Excel.</td></tr>
                     <tr><td>Number formatting is fixed</td><td>Decimal-place precision (1, 2, or 3 dp depending on column) is hardcoded and cannot be adjusted by the user from within the Table Tab.</td></tr>
                     <tr><td>Dark-mode styling is implemented but currently unreachable in normal use</td><td>Since SlipTendencyApp.change_appearance() always forces the Light theme at the application level.</td></tr>
-                </table>
+                </tbody></table>
 
                 <!-- ================================================= -->
                 <h2 id="references">16. References</h2>
@@ -919,5 +918,5 @@ SfLegacy (original)           =  σₙ − τ / μ
         </main>
     </div>
     <script src="script.js"></script>
-</body>
-</html>
+
+</body></html>
