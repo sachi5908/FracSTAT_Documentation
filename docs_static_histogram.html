@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Static Histogram Tab | FracSTAT Docs</title>
@@ -89,7 +88,7 @@
                     <li><a href="docs_uncertainty_montecarlo.html">Monte Carlo Tab</a></li>
                     <li><a href="docs_uncertainty_lhs.html">LHS Tab</a></li>
                     <li><a href="docs_uncertainty_pce.html">PCE Tab</a></li>
-                </ul>
+                <li><a href="docs_demo.html">demo</a></li></ul>
             </div>
 
         </aside>
@@ -150,7 +149,7 @@
 
                 <h3>1.1 Sidebar Cards at a Glance</h3>
                 <table>
-                    <tr><th>Card</th><th>Purpose</th><th>Always visible?</th></tr>
+                    <tbody><tr><th>Card</th><th>Purpose</th><th>Always visible?</th></tr>
                     <tr><td>Data Settings</td><td>Selects which quantity to plot (segment length, trace length, segment angle, or the bivariate Cross Plot) and whether edge‑censoring is applied.</td><td>Yes</td></tr>
                     <tr><td>Options</td><td>Sets the number of histogram bins and provides an explicit "Update Plot" redraw button.</td><td>Histogram modes</td></tr>
                     <tr><td>Plot Appearance</td><td>Controls the figure title, background colours, plot boundary styling, grid, legend placement, and the pixel dimensions of the plotting area.</td><td>Yes</td></tr>
@@ -158,7 +157,7 @@
                     <tr><td>Text &amp; Axis Styling</td><td>Controls the colour of the left (Frequency) axis text, the right (Frequency %) axis text, and the X‑axis text.</td><td>Histogram modes</td></tr>
                     <tr><td>Statistics</td><td>A read‑only results panel reporting n, censored count, minimum, maximum, mean, and total length.</td><td>Histogram modes</td></tr>
                     <tr><td>Cross Plot Settings</td><td>X‑axis/Y‑axis attribute selectors, colour‑by attribute, marker styling, trend‑line controls, and colour‑scale/colourbar options.</td><td>Cross Plot mode only</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3>1.2 Plot Canvas</h3>
                 <p>
@@ -196,7 +195,7 @@
 
                 <h3>2.2 Columns Consumed</h3>
                 <table>
-                    <tr><th>Column</th><th>Type</th><th>Used for</th><th>Notes</th></tr>
+                    <tbody><tr><th>Column</th><th>Type</th><th>Used for</th><th>Notes</th></tr>
                     <tr><td><code>Length_m</code></td><td>float</td><td>Segment‑length histogram; length statistics; Cross Plot "Segment Length" axis</td><td>Real‑world segment length in the currently selected display unit (despite the fixed column‑name suffix "_m").</td></tr>
                     <tr><td><code>StrikeDeg</code></td><td>float</td><td>Segment‑angle histogram; Cross Plot "Segment/Strike angle" axis</td><td>Stored fully‑directed (0–360°); the tab folds it to the 0–180° fracture‑orientation convention with modulo arithmetic before plotting.</td></tr>
                     <tr><td><code>Trace</code></td><td>int</td><td>Trace‑length aggregation; edge‑censoring grouping</td><td>Used with a pandas <code>groupby</code> to sum segment lengths per trace.</td></tr>
@@ -204,7 +203,7 @@
                     <tr><td><code>X1, Y1, X2, Y2</code></td><td>float</td><td>Edge‑censoring bounding‑box test; SVG fallback cross‑plot geometry</td><td>Real‑world (scaled) segment endpoints for SVG‑sourced data.</td></tr>
                     <tr><td><code>Aperture</code></td><td>float</td><td>Cross Plot Y‑axis default for Excel/CSV data</td><td>Only populated when the source spreadsheet supplies an Aperture column; otherwise NaN.</td></tr>
                     <tr><td><code>ID</code></td><td>int</td><td>Cross Plot "Segment ID" axis option</td><td>Sequential per‑segment identifier matching the Table/Results tabs.</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3>2.3 Handling of Missing or Empty Data</h3>
                 <p>
@@ -233,21 +232,21 @@
 
                 <h3>3.1 Data Settings Card</h3>
                 <table>
-                    <tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
+                    <tbody><tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Data Settings dropdown</td><td>Option menu</td><td>Segment lengths</td><td>Chooses the plotted quantity: "Segment lengths", "Trace lengths", "Segment angles", or "Cross Plot". Selecting "Cross Plot" additionally reveals the Cross Plot Settings card; any other choice hides it.</td></tr>
                     <tr><td>Censor edge traces</td><td>Checkbox</td><td>Unchecked</td><td>When enabled, any trace with at least one segment endpoint numerically coincident with the bounding box of the loaded dataset is excluded from the plotted sample (see <a href="#algorithms">Section 5.2</a>). Applies to Segment lengths, Trace lengths, and Cross Plot (SVG geometry only) modes.</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3>3.2 Options Card</h3>
                 <table>
-                    <tr><th>Control</th><th>Widget</th><th>Default</th><th>Valid range</th><th>Effect</th></tr>
+                    <tbody><tr><th>Control</th><th>Widget</th><th>Default</th><th>Valid range</th><th>Effect</th></tr>
                     <tr><td>Number of bins</td><td>Text entry</td><td>20</td><td>Clamped to 3–200 on commit</td><td>Sets the histogram bin count used to partition the length or angle range into equal‑width intervals. Committed on <kbd>Enter</kbd> or on focus‑out.</td></tr>
                     <tr><td>Update Plot</td><td>Button</td><td>—</td><td>—</td><td>Manually forces a redraw; provided for consistency of interaction pattern even though most controls already redraw automatically.</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3>3.3 Plot Appearance Card</h3>
                 <table>
-                    <tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
+                    <tbody><tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Custom title (blank = auto)</td><td>Text entry</td><td>"" (auto title)</td><td>Overrides the automatically generated plot title. The automatic title reports the plotted quantity and sample size n (and, in Cross Plot mode, the X/Y axis labels).</td></tr>
                     <tr><td>Outer background</td><td>Colour swatch</td><td>#FFFFFF</td><td>Sets the Matplotlib Figure facecolor — the canvas area outside the axes bounding box.</td></tr>
                     <tr><td>Plot background</td><td>Colour swatch</td><td>#FFFFFF</td><td>Sets the Axes facecolor (the area inside the plot frame).</td></tr>
@@ -260,11 +259,11 @@
                     <tr><td>Plot Area Size — Width (px)</td><td>Text entry (int)</td><td>700</td><td>Sets the target pixel width of the rendered figure by destroying and recreating the canvas at the requested size (see <a href="#algorithms">Section 5.4</a>).</td></tr>
                     <tr><td>Plot Area Size — Height (px)</td><td>Text entry (int)</td><td>600</td><td>Sets the target pixel height of the rendered figure, using the same rebuild mechanism as Width.</td></tr>
                     <tr><td>Reset Size to Auto</td><td>Button</td><td>—</td><td>Rebuilds the canvas at the fixed default of 700 × 600 px (7.0 × 6.0 inches at 100 dpi).</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3>3.4 Element Styling Card (Histogram Modes)</h3>
                 <table>
-                    <tr><th>Control</th><th>Widget</th><th>Default</th><th>Applies to</th></tr>
+                    <tbody><tr><th>Control</th><th>Widget</th><th>Default</th><th>Applies to</th></tr>
                     <tr><td>Bar fill colour</td><td>Colour swatch</td><td>#0000CC</td><td>Histogram bars.</td></tr>
                     <tr><td>Bar border colour</td><td>Colour swatch</td><td>#000000</td><td>The edge colour drawn around each bar.</td></tr>
                     <tr><td>Bar border width</td><td>Text entry (float)</td><td>0.6</td><td>Bar edge line width, in points.</td></tr>
@@ -272,27 +271,27 @@
                     <tr><td>Min line width</td><td>Text entry (float)</td><td>1.4</td><td>Line width of the minimum‑value reference line.</td></tr>
                     <tr><td>Max line colour</td><td>Colour swatch</td><td>#CC0000</td><td>The vertical reference line marking the sample maximum.</td></tr>
                     <tr><td>Max line width</td><td>Text entry (float)</td><td>1.4</td><td>Line width of the maximum‑value reference line.</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3>3.5 Text &amp; Axis Styling Card (Histogram Modes)</h3>
                 <table>
-                    <tr><th>Control</th><th>Widget</th><th>Default</th></tr>
+                    <tbody><tr><th>Control</th><th>Widget</th><th>Default</th></tr>
                     <tr><td>Frequency (Left) colour</td><td>Colour swatch</td><td>Matches Bar fill colour</td></tr>
                     <tr><td>Frequency % (Right) colour</td><td>Colour swatch</td><td>#CC4400</td></tr>
                     <tr><td>X‑axis text colour</td><td>Colour swatch</td><td>Workspace text colour (typically #1F2933)</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3>3.6 Statistics Card (Histogram Modes)</h3>
                 <p>The Statistics card is a read‑only report, recomputed on every histogram redraw from the filtered, positive‑valued sample.</p>
                 <table>
-                    <tr><th>Field</th><th>Description</th><th>Units</th></tr>
+                    <tbody><tr><th>Field</th><th>Description</th><th>Units</th></tr>
                     <tr><td>n (count)</td><td>Number of observations remaining in the plotted sample after filtering non‑finite and non‑positive values, and after any edge‑censoring.</td><td>count</td></tr>
                     <tr><td>Censored</td><td>Number of observations removed by the edge‑censoring rule (zero when censoring is disabled).</td><td>count</td></tr>
                     <tr><td>Minimum</td><td>Sample minimum of the plotted attribute.</td><td>display unit or degrees</td></tr>
                     <tr><td>Maximum</td><td>Sample maximum of the plotted attribute.</td><td>display unit or degrees</td></tr>
                     <tr><td>Mean</td><td>Arithmetic mean of the plotted attribute.</td><td>display unit or degrees</td></tr>
                     <tr><td>Total Length</td><td>Sum of all plotted lengths (reported only for length‑based modes; computed but not meaningful for the Segment angles mode).</td><td>display unit</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3>3.7 Cross Plot Settings Card</h3>
                 <p>
@@ -300,7 +299,7 @@
                     "Cross Plot"; toggling back to any histogram mode hides it again.
                 </p>
                 <table>
-                    <tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
+                    <tbody><tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>X axis</td><td>Option menu</td><td>Segment Angle (°)</td><td>Selects the attribute plotted on the horizontal axis. Options: Segment Angle (°), Segment Length, Trace Angle (°), Trace Length, Strike (°), Length, Aperture (mm), Dip (°), Segment ID, Trace ID.</td></tr>
                     <tr><td>Y axis</td><td>Option menu</td><td>Segment Length</td><td>Selects the attribute plotted on the vertical axis, from the same option list as X axis.</td></tr>
                     <tr><td>Colour points by</td><td>Option menu</td><td>None</td><td>Optionally colours each scatter point by a third attribute using a continuous colormap; "None" plots all points in a single solid colour.</td></tr>
@@ -314,7 +313,7 @@
                     <tr><td>Colour scale (when colouring by)</td><td>Option menu</td><td>viridis</td><td>Matplotlib colormap name applied when "Colour points by" is not "None". Options include viridis, plasma, inferno, magma, cividis, turbo, jet, hot, coolwarm, RdYlBu, Spectral, YlGnBu, Greys.</td></tr>
                     <tr><td>Colorbar position</td><td>Option menu</td><td>Right</td><td>Right, Left, Bottom, Top, or None; controls placement of the colourbar associated with the "Colour points by" mapping.</td></tr>
                     <tr><td>Colorbar bg colour</td><td>Colour swatch</td><td>Matches Outer background</td><td>Background colour behind the colourbar axis.</td></tr>
-                </table>
+                </tbody></table>
 
                 <!-- ================================================= -->
                 <h2 id="maths">4. Mathematical Background</h2>
@@ -394,7 +393,7 @@ ax_left.bar(centres, counts, width=widths, align="center",
             label="Frequency")
 
 ax_right = ax_left.twinx()
-count_max = counts.max() if counts.max() > 0 else 1
+count_max = counts.max() if counts.max() &gt; 0 else 1
 ax_right.set_ylim(0, count_max / n * 100.0 * 1.05)</code></pre>
                 </div>
                 <p class="ph-caption" style="text-align:left; margin: -1rem 0 1.5rem 0;">Simplified excerpt of the binning and dual‑axis logic in <code>_draw_length_histogram()</code>, showing the degenerate single‑bin fallback and the percentage‑axis headroom calculation described above.</p>
@@ -525,13 +524,13 @@ X'i = (Xi − x_min) × scale_x,   Y'i = (Yi − y_min) × scale_y
                 <!-- ================================================= -->
                 <h2 id="statistics">6. Statistical Methods</h2>
                 <table>
-                    <tr><th>Statistic</th><th>Formula</th><th>Interpretation</th></tr>
+                    <tbody><tr><th>Statistic</th><th>Formula</th><th>Interpretation</th></tr>
                     <tr><td>n</td><td>count of filtered, positive observations</td><td>Effective sample size available for interpretation; small n (roughly below 30) warrants caution when generalising the distribution shape.</td></tr>
                     <tr><td>Minimum / Maximum</td><td>min(x), max(x)</td><td>Bounds of the observed range; in fracture studies the minimum is frequently a mapping‑resolution artefact (the shortest resolvable trace) rather than a true geological minimum.</td></tr>
                     <tr><td>Mean</td><td>(1/n) Σ xi</td><td>Central tendency; for heavy‑tailed (power‑law‑like) fracture length distributions the mean can be strongly influenced by a small number of very long traces and may not represent a "typical" fracture — the CDF tab's median and quantile statistics are often more robust.</td></tr>
                     <tr><td>Total Length / Sum</td><td>Σ xi</td><td>Aggregate fracture length in the sample area; directly relevant to fracture‑intensity metrics such as P21 computed elsewhere in FracSTAT (Intensity &amp; Density tab).</td></tr>
                     <tr><td>Censored count</td><td>count of excluded boundary‑touching observations</td><td>Quantifies the magnitude of the truncation‑bias correction; a large censored fraction relative to n signals that the mapped area may be too small relative to the characteristic fracture length for unbiased length statistics.</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3>6.1 Relationship to the CDF Tab</h3>
                 <p>
@@ -696,7 +695,7 @@ X'i = (Xi − x_min) × scale_x,   Y'i = (Yi − y_min) × scale_y
                 <!-- ================================================= -->
                 <h2 id="pitfalls">10. Limitations &amp; Common Pitfalls</h2>
                 <table>
-                    <tr><th>Limitation / Pitfall</th><th>Description</th></tr>
+                    <tbody><tr><th>Limitation / Pitfall</th><th>Description</th></tr>
                     <tr><td>No formal distributional fitting</td><td>The module performs no maximum‑likelihood fitting, goodness‑of‑fit testing, or confidence‑interval estimation; such analysis is deferred entirely to the CDF tab.</td></tr>
                     <tr><td>Equal‑width binning obscures heavy tails</td><td>Linear binning can visually obscure power‑law‑like fracture length distributions, which are frequently better examined on logarithmic axes or via the CDF tab's complementary cumulative distribution plots.</td></tr>
                     <tr><td>OLS assumes linearity</td><td>The trend line assumes a linear x–y relationship; no alternative functional forms (power‑law, exponential, logarithmic) are offered within the Cross Plot tool itself.</td></tr>
@@ -704,7 +703,7 @@ X'i = (Xi − x_min) × scale_x,   Y'i = (Yi − y_min) × scale_y
                     <tr><td>No circular‑statistics correction</td><td>Segment‑angle statistics are computed on the linear (folded) 0–180° domain; near‑boundary orientation populations should be cross‑checked against the Rose Plot tab.</td></tr>
                     <tr><td>Single third‑attribute colouring</td><td>"Colour points by" supports only one attribute at a time and does not support multivariate (e.g. size‑and‑colour combined) encodings beyond marker colour.</td></tr>
                     <tr><td>Orientation‑only Excel/CSV data</td><td>Legacy fracture‑plane or Trend/Plunge pole formats with no true spatial coordinates can supply Length and Aperture only when those optional columns are present in the source spreadsheet; when absent, the corresponding statistics and Cross Plot axes show no valid data.</td></tr>
-                </table>
+                </tbody></table>
 
                 <!-- ================================================= -->
                 <h2 id="advanced">11. Advanced &amp; Related Capabilities</h2>
@@ -758,5 +757,5 @@ X'i = (Xi − x_min) × scale_x,   Y'i = (Yi − y_min) × scale_y
         </main>
     </div>
     <script src="script.js"></script>
-</body>
-</html>
+
+</body></html>
