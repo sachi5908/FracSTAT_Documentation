@@ -701,8 +701,6 @@
             { file: "docs_uncertainty_montecarlo.html", label: "Monte Carlo Tab" },
             { file: "docs_uncertainty_lhs.html", label: "LHS Tab" },
             { file: "docs_uncertainty_pce.html", label: "PCE Tab" }
-        ,
-            { file: "docs_demo.html", label: "demo" }
         ]}
     ];
 
@@ -2268,19 +2266,27 @@
                 PENDING_NEW_FILES.delete(currentFile);
             }
 
-            editorStatus.innerHTML = `<span style="color: #10b981; font-weight: 700;">🎉 Success!</span> <b>${currentFile}</b> has been ${isNewFile ? "created on" : "pushed to"} GitHub. <span style="opacity: 0.85;">(Please allow 1–2 minutes for the live site to update)</span>` +
-                (isNewFile ? ' <button type="button" id="afterCreatePropagateBtn" class="action btn-addsidebar" style="margin-left:8px; display:inline-flex;">+ Add to Sidebar Everywhere</button>' : "");
+            const successMsg = `<span style="color: #10b981; font-weight: 700;">🎉 Success!</span> <b>${currentFile}</b> has been ${isNewFile ? "created on" : "pushed to"} GitHub. <span style="opacity: 0.85;">(Please allow 1–2 minutes for the live site to update)</span>`;
 
             if (isNewFile) {
-                var propBtn = document.getElementById("afterCreatePropagateBtn");
-                if (propBtn) {
-                    var meta = findFileMeta(currentFile);
-                    propBtn.addEventListener("click", function () {
-                        updateSidebarRegistry(currentFile).then(function () {
-                            if (meta) return updateAdminHtmlSource(currentFile, meta.label, meta.section);
-                        });
-                    });
+                // New pages need their link registered in the shared sidebar
+                // (script.js) so they actually show up in navigation anywhere.
+                // Do this automatically now instead of making the user click
+                // a second "Add to Sidebar Everywhere" button.
+                editorStatus.innerHTML = successMsg + ' <span style="opacity:0.85;">Registering in sidebar…</span>';
+                const meta = findFileMeta(currentFile);
+                try {
+                    await updateSidebarRegistry(currentFile);
+                    if (meta) {
+                        await updateAdminHtmlSource(currentFile, meta.label, meta.section);
+                    }
+                    editorStatus.innerHTML = successMsg + ' <span style="opacity:0.85;">Sidebar updated automatically — this page now appears in navigation everywhere.</span>';
+                } catch (sidebarErr) {
+                    console.error("Automatic sidebar registration failed:", sidebarErr);
+                    editorStatus.innerHTML = successMsg + ' <span style="color:#dc2626;">Could not automatically update the sidebar — use "Add to Sidebar" to retry.</span>';
                 }
+            } else {
+                editorStatus.innerHTML = successMsg;
             }
             
         } catch (err) {
