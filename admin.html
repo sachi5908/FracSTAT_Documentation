@@ -720,8 +720,7 @@
         { title: "Uncertainty Analyzer", files: [
             { file: "docs_uncertainty_montecarlo.html", label: "Monte Carlo Tab" },
             { file: "docs_uncertainty_lhs.html", label: "LHS Tab" },
-            { file: "docs_uncertainty_pce.html", label: "PCE Tab" },
-            { file: "docs_demo.html", label: "demo" }
+            { file: "docs_uncertainty_pce.html", label: "PCE Tab" }
         ]}
     ];
 
@@ -859,39 +858,118 @@
     // admin.html's own FILE_SECTIONS list, so it still shows up in the
     // dashboard after the admin panel is reloaded. Failures are logged but
     // never block the rest of the publish flow.
-    async function updateAdminHtmlSource(targetFile, label, sectionTitle) {
-        var token = sessionStorage.getItem("github_token");
-        if (!token) return;
+    // Computes the updated admin.html source needed to register a page in
+    // FILE_SECTIONS, WITHOUT pushing anything to GitHub itself. Returns the
+    // new source string, or null if no admin.html change is needed (already
+    // registered, or the patch couldn't be computed). Pairing this with
+    // computeSidebarPatch() below and pushing both through
+    // commitMultipleFilesToGithub() is what lets several files change
+    // together in one commit instead of one GitHub Pages deployment per file.
+    async function computeAdminHtmlPatch(targetFile, label, sectionTitle) {
         try {
             var res = await fetchFresh("admin.html");
             if (!res.ok) throw new Error("fetch admin.html failed: " + res.status);
             var src = await res.text();
 
-            if (src.indexOf('"' + targetFile + '"') !== -1) return; // already registered
+            if (src.indexOf('"' + targetFile + '"') !== -1) return null; // already registered
 
-            var updatedSrc = patchFileSectionsSource(src, sectionTitle, targetFile, label);
-            if (!updatedSrc) return;
+            return patchFileSectionsSource(src, sectionTitle, targetFile, label);
+        } catch (err) {
+            console.error("Failed to compute admin.html FILE_SECTIONS patch:", err);
+            return null;
+        }
+    }
 
-            var apiUrl = "https://api.github.com/repos/" + GITHUB_REPO_OWNER + "/" + GITHUB_REPO_NAME + "/contents/admin.html";
-            var shaRes = await fetch(apiUrl, { headers: { "Authorization": "token " + token }, cache: "no-store" });
-            var sha = null;
-            if (shaRes.ok) { var shaData = await shaRes.json(); sha = shaData.sha; }
+    // ---------------------------------------------------------
+    // Single-commit multi-file publishing.
+    //
+    // Previously, creating a new page pushed up to three SEPARATE commits
+    // in a row (the page itself, then script.js, then admin.html), each
+    // one via the Contents API (PUT /contents/{path}). GitHub Pages queues
+    // a fresh build for every commit that lands on the deployed branch, so
+    // three quick commits meant three back-to-back deployments — slower,
+    // and prone to an earlier build finishing (and briefly serving a
+    // stale sidebar) after a later commit had already landed.
+    //
+    // This helper instead uses the lower-level Git Data API to build ONE
+    // commit containing every changed file: read the branch's current
+    // commit/tree, upload a blob per changed file, create a new tree that
+    // layers those blobs onto the existing tree, wrap that in a single new
+    // commit, then fast-forward the branch ref to it. One commit in, one
+    // Pages deployment out, no matter how many files were touched.
+    // ---------------------------------------------------------
+    async function commitMultipleFilesToGithub(fileMap, commitMessage) {
+        var token = sessionStorage.getItem("github_token");
+        if (!token) throw new Error("No GitHub token found. Please log in again.");
 
-            var encoded = btoa(unescape(encodeURIComponent(updatedSrc)));
-            await fetch(apiUrl, {
-                method: "PUT",
-                headers: { "Authorization": "token " + token, "Content-Type": "application/json" },
+        var apiBase = "https://api.github.com/repos/" + GITHUB_REPO_OWNER + "/" + GITHUB_REPO_NAME;
+        var headers = {
+            "Authorization": "token " + token,
+            "Content-Type": "application/json"
+        };
+
+        // 1. Resolve the branch's current commit.
+        var refRes = await fetch(apiBase + "/git/ref/heads/" + GITHUB_BRANCH, { headers: headers, cache: "no-store" });
+        if (!refRes.ok) throw new Error("Could not read branch ref (HTTP " + refRes.status + ")");
+        var refData = await refRes.json();
+        var parentSha = refData.object.sha;
+
+        // 2. Resolve that commit's base tree.
+        var commitRes = await fetch(apiBase + "/git/commits/" + parentSha, { headers: headers, cache: "no-store" });
+        if (!commitRes.ok) throw new Error("Could not read latest commit (HTTP " + commitRes.status + ")");
+        var commitData = await commitRes.json();
+        var baseTreeSha = commitData.tree.sha;
+
+        // 3. Upload one blob per changed file.
+        var treeEntries = [];
+        var paths = Object.keys(fileMap);
+        for (var i = 0; i < paths.length; i++) {
+            var path = paths[i];
+            var content = fileMap[path];
+            var blobRes = await fetch(apiBase + "/git/blobs", {
+                method: "POST",
+                headers: headers,
                 cache: "no-store",
                 body: JSON.stringify({
-                    message: "Register " + targetFile + " in admin FILE_SECTIONS",
-                    content: encoded,
-                    sha: sha,
-                    branch: GITHUB_BRANCH
+                    content: btoa(unescape(encodeURIComponent(content))),
+                    encoding: "base64"
                 })
             });
-        } catch (err) {
-            console.error("Failed to update admin.html FILE_SECTIONS:", err);
+            if (!blobRes.ok) throw new Error("Failed to create blob for " + path);
+            var blobData = await blobRes.json();
+            treeEntries.push({ path: path, mode: "100644", type: "blob", sha: blobData.sha });
         }
+
+        // 4. Build one new tree layering every changed file onto the base tree.
+        var treeRes = await fetch(apiBase + "/git/trees", {
+            method: "POST",
+            headers: headers,
+            cache: "no-store",
+            body: JSON.stringify({ base_tree: baseTreeSha, tree: treeEntries })
+        });
+        if (!treeRes.ok) throw new Error("Failed to create tree");
+        var treeData = await treeRes.json();
+
+        // 5. Wrap that tree in a single new commit.
+        var newCommitRes = await fetch(apiBase + "/git/commits", {
+            method: "POST",
+            headers: headers,
+            cache: "no-store",
+            body: JSON.stringify({ message: commitMessage, tree: treeData.sha, parents: [parentSha] })
+        });
+        if (!newCommitRes.ok) throw new Error("Failed to create commit");
+        var newCommitData = await newCommitRes.json();
+
+        // 6. Fast-forward the branch to the new commit — one deploy, not several.
+        var updateRefRes = await fetch(apiBase + "/git/refs/heads/" + GITHUB_BRANCH, {
+            method: "PATCH",
+            headers: headers,
+            cache: "no-store",
+            body: JSON.stringify({ sha: newCommitData.sha, force: false })
+        });
+        if (!updateRefRes.ok) throw new Error("Failed to update branch ref");
+
+        return newCommitData.sha;
     }
 
     // Finds the SIDEBAR_SECTIONS array literal inside script.js's own
@@ -957,49 +1035,22 @@
     // HTML: since the sidebar is rendered client-side from this one array,
     // updating it here instantly puts the new page's link on every page's
     // sidebar, with just one file to push to GitHub.
-    async function updateSidebarRegistry(targetFile) {
-        var token = sessionStorage.getItem("github_token");
-        if (!token) { alert("No GitHub token found. Please log in again."); return; }
-
+    // Computes the updated script.js source needed to register a page's
+    // sidebar entry, WITHOUT pushing anything to GitHub itself. Returns the
+    // new source string, or null if no change is needed (already registered)
+    // or the patch couldn't be computed. See computeAdminHtmlPatch() above
+    // for why this is split out from the actual push.
+    async function computeSidebarPatch(targetFile) {
         var meta = findFileMeta(targetFile);
-        if (!meta) { alert("Could not determine this page's sidebar label/section."); return; }
-
-        editorStatus.textContent = "Updating shared sidebar (script.js)…";
+        if (!meta) return null;
         try {
             var localRes = await fetchFresh("script.js");
             if (!localRes.ok) throw new Error("fetch script.js failed: " + localRes.status);
             var rawJs = await localRes.text();
-
-            var updatedJs = patchScriptJsSidebarSource(rawJs, meta.section, targetFile, meta.label);
-            if (updatedJs === null) {
-                editorStatus.textContent = "Sidebar already includes " + targetFile + " — nothing to update.";
-                return;
-            }
-
-            var apiUrl = "https://api.github.com/repos/" + GITHUB_REPO_OWNER + "/" + GITHUB_REPO_NAME + "/contents/script.js";
-            var shaRes = await fetch(apiUrl, { headers: { "Authorization": "token " + token }, cache: "no-store" });
-            var sha = null;
-            if (shaRes.ok) { var shaData = await shaRes.json(); sha = shaData.sha; }
-
-            var encoded = btoa(unescape(encodeURIComponent(updatedJs)));
-            var putRes = await fetch(apiUrl, {
-                method: "PUT",
-                headers: { "Authorization": "token " + token, "Content-Type": "application/json" },
-                cache: "no-store",
-                body: JSON.stringify({
-                    message: "Add " + targetFile + " to shared sidebar (via Admin Panel)",
-                    content: encoded,
-                    sha: sha,
-                    branch: GITHUB_BRANCH
-                })
-            });
-            if (!putRes.ok) throw new Error("GitHub PUT failed for script.js");
-
-            editorStatus.textContent = "Sidebar updated — " + targetFile + " now appears on every page's navigation. " +
-                "(Allow 1-2 minutes for the live site to redeploy.)";
+            return patchScriptJsSidebarSource(rawJs, meta.section, targetFile, meta.label);
         } catch (err) {
-            console.error("Sidebar registry update failed:", err);
-            editorStatus.textContent = "Sidebar update failed: " + err.message;
+            console.error("Failed to compute script.js sidebar patch:", err);
+            return null;
         }
     }
 
@@ -1336,14 +1387,38 @@
         updateInGithub();
     });
 
-    addSidebarBtn.addEventListener("click", function () {
+    addSidebarBtn.addEventListener("click", async function () {
         if (!currentFile) return;
         var meta = findFileMeta(currentFile);
         if (!meta) { alert("Couldn't determine this page's sidebar section/label."); return; }
-        if (!confirm('Add "' + currentFile + '" (' + meta.label + ') to the shared sidebar (script.js), and push that change to GitHub now? Every page reads its sidebar from this one file, so this single update is enough to make it appear everywhere.')) return;
-        updateSidebarRegistry(currentFile).then(function () {
-            return updateAdminHtmlSource(currentFile, meta.label, meta.section);
-        });
+        if (!confirm('Add "' + currentFile + '" (' + meta.label + ') to the shared sidebar (script.js) and to admin.html\'s own page registry, pushing both as a SINGLE commit to GitHub now?')) return;
+
+        editorStatus.textContent = "Preparing sidebar + registry update…";
+        try {
+            var filesToCommit = {};
+
+            var sidebarPatch = await computeSidebarPatch(currentFile);
+            if (sidebarPatch !== null) filesToCommit["script.js"] = sidebarPatch;
+
+            var adminPatch = await computeAdminHtmlPatch(currentFile, meta.label, meta.section);
+            if (adminPatch !== null) filesToCommit["admin.html"] = adminPatch;
+
+            if (Object.keys(filesToCommit).length === 0) {
+                editorStatus.textContent = currentFile + " is already registered everywhere — nothing to update.";
+                return;
+            }
+
+            editorStatus.textContent = "Pushing a single combined commit to GitHub…";
+            await commitMultipleFilesToGithub(
+                filesToCommit,
+                "Add " + currentFile + " to shared sidebar + admin registry (via Admin Panel)"
+            );
+            editorStatus.textContent = "Done in one commit — " + currentFile + " now appears on every page's navigation. " +
+                "(Allow 1-2 minutes for the live site to redeploy.)";
+        } catch (err) {
+            console.error("Sidebar/registry update failed:", err);
+            editorStatus.textContent = "Update failed: " + err.message;
+        }
     });
 
     undoBtn.addEventListener("click", function () {
@@ -2251,73 +2326,80 @@
             var outHtml = "<!DOCTYPE html>\n" + freshDoc.documentElement.outerHTML;
             if (isNewFile) NEW_PAGES[currentFile].html = outHtml;
 
-            // 3. Base64 Encode the HTML for GitHub (Safe for Unicode)
-            const encodedContent = btoa(unescape(encodeURIComponent(outHtml)));
+            if (isNewFile) {
+                // A brand-new page also needs script.js (sidebar) and
+                // admin.html (FILE_SECTIONS) updated so it actually shows up
+                // in navigation. Rather than pushing the page, then script.js,
+                // then admin.html as three separate commits (= three separate
+                // GitHub Pages deployments queued back to back), compute all
+                // three file contents first and publish them together in one
+                // commit via the Git Data API.
+                editorStatus.textContent = "Preparing sidebar + registry updates…";
+                var meta = findFileMeta(currentFile);
+                var filesToCommit = {};
+                filesToCommit[filePath] = outHtml;
 
-            editorStatus.textContent = "Connecting to GitHub…";
+                var sidebarPatch = await computeSidebarPatch(currentFile);
+                if (sidebarPatch !== null) filesToCommit["script.js"] = sidebarPatch;
 
-            // 4. Get the file's current SHA (Required to update existing files;
-            //    skipped for a brand-new file, since none exists yet)
-            const apiUrl = `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${filePath}`;
-            
-            let fileSha = null;
-            if (!isNewFile) {
+                if (meta) {
+                    var adminPatch = await computeAdminHtmlPatch(currentFile, meta.label, meta.section);
+                    if (adminPatch !== null) filesToCommit["admin.html"] = adminPatch;
+                }
+
+                editorStatus.textContent = "Connecting to GitHub…";
+                await commitMultipleFilesToGithub(
+                    filesToCommit,
+                    "Create " + filePath + " via Admin Panel (page + sidebar + registry)"
+                );
+
+                PENDING_NEW_FILES.delete(currentFile);
+
+                var fileCount = Object.keys(filesToCommit).length;
+                var successMsg = `<span style="color: #10b981; font-weight: 700;">🎉 Success!</span> <b>${currentFile}</b> has been created on GitHub` +
+                    (fileCount > 1 ? `, together with the sidebar/registry updates, in a single commit.` : `.`) +
+                    ` <span style="opacity: 0.85;">(Please allow 1–2 minutes for the live site to update)</span>`;
+                editorStatus.innerHTML = successMsg;
+            } else {
+                // Existing file: only one file ever changes here, so a plain
+                // single-file Contents-API PUT is simplest and already only
+                // triggers one deployment.
+                const encodedContent = btoa(unescape(encodeURIComponent(outHtml)));
+
+                editorStatus.textContent = "Connecting to GitHub…";
+
+                const apiUrl = `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${filePath}`;
                 const shaRes = await fetch(apiUrl, {
                     headers: { "Authorization": `token ${token}` },
                     cache: "no-store"
                 });
+                let fileSha = null;
                 if (shaRes.ok) {
                     const shaData = await shaRes.json();
                     fileSha = shaData.sha;
                 }
-            }
 
-            // 5. Push the update (or creation) to GitHub
-            const updateRes = await fetch(apiUrl, {
-                method: "PUT",
-                headers: {
-                    "Authorization": `token ${token}`,
-                    "Content-Type": "application/json"
-                },
-                cache: "no-store",
-                body: JSON.stringify({
-                    message: `${isNewFile ? "Create" : "Update"} ${filePath} via Admin Panel`,
-                    content: encodedContent,
-                    sha: fileSha,
-                    branch: GITHUB_BRANCH
-                })
-            });
+                const updateRes = await fetch(apiUrl, {
+                    method: "PUT",
+                    headers: {
+                        "Authorization": `token ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    cache: "no-store",
+                    body: JSON.stringify({
+                        message: `Update ${filePath} via Admin Panel`,
+                        content: encodedContent,
+                        sha: fileSha,
+                        branch: GITHUB_BRANCH
+                    })
+                });
 
-            if (!updateRes.ok) {
-                const errData = await updateRes.json();
-                throw new Error(errData.message || "GitHub upload failed.");
-            }
-
-            if (isNewFile) {
-                PENDING_NEW_FILES.delete(currentFile);
-            }
-
-            const successMsg = `<span style="color: #10b981; font-weight: 700;">🎉 Success!</span> <b>${currentFile}</b> has been ${isNewFile ? "created on" : "pushed to"} GitHub. <span style="opacity: 0.85;">(Please allow 1–2 minutes for the live site to update)</span>`;
-
-            if (isNewFile) {
-                // New pages need their link registered in the shared sidebar
-                // (script.js) so they actually show up in navigation anywhere.
-                // Do this automatically now instead of making the user click
-                // a second "Add to Sidebar Everywhere" button.
-                editorStatus.innerHTML = successMsg + ' <span style="opacity:0.85;">Registering in sidebar…</span>';
-                const meta = findFileMeta(currentFile);
-                try {
-                    await updateSidebarRegistry(currentFile);
-                    if (meta) {
-                        await updateAdminHtmlSource(currentFile, meta.label, meta.section);
-                    }
-                    editorStatus.innerHTML = successMsg + ' <span style="opacity:0.85;">Sidebar updated automatically — this page now appears in navigation everywhere.</span>';
-                } catch (sidebarErr) {
-                    console.error("Automatic sidebar registration failed:", sidebarErr);
-                    editorStatus.innerHTML = successMsg + ' <span style="color:#dc2626;">Could not automatically update the sidebar — use "Add to Sidebar" to retry.</span>';
+                if (!updateRes.ok) {
+                    const errData = await updateRes.json();
+                    throw new Error(errData.message || "GitHub upload failed.");
                 }
-            } else {
-                editorStatus.innerHTML = successMsg;
+
+                editorStatus.innerHTML = `<span style="color: #10b981; font-weight: 700;">🎉 Success!</span> <b>${currentFile}</b> has been pushed to GitHub. <span style="opacity: 0.85;">(Please allow 1–2 minutes for the live site to update)</span>`;
             }
             
         } catch (err) {
