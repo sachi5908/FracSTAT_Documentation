@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Static Intensity Tab | FracSTAT Docs</title>
@@ -89,7 +88,7 @@
                     <li><a href="docs_uncertainty_montecarlo.html">Monte Carlo Tab</a></li>
                     <li><a href="docs_uncertainty_lhs.html">LHS Tab</a></li>
                     <li><a href="docs_uncertainty_pce.html">PCE Tab</a></li>
-                </ul>
+                <li><a href="docs_demo.html">demo</a></li></ul>
             </div>
 
         </aside>
@@ -189,13 +188,13 @@
 
                 <h3>2.1 Sidebar Cards</h3>
                 <table>
-                    <tr><th>Card</th><th>Purpose</th></tr>
+                    <tbody><tr><th>Card</th><th>Purpose</th></tr>
                     <tr><td>Settings</td><td>Selects the statistic (P21/P20), the map rendering style (Heatmap/Contour), contour level count, axis flipping, scan‑circle overlay, circle count, and the trace/grid layering and opacity controls.</td></tr>
                     <tr><td>Plot Options</td><td>Custom plot title, colour‑scale (colormap) selector with a live gradient preview swatch, and colour‑bar position.</td></tr>
                     <tr><td>Map Elements</td><td>Colour pickers and toggle for outer/plot background, grid, trace colour, contour line colour, border colour/width, contour line width, and the show‑grid‑lines checkbox.</td></tr>
                     <tr><td>Background Image</td><td>Enables and configures an optional calibrated real‑world photograph drawn behind the intensity/density map, with an opacity slider.</td></tr>
                     <tr><td>Global Results</td><td>Read‑only statistics panel reporting the scan grid layout, total scan‑circle count, and the two headline global statistics: Global Intensity (P21) and Global Density (P20).</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3>2.2 Plot Toolbar</h3>
                 <p>
@@ -230,10 +229,10 @@
 
                 <h3>3.1 Required Columns</h3>
                 <table>
-                    <tr><th>Column</th><th>Description</th></tr>
+                    <tbody><tr><th>Column</th><th>Description</th></tr>
                     <tr><td><code>X1, Y1, X2, Y2</code></td><td>Real‑world (scaled) segment endpoint coordinates, in the project's display unit (m, cm, mm, or km).</td></tr>
                     <tr><td><code>Length_m</code></td><td>Pre‑computed Euclidean segment length in the same display unit (name retained from the original metre‑based implementation).</td></tr>
-                </table>
+                </tbody></table>
                 <p>If any of these four columns is absent, the tab renders an empty‑state message ("Missing coordinate columns") rather than attempting a calculation.</p>
 
                 <h3>3.2 Data‑Source Compatibility</h3>
@@ -276,7 +275,7 @@
 
                 <h3>4.1 Settings Card</h3>
                 <table>
-                    <tr><th>Control</th><th>Widget</th><th>Variable</th><th>Default</th><th>Effect</th></tr>
+                    <tbody><tr><th>Control</th><th>Widget</th><th>Variable</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Estimated Intensity, P21 / Estimated Density, P20</td><td>Radio button pair</td><td><code>plot_mode_var</code></td><td>"P21"</td><td>Selects which of the two Mauldon estimators (intensity or density) is displayed as the coloured grid/contour surface and reported as the map title / colour‑bar label.</td></tr>
                     <tr><td>Grid Heatmap / Contour (Filled) / Contour (Lines Only)</td><td>Radio button trio</td><td><code>plot_style_var</code></td><td>"Heatmap"</td><td>Chooses the rendering style: a discrete pcolormesh grid of scan‑circle values, a smoothly interpolated/kriged filled contour, or contour lines only (no fill).</td></tr>
                     <tr><td>Contour Levels</td><td>Text entry</td><td><code>contour_levels_var</code></td><td>"15"</td><td>Number of contour bands (integer) used for both the Matplotlib MaxNLocator tick calculation and, if a non‑integer step value is supplied, a fixed contour interval in data units (see §6.4).</td></tr>
@@ -286,7 +285,7 @@
                     <tr><td>Show fracture traces (Map)</td><td>Checkbox</td><td><code>show_map_var</code></td><td>True</td><td>Toggles the LineCollection overlay of the raw fracture segments on top of (or below) the intensity/density surface.</td></tr>
                     <tr><td>Traces above Grid / Grid above Traces</td><td>Radio button pair</td><td><code>layer_order_var</code></td><td>"traces_top"</td><td>Sets the Z‑order and, correspondingly, which layer receives the partial‑opacity blend from the slider below (see §4.1.1).</td></tr>
                     <tr><td>Upper layer opacity</td><td>Slider (0.1–1.0)</td><td><code>top_opacity_var</code></td><td>0.8</td><td>Alpha applied to whichever layer (traces or grid) is currently on top per Layer stacking order; the lower layer remains fully opaque. Debounced via a 100&nbsp;ms Tk <code>after()</code> timer to avoid re‑triggering the (potentially expensive) kriging step on every pixel of slider drag.</td></tr>
-                </table>
+                </tbody></table>
 
                 <h4>4.1.1 Layer Stacking and Opacity Logic</h4>
                 <p>
@@ -301,15 +300,15 @@
 
                 <h3>4.2 Plot Options Card</h3>
                 <table>
-                    <tr><th>Control</th><th>Widget</th><th>Variable</th><th>Default</th><th>Effect</th></tr>
+                    <tbody><tr><th>Control</th><th>Widget</th><th>Variable</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Custom title (blank = auto)</td><td>Text entry</td><td><code>title_var</code></td><td>""</td><td>Overrides the automatically generated plot title (e.g. "Estimated P21 (Grid Heatmap)") with user‑supplied text when non‑empty.</td></tr>
                     <tr><td>Colour scale</td><td>Custom dropdown (CustomColorDropdown)</td><td><code>cmap_var</code> / <code>_cmap_resolved</code></td><td>"Viridis"</td><td>Selects the Matplotlib colormap applied to the heatmap/contour fill. A 104×28&nbsp;px live gradient swatch previews the selected colormap. Internally resolved to a matplotlib colormap id (or the bundled Parula approximation) and cached in <code>_cmap_resolved</code> to avoid re‑parsing the display name on every redraw.</td></tr>
                     <tr><td>Colorbar position</td><td>Dropdown</td><td><code>colorbar_pos_var</code></td><td>"Right"</td><td>Bottom / Top / Left / Right / None — passed to Matplotlib's <code>fig.colorbar(..., location=...)</code>. Selecting None suppresses colour‑bar rendering entirely.</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3>4.3 Map Elements Card</h3>
                 <table>
-                    <tr><th>Control</th><th>Variable</th><th>Default</th><th>Effect</th></tr>
+                    <tbody><tr><th>Control</th><th>Variable</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Outer BG</td><td><code>outer_bg_var</code></td><td>#F5F7FA</td><td>Colour of the Matplotlib Figure background, outside the plot axes.</td></tr>
                     <tr><td>Plot BG</td><td><code>inner_bg_var</code></td><td>#FFFFFF</td><td>Colour of the Axes background (i.e. inside the plot frame).</td></tr>
                     <tr><td>Grid Color</td><td><code>grid_color_var</code></td><td>#D9E2EC</td><td>Colour of the reference grid lines (only drawn when "Show grid lines" is checked).</td></tr>
@@ -319,7 +318,7 @@
                     <tr><td>Border Color</td><td><code>border_color_var</code></td><td>#475569</td><td>Colour applied to all four Matplotlib Axes spines.</td></tr>
                     <tr><td>Border Width</td><td><code>border_width_var</code></td><td>"1.0"</td><td>Line width (points) applied to all spines; invalid entries silently fall back to 1.0.</td></tr>
                     <tr><td>Contour Line Width</td><td><code>contour_line_width_var</code></td><td>"0.5"</td><td>Line width used for contour isolines; invalid entries fall back to 0.5.</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3>4.4 Background Image Card</h3>
                 <p>
@@ -329,12 +328,12 @@
                     across every spatial tab in the Static Analyzer without re‑uploading it.
                 </p>
                 <table>
-                    <tr><th>Control</th><th>Widget</th><th>Variable</th><th>Behaviour</th></tr>
+                    <tbody><tr><th>Control</th><th>Widget</th><th>Variable</th><th>Behaviour</th></tr>
                     <tr><td>Show real photo behind plot</td><td>Checkbox</td><td><code>p21_bg_mode_var</code></td><td>On check, calls <code>_resolve_p21_bg_image_path(prompt_if_missing=True)</code>, which first tries to auto‑detect an already‑known image (this tab's own path, the Fracture Map tab's calibrated image, or the <code>&lt;svg_base&gt;_bg.png</code> sidecar written by the Trace Map tool) before opening a file‑browse dialog; if no image can be resolved, the checkbox is reset to unchecked.</td></tr>
                     <tr><td>Change Image…</td><td>Button</td><td>—</td><td>Opens a file dialog restricted to common raster formats (PNG, JPG/JPEG, BMP, TIFF, WEBP) and stores the chosen path.</td></tr>
                     <tr><td>Status label</td><td>Read‑only label</td><td>—</td><td>Displays "Image: &lt;basename&gt;" when a valid path is set, or "No image set" otherwise.</td></tr>
                     <tr><td>Image opacity (0–1)</td><td>Text entry</td><td><code>p21_bg_alpha_var</code></td><td>Default 1.0. Alpha blended into <code>ax.imshow()</code>; values are clamped to [0, 1] before use.</td></tr>
-                </table>
+                </tbody></table>
                 <p>
                     The image is drawn with <code>ax.imshow(extent=(xMin, xMax, yMax, yMin), origin='upper',
                     zorder=0)</code>, which intentionally swaps the vertical extent bounds to compensate for the
@@ -345,12 +344,12 @@
 
                 <h3>4.5 Global Results Card (Read‑Only)</h3>
                 <table>
-                    <tr><th>Field</th><th>Meaning</th></tr>
+                    <tbody><tr><th>Field</th><th>Meaning</th></tr>
                     <tr><td>Grid Layout (X x Y)</td><td>The resolved scan‑circle grid dimensions, xNumCircle × yNumCircle, after the packing algorithm in §6.1 has run.</td></tr>
                     <tr><td>Total Scan Circles</td><td>xNumCircle × yNumCircle, the total number of circular sampling windows used.</td></tr>
                     <tr><td>Global Intensity (P21)</td><td>The single scalar network‑wide intensity, total fracture length divided by mapped area, with a unit⁻¹ superscript matching the active display unit.</td></tr>
                     <tr><td>Global Density (P20)</td><td>The single scalar network‑wide density, fracture‑segment count divided by mapped area, with a unit⁻² superscript.</td></tr>
-                </table>
+                </tbody></table>
 
                 <!-- ================================================= -->
                 <h2 id="maths">5. Mathematical Background</h2>
@@ -365,7 +364,7 @@
 
                 <h3>5.1 Symbol Definitions</h3>
                 <table>
-                    <tr><th>Symbol</th><th>Description</th><th>Units</th></tr>
+                    <tbody><tr><th>Symbol</th><th>Description</th><th>Units</th></tr>
                     <tr><td>r</td><td>Radius of a circular scan window (<code>rCircle</code> in the implementation).</td><td>[length]</td></tr>
                     <tr><td>N</td><td>Number of discrete fracture‑segment/circle‑boundary intersection points found for one scan circle.</td><td>count</td></tr>
                     <tr><td>M</td><td>Number of fracture segment endpoints ("tips") that fall strictly inside a scan circle.</td><td>count</td></tr>
@@ -373,7 +372,7 @@
                     <tr><td>D</td><td>Local (per‑circle) estimate of P20, fracture density.</td><td>[length]⁻²</td></tr>
                     <tr><td>L_tot</td><td>Sum of all segment lengths in the mapped dataset (Σ Length_m).</td><td>[length]</td></tr>
                     <tr><td>A_map</td><td>Bounding‑box area of the mapped dataset, (x_max−x_min)×(y_max−y_min).</td><td>[length]²</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3>5.2 Circle‑Based P21 (Intensity) Estimator</h3>
                 <p>For a single scan circle of radius r, the Mauldon circular‑scanline estimator of areal fracture intensity is:</p>
@@ -636,7 +635,7 @@ t1,2 = (−b ∓ √Δ) / (2a)</div>
                 <!-- ================================================= -->
                 <h2 id="visualization">8. Visualization Components</h2>
                 <table>
-                    <tr><th>Element</th><th>Matplotlib Object</th><th>Description</th></tr>
+                    <tbody><tr><th>Element</th><th>Matplotlib Object</th><th>Description</th></tr>
                     <tr><td>Heatmap surface</td><td><code>ax.pcolormesh()</code></td><td>Discrete, cell‑based colouring of the raw (non‑interpolated) I_grid/D_grid values, masked where zero.</td></tr>
                     <tr><td>Filled contour</td><td><code>ax.contourf()</code></td><td>Smooth, kriged/interpolated shaded bands of the selected statistic.</td></tr>
                     <tr><td>Contour isolines</td><td><code>ax.contour()</code> + <code>ax.clabel()</code></td><td>Labelled black (or user‑coloured) contour lines, always available in both contour styles, and independently controllable in width/colour.</td></tr>
@@ -644,7 +643,7 @@ t1,2 = (−b ∓ √Δ) / (2a)</div>
                     <tr><td>Scan‑circle outlines</td><td><code>matplotlib.patches.Circle</code> (unfilled)</td><td>One outline per scan‑circle centre, only drawn when "Show scan circles" is enabled; useful for auditing grid coverage and spacing.</td></tr>
                     <tr><td>Background photograph</td><td><code>ax.imshow()</code></td><td>Optional calibrated field photo drawn beneath (z‑order 0) all data layers.</td></tr>
                     <tr><td>Colour bar</td><td><code>fig.colorbar(mappable, ax=ax, location=…)</code></td><td>Axis‑anchored (not manually positioned) colour bar with configurable side and 4% padding / 4.6% fraction of the parent axes.</td></tr>
-                </table>
+                </tbody></table>
 
                 <figure class="figure-block">
                     <div class="figure-img-wrap">
@@ -728,13 +727,13 @@ t1,2 = (−b ∓ √Δ) / (2a)</div>
                     contour styles, the kriging/interpolation step scale with the number of scan circles.
                 </p>
                 <table>
-                    <tr><th>Technique</th><th>Where Applied</th><th>Benefit</th></tr>
+                    <tbody><tr><th>Technique</th><th>Where Applied</th><th>Benefit</th></tr>
                     <tr><td>Full vectorisation (NumPy broadcasting)</td><td>Line/circle intersection test (§6.2)</td><td>Avoids an explicit Python double loop over every (segment, circle) pair; scales efficiently to networks with thousands of segments.</td></tr>
                     <tr><td>Single‑entry kriging/interpolation cache</td><td>Contour rendering branch (§6.6)</td><td>Skips the most computationally expensive step (kriging or cubic griddata) whenever only cosmetic settings (colour, title, borders, etc.) have changed.</td></tr>
                     <tr><td>Debounced opacity slider</td><td>Layer opacity control</td><td>Prevents dozens of redundant full redraws (including potential re‑kriging) while a slider is actively being dragged; only the settled value triggers computation.</td></tr>
                     <tr><td>Colormap‑name resolution caching</td><td><code>_resolve_cmap()</code> / <code>_cmap_resolved</code></td><td>Avoids repeated dynamic imports and string‑matching lookups of the active colormap on every redraw once the dropdown has fired once.</td></tr>
                     <tr><td>Masked‑array rendering</td><td>Heatmap style</td><td><code>np.ma.masked_where()</code> lets Matplotlib skip drawing (and colour‑mapping) cells with no data, reducing rendering overhead and avoiding a misleading colour for zero‑intensity cells.</td></tr>
-                </table>
+                </tbody></table>
 
                 <!-- ================================================= -->
                 <h2 id="examples">11. Practical Examples</h2>
@@ -797,26 +796,26 @@ t1,2 = (−b ∓ √Δ) / (2a)</div>
                 <!-- ================================================= -->
                 <h2 id="implementation">13. Implementation Notes</h2>
                 <table>
-                    <tr><th>Topic</th><th>Note</th></tr>
+                    <tbody><tr><th>Topic</th><th>Note</th></tr>
                     <tr><td>Class and inheritance</td><td><code>TraceIntensityTab</code> is implemented as a mixin class, combined with several sibling mixins (StaticMapTab, StaticLengthsTab, StaticCDFTab, StaticAnglesTab, StaticStereonetTab, StaticFluidFlowTab, StaticGraphsTab, StaticResultsTab, WorkspaceHeaderMixin) into the single <code>StaticAnalyzerApp</code> class, following the shared‑mixin architecture used throughout the Static Analyzer.</td></tr>
                     <tr><td>Shared data source</td><td><code>self.results</code> / <code>self._static_results</code> is populated exclusively by the Fracture Map tab's geometry pipeline (<code>run_static_calculations()</code>, overridden at runtime to <code>_static_map_run_geometry()</code>); this tab performs no independent geometry computation of its own beyond the scan‑circle grid and intersection test.</td></tr>
                     <tr><td>Colormap resolution helper</td><td>The module‑level <code>_resolve_cmap()</code> function is duplicated (by design, for decoupling) from the equivalent helper in <code>static_map_tab.py</code>; both resolve a display colormap name to a matplotlib Colormap object, including the app's custom bundled Parula approximation via <code>SlipTendencyApp._parula_colormap()</code>.</td></tr>
                     <tr><td>Palette source</td><td>Default background/border/grid colours are seeded once from <code>self.plot_palette()</code> (a method shared across the workspace) at widget‑construction time, but thereafter are fully independent, user‑editable StringVars specific to this tab.</td></tr>
                     <tr><td>Unit propagation</td><td>The display unit (m/cm/mm/km) is never stored locally; it is read on every draw from the shared <code>_static_map_unit_var</code> owned by the Fracture Map tab, ensuring the Intensity &amp; Density tab always reports statistics in the workspace's currently active unit even if the unit is changed after this tab was last drawn.</td></tr>
                     <tr><td>No independent SVG/Excel loading</td><td>This tab intentionally exposes no Load SVG / Load Excel controls; all data loading is centralized in the shared workspace header and the Fracture Map tab, per the application's overall data‑flow design.</td></tr>
-                </table>
+                </tbody></table>
 
                 <!-- ================================================= -->
                 <h2 id="limitations">14. Limitations</h2>
                 <table>
-                    <tr><th>Limitation</th><th>Description</th></tr>
+                    <tbody><tr><th>Limitation</th><th>Description</th></tr>
                     <tr><td>Endpoint‑based P20 proxy</td><td>The P20 estimator implemented here counts fracture‑segment endpoints falling inside each scan circle as a proxy for fracture centers; for very short segments relative to the circle radius, or for fracture traces that were digitised as multiple connected sub‑segments (rather than one segment per physical fracture), this can differ from a strict fracture‑center count and should be interpreted with care.</td></tr>
                     <tr><td>Fixed variogram model</td><td>The fixed linear‑variogram kriging model (§7.2) is not adaptively fit to each dataset's own spatial autocorrelation structure; it functions as a general‑purpose smoothing interpolator rather than a geostatistically optimal predictor for every possible fracture network.</td></tr>
                     <tr><td>Indirect grid resolution control</td><td>Grid resolution is controlled indirectly, via the Number of scan circles field, which sets circle count along the shorter map dimension only — very elongated (high aspect‑ratio) datasets may produce an uneven number of circles along the two axes.</td></tr>
                     <tr><td>2‑D only</td><td>The tab operates strictly on 2‑D trace‑map geometry; no 3‑D fracture‑intensity (P32) conversion, borehole scanline correction, or subsurface/depth information is incorporated.</td></tr>
                     <tr><td>No orientation‑only support</td><td>Orientation‑only Excel/CSV data (legacy Strike/Dip tables or Trend/Plunge pole files with no real spatial coordinates) cannot be analysed on this tab by design, since circular scanline sampling has no meaning without real X/Y geometry.</td></tr>
                     <tr><td>First‑redraw cost</td><td>Very large fracture datasets combined with a high scan‑circle count can produce a noticeably slower first redraw (particularly with kriging enabled) before the caching mechanism of §6.6 becomes effective on subsequent cosmetic‑only redraws.</td></tr>
-                </table>
+                </tbody></table>
 
                 <!-- ================================================= -->
                 <h2 id="references">15. References</h2>
@@ -843,5 +842,5 @@ t1,2 = (−b ∓ √Δ) / (2a)</div>
         </main>
     </div>
     <script src="script.js"></script>
-</body>
-</html>
+
+</body></html>
