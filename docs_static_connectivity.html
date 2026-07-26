@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Static Connectivity Tab | FracSTAT Docs</title>
@@ -86,7 +85,7 @@
                     <li><a href="docs_uncertainty_montecarlo.html">Monte Carlo Tab</a></li>
                     <li><a href="docs_uncertainty_lhs.html">LHS Tab</a></li>
                     <li><a href="docs_uncertainty_pce.html">PCE Tab</a></li>
-                </ul>
+                <li><a href="docs_demo.html">demo</a></li></ul>
             </div>
 
         </aside>
@@ -160,13 +159,13 @@
 
                 <h3>1.1 Sidebar Card Structure</h3>
                 <table>
-                    <tr><th>Card</th><th>Purpose</th></tr>
+                    <tbody><tr><th>Card</th><th>Purpose</th></tr>
                     <tr><td>Plots</td><td>Grouped navigation buttons for switching between the five available diagrams (one Connectivity view, four Ternary views).</td></tr>
                     <tr><td>Settings</td><td>Node snap tolerance entry, "Include boundary I-nodes" switch, "Show node labels" switch, and a Recalculate button.</td></tr>
                     <tr><td>I-Y-X Summary</td><td>Eight live numeric read-outs: I Nodes, Y Nodes, X Nodes, Total Nodes, Branches, Connected Fraction, Connections / Branch, B22.</td></tr>
                     <tr><td>Branch Topology</td><td>Five live numeric read-outs: I-I Branches, I-C Branches, C-C Branches, C_L, C_B.</td></tr>
                     <tr><td>Node Colours</td><td>A static colour legend explaining the three node-type colours used on the spatial map.</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3>1.2 Plot Navigation</h3>
                 <p>
@@ -178,22 +177,22 @@
                     or shown, switching between diagrams is instantaneous and requires no recomputation.
                 </p>
                 <table>
-                    <tr><th>Group</th><th>Plot Key</th><th>Diagram</th></tr>
+                    <tbody><tr><th>Group</th><th>Plot Key</th><th>Diagram</th></tr>
                     <tr><td>Connectivity</td><td><code>connectivity</code></td><td>I-Y-X Connectivity Nodes (spatial map)</td></tr>
                     <tr><td>Ternary</td><td><code>ternary_iyx</code></td><td>I-Y-X Ternary Connectivity</td></tr>
                     <tr><td>Ternary</td><td><code>ternary_cl</code></td><td>Connections per Line (C_L)</td></tr>
                     <tr><td>Ternary</td><td><code>ternary_cb</code></td><td>Connections per Branch (C_B)</td></tr>
                     <tr><td>Ternary</td><td><code>ternary_br</code></td><td>Branch Topology (I-I · I-C · C-C)</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3>1.3 Plot Area Toolbar</h3>
                 <p>The toolbar above the plot canvas shows the name of the active diagram on the left and three action buttons on the right.</p>
                 <table>
-                    <tr><th>Control</th><th>Action</th></tr>
+                    <tbody><tr><th>Control</th><th>Action</th></tr>
                     <tr><td>⬇ Save Image</td><td>Exports the currently active diagram to a timestamped PNG file inside the project's <code>FracSTAT_plot_exports</code> folder via the shared <code>save_plot_image()</code> helper.</td></tr>
                     <tr><td>↺ Reset View</td><td>Restores the default pan/zoom extent of the active diagram without re-running the topological computation (<code>recalculate=False</code>).</td></tr>
                     <tr><td>⚙ Settings</td><td>Toggles between the main sidebar and the Display Settings sidebar.</td></tr>
-                </table>
+                </tbody></table>
 
                 <!-- ================================================= -->
                 <h2 id="data-input">2. Data Input</h2>
@@ -209,11 +208,11 @@
 
                 <h3>2.2 Required Columns</h3>
                 <table>
-                    <tr><th>Column</th><th>Description</th></tr>
+                    <tbody><tr><th>Column</th><th>Description</th></tr>
                     <tr><td><code>Trace</code></td><td>Integer or string identifier grouping segments belonging to the same digitised fracture trace.</td></tr>
                     <tr><td><code>Segment</code></td><td>Integer identifier of a segment within its trace, used to order segments when extracting trace endpoints.</td></tr>
                     <tr><td><code>X1, Y1, X2, Y2</code></td><td>Real-world (scaled) coordinates of each segment's two endpoints, in the project's selected display unit (m, cm, mm, or km).</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3>2.3 Data-Source Gating</h3>
                 <p>
@@ -244,12 +243,12 @@
 
                 <h3>3.1 Settings Card (Main Sidebar)</h3>
                 <table>
-                    <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
+                    <tbody><tr><th>Control</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Node snap tolerance</td><td>0.1 (display unit)</td><td>Distance threshold below which two nearby points are treated as the same physical node. Directly controls I/Y/X classification sensitivity. Committed on <kbd>Enter</kbd> or focus-loss; triggers a full recompute.</td></tr>
                     <tr><td>Include boundary I-nodes</td><td>Off (excluded)</td><td>When off, isolated (I) endpoints lying on the bounding box of the mapped area are removed before counting — they are artefacts of the finite sample window rather than genuine fracture tips. When on, every I endpoint is retained. Always forces a full recompute.</td></tr>
                     <tr><td>Show node labels</td><td>Off</td><td>Overlays a small text label (e.g. "I3", "Y12", "X1") beside every plotted node on the spatial map. Cosmetic only; does not trigger recomputation.</td></tr>
                     <tr><td>↻ Recalculate</td><td>—</td><td>Forces an explicit, user-initiated recompute; shows the global loading overlay while the O(n²) intersection search runs.</td></tr>
-                </table>
+                </tbody></table>
 
                 <div class="tip-box">
                     <strong>Tip:</strong> the Node Snap Tolerance help icon (?) opens a floating card explaining
@@ -259,7 +258,7 @@
 
                 <h3>3.2 I-Y-X Summary Card</h3>
                 <table>
-                    <tr><th>Label</th><th>Symbol</th><th>Source</th></tr>
+                    <tbody><tr><th>Label</th><th>Symbol</th><th>Source</th></tr>
                     <tr><td>I Nodes</td><td>N_I</td><td><code>result.n_i</code> — count of isolated fracture tips</td></tr>
                     <tr><td>Y Nodes</td><td>N_Y</td><td><code>result.n_y</code> — count of abutting (T-shaped) intersections</td></tr>
                     <tr><td>X Nodes</td><td>N_X</td><td><code>result.n_x</code> — count of crossing (X-shaped) intersections</td></tr>
@@ -268,17 +267,17 @@
                     <tr><td>Connected Fraction</td><td>CF</td><td><code>result.connected_fraction</code> = (N_Y + N_X) / N</td></tr>
                     <tr><td>Connections / Branch</td><td>C̄</td><td><code>result.connections_per_branch</code> = (N_Y + 2N_X) / N_B</td></tr>
                     <tr><td>B22</td><td>B₂₂</td><td><code>result.dimensionless_intensity</code> = L²_total / A</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3>3.3 Branch Topology Card</h3>
                 <table>
-                    <tr><th>Label</th><th>Symbol</th><th>Source</th></tr>
+                    <tbody><tr><th>Label</th><th>Symbol</th><th>Source</th></tr>
                     <tr><td>I-I Branches</td><td>N_II</td><td><code>result.n_ii</code> — branches with both endpoints isolated</td></tr>
                     <tr><td>I-C Branches</td><td>N_IC</td><td><code>result.n_ic</code> — branches with one isolated, one connected endpoint</td></tr>
                     <tr><td>C-C Branches</td><td>N_CC</td><td><code>result.n_cc</code> — branches with both endpoints connected</td></tr>
                     <tr><td>C_L</td><td>C_L</td><td>Connections per line, recomputed locally in <code>_update_branch_stats</code></td></tr>
                     <tr><td>C_B</td><td>C_B</td><td>Connections per branch, recomputed locally in <code>_update_branch_stats</code></td></tr>
-                </table>
+                </tbody></table>
 
                 <h3>3.4 Display Settings Sidebar</h3>
                 <p>
@@ -290,13 +289,13 @@
 
                 <h4>3.4.1 Display Options</h4>
                 <table>
-                    <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
+                    <tbody><tr><th>Control</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Ternary plot heading</td><td>blank (automatic)</td><td>Custom title overriding the automatic heading on all four ternary diagrams.</td></tr>
-                </table>
+                </tbody></table>
 
                 <h4>3.4.2 Plot Elements</h4>
                 <table>
-                    <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
+                    <tbody><tr><th>Control</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Outer background</td><td>theme background</td><td>Figure-level (canvas) background colour for all five diagrams.</td></tr>
                     <tr><td>Plot background</td><td>theme panel</td><td>Axes-level background colour.</td></tr>
                     <tr><td>Grid colour</td><td>theme grid</td><td>Colour of gridlines on the map and ternary reference grids.</td></tr>
@@ -308,15 +307,15 @@
                     <tr><td>Base Node Size</td><td>36</td><td>Base marker area (Matplotlib <code>s</code> parameter, in points²) for I, Y, and X node scatter markers on the spatial map.</td></tr>
                     <tr><td>Show grid lines</td><td>Off</td><td>Toggles gridlines on all diagrams.</td></tr>
                     <tr><td>Grid line width</td><td>0.6</td><td>Line width (pt) of gridlines when shown.</td></tr>
-                </table>
+                </tbody></table>
 
                 <h4>3.4.3 Background Image</h4>
                 <table>
-                    <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
+                    <tbody><tr><th>Control</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Show real photo behind nodes</td><td>Off</td><td>Enables a calibrated photograph drawn behind the spatial node map only (the four ternary diagrams do not use a background image). If no image path is yet known, automatically prompts a file browser or reuses an image already calibrated elsewhere in the project.</td></tr>
                     <tr><td>Change Image…</td><td>—</td><td>Opens a file dialog to (re)select the background photograph.</td></tr>
                     <tr><td>Image opacity (0–1)</td><td>1.0</td><td>Alpha blending factor applied to the background image via Matplotlib's <code>imshow(alpha=...)</code>.</td></tr>
-                </table>
+                </tbody></table>
 
                 <h4>3.4.4 Reset Defaults</h4>
                 <p>
@@ -339,11 +338,11 @@
                     classified into exactly one of three mutually exclusive categories:
                 </p>
                 <table>
-                    <tr><th>Symbol</th><th>Name</th><th>Geometric Definition</th><th>Geological Meaning</th></tr>
+                    <tbody><tr><th>Symbol</th><th>Name</th><th>Geometric Definition</th><th>Geological Meaning</th></tr>
                     <tr><td><strong>I</strong></td><td>Isolated node</td><td>A trace endpoint that does not lie within snap tolerance of any other trace or interior crossing.</td><td>A fracture tip that terminates in intact rock — propagation stopped without linking to another fracture.</td></tr>
                     <tr><td><strong>Y</strong></td><td>Abutting node</td><td>An intersection point where one trace terminates against another; the intersection coincides with an endpoint of at least one of the two segments involved.</td><td>One fracture terminated against an earlier through-going fracture — the classic "T" intersection recording a relative age relationship.</td></tr>
                     <tr><td><strong>X</strong></td><td>Crossing node</td><td>An interior intersection point lying strictly within both intersecting segments, not coincident with either endpoint.</td><td>Two fractures crossed each other, implying both were open/active at the time of intersection or that a younger fracture propagated straight through an older one.</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3>4.2 Node-Level Statistics</h3>
                 <div class="formula-block">
@@ -379,11 +378,11 @@ B₂₂ = L_total² / A</div>
                     C (connected) or I (isolated):
                 </p>
                 <table>
-                    <tr><th>Class</th><th>Endpoint Pattern</th><th>Symbol</th><th>Meaning</th></tr>
+                    <tbody><tr><th>Class</th><th>Endpoint Pattern</th><th>Symbol</th><th>Meaning</th></tr>
                     <tr><td>I–I</td><td>isolated – isolated</td><td><code>n_ii</code></td><td>A fully isolated strand that neither terminates against nor is crossed by any other fracture at either end.</td></tr>
                     <tr><td>I–C</td><td>isolated – connected</td><td><code>n_ic</code></td><td>A branch that dangles freely at one end but connects to the network at the other — a "dead-end spur".</td></tr>
                     <tr><td>C–C</td><td>connected – connected</td><td><code>n_cc</code></td><td>A branch connected to the rest of the network at both ends — the fully connected, fluid-conducting portion of the fracture set.</td></tr>
-                </table>
+                </tbody></table>
                 <div class="formula-block">
 N_B = N_II + N_IC + N_CC</div>
 
@@ -539,7 +538,7 @@ If both u₁, u₂ ∈ [0, 1] (±1×10⁻¹⁰ tolerance) → intersection accep
         results_df[col] = pd.to_numeric(results_df[col], errors="coerce")
     results_df = results_df.dropna(subset=["X1", "Y1", "X2", "Y2"])
     lengths = np.hypot(results_df.X2 - results_df.X1, results_df.Y2 - results_df.Y1)
-    results_df = results_df[lengths > 1e-12]
+    results_df = results_df[lengths &gt; 1e-12]
     tolerance = max(tolerance, 0.0)
 
     # Pairwise intersection search (O(n^2), cross-trace pairs only)
@@ -550,10 +549,10 @@ If both u₁, u₂ ∈ [0, 1] (±1×10⁻¹⁰ tolerance) → intersection accep
             continue
         if _near_any_endpoint(pt, row_i, row_j, tolerance):
             y_raw.append(pt)            # abutting (Y) candidate
-        elif 0 < ua < 1 and 0 < ub < 1:
+        elif 0 &lt; ua &lt; 1 and 0 &lt; ub &lt; 1:
             x_raw.append(pt)            # crossing (X) candidate
 
-    # Cluster, then de-duplicate with priority X > Y > I
+    # Cluster, then de-duplicate with priority X &gt; Y &gt; I
     x_nodes = _cluster_points(x_raw, tolerance)
     y_nodes  = _cluster_points(
         _remove_points_near(y_raw, x_nodes, tolerance), tolerance)
@@ -577,12 +576,12 @@ If both u₁, u₂ ∈ [0, 1] (±1×10⁻¹⁰ tolerance) → intersection accep
 
                 <h3>5.8 Algorithm Complexity Summary</h3>
                 <table>
-                    <tr><th>Stage</th><th>Complexity</th><th>Notes</th></tr>
+                    <tbody><tr><th>Stage</th><th>Complexity</th><th>Notes</th></tr>
                     <tr><td>Pairwise intersection search (first pass)</td><td>O(n²)</td><td>n = number of segments; every cross-trace pair is tested once.</td></tr>
                     <tr><td>Point clustering</td><td>O(k²) per class</td><td>k = raw candidate count for that node class, typically ≪ n².</td></tr>
                     <tr><td>Boundary exclusion</td><td>O(m)</td><td>m = number of trace-tip candidates (2 per trace).</td></tr>
                     <tr><td>Branch split &amp; classify (second pass)</td><td>O(n²)</td><td>Repeats the interior-crossing search to build the per-segment split table.</td></tr>
-                </table>
+                </tbody></table>
                 <p>
                     The dominant cost is quadratic in the number of segments. For very dense SVG traces (many
                     thousands of short curve-sampled segments), this can become the single most expensive
@@ -600,7 +599,7 @@ If both u₁, u₂ ∈ [0, 1] (±1×10⁻¹⁰ tolerance) → intersection accep
                     numbers in the classical statistical sense.
                 </p>
                 <table>
-                    <tr><th>Quantity</th><th>Type</th><th>Range</th><th>Interpretation</th></tr>
+                    <tbody><tr><th>Quantity</th><th>Type</th><th>Range</th><th>Interpretation</th></tr>
                     <tr><td>N_I, N_Y, N_X</td><td>Count (integer)</td><td>≥ 0</td><td>Absolute abundance of each node class.</td></tr>
                     <tr><td>N (total nodes)</td><td>Count (integer)</td><td>≥ 0</td><td>Sum of all node classes.</td></tr>
                     <tr><td>Connected Fraction CF</td><td>Proportion</td><td>[0, 1]</td><td>Higher = more of the network participates in genuine connections rather than dead ends.</td></tr>
@@ -610,7 +609,7 @@ If both u₁, u₂ ∈ [0, 1] (±1×10⁻¹⁰ tolerance) → intersection accep
                     <tr><td>C_L</td><td>Ratio (dimensionless)</td><td>typically 0–4</td><td>Connections per fracture line.</td></tr>
                     <tr><td>C_B</td><td>Ratio (dimensionless)</td><td>typically 0–2</td><td>Connections per branch; theoretical random-network bound is exactly 2.</td></tr>
                     <tr><td>Barycentric ternary position</td><td>Composition (proportion triple)</td><td>simplex</td><td>Visual, compositional summary of any of the three-part classifications above.</td></tr>
-                </table>
+                </tbody></table>
                 <p>
                     The principal sources of uncertainty are (a) digitisation error in the original trace map, (b)
                     sensitivity to the chosen snap tolerance, and (c) truncation/censoring at the edges of the
@@ -918,10 +917,10 @@ C_B  = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82</div>
 
                 <h3>11.4 Module Architecture</h3>
                 <table>
-                    <tr><th>File</th><th>Responsibility</th></tr>
+                    <tbody><tr><th>File</th><th>Responsibility</th></tr>
                     <tr><td><code>core/branch_counter.py</code></td><td>Pure, GUI-independent geometry/topology engine: <code>ConnectivityResult</code> dataclass and <code>count_iyx_nodes()</code> plus all private helper functions (<code>_segment_intersection</code>, <code>_near_any_endpoint</code>, <code>_trace_endpoints</code>, <code>_cluster_points</code>, <code>_remove_points_near</code>, <code>_on_boundary</code>, <code>_classify_branches</code>, <code>_empty_result</code>).</td></tr>
                     <tr><td><code>static_analyzer/tabs/static_connectivity_tab.py</code></td><td>GUI mixin class <code>StaticFluidFlowTab</code>: sidebar and settings construction, the five Matplotlib diagrams and their drawing routines, caching/staleness logic, background-image handling, pan/zoom interaction, and sidebar statistics refresh.</td></tr>
-                </table>
+                </tbody></table>
                 <p>
                     <code>StaticFluidFlowTab</code> is one of eight sibling tab mixins combined via Python
                     multiple inheritance into the single <code>StaticAnalyzerApp</code> class. This design lets
@@ -933,17 +932,17 @@ C_B  = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82</div>
 
                 <h3>11.5 Numerical Tolerances Reference</h3>
                 <table>
-                    <tr><th>Constant</th><th>Value</th><th>Purpose</th></tr>
+                    <tbody><tr><th>Constant</th><th>Value</th><th>Purpose</th></tr>
                     <tr><td>Segment length floor</td><td>1×10⁻¹²</td><td>Discards degenerate, zero-length segments before intersection testing.</td></tr>
                     <tr><td>Parallel-line determinant floor</td><td>1×10⁻¹²</td><td>Below this, two segments are treated as parallel and no intersection is attempted.</td></tr>
                     <tr><td>Parametric interval slack</td><td>±1×10⁻¹⁰</td><td>Admits intersections numerically just outside [0, 1] due to floating-point rounding.</td></tr>
                     <tr><td>Minimum clustering threshold</td><td>1×10⁻⁹</td><td>Floor applied to the user-supplied tolerance to avoid division-by-zero-like degeneracies when tolerance is set to exactly 0.</td></tr>
-                </table>
+                </tbody></table>
 
                 <!-- ================================================= -->
                 <h2 id="limitations">12. Limitations</h2>
                 <table>
-                    <tr><th>Limitation</th><th>Description</th></tr>
+                    <tbody><tr><th>Limitation</th><th>Description</th></tr>
                     <tr><td>Requires genuine spatial geometry</td><td>Orientation-only Excel/CSV formats (legacy Strike/Dip tables, Trend/Plunge pole tables) cannot be analysed, since they carry no real map position.</td></tr>
                     <tr><td>O(n²) computation cost</td><td>For very dense digitisations (tens of thousands of segments), computation time can become noticeable even with the caching strategy, since a genuine geometry change still requires a full recomputation.</td></tr>
                     <tr><td>Greedy point-clustering</td><td>The order-dependent greedy clustering algorithm can produce weakly order-dependent cluster centroids in rare pathological configurations of closely spaced, nearly-collinear candidate points. In practice, at sensible tolerances, this has negligible effect on reported statistics.</td></tr>
@@ -952,7 +951,7 @@ C_B  = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82</div>
                     <tr><td>Heuristic reference contours</td><td>The C_L = 3.57 and C_B ≈ 2 reference contours are values drawn from the published topological fracture-network literature and are not dynamically recalculated for the specific length or orientation distribution of the loaded data set.</td></tr>
                     <tr><td>Rectangular boundary assumption</td><td>Boundary I-node exclusion uses the simple rectangular bounding box of all digitised endpoints as the sample-domain boundary. For irregularly shaped mapped areas, this can over- or under-exclude genuine edge-truncated tips relative to the true panel boundary.</td></tr>
                     <tr><td>Main-thread computation</td><td>All fitting and intersection computation runs on the main UI thread since Matplotlib's TkAgg backend is not safe to drive concurrently from a worker thread. Very large networks will therefore block interaction until the computation completes, mitigated only by the loading overlay.</td></tr>
-                </table>
+                </tbody></table>
 
                 <!-- ================================================= -->
                 <h2 id="references">13. References</h2>
@@ -979,5 +978,5 @@ C_B  = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82</div>
         </main>
     </div>
     <script src="script.js"></script>
-</body>
-</html>
+
+</body></html>
