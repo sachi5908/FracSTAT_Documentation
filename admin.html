@@ -653,6 +653,26 @@
     var CLOUDINARY_CLOUD_NAME = "hcaqjcqf";
     var CLOUDINARY_UPLOAD_PRESET = "FracSTAT";
 
+    // ---------------------------------------------------------
+    // Cache-busting helpers. The admin panel repeatedly re-fetches its
+    // own site files (the page being edited, script.js, admin.html) to
+    // read their latest content before patching and re-publishing them.
+    // Browsers/CDNs (and GitHub Pages in particular) can serve a stale
+    // cached copy of these, which would silently discard recent edits or
+    // show an out-of-date sidebar. Every such fetch should go through
+    // fetchFresh() so it always reaches the server for a live copy.
+    // ---------------------------------------------------------
+    function noCacheUrl(url) {
+        var sep = url.indexOf("?") === -1 ? "?" : "&";
+        return url + sep + "_cb=" + Date.now();
+    }
+
+    function fetchFresh(url, opts) {
+        opts = opts || {};
+        opts.cache = "no-store";
+        return fetch(noCacheUrl(url), opts);
+    }
+
     function uploadImageToCloudinary(file) {
         var formData = new FormData();
         formData.append("file", file);
@@ -701,8 +721,6 @@
             { file: "docs_uncertainty_montecarlo.html", label: "Monte Carlo Tab" },
             { file: "docs_uncertainty_lhs.html", label: "LHS Tab" },
             { file: "docs_uncertainty_pce.html", label: "PCE Tab" }
-        ,
-            { file: "docs_demo3.html", label: "demo3" }
         ]}
     ];
 
@@ -821,7 +839,10 @@
                 else if (arrText[j] === "]") { fdepth--; if (fdepth === 0) { fArrEnd = j; break; } }
             }
             if (fArrEnd === -1) return null;
-            var before = arrText.substring(0, fArrEnd);
+            // Trim trailing whitespace/newlines left over before the "]" so
+            // the new entry's comma lands right after the previous entry's
+            // closing brace, instead of dangling alone on its own line.
+            var before = arrText.substring(0, fArrEnd).replace(/\s+$/, "");
             var after = arrText.substring(fArrEnd);
             newArrText = before + ",\n            " + newEntry + "\n        " + after;
         } else {
@@ -841,7 +862,7 @@
         var token = sessionStorage.getItem("github_token");
         if (!token) return;
         try {
-            var res = await fetch("admin.html");
+            var res = await fetchFresh("admin.html");
             if (!res.ok) throw new Error("fetch admin.html failed: " + res.status);
             var src = await res.text();
 
@@ -851,7 +872,7 @@
             if (!updatedSrc) return;
 
             var apiUrl = "https://api.github.com/repos/" + GITHUB_REPO_OWNER + "/" + GITHUB_REPO_NAME + "/contents/admin.html";
-            var shaRes = await fetch(apiUrl, { headers: { "Authorization": "token " + token } });
+            var shaRes = await fetch(apiUrl, { headers: { "Authorization": "token " + token }, cache: "no-store" });
             var sha = null;
             if (shaRes.ok) { var shaData = await shaRes.json(); sha = shaData.sha; }
 
@@ -859,6 +880,7 @@
             await fetch(apiUrl, {
                 method: "PUT",
                 headers: { "Authorization": "token " + token, "Content-Type": "application/json" },
+                cache: "no-store",
                 body: JSON.stringify({
                     message: "Register " + targetFile + " in admin FILE_SECTIONS",
                     content: encoded,
@@ -911,7 +933,10 @@
                 else if (arrText[j] === "]") { ldepth--; if (ldepth === 0) { lArrEnd = j; break; } }
             }
             if (lArrEnd === -1) return null;
-            var before = arrText.substring(0, lArrEnd);
+            // Trim trailing whitespace/newlines left over before the "]" so
+            // the new entry's comma lands right after the previous entry's
+            // closing brace, instead of dangling alone on its own line.
+            var before = arrText.substring(0, lArrEnd).replace(/\s+$/, "");
             var after = arrText.substring(lArrEnd);
             newArrText = before + ",\n            " + newEntry + "\n        " + after;
         } else {
@@ -940,7 +965,7 @@
 
         editorStatus.textContent = "Updating shared sidebar (script.js)…";
         try {
-            var localRes = await fetch("script.js");
+            var localRes = await fetchFresh("script.js");
             if (!localRes.ok) throw new Error("fetch script.js failed: " + localRes.status);
             var rawJs = await localRes.text();
 
@@ -951,7 +976,7 @@
             }
 
             var apiUrl = "https://api.github.com/repos/" + GITHUB_REPO_OWNER + "/" + GITHUB_REPO_NAME + "/contents/script.js";
-            var shaRes = await fetch(apiUrl, { headers: { "Authorization": "token " + token } });
+            var shaRes = await fetch(apiUrl, { headers: { "Authorization": "token " + token }, cache: "no-store" });
             var sha = null;
             if (shaRes.ok) { var shaData = await shaRes.json(); sha = shaData.sha; }
 
@@ -959,6 +984,7 @@
             var putRes = await fetch(apiUrl, {
                 method: "PUT",
                 headers: { "Authorization": "token " + token, "Content-Type": "application/json" },
+                cache: "no-store",
                 body: JSON.stringify({
                     message: "Add " + targetFile + " to shared sidebar (via Admin Panel)",
                     content: encoded,
@@ -1281,7 +1307,7 @@
             editorFrame.srcdoc = NEW_PAGES[file].html;
         } else {
             editorFrame.removeAttribute("srcdoc");
-            editorFrame.src = file;
+            editorFrame.src = noCacheUrl(file);
         }
     }
 
@@ -2136,7 +2162,7 @@
         var isNewFile = PENDING_NEW_FILES.has(currentFile);
         var rawHtmlPromise = isNewFile
             ? Promise.resolve(NEW_PAGES[currentFile].html)
-            : fetch(currentFile).then(function (res) {
+            : fetchFresh(currentFile).then(function (res) {
                 if (!res.ok) throw new Error("HTTP " + res.status);
                 return res.text();
             });
@@ -2211,7 +2237,7 @@
             if (isNewFile) {
                 rawHtml = NEW_PAGES[currentFile].html;
             } else {
-                const localRes = await fetch(currentFile);
+                const localRes = await fetchFresh(currentFile);
                 if (!localRes.ok) throw new Error("Could not fetch local template.");
                 rawHtml = await localRes.text();
             }
@@ -2236,7 +2262,8 @@
             let fileSha = null;
             if (!isNewFile) {
                 const shaRes = await fetch(apiUrl, {
-                    headers: { "Authorization": `token ${token}` }
+                    headers: { "Authorization": `token ${token}` },
+                    cache: "no-store"
                 });
                 if (shaRes.ok) {
                     const shaData = await shaRes.json();
@@ -2251,6 +2278,7 @@
                     "Authorization": `token ${token}`,
                     "Content-Type": "application/json"
                 },
+                cache: "no-store",
                 body: JSON.stringify({
                     message: `${isNewFile ? "Create" : "Update"} ${filePath} via Admin Panel`,
                     content: encodedContent,
