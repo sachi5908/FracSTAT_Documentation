@@ -346,6 +346,65 @@
         box-shadow: var(--shadow-sm);
     }
 
+    /* ---------- DRAG & DROP REORDERING ---------- */
+    .file-card[draggable="true"] { cursor: grab; }
+    .file-card.dragging { opacity: 0.4; cursor: grabbing; }
+    .file-card .fc-title { padding-right: 1.6rem; }
+    .file-card .fc-drag-handle {
+        position: absolute;
+        top: 0.65rem;
+        right: 0.7rem;
+        color: #c3c8de;
+        display: flex;
+        transition: color 0.15s ease;
+    }
+    .file-card:hover .fc-drag-handle { color: var(--primary); }
+    .file-card .fc-drag-handle svg { width: 16px; height: 16px; }
+    .file-grid {
+        transition: outline-color 0.15s ease;
+        border-radius: 12px;
+    }
+    .file-grid.drag-over {
+        outline: 2px dashed rgba(99,102,241,0.45);
+        outline-offset: 8px;
+    }
+
+    /* ---------- SIDEBAR ORDER CARD ---------- */
+    #orderControls {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.25rem 1.5rem;
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 2.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    #orderControls .oc-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    #orderControls h2 { border: none; padding-bottom: 0; margin-bottom: 0; }
+    #orderControls p.oc-desc { color: var(--ink-light); font-size: 0.9rem; margin: 0; max-width: 640px; line-height: 1.5; }
+    #saveOrderBtn {
+        flex-shrink: 0;
+        padding: 0.65rem 1.3rem;
+        border: none;
+        border-radius: 9px;
+        background: linear-gradient(135deg, var(--accent-warm), #a855f7);
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.85rem;
+        box-shadow: 0 10px 20px -8px rgba(168,85,247,0.5);
+        transition: transform 0.15s ease, filter 0.15s ease;
+    }
+    #saveOrderBtn:hover { transform: translateY(-1px); filter: brightness(1.07); }
+    #orderStatus { font-size: 0.85rem; color: var(--ink-light); min-height: 1.2em; }
+
     /* ---------- CREATE NEW PAGE CARD ---------- */
     #createPageSection {
         background: var(--card-bg);
@@ -672,6 +731,22 @@
                 "+ Row / − Row / + Col / − Col" controls. When you're done, use
                 "Download Page" to export the updated file and upload it back to your site.
             </p>  -->
+            <div id="orderControls">
+                <div class="oc-row">
+                    <h2>Sidebar Order</h2>
+                    <button type="button" id="saveOrderBtn">💾 Save Order to Sidebar</button>
+                </div>
+                <p class="oc-desc">
+                    Drag any page card below — within its section, or straight into a different section —
+                    to change the order pages appear in the live sidebar and in the Previous/Next
+                    navigation at the bottom of every docs page. Reordering here is instant on screen but
+                    stays local until you click "Save Order to Sidebar", which pushes the new order to
+                    <code>script.js</code> (sidebar + page order) and <code>admin.html</code>'s own page
+                    registry in a single commit.
+                </p>
+                <div id="orderStatus"></div>
+            </div>
+
             <div class="file-section" id="createPageSection">
                 <h2>Create New Page</h2>
                 <div class="create-page-form">
@@ -820,6 +895,7 @@
         ]},
         { title: "Dynamic Analyzer", files: [
             { file: "docs_dynamic_map.html", label: "Map Tab" },
+            { file: "docs_demo.html", label: "demo" },
             { file: "docs_dynamic_rose.html", label: "Rose Tab" },
             { file: "docs_dynamic_mohr.html", label: "Mohr Tab" },
             { file: "docs_dynamic_stereonet.html", label: "Stereonet Tab" },
@@ -1321,6 +1397,8 @@
     var redoBtn = document.getElementById("redoBtn");
     var githubBtn = document.getElementById("githubBtn");
     var addSidebarBtn = document.getElementById("addSidebarBtn");
+    var saveOrderBtn = document.getElementById("saveOrderBtn");
+    var orderStatus = document.getElementById("orderStatus");
 
     // ---------------------------------------------------------
     // Login
@@ -1499,6 +1577,7 @@
         FILE_SECTIONS.forEach(function (section) {
             var sectionEl = document.createElement("div");
             sectionEl.className = "file-section";
+            sectionEl.dataset.section = section.title;
 
             var h2 = document.createElement("h2");
             h2.textContent = section.title;
@@ -1510,9 +1589,14 @@
             section.files.forEach(function (entry) {
                 var card = document.createElement("div");
                 card.className = "file-card";
+                card.draggable = true;
+                card.dataset.file = entry.file;
                 var draftBadge = PENDING_NEW_FILES.has(entry.file)
                     ? '<span class="fc-draft-badge">Draft — not pushed yet</span>' : "";
                 card.innerHTML =
+                    '<span class="fc-drag-handle" title="Drag to reorder">' +
+                        '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"></circle><circle cx="15" cy="6" r="1.5"></circle><circle cx="9" cy="12" r="1.5"></circle><circle cx="15" cy="12" r="1.5"></circle><circle cx="9" cy="18" r="1.5"></circle><circle cx="15" cy="18" r="1.5"></circle></svg>' +
+                    '</span>' +
                     '<div class="fc-title">' + entry.label + '</div>' +
                     '<div class="fc-name">' + entry.file + '</div>' +
                     draftBadge +
@@ -1520,12 +1604,106 @@
                 card.querySelector(".fc-edit").addEventListener("click", function () {
                     openEditor(entry.file, entry.label);
                 });
+                bindCardDragEvents(card);
                 grid.appendChild(card);
             });
 
+            bindGridDropEvents(grid);
             sectionEl.appendChild(grid);
             fileSectionsEl.appendChild(sectionEl);
         });
+    }
+
+    // ---------------------------------------------------------
+    // Drag-and-drop reordering of page cards.
+    //
+    // Cards are draggable across the whole dashboard (not just within
+    // their own section), so a page can be dragged into a different
+    // sidebar section as well as reordered within one. Every drop
+    // rebuilds FILE_SECTIONS directly from the current DOM order, so
+    // the in-memory model always matches exactly what's on screen —
+    // no separate index bookkeeping to keep in sync.
+    // ---------------------------------------------------------
+    function bindCardDragEvents(card) {
+        card.addEventListener("dragstart", function (e) {
+            card.classList.add("dragging");
+            e.dataTransfer.effectAllowed = "move";
+            try { e.dataTransfer.setData("text/plain", card.dataset.file || ""); } catch (err) { /* Safari needs a set, ignore failures */ }
+        });
+        card.addEventListener("dragend", function () {
+            card.classList.remove("dragging");
+            document.querySelectorAll(".file-grid").forEach(function (g) { g.classList.remove("drag-over"); });
+        });
+    }
+
+    // Finds the card the dragged item should be inserted before, based on
+    // cursor position. Prefers a same-row neighbour (compares X) so drops
+    // within a row land precisely; falls back to the first card whose row
+    // starts below the cursor for drops between rows or into empty space.
+    function getDragAfterElement(grid, x, y) {
+        var cards = Array.prototype.slice.call(grid.querySelectorAll(".file-card:not(.dragging)"));
+        var sameRow = null, sameRowOffset = Number.NEGATIVE_INFINITY;
+        var below = null, belowTop = Number.POSITIVE_INFINITY;
+        cards.forEach(function (card) {
+            var box = card.getBoundingClientRect();
+            var centerY = box.top + box.height / 2;
+            if (Math.abs(y - centerY) < box.height / 2) {
+                var offsetX = x - (box.left + box.width / 2);
+                if (offsetX < 0 && offsetX > sameRowOffset) {
+                    sameRowOffset = offsetX;
+                    sameRow = card;
+                }
+            } else if (box.top > (y - box.height / 2) && box.top < belowTop) {
+                belowTop = box.top;
+                below = card;
+            }
+        });
+        return sameRow || below;
+    }
+
+    function bindGridDropEvents(grid) {
+        grid.addEventListener("dragover", function (e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = "move";
+            grid.classList.add("drag-over");
+            var dragging = document.querySelector(".file-card.dragging");
+            if (!dragging) return;
+            var after = getDragAfterElement(grid, e.clientX, e.clientY);
+            if (after == null) grid.appendChild(dragging);
+            else if (after !== dragging) grid.insertBefore(dragging, after);
+        });
+        grid.addEventListener("dragleave", function (e) {
+            if (!grid.contains(e.relatedTarget)) grid.classList.remove("drag-over");
+        });
+        grid.addEventListener("drop", function (e) {
+            e.preventDefault();
+            grid.classList.remove("drag-over");
+            rebuildFileSectionsFromDom();
+            if (orderStatus) orderStatus.textContent = 'Order changed locally — click "Save Order to Sidebar" to publish it.';
+        });
+    }
+
+    // Rebuilds FILE_SECTIONS (the single in-memory source of truth also
+    // used by populateSectionDropdown, create-page, etc.) directly from
+    // the current DOM order, so a card dragged into a different section
+    // is correctly re-parented as well as reordered.
+    function rebuildFileSectionsFromDom() {
+        var newSections = [];
+        fileSectionsEl.querySelectorAll(".file-section").forEach(function (sectionEl) {
+            var h2El = sectionEl.querySelector("h2");
+            var title = h2El ? h2El.textContent.trim() : "";
+            var files = [];
+            sectionEl.querySelectorAll(".file-card").forEach(function (card) {
+                var file = card.dataset.file;
+                var labelEl = card.querySelector(".fc-title");
+                var label = labelEl ? labelEl.textContent.trim() : file;
+                files.push({ file: file, label: label });
+            });
+            newSections.push({ title: title, files: files });
+        });
+        FILE_SECTIONS.length = 0;
+        newSections.forEach(function (s) { FILE_SECTIONS.push(s); });
+        populateSectionDropdown();
     }
 
     // ---------------------------------------------------------
@@ -1619,6 +1797,189 @@
             editorStatus.textContent = "Update failed: " + err.message;
         }
     });
+
+    if (saveOrderBtn) {
+        saveOrderBtn.addEventListener("click", function () {
+            saveSidebarOrder();
+        });
+    }
+
+    // ---------------------------------------------------------
+    // Publishing a new page order.
+    //
+    // Unlike the insertion-style patches above (patchFileSectionsSource,
+    // patchScriptJsSidebarSource, patchScriptJsPageOrderSource — which
+    // only ever splice ONE new entry into an existing array without
+    // disturbing anything else), reordering means every entry's position
+    // can change at once. Patching that incrementally would be fragile,
+    // so instead these helpers regenerate the ENTIRE FILE_SECTIONS /
+    // SIDEBAR_SECTIONS / PAGE_ORDER array literal from the current
+    // in-memory FILE_SECTIONS model and splice that whole literal back
+    // into the source, leaving everything else in the file untouched.
+    // ---------------------------------------------------------
+
+    function escapeJsString(s) {
+        return String(s).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+    }
+
+    function unescapeJsString(s) {
+        return String(s).replace(/\\"/g, '"').replace(/\\\\/g, "\\");
+    }
+
+    // Locates an array literal (e.g. "var FILE_SECTIONS = [ ... ]") by
+    // finding the declaration, then the first "[" after it, then its
+    // matching "]" via bracket-depth counting. Mirrors the approach used
+    // by patchFileSectionsSource()/patchScriptJsSidebarSource() above,
+    // but returns the full [start, end] range instead of assuming a
+    // single insertion point.
+    function findArrayLiteralRange(src, declRegex) {
+        var m = declRegex.exec(src);
+        if (!m) return null;
+        var declIdx = m.index;
+        var arrStart = src.indexOf("[", declIdx);
+        if (arrStart === -1) return null;
+        var depth = 0, arrEnd = -1;
+        for (var i = arrStart; i < src.length; i++) {
+            if (src[i] === "[") depth++;
+            else if (src[i] === "]") { depth--; if (depth === 0) { arrEnd = i; break; } }
+        }
+        if (arrEnd === -1) return null;
+        return { start: arrStart, end: arrEnd };
+    }
+
+    // Recovers { href, label } pairs already present in an existing
+    // PAGE_ORDER array literal, so regenerating it can preserve each
+    // page's current pagination label (which sometimes differs from its
+    // sidebar label, e.g. "Static Map Tab" vs. "Map Tab") rather than
+    // silently overwriting it.
+    function parseSimpleHrefLabelEntries(arrText) {
+        var entries = [];
+        var re = /\{\s*href:\s*"((?:[^"\\]|\\.)*)"\s*,\s*label:\s*"((?:[^"\\]|\\.)*)"\s*\}/g;
+        var m;
+        while ((m = re.exec(arrText)) !== null) {
+            entries.push({ href: unescapeJsString(m[1]), label: unescapeJsString(m[2]) });
+        }
+        return entries;
+    }
+
+    function serializeFileSectionsArray() {
+        var lines = ["["];
+        FILE_SECTIONS.forEach(function (section, si) {
+            lines.push('        { title: "' + escapeJsString(section.title) + '", files: [');
+            section.files.forEach(function (f, fi) {
+                var comma = fi < section.files.length - 1 ? "," : "";
+                lines.push('            { file: "' + escapeJsString(f.file) + '", label: "' + escapeJsString(f.label) + '" }' + comma);
+            });
+            var sectionComma = si < FILE_SECTIONS.length - 1 ? "," : "";
+            lines.push("        ]}" + sectionComma);
+        });
+        lines.push("    ]");
+        return lines.join("\n");
+    }
+
+    // Rewrites admin.html's own FILE_SECTIONS array (the page registry
+    // driving the dashboard grid you just dragged) to match the current
+    // in-memory order exactly.
+    function replaceFileSectionsWholeArray(src) {
+        var range = findArrayLiteralRange(src, /var\s+FILE_SECTIONS/);
+        if (!range) return null;
+        var newArr = serializeFileSectionsArray();
+        var newSrc = src.substring(0, range.start) + newArr + src.substring(range.end + 1);
+        return newSrc === src ? null : newSrc;
+    }
+
+    // Rewrites script.js's SIDEBAR_SECTIONS (drives every page's live
+    // sidebar) and PAGE_ORDER (drives Previous/Next pagination) arrays
+    // together, from the same FILE_SECTIONS order, in one pass so both
+    // stay mutually consistent.
+    function replaceSidebarAndPageOrder(src) {
+        var sbRange = findArrayLiteralRange(src, /(?:const|var)\s+SIDEBAR_SECTIONS/);
+        var poRange = findArrayLiteralRange(src, /(?:const|var)\s+PAGE_ORDER/);
+        if (!sbRange || !poRange) return null;
+
+        var oldPageOrderText = src.substring(poRange.start, poRange.end + 1);
+        var oldLabelByHref = {};
+        parseSimpleHrefLabelEntries(oldPageOrderText).forEach(function (e) {
+            oldLabelByHref[e.href] = e.label;
+        });
+
+        var sbLines = ["["];
+        FILE_SECTIONS.forEach(function (section, si) {
+            sbLines.push("    {");
+            sbLines.push('        title: "' + escapeJsString(section.title) + '",');
+            sbLines.push("        links: [");
+            section.files.forEach(function (f, fi) {
+                var comma = fi < section.files.length - 1 ? "," : "";
+                sbLines.push('            { href: "' + escapeJsString(f.file) + '", label: "' + escapeJsString(f.label) + '" }' + comma);
+            });
+            sbLines.push("        ]");
+            sbLines.push("    }" + (si < FILE_SECTIONS.length - 1 ? "," : ""));
+        });
+        sbLines.push("]");
+        var newSidebarText = sbLines.join("\n");
+
+        var flat = [];
+        FILE_SECTIONS.forEach(function (section) {
+            section.files.forEach(function (f) {
+                var label = oldLabelByHref.hasOwnProperty(f.file) ? oldLabelByHref[f.file] : f.label;
+                flat.push({ href: f.file, label: label });
+            });
+        });
+        var poLines = ["["];
+        flat.forEach(function (e, i) {
+            var comma = i < flat.length - 1 ? "," : "";
+            poLines.push('    { href: "' + escapeJsString(e.href) + '", label: "' + escapeJsString(e.label) + '" }' + comma);
+        });
+        poLines.push("]");
+        var newPageOrderText = poLines.join("\n");
+
+        // Replace whichever range starts later first, so splicing the
+        // first replacement never shifts the still-unprocessed range's
+        // stored indices out from under it.
+        var replacements = [
+            { range: sbRange, text: newSidebarText },
+            { range: poRange, text: newPageOrderText }
+        ].sort(function (a, b) { return b.range.start - a.range.start; });
+
+        var result = src;
+        replacements.forEach(function (r) {
+            result = result.substring(0, r.range.start) + r.text + result.substring(r.range.end + 1);
+        });
+        return result === src ? null : result;
+    }
+
+    async function saveSidebarOrder() {
+        rebuildFileSectionsFromDom();
+        if (!orderStatus) return;
+        orderStatus.textContent = "Computing order changes…";
+        try {
+            var filesToCommit = {};
+
+            var adminRes = await fetchFresh("admin.html");
+            if (!adminRes.ok) throw new Error("fetch admin.html failed: " + adminRes.status);
+            var adminSrc = await adminRes.text();
+            var newAdminSrc = replaceFileSectionsWholeArray(adminSrc);
+            if (newAdminSrc !== null) filesToCommit["admin.html"] = newAdminSrc;
+
+            var scriptRes = await fetchFresh("script.js");
+            if (!scriptRes.ok) throw new Error("fetch script.js failed: " + scriptRes.status);
+            var scriptSrc = await scriptRes.text();
+            var newScriptSrc = replaceSidebarAndPageOrder(scriptSrc);
+            if (newScriptSrc !== null) filesToCommit["script.js"] = newScriptSrc;
+
+            if (Object.keys(filesToCommit).length === 0) {
+                orderStatus.textContent = "No changes to publish — order already matches the live site.";
+                return;
+            }
+
+            orderStatus.textContent = "Pushing new order to GitHub (single commit)…";
+            await commitMultipleFilesToGithub(filesToCommit, "Reorder sidebar pages via Admin Panel drag-and-drop");
+            orderStatus.textContent = "Order published! (Allow 1-2 minutes for the live site to redeploy.)";
+        } catch (err) {
+            console.error("Failed to save sidebar order:", err);
+            orderStatus.textContent = "Failed to save order: " + err.message;
+        }
+    }
 
     undoBtn.addEventListener("click", function () {
         var doc = editorFrame.contentDocument;
@@ -2609,6 +2970,44 @@
         }
     }
 })();
+</script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
 </script>
 </body>
 </html>
