@@ -754,12 +754,8 @@ def _mohr_field(sigma1, sigma2, sigma3, pore_pressure, cohesion, friction, value
                 <h2 id="limitations">15. Limitations</h2>
                 <table>
                     <tr><th>Limitation</th><th>Description</th></tr>
-                    <tr><td>Read-only stress visualization</td><td>The Mohr Tab visualizes results already computed elsewhere; it cannot itself correct or flag physically inconsistent stress inputs (e.g. &sigma;&#8321; &lt; &sigma;&#8322; &lt; &sigma;&#8323; violations) beyond what the sidebar's own validation performs before Calculate is pressed.</td></tr>
-                    <tr><td>Fixed "Near envelope" threshold</td><td>The threshold is a fixed 5% of the dataset's own maximum shear stress and is not user-configurable; for datasets with a very small or very large stress range this relative definition may classify differently than an analyst's intended absolute MPa tolerance.</td></tr>
                     <tr><td>Bounded background field resolution</td><td>The continuous background tendency field is sampled on a fixed 58&times;116 polar/azimuthal grid; it is a smooth visual guide to the full orientation space rather than an exhaustive enumeration, and very thin features of the failure surface could in principle be under-resolved at that grid density.</td></tr>
                     <tr><td>Coupled pixel size and DPI</td><td>Manual pixel sizing fixes the on-screen and exported figure resolution together; changing DPI in the application Settings page after fixing a pixel size changes the physical (inches) size of the exported PNG.</td></tr>
-                    <tr><td>Session-local UI state</td><td>The draggable Symbols index position and the fixed-pixel plot size are session-local UI state; unlike stress parameters and loaded data, they are not currently persisted to the project's saved session JSON file, so they reset to defaults when the project is reopened.</td></tr>
-                    <tr><td>No plotted kinematic detail</td><td>Kinematic (rake / Wallace&ndash;Bott) information for focal-mechanism input is displayed in the sidebar segment-info text and the Map tab's selection panel, but is not itself plotted on the Mohr diagram, which shows only the (&sigma;n&prime;, &tau;) stress state.</td></tr>
                 </table>
 
                 <!-- ================================================= -->

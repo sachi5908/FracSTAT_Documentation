@@ -839,7 +839,6 @@ field_x, field_y = (radius*np.sin(trend)).ravel(), (radius*np.cos(trend)).ravel(
                     <tr><td>Visual clutter for dense datasets</td><td>Great-circle plane traces ("Show All Planes") can become visually cluttered for datasets with many hundreds of fractures; the fixed low alpha (0.25) mitigates but does not eliminate this.</td></tr>
                     <tr><td>Non-linear angular compression</td><td>The equal-area projection, while area-preserving, still compresses angular relationships non-linearly toward the primitive circle; visual judgements of "cluster tightness" should be corroborated with the quantitative statistics available on the Rose tab.</td></tr>
                     <tr><td>Dip clamping</td><td>Dip values are clipped to 0–90°; any input data implying an overturned or otherwise out-of-range dip will be silently clamped rather than rejected.</td></tr>
-                    <tr><td>Symbols index position not persisted</td><td>The Symbols index drag-repositioning state is not currently persisted in the saved project session file, so it resets to its default anchor when a project is reopened.</td></tr>
                     <tr><td>No rake-misfit colour metric</td><td>Kinematic (Wallace–Bott) rake-misfit diagnostics for focal-mechanism data are available in the Table tab but are not exposed as a Stereonet colour-by metric.</td></tr>
                 </table>
 

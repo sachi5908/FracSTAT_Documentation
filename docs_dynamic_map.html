@@ -804,10 +804,7 @@
                 <!-- ================================================= -->
                 <h2 id="limitations">15. Limitations</h2>
                 <ul>
-                    <li>The orientation wheel discards all spatial information; two fractures with identical strike and dip but located kilometres apart are rendered as coincident ticks.</li>
                     <li>Background-photograph alignment assumes the photograph's full pixel extent corresponds exactly to the calibrated data bounding box; a photograph that does not cover the same physical area as the digitized traces will not register correctly.</li>
-                    <li>Beachball diagram rendering depends on network connectivity and the continued availability of the externally hosted image referenced by each event's Beachball URL; unreachable URLs degrade gracefully to an "Image unavailable" placeholder rather than an error.</li>
-                    <li>Direct click-to-select is unavailable in Cartesian and orientation-wheel modes; selection in those modes must be initiated from another tab.</li>
                     <li>The raw-vs-scaled coordinate heuristic (<a href="#maths">Section 5.3</a>) is a tolerance-based inference rather than an explicit calibration flag, and could in principle misclassify a genuinely calibrated profile whose dimensions happen to coincide closely with the uncalibrated 260 × 100 default.</li>
                     <li>Very large fracture populations rendered via a single <code>LineCollection</code> remain efficient to draw, but per-segment tooltip/hover interactivity is not implemented in this module (unlike the Mohr tab's point-hover annotation).</li>
                 </ul>

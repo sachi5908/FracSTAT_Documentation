@@ -2041,7 +2041,7 @@
             }
 
             orderStatus.textContent = "Pushing new order to GitHub (single commit)…";
-            await commitMultipleFilesToGithub(filesToCommit, "Reorder sidebar pages via Admin Panel drag-and-drop");
+            await commitMultipleFilesToGithub(filesToCommit, "Sidebar Pages Reorder ");
             orderStatus.textContent = "Order published! (Allow 1-2 minutes for the live site to redeploy.)";
         } catch (err) {
             console.error("Failed to save sidebar order:", err);

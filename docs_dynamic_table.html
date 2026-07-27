@@ -81,8 +81,7 @@
                         <li><a href="#examples">12. Practical Examples</a></li>
                         <li><a href="#interpretation">13. Geological and Geomechanical Interpretation</a></li>
                         <li><a href="#implementation">14. Implementation Notes</a></li>
-                        <li><a href="#limitations">15. Limitations</a></li>
-                        <li><a href="#references">16. References</a></li>
+                        <li><a href="#references">15. References</a></li>
                     </ul>
                 </div>
 
@@ -821,19 +820,6 @@ SfLegacy (original)           =  σₙ − τ / μ
                     implemented because no other thread ever mutates <code>self.results</code> or
                     <code>self.selected_segment_id</code> concurrently with the Table Tab's own execution.</li>
                 </ul>
-
-                <!-- ================================================= -->
-                <h2 id="limitations">15. Limitations</h2>
-                <table>
-                    <tr><th>Limitation</th><th>Description</th></tr>
-                    <tr><td>Row cap</td><td>Only the first 1000 rows of self.results are ever rendered on screen (Section 10); very large fracture networks require the Export Excel action to inspect the full dataset.</td></tr>
-                    <tr><td>No interactive sorting or filtering</td><td>The Table Tab cannot resort by column value, filter by threshold, or search by ID directly within the application; such operations require exporting to Excel/CSV first.</td></tr>
-                    <tr><td>No in-place editing</td><td>All fifteen displayed columns are read-only; the Table Tab cannot be used to manually override a segment's dip, strike, or any derived attribute (dip overrides must instead be supplied via a separate CSV/Excel dip-override file loaded through the sidebar).</td></tr>
-                    <tr><td>No multi-row selection semantics for cross-tab highlighting</td><td>Although ttk.Treeview technically supports multi-row selection, on_table_select() only ever reads selection()[0], so highlighting a batch of rows simultaneously across the Map/Mohr/Stereonet tabs is not supported.</td></tr>
-                    <tr><td>Column set is fixed</td><td>The fifteen columns cannot be reconfigured, reordered, hidden, or extended with additional derived quantities (e.g. Rake, TauRake, PredictedRake, RakeMisfit for focal-mechanism datasets, or Lat/Lon for geographic data) from within the tab itself, even though these fields exist in self.results and are exported to Excel.</td></tr>
-                    <tr><td>Number formatting is fixed</td><td>Decimal-place precision (1, 2, or 3 dp depending on column) is hardcoded and cannot be adjusted by the user from within the Table Tab.</td></tr>
-                    <tr><td>Dark-mode styling is implemented but currently unreachable in normal use</td><td>Since SlipTendencyApp.change_appearance() always forces the Light theme at the application level.</td></tr>
-                </table>
 
                 <!-- ================================================= -->
                 <h2 id="references">16. References</h2>
