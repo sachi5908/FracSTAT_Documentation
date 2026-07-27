@@ -7,49 +7,54 @@
 <link rel="icon" type="image/png" href="https://res.cloudinary.com/hcaqjcqf/image/upload/v1784441772/akioq6cgnbsigsemtf0f.png">
 
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
     :root {
         --primary: #6366f1;
         --primary-light: #818cf8;
-        --primary-dark: #4338ca;
+        --primary-dark: #4f46e5;
         --accent: #06b6d4;
         --accent-warm: #f472b6;
-        --ink: #0f1117;
-        --ink-soft: #1a1d2b;
+        --ink: #0f172a;
+        --ink-soft: #334155;
         --ink-light: #64748b;
-        --bg: #f4f5fb;
+        --bg: #f8fafc;
+        --sidebar-bg: #ffffff;
         --card-bg: #ffffff;
-        --border: #e7e9f3;
+        --border: #e2e8f0;
+        --border-light: #f1f5f9;
         --danger: #ef4444;
         --success: #10b981;
-        --shadow-sm: 0 1px 2px rgba(15, 17, 23, 0.05);
-        --shadow-md: 0 8px 24px -8px rgba(67, 56, 202, 0.18);
-        --shadow-lg: 0 24px 48px -16px rgba(15, 17, 23, 0.22);
-        --radius: 16px;
+        --success-bg: #ecfdf5;
+        --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.05), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+        --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.05), 0 4px 6px -4px rgba(15, 23, 42, 0.05);
+        --radius: 12px;
+        --radius-lg: 16px;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    
     body {
-        background:
-            radial-gradient(1100px 600px at 8% -10%, rgba(99,102,241,0.14) 0%, rgba(99,102,241,0) 60%),
-            radial-gradient(900px 500px at 105% 10%, rgba(6,182,212,0.14) 0%, rgba(6,182,212,0) 55%),
-            var(--bg);
+        background-color: var(--bg);
         color: var(--ink);
         min-height: 100vh;
+        overflow-x: hidden;
     }
 
-    /* ---------- shared bits ---------- */
     .hidden { display: none !important; }
     button { cursor: pointer; font-family: inherit; }
     ::selection { background: rgba(99,102,241,0.25); }
 
-    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #cbd1e6; border-radius: 8px; }
-    ::-webkit-scrollbar-thumb:hover { background: #aab1cf; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
     .svg-icon {
         display: inline-block;
-        width: 1.1em;
-        height: 1.1em;
+        width: 1.2em;
+        height: 1.2em;
         vertical-align: -0.2em;
         fill: none;
         stroke: currentColor;
@@ -65,645 +70,321 @@
         align-items: center;
         justify-content: center;
         padding: 1.5rem;
-        position: relative;
-        overflow: hidden;
-    }
-    #loginScreen::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background:
-            radial-gradient(700px 420px at 15% 20%, rgba(99,102,241,0.20), transparent 60%),
-            radial-gradient(600px 380px at 85% 80%, rgba(244,114,182,0.16), transparent 60%),
-            radial-gradient(500px 320px at 90% 10%, rgba(6,182,212,0.16), transparent 55%);
-        z-index: 0;
+        background: radial-gradient(circle at center, #ffffff 0%, var(--bg) 100%);
     }
     .login-card {
-        position: relative;
-        z-index: 1;
         width: 100%;
-        max-width: 380px;
-        background: rgba(255,255,255,0.85);
-        backdrop-filter: blur(18px);
-        -webkit-backdrop-filter: blur(18px);
-        border: 1px solid rgba(255,255,255,0.6);
-        border-radius: 20px;
-        padding: 2.5rem 2.25rem;
+        max-width: 400px;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 2.5rem;
         box-shadow: var(--shadow-lg);
-        animation: cardIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        text-align: center;
     }
-    @keyframes cardIn {
-        from { opacity: 0; transform: translateY(14px) scale(0.98); }
-        to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-    .login-card h1 {
-        font-size: 1.5rem;
-        margin-bottom: 0.4rem;
-        letter-spacing: -0.02em;
-        display: flex;
-        align-items: center;
-        gap: 0.55rem;
-        color: var(--ink);
-    }
-    .login-card h1 svg {
-        width: 1.3em; height: 1.3em;
-        padding: 6px;
-        border-radius: 10px;
-        background: linear-gradient(135deg, var(--primary), var(--accent));
-        stroke: #fff;
-        box-shadow: 0 6px 16px -4px rgba(99,102,241,0.5);
-    }
-    .login-card p.sub {
-        color: var(--ink-light);
-        font-size: 0.92rem;
-        margin-bottom: 2rem;
-    }
-    .field { margin-bottom: 1.2rem; }
-    .field label {
-        display: block;
-        font-size: 0.8rem;
-        font-weight: 700;
-        color: var(--ink-light);
-        margin-bottom: 0.4rem;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-    }
-    .field input {
-        width: 100%;
-        padding: 0.75rem 0.9rem;
-        border: 1.5px solid var(--border);
-        border-radius: 10px;
-        font-size: 0.95rem;
-        outline: none;
-        background: #fbfbfe;
-        transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
-    }
-    .field input:focus {
-        border-color: var(--primary);
-        background: #fff;
-        box-shadow: 0 0 0 4px rgba(99,102,241,0.14);
-    }
-    .password-wrap {
-        position: relative;
-    }
-    .password-wrap input {
-        padding-right: 2.6rem;
-    }
-    .password-toggle-btn {
-        position: absolute;
-        top: 50%;
-        right: 0.5rem;
-        transform: translateY(-50%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 30px;
-        height: 30px;
-        padding: 0;
-        border: none;
-        background: transparent;
-        border-radius: 8px;
-        color: var(--ink-light);
-        transition: color 0.15s ease, background-color 0.15s ease;
-    }
-    .password-toggle-btn:hover {
-        color: var(--primary);
-        background-color: rgba(99,102,241,0.1);
-    }
-    .password-toggle-btn svg {
-        width: 18px;
-        height: 18px;
-        fill: none;
-        stroke: currentColor;
-        stroke-width: 2;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-    }
-    .login-btn {
-        width: 100%;
-        padding: 0.8rem;
-        border: none;
-        border-radius: 10px;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-        color: #fff;
-        font-weight: 700;
-        font-size: 0.98rem;
-        margin-top: 0.5rem;
-        box-shadow: 0 10px 22px -8px rgba(67,56,202,0.55);
-        transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
-    }
-    .login-btn:hover { transform: translateY(-1px); filter: brightness(1.06); box-shadow: 0 14px 28px -8px rgba(67,56,202,0.6); }
-    .login-btn:active { transform: translateY(0); }
-    #loginError {
-        color: var(--danger);
-        font-size: 0.85rem;
-        margin-top: 0.9rem;
-        min-height: 1.1em;
-        font-weight: 600;
-    }
-    .login-hint {
-        margin-top: 1.6rem;
-        padding-top: 1.2rem;
-        border-top: 1px solid var(--border);
-        font-size: 0.78rem;
-        color: #9aa1b5;
-        line-height: 1.5;
-    }
-
-    /* ---------- DASHBOARD ---------- */
-    #dashboard { min-height: 100vh; }
-    .admin-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 1.15rem 2rem;
-        background: linear-gradient(120deg, #12142a 0%, #1c1f3a 55%, #241a3d 100%);
-        color: #fff;
-        box-shadow: 0 2px 18px rgba(15,17,23,0.18);
-        position: sticky;
-        top: 0;
-        z-index: 30;
-    }
-    .admin-header h1 {
-        font-size: 1.12rem;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 0.6rem;
-        letter-spacing: -0.01em;
-    }
-    .admin-header h1 svg {
-        width: 1.25em; height: 1.25em;
-        padding: 5px;
-        border-radius: 8px;
-        background: linear-gradient(135deg, var(--primary), var(--accent));
-        stroke: #fff;
-    }
-    .admin-header .logout-btn {
-        background: rgba(255,255,255,0.08);
-        color: #e2e8f0;
-        border: 1px solid rgba(255,255,255,0.16);
-        padding: 0.55rem 1rem;
-        border-radius: 9px;
-        font-size: 0.82rem;
-        font-weight: 700;
-        transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
-    }
-    .admin-header .logout-btn:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.3); transform: translateY(-1px); }
-
-    .dashboard-body { padding: 2.25rem; max-width: 1160px; margin: 0 auto; }
-    .dashboard-body > p.intro {
-        color: var(--ink-light);
-        margin-bottom: 2.25rem;
-        max-width: 680px;
-        line-height: 1.6;
-        font-size: 0.98rem;
-    }
-
-    .file-section { margin-bottom: 2.5rem; }
-    .file-section h2 {
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: var(--primary-dark);
-        font-weight: 800;
-        margin-bottom: 1rem;
-        padding-bottom: 0.6rem;
-        border-bottom: 2px solid transparent;
-        border-image: linear-gradient(90deg, var(--primary), var(--accent), transparent) 1;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    .file-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-        gap: 1rem;
-    }
-    .file-card {
-        background: var(--card-bg);
-        border: 1px solid var(--border);
-        border-radius: 14px;
-        padding: 1.2rem 1.25rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.65rem;
-        position: relative;
-        overflow: hidden;
-        transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
-    }
-    .file-card::before {
-        content: "";
-        position: absolute;
-        top: 0; left: 0; right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, var(--primary), var(--accent));
-        opacity: 0;
-        transition: opacity 0.2s ease;
-    }
-    .file-card:hover {
-        box-shadow: var(--shadow-md);
-        transform: translateY(-3px);
-        border-color: rgba(99,102,241,0.3);
-    }
-    .file-card:hover::before { opacity: 1; }
-    .file-card .fc-title { font-weight: 700; font-size: 1rem; color: var(--ink); }
-    .file-card .fc-name {
-        font-size: 0.78rem;
-        color: #94a3b8;
-        font-family: 'Consolas', 'Monaco', monospace;
-        word-break: break-all;
-    }
-    .file-card .fc-edit {
-        margin-top: 0.35rem;
-        align-self: flex-start;
-        padding: 0.45rem 0.95rem;
-        border: none;
-        border-radius: 8px;
-        background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(6,182,212,0.12));
-        color: var(--primary-dark);
-        font-weight: 700;
-        font-size: 0.82rem;
-        display: flex;
-        align-items: center;
-        gap: 0.35rem;
-        transition: background 0.18s ease, color 0.18s ease, transform 0.15s ease;
-    }
-    .file-card .fc-edit:hover {
-        background: linear-gradient(135deg, var(--primary), var(--accent));
-        color: #fff;
-        transform: translateY(-1px);
-    }
-
-    .fc-draft-badge {
-        align-self: flex-start;
-        font-size: 0.72rem;
-        font-weight: 800;
-        color: #92400e;
-        background: linear-gradient(135deg, #fef3c7, #fde68a);
-        padding: 3px 9px;
-        border-radius: 999px;
-        box-shadow: var(--shadow-sm);
-    }
-
-    /* ---------- DRAG & DROP REORDERING ---------- */
-    .file-card[draggable="true"] { cursor: grab; }
-    .file-card.dragging { opacity: 0.4; cursor: grabbing; }
-    .file-card .fc-title { padding-right: 1.6rem; }
-    .file-card .fc-drag-handle {
-        position: absolute;
-        top: 0.65rem;
-        right: 0.7rem;
-        color: #c3c8de;
-        display: flex;
-        transition: color 0.15s ease;
-    }
-    .file-card:hover .fc-drag-handle { color: var(--primary); }
-    .file-card .fc-drag-handle svg { width: 16px; height: 16px; }
-    .file-grid {
-        transition: outline-color 0.15s ease;
+    .login-card .logo-icon {
+        width: 48px; height: 48px;
+        background: var(--primary);
+        color: white;
         border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.5rem; font-weight: 700;
+        margin: 0 auto 1.5rem auto;
     }
-    .file-grid.drag-over {
-        outline: 2px dashed rgba(99,102,241,0.45);
-        outline-offset: 8px;
+    .login-card h1 { font-size: 1.5rem; color: var(--ink); margin-bottom: 0.5rem; }
+    .login-card p.sub { color: var(--ink-light); font-size: 0.95rem; margin-bottom: 2rem; }
+    .field { margin-bottom: 1.25rem; text-align: left; }
+    .field label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--ink-soft); margin-bottom: 0.5rem; }
+    .field input { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.95rem; outline: none; transition: all 0.2s; }
+    .field input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
+    .password-wrap { position: relative; }
+    .password-toggle-btn { position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--ink-light); }
+    .password-toggle-btn svg { width: 18px; height: 18px; }
+    .login-btn { width: 100%; padding: 0.85rem; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: 600; font-size: 1rem; transition: background 0.2s; }
+    .login-btn:hover { background: var(--primary-dark); }
+    #loginError { color: var(--danger); font-size: 0.85rem; margin-top: 1rem; font-weight: 500; min-height: 1.2em; }
+
+    /* ---------- NEW DASHBOARD LAYOUT ---------- */
+    #dashboard {
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
     }
 
-    /* ---------- DRAG & DROP: WHOLE SECTIONS ---------- */
-    /* Mirrors the card-level dragging above, but for an entire sidebar
-       section (its heading + every card inside it) so whole groups can
-       be reordered relative to one another, not just the pages within
-       a single group. */
-    .file-section[draggable="true"] { cursor: grab; }
-    .file-section.dragging-section { opacity: 0.35; cursor: grabbing; }
-    .file-section h2 {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    .fs-drag-handle {
-        display: flex;
-        color: #c3c8de;
-        transition: color 0.15s ease;
-    }
-    .file-section:hover .fs-drag-handle { color: var(--primary); }
-    .fs-drag-handle svg { width: 16px; height: 16px; }
-    #fileSections {
-        transition: outline-color 0.15s ease;
-        border-radius: 14px;
-    }
-    #fileSections.drag-over-sections {
-        outline: 2px dashed rgba(244,114,182,0.45);
-        outline-offset: 10px;
-    }
-
-    /* ---------- SIDEBAR ORDER CARD ---------- */
-    #orderControls {
-        background: var(--card-bg);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        padding: 1.25rem 1.5rem;
-        box-shadow: var(--shadow-sm);
-        margin-bottom: 2.5rem;
+    /* Sidebar */
+    .app-sidebar {
+        width: 260px;
+        background: var(--sidebar-bg);
+        border-right: 1px solid var(--border);
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
+        flex-shrink: 0;
+        z-index: 20;
     }
-    #orderControls .oc-row {
+    .sidebar-header {
+        height: 70px;
+        display: flex;
+        align-items: center;
+        padding: 0 1.5rem;
+        border-bottom: 1px solid var(--border-light);
+    }
+    .brand-logo {
+        width: 32px; height: 32px;
+        background: var(--primary);
+        color: white;
+        border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: 1.1rem;
+        margin-right: 0.75rem;
+    }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-text strong { font-size: 1rem; color: var(--ink); line-height: 1.2; }
+    .brand-text span { font-size: 0.75rem; color: var(--ink-light); }
+
+    .sidebar-nav {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1.5rem 1rem;
+    }
+    .nav-section {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--ink-light);
+        font-weight: 700;
+        margin: 1.5rem 0 0.5rem 0.75rem;
+    }
+    .nav-section:first-child { margin-top: 0; }
+    .nav-item {
+        display: flex;
+        align-items: center;
+        padding: 0.65rem 0.75rem;
+        color: var(--ink-soft);
+        font-size: 0.9rem;
+        font-weight: 500;
+        border-radius: 8px;
+        margin-bottom: 0.25rem;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .nav-item svg { margin-right: 0.75rem; color: var(--ink-light); width: 1.1em; height: 1.1em; }
+    .nav-item:hover { background: var(--border-light); color: var(--ink); }
+    .nav-item.active { background: rgba(99,102,241,0.08); color: var(--primary-dark); }
+    .nav-item.active svg { color: var(--primary); }
+    .nav-item .external-icon { margin-left: auto; width: 0.9em; height: 0.9em; opacity: 0.5; }
+
+    .sidebar-footer {
+        padding: 1rem;
+        border-top: 1px solid var(--border-light);
+    }
+    .user-card {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    .user-avatar {
+        width: 36px; height: 36px;
+        border-radius: 50%;
+        background: var(--primary);
+        color: white;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 600; margin-right: 0.75rem; position: relative;
+    }
+    .user-avatar::after {
+        content: ''; position: absolute; bottom: 0; right: 0;
+        width: 10px; height: 10px; background: var(--success); border: 2px solid white; border-radius: 50%;
+    }
+    .user-info { display: flex; flex-direction: column; }
+    .user-info strong { font-size: 0.9rem; color: var(--ink); }
+    .user-info span { font-size: 0.75rem; color: var(--ink-light); }
+    .logout-btn {
+        width: 100%; display: flex; align-items: center; padding: 0.65rem 0.75rem;
+        color: var(--ink-soft); font-size: 0.9rem; font-weight: 500; border: none; background: none; border-radius: 8px;
+    }
+    .logout-btn svg { margin-right: 0.75rem; width: 1.1em; height: 1.1em; color: var(--ink-light); }
+    .logout-btn:hover { background: var(--border-light); color: var(--danger); }
+
+    /* Main Content Area */
+    .app-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .topbar {
+        height: 70px;
+        background: var(--sidebar-bg);
+        border-bottom: 1px solid var(--border);
         display: flex;
         align-items: center;
         justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-    #orderControls h2 { border: none; padding-bottom: 0; margin-bottom: 0; }
-    #orderControls p.oc-desc { color: var(--ink-light); font-size: 0.9rem; margin: 0; max-width: 640px; line-height: 1.5; }
-    #saveOrderBtn {
+        padding: 0 2rem;
         flex-shrink: 0;
-        padding: 0.65rem 1.3rem;
-        border: none;
-        border-radius: 9px;
-        background: linear-gradient(135deg, var(--accent-warm), #a855f7);
-        color: #fff;
-        font-weight: 700;
-        font-size: 0.85rem;
-        box-shadow: 0 10px 20px -8px rgba(168,85,247,0.5);
-        transition: transform 0.15s ease, filter 0.15s ease;
     }
-    #saveOrderBtn:hover { transform: translateY(-1px); filter: brightness(1.07); }
-    #orderStatus { font-size: 0.85rem; color: var(--ink-light); min-height: 1.2em; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; font-weight: 600; color: var(--ink); }
+    .breadcrumb span { color: var(--ink-light); font-weight: 400; font-size: 0.9rem; }
+    .topbar-actions { display: flex; align-items: center; gap: 1rem; }
+    .icon-btn { position: relative; width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: var(--ink-soft); display: flex; align-items: center; justify-content: center; }
+    .icon-btn:hover { background: var(--border-light); }
+    .icon-btn .badge { position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; background: var(--primary); border-radius: 50%; }
+    .visit-site-btn {
+        display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem;
+        border: 1px solid var(--primary-light); color: var(--primary-dark);
+        border-radius: 8px; font-weight: 600; font-size: 0.85rem; background: rgba(99,102,241,0.05); text-decoration: none;
+    }
+    .visit-site-btn:hover { background: rgba(99,102,241,0.1); }
 
-    /* ---------- CREATE NEW PAGE CARD ---------- */
-    #createPageSection {
+    .content-scroll {
+        flex: 1;
+        overflow-y: auto;
+        padding: 2rem;
+    }
+    .dashboard-grid {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    /* Cards shared */
+    .panel-card {
         background: var(--card-bg);
         border: 1px solid var(--border);
         border-radius: var(--radius);
-        padding: 1.5rem 1.6rem 1.75rem 1.6rem;
+        padding: 1.5rem;
         box-shadow: var(--shadow-sm);
     }
-    #createPageSection h2 { border: none; padding-bottom: 0; margin-bottom: 1.1rem; }
-    .create-page-form {
-        display: flex;
-        flex-direction: column;
-        gap: 0.9rem;
-        max-width: 480px;
-    }
-    .cp-field label {
-        display: block;
-        font-size: 0.78rem;
-        font-weight: 700;
-        color: var(--ink-light);
-        margin-bottom: 0.35rem;
-    }
-    .cp-field input, .cp-field select {
-        width: 100%;
-        padding: 0.65rem 0.8rem;
-        border: 1.5px solid var(--border);
-        border-radius: 9px;
-        font-size: 0.9rem;
-        outline: none;
-        background: #fbfbfe;
-        transition: border-color 0.15s ease, box-shadow 0.15s ease;
-    }
-    .cp-field input:focus, .cp-field select:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 4px rgba(99,102,241,0.14);
-        background: #fff;
-    }
-    #cpCreateBtn {
-        align-self: flex-start;
-        padding: 0.65rem 1.3rem;
-        border: none;
-        border-radius: 9px;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-        color: #fff;
-        font-weight: 700;
-        font-size: 0.85rem;
-        box-shadow: 0 10px 20px -8px rgba(67,56,202,0.5);
-        transition: transform 0.15s ease, filter 0.15s ease;
-    }
-    #cpCreateBtn:hover { transform: translateY(-1px); filter: brightness(1.07); }
-    .cp-status {
-        font-size: 0.85rem;
-        color: var(--ink-light);
-        min-height: 1.2em;
-        line-height: 1.5;
-    }
+    .panel-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+    .panel-card-title { font-size: 1.1rem; font-weight: 600; color: var(--ink); margin-bottom: 0.25rem; }
+    .panel-card-subtitle { font-size: 0.85rem; color: var(--ink-light); }
 
-    /* ---------- EDITOR VIEW ---------- */
-    #editorView { min-height: 100vh; display: flex; flex-direction: column; }
+    /* Welcome Hero */
+    .welcome-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+    .welcome-hero { position: relative; overflow: hidden; padding: 2rem; }
+    .welcome-hero::after {
+        content: ''; position: absolute; top: -50px; right: -50px; width: 300px; height: 300px;
+        background: radial-gradient(circle, rgba(99,102,241,0.08) 0%, rgba(255,255,255,0) 70%); border-radius: 50%; pointer-events: none;
+    }
+    .welcome-hero h2 { font-size: 1.75rem; font-weight: 700; color: var(--ink); margin-bottom: 0.5rem; }
+    .welcome-hero p { color: var(--ink-light); font-size: 0.95rem; margin-bottom: 2rem; }
+    
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    .stat-box { border: 1px solid var(--border-light); border-radius: 10px; padding: 1.25rem 1rem; display: flex; align-items: center; gap: 1rem; background: white; }
+    .stat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+    .stat-icon.purple { background: rgba(99,102,241,0.1); color: var(--primary); }
+    .stat-icon.green { background: rgba(16,185,129,0.1); color: var(--success); }
+    .stat-icon.blue { background: rgba(6,182,212,0.1); color: var(--accent); }
+    .stat-icon.orange { background: rgba(245,158,11,0.1); color: #f59e0b; }
+    .stat-info strong { display: block; font-size: 1.25rem; font-weight: 700; color: var(--ink); line-height: 1; margin-bottom: 0.25rem; }
+    .stat-info span { font-size: 0.75rem; color: var(--ink-light); font-weight: 500; }
+
+    /* Quick Access */
+    .quick-access-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1rem; }
+    .qa-card {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 1.25rem; border: 1px solid var(--border); border-radius: 10px;
+        background: var(--card-bg); text-decoration: none; color: var(--ink); transition: all 0.2s;
+    }
+    .qa-card:hover { border-color: var(--primary-light); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .qa-content { display: flex; align-items: center; gap: 1rem; }
+    .qa-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .qa-info h3 { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.15rem; }
+    .qa-info p { font-size: 0.75rem; color: var(--ink-light); }
+    .qa-arrow { color: var(--primary); }
+
+    /* Existing Tool Wrappers styled to match */
+    #orderControls {
+        border: none; padding: 0; box-shadow: none; display: flex; flex-direction: column; height: 100%; justify-content: center;
+    }
+    #orderControls .oc-row { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.5rem; }
+    #orderControls h2 { font-size: 1.1rem; font-weight: 600; color: var(--ink); margin-bottom: 0.25rem; border: none; padding: 0; }
+    #orderControls p.oc-desc { font-size: 0.85rem; color: var(--ink-light); line-height: 1.4; margin-bottom: 1.5rem; }
+    #saveOrderBtn {
+        padding: 0.5rem 1rem; border: none; border-radius: 6px; background: var(--primary); color: white;
+        font-weight: 600; font-size: 0.85rem; transition: background 0.2s;
+    }
+    #saveOrderBtn:hover { background: var(--primary-dark); }
+    #orderStatus { font-size: 0.8rem; color: var(--primary); margin-top: 0.5rem; }
+
+    #createPageSection { background: transparent; border: none; padding: 0; box-shadow: none; margin-bottom: 2rem; }
+    #createPageSection h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: var(--ink); }
+    .create-page-form { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-width: 100%; }
+    .cp-field label { font-size: 0.8rem; font-weight: 600; color: var(--ink-soft); margin-bottom: 0.4rem; display: block; }
+    .cp-field input, .cp-field select { width: 100%; padding: 0.65rem 0.8rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; background: #fff; }
+    .cp-field input:focus, .cp-field select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99,102,241,0.15); outline: none; }
+    #cpCreateBtn { padding: 0.65rem 1.25rem; border: none; border-radius: 8px; background: rgba(99,102,241,0.1); color: var(--primary-dark); font-weight: 600; font-size: 0.9rem; transition: background 0.2s; align-self: flex-end; height: 42px; }
+    #cpCreateBtn:hover { background: var(--primary); color: white; }
+
+    /* File Grid Styles to match UI */
+    .file-section { margin-bottom: 2rem; }
+    .file-section h2 {
+        font-size: 0.95rem; font-weight: 600; color: var(--ink); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;
+        padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-light);
+    }
+    .fs-drag-handle { cursor: grab; color: var(--ink-light); }
+    .file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+    .file-grid.drag-over { outline: 2px dashed var(--primary-light); outline-offset: 4px; border-radius: 8px; }
+    
+    .file-card {
+        background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 1rem;
+        display: flex; align-items: center; justify-content: space-between; transition: all 0.2s; position: relative;
+    }
+    .file-card:hover { border-color: var(--primary-light); box-shadow: var(--shadow-sm); }
+    .file-card.dragging { opacity: 0.4; }
+    .fc-drag-handle { cursor: grab; color: var(--ink-light); margin-right: 0.75rem; }
+    .fc-drag-handle:hover { color: var(--primary); }
+    .fc-info { flex: 1; min-width: 0; }
+    .fc-title { font-weight: 600; font-size: 0.95rem; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fc-name { font-size: 0.75rem; color: var(--ink-light); font-family: monospace; margin-top: 0.25rem; }
+    .fc-actions { display: flex; align-items: center; gap: 0.5rem; }
+    
+    .fc-badge {
+        font-size: 0.7rem; font-weight: 600; padding: 0.25rem 0.6rem; border-radius: 20px;
+        background: var(--success-bg); color: var(--success); border: 1px solid rgba(16,185,129,0.2);
+    }
+    .fc-draft-badge { background: #fffbeb; color: #d97706; border-color: #fde68a; }
+    
+    .fc-edit {
+        background: none; border: none; color: var(--ink-light); padding: 0.4rem; border-radius: 6px; display: flex; align-items: center; justify-content: center;
+    }
+    .fc-edit:hover { background: rgba(99,102,241,0.1); color: var(--primary); }
+    .fc-edit svg { width: 1.1em; height: 1.1em; }
+    .fc-edit span { display: none; } /* Hide text, icon only like image */
+
+    /* ---------- EDITOR VIEW (Kept largely intact but recolored) ---------- */
+    #editorView { min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); }
     .editor-toolbar {
-        display: flex;
-        align-items: center;
-        gap: 0.85rem;
-        padding: 0.9rem 1.5rem;
-        background: linear-gradient(120deg, #12142a 0%, #1c1f3a 55%, #241a3d 100%);
-        color: #fff;
-        flex-wrap: wrap;
-        box-shadow: 0 2px 18px rgba(15,17,23,0.18);
+        display: flex; align-items: center; gap: 0.85rem; padding: 0.75rem 1.5rem; background: var(--sidebar-bg);
+        border-bottom: 1px solid var(--border); color: var(--ink); flex-wrap: wrap;
     }
-    .editor-toolbar .back-btn {
-        background: rgba(255,255,255,0.08);
-        border: 1px solid rgba(255,255,255,0.16);
-        color: #e2e8f0;
-        padding: 0.55rem 0.9rem;
-        border-radius: 9px;
-        font-size: 0.82rem;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 0.3rem;
-        transition: background-color 0.15s ease, transform 0.15s ease;
-    }
-    .editor-toolbar .back-btn:hover { background: rgba(255,255,255,0.16); transform: translateX(-2px); }
-    .editor-toolbar .et-title {
-        font-weight: 700;
-        font-size: 0.95rem;
-        margin-right: auto;
-        color: #f1f5f9;
-    }
-    .editor-toolbar .et-status {
-        font-size: 0.8rem;
-        color: #a5adc6;
-        flex-basis: 100%;
-    }
-    .editor-toolbar .et-actions { display: flex; gap: 0.55rem; }
-    .editor-toolbar button.action {
-        border: none;
-        border-radius: 9px;
-        padding: 0.55rem 0.95rem;
-        font-weight: 700;
-        font-size: 0.82rem;
-        display: flex;
-        align-items: center;
-        gap: 0.35rem;
-        transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
-    }
-    .editor-toolbar button.action:hover { transform: translateY(-1px); }
-    .btn-save { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; box-shadow: 0 8px 18px -8px rgba(99,102,241,0.6); }
-    .btn-save:hover { filter: brightness(1.08); }
+    .editor-toolbar .back-btn { background: var(--bg); border: 1px solid var(--border); color: var(--ink-soft); padding: 0.5rem 0.8rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 0.3rem; }
+    .editor-toolbar .back-btn:hover { background: var(--border-light); }
+    .editor-toolbar .et-title { font-weight: 600; font-size: 1rem; margin-right: auto; color: var(--ink); }
+    .editor-toolbar .et-status { font-size: 0.8rem; color: var(--ink-light); flex-basis: 100%; }
+    .editor-toolbar .et-actions { display: flex; gap: 0.5rem; }
+    .editor-toolbar button.action { border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem 0.8rem; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 0.35rem; background: white; color: var(--ink-soft); }
+    .editor-toolbar button.action:hover { background: var(--bg); }
+    .btn-save { background: var(--primary) !important; color: white !important; border-color: var(--primary-dark) !important; }
+    .btn-save:hover { background: var(--primary-dark) !important; }
+    .btn-github { background: #1b1f27 !important; color: white !important; border-color: #05070c !important; }
+    .btn-github:hover { background: #000 !important; }
 
-    /* New GitHub Button Styles */
-    .btn-github { background: #1b1f27; color: #fff; border: 1px solid #2c313d; }
-    .btn-github:hover { background: #05070c; border-color: #05070c; }
+    .format-toolbar { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1.5rem; background: #fff; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+    .format-toolbar .fmt-label { color: var(--ink-light); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-right: 0.5rem; }
+    .fmt-btn { min-width: 32px; height: 32px; border: 1px solid var(--border); border-radius: 6px; background: #fff; color: var(--ink-soft); font-weight: 600; }
+    .fmt-btn:hover { background: var(--bg); color: var(--ink); }
+    .fmt-sep { width: 1px; height: 20px; background: var(--border); margin: 0 0.2rem; }
 
-    .btn-discard { background: #2a2f45; color: #e2e8f0; }
-    .btn-discard:hover { background: #363c58; }
+    #editorFrame { flex: 1; width: 100%; border: none; background: #fff; }
 
-    .btn-undo, .btn-redo { background: #202538; color: #e2e8f0; }
-    .btn-undo:hover, .btn-redo:hover { background: #2c324a; }
-    .btn-undo:disabled, .btn-redo:disabled { opacity: 0.35; cursor: not-allowed; }
-    .btn-undo:disabled:hover, .btn-redo:disabled:hover { background: #202538; }
-
-    /* ---------- FORMAT TOOLBAR ---------- */
-    .format-toolbar {
-        display: flex;
-        align-items: center;
-        gap: 0.45rem;
-        padding: 0.6rem 1.5rem;
-        background: #171a2c;
-        border-top: 1px solid #2b2f45;
-        flex-wrap: wrap;
-    }
-    .format-toolbar .fmt-label {
-        color: #8b93b0;
-        font-size: 0.75rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        margin-right: 0.3rem;
-    }
-    .fmt-btn {
-        min-width: 34px;
-        height: 34px;
-        padding: 0 0.65rem;
-        border: 1px solid #33395a;
-        border-radius: 8px;
-        background: #12142a;
-        color: #e2e8f0;
-        font-size: 0.88rem;
-        font-weight: 700;
-        transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
-    }
-    .fmt-btn:hover { background: linear-gradient(135deg, var(--primary), var(--accent)); border-color: transparent; color: #fff; transform: translateY(-1px); }
-    .fmt-sep {
-        width: 1px;
-        height: 22px;
-        background: #33395a;
-        margin: 0 0.3rem;
-    }
-
-    #editorFrame {
-        flex: 1;
-        width: 100%;
-        border: none;
-        background: #fff;
-    }
-
-    /* ---------- RESPONSIVE / MOBILE ---------- */
     @media (max-width: 900px) {
-        .dashboard-body { padding: 1.5rem; }
-        .file-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
-    }
-
-    @media (max-width: 720px) {
-        /* Login screen */
-        #loginScreen { padding: 1rem; }
-        .login-card { padding: 1.85rem 1.5rem; max-width: 100%; }
-        .login-card h1 { font-size: 1.25rem; }
-
-        /* Dashboard header */
-        .admin-header {
-            flex-wrap: wrap;
-            row-gap: 0.6rem;
-            padding: 0.85rem 1rem;
-        }
-        .admin-header h1 { font-size: 0.95rem; }
-        .admin-header .logout-btn { padding: 0.45rem 0.8rem; font-size: 0.78rem; }
-
-        .dashboard-body { padding: 1.1rem; }
-        .dashboard-body > p.intro { font-size: 0.92rem; margin-bottom: 1.5rem; }
-        .file-section h2 { font-size: 0.76rem; }
-        .file-grid { grid-template-columns: 1fr; gap: 0.7rem; }
-        .file-card { padding: 1rem; }
-
-        /* Editor toolbar: title takes its own full-width row, action
-           buttons become a horizontally-scrollable strip so nothing
-           gets clipped or forces the page to zoom out on a phone. */
-        .editor-toolbar {
-            padding: 0.65rem 0.85rem;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-        .editor-toolbar .back-btn {
-            order: 1;
-            font-size: 0.78rem;
-            padding: 0.45rem 0.7rem;
-        }
-        .editor-toolbar .et-title {
-            order: 3;
-            flex-basis: 100%;
-            margin-right: 0;
-            font-size: 0.85rem;
-            white-space: normal;
-            word-break: break-word;
-        }
-        .editor-toolbar .et-actions {
-            order: 4;
-            flex-basis: 100%;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            padding-bottom: 0.2rem;
-            scrollbar-width: thin;
-        }
-        .editor-toolbar .et-actions button.action {
-            flex: 0 0 auto;
-            white-space: nowrap;
-            font-size: 0.76rem;
-            padding: 0.45rem 0.7rem;
-        }
-        .editor-toolbar .et-status {
-            order: 5;
-            font-size: 0.75rem;
-        }
-
-        /* Format toolbar: horizontally scrollable, hide the long hint
-           text that doesn't fit on a phone screen. */
-        .format-toolbar {
-            padding: 0.5rem 0.85rem;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        .format-toolbar .fmt-label:last-child { display: none; }
-        .fmt-btn { flex: 0 0 auto; min-width: 32px; height: 32px; }
-
-        #editorFrame { min-height: 0; }
-    }
-
-    @media (max-width: 480px) {
-        .login-card { padding: 1.5rem 1.1rem; }
-        .login-card h1 { font-size: 1.1rem; }
-        .login-btn { padding: 0.7rem; font-size: 0.9rem; }
-
-        .admin-header h1 svg { display: none; }
-        .admin-header h1 { font-size: 0.85rem; }
-
-        .file-card .fc-title { font-size: 0.9rem; }
-        .file-card .fc-name { font-size: 0.72rem; }
-        .file-card .fc-edit { font-size: 0.78rem; padding: 0.35rem 0.7rem; }
-
-        .editor-toolbar .back-btn span,
-        .editor-toolbar .back-btn { font-size: 0.74rem; }
-    }
-
-    /* Larger, easier-to-tap hit areas on touch devices */
-    @media (hover: none) and (pointer: coarse) {
-        .fc-edit, .logout-btn, .back-btn, button.action, .fmt-btn,
-        .password-toggle-btn, .login-btn {
-            min-height: 40px;
-        }
+        .welcome-grid { grid-template-columns: 1fr; }
+        .stats-row { grid-template-columns: repeat(2, 1fr); }
+        .quick-access-grid { grid-template-columns: repeat(2, 1fr); }
+        .create-page-form { grid-template-columns: 1fr; }
     }
 </style>
 </head>
@@ -712,18 +393,19 @@
     <!-- ================= LOGIN SCREEN ================= -->
     <div id="loginScreen">
         <form class="login-card" id="loginForm">
-            <h1><svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> FracSTAT Docs Admin</h1>
-            <p class="sub">Sign in to edit the documentation pages in your browser.</p>
+            <div class="logo-icon">Fs</div>
+            <h1>Welcome Back</h1>
+            <p class="sub">Sign in to FracSTAT Admin Panel</p>
 
             <div class="field">
                 <label for="loginUser">Username</label>
-                <input type="text" id="loginUser" autocomplete="username" required>
+                <input type="text" id="loginUser" autocomplete="username" placeholder="Enter username" required>
             </div>
             <div class="field">
                 <label for="loginPass">Password</label>
                 <div class="password-wrap">
-                    <input type="password" id="loginPass" autocomplete="current-password" required>
-                    <button type="button" class="password-toggle-btn" id="togglePasswordBtn" aria-label="Show password" title="Show password">
+                    <input type="password" id="loginPass" autocomplete="current-password" placeholder="Enter password" required>
+                    <button type="button" class="password-toggle-btn" id="togglePasswordBtn">
                         <svg id="eyeIconOpen" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                         <svg id="eyeIconClosed" viewBox="0 0 24 24" style="display:none;"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
                     </button>
@@ -732,88 +414,209 @@
 
             <button type="submit" class="login-btn">Sign In</button>
             <div id="loginError"></div>
-
-            <div class="login-hint">
-                This is a temporary in-browser editor for the developer's own use.
-            </div>
         </form>
     </div>
 
-    <!-- ================= DASHBOARD ================= -->
+    <!-- ================= DASHBOARD (NEW LAYOUT) ================= -->
     <div id="dashboard" class="hidden">
-        <div class="admin-header">
-            <h1><svg class="svg-icon" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg> FracSTAT Docs — Admin Panel</h1>
-            <button class="logout-btn" id="logoutBtn">Log Out</button>
-        </div>
-        <div class="dashboard-body">
-            <!-- <p class="intro">
-                Pick a page below to open it for editing. You'll be able to click directly
-                into any paragraph, heading, table cell, code snippet, or note/tip box to
-                change its text, and hover an image to replace it. Hover any block to
-                reveal move / duplicate / delete controls, and click the small "+" bar
-                between blocks to insert a new paragraph, heading, list, table, code
-                snippet, note box, tip box, or image anywhere on the page — including
-                directly above or below the code snippet area. Tables get their own
-                "+ Row / − Row / + Col / − Col" controls. When you're done, use
-                "Download Page" to export the updated file and upload it back to your site.
-            </p>  -->
-            <div id="orderControls">
-                <div class="oc-row">
-                    <h2>Sidebar Order</h2>
-                    <button type="button" id="saveOrderBtn">💾 Save Order to Sidebar</button>
-                </div>
-                <p class="oc-desc">
-                    Drag any page card below — within its section, or straight into a different section —
-                    to change the order pages appear in the live sidebar and in the Previous/Next
-                    navigation at the bottom of every docs page. Reordering here is instant on screen but
-                    stays local until you click "Save Order to Sidebar", which pushes the new order to
-                    <code>script.js</code> (sidebar + page order) and <code>admin.html</code>'s own page
-                    registry in a single commit.
-                </p>
-                <div id="orderStatus"></div>
-            </div>
-
-            <div class="file-section" id="createPageSection">
-                <h2>Create New Page</h2>
-                <div class="create-page-form">
-                    <div class="cp-field">
-                        <label for="cpTitle">Page Title</label>
-                        <input type="text" id="cpTitle" placeholder="e.g. Static Foo Tab">
-                    </div>
-                    <div class="cp-field">
-                        <label for="cpFilename">Filename</label>
-                        <input type="text" id="cpFilename" placeholder="e.g. docs_static_foo.html">
-                    </div>
-                    <div class="cp-field">
-                        <label for="cpSection">Sidebar Section</label>
-                        <select id="cpSection"></select>
-                    </div>
-                    <div class="cp-field" id="cpNewSectionWrap" style="display:none;">
-                        <label for="cpNewSectionName">New Section Name</label>
-                        <input type="text" id="cpNewSectionName" placeholder="e.g. My New Group">
-                    </div>
-                    <div class="cp-field">
-                        <label for="cpSidebarLabel">Sidebar Link Text</label>
-                        <input type="text" id="cpSidebarLabel" placeholder="e.g. Foo Tab">
-                    </div>
-                    <button type="button" id="cpCreateBtn">+ Create Page</button>
-                    <div id="cpStatus" class="cp-status"></div>
+        
+        <!-- Sidebar -->
+        <aside class="app-sidebar">
+            <div class="sidebar-header">
+                <div class="brand-logo">Fs</div>
+                <div class="brand-text">
+                    <strong>FracSTAT</strong>
+                    <span>Admin Panel</span>
                 </div>
             </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">Content Management</div>
+                <a class="nav-item active"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> Dashboard</a>
+                <a class="nav-item" href="#fileSections"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> All Pages</a>
+                <a class="nav-item" href="#createPageSection"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg> Create New Page</a>
+                <a class="nav-item" href="#orderControls"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg> Sidebar Order</a>
 
-            <div id="fileSections"></div>
-        </div>
+                <div class="nav-section">Analysis Modules</div>
+                <a class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Static Analyzer</a>
+                <a class="nav-item"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg> Dynamic Analyzer</a>
+                <a class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 12h4l3-9 5 18 3-9h5"></path></svg> Uncertainty Analyzer</a>
+
+                <div class="nav-section">Quick Links</div>
+                <a class="nav-item" href="introduction.html" target="_blank"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg> View Documentation <svg class="external-icon" viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                <a class="nav-item" href="index.html" target="_blank"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg> Visit Website <svg class="external-icon" viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-card">
+                    <div class="user-avatar">A</div>
+                    <div class="user-info">
+                        <strong>Admin</strong>
+                        <span>Administrator</span>
+                    </div>
+                </div>
+                <button class="logout-btn" id="logoutBtn">
+                    <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    Log Out
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="breadcrumb">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                    Dashboard <span>› Overview & Management</span>
+                </div>
+                <div class="topbar-actions">
+                    <button class="icon-btn">
+                        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                        <span class="badge"></span>
+                    </button>
+                    <a href="index.html" target="_blank" class="visit-site-btn">Visit Site <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>
+                </div>
+            </header>
+
+            <!-- Scrollable Content -->
+            <div class="content-scroll">
+                <div class="dashboard-grid">
+                    
+                    <!-- Welcome Row -->
+                    <div class="welcome-grid">
+                        <div class="panel-card welcome-hero">
+                            <h2 style="display:flex; align-items:center; gap:8px;">Welcome back, Admin <span style="font-size:24px;">👋</span></h2>
+                            <p>Here's what's happening with your documentation today.</p>
+                            
+                            <div class="stats-row">
+                                <div class="stat-box">
+                                    <div class="stat-icon purple"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg></div>
+                                    <div class="stat-info"><strong>24</strong><span>Total Pages</span></div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-icon green"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
+                                    <div class="stat-info"><strong>15</strong><span>Published</span></div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-icon blue"><svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg></div>
+                                    <div class="stat-info"><strong>9</strong><span>Modules</span></div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-icon orange"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div>
+                                    <div class="stat-info"><strong>2</strong><span>Drafts</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Functional Order Controls integrated -->
+                        <div class="panel-card" id="orderControls">
+                            <div class="oc-row">
+                                <h2>Sidebar Order</h2>
+                                <button type="button" id="saveOrderBtn">Manage Order</button>
+                            </div>
+                            <p class="oc-desc">Reorder your documentation pages in the sidebar navigation via drag and drop below.</p>
+                            <div id="orderStatus"></div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Access Links -->
+                    <div class="panel-card">
+                        <div class="panel-card-header" style="margin-bottom:0;">
+                            <div>
+                                <h3 class="panel-card-title">Quick Access</h3>
+                                <p class="panel-card-subtitle">Common actions to manage your documentation efficiently.</p>
+                            </div>
+                        </div>
+                        <div class="quick-access-grid">
+                            <a href="#createPageSection" class="qa-card">
+                                <div class="qa-content">
+                                    <div class="qa-icon" style="background:rgba(99,102,241,0.1); color:var(--primary);"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
+                                    <div class="qa-info"><h3>Create New Page</h3><p>Add a new page</p></div>
+                                </div>
+                                <svg class="qa-arrow" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            </a>
+                            <a href="#fileSections" class="qa-card">
+                                <div class="qa-content">
+                                    <div class="qa-icon" style="background:rgba(6,182,212,0.1); color:var(--accent);"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg></div>
+                                    <div class="qa-info"><h3>All Pages</h3><p>View and manage</p></div>
+                                </div>
+                                <svg class="qa-arrow" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            </a>
+                            <a href="#orderControls" class="qa-card">
+                                <div class="qa-content">
+                                    <div class="qa-icon" style="background:rgba(16,185,129,0.1); color:var(--success);"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg></div>
+                                    <div class="qa-info"><h3>Sidebar Order</h3><p>Reorder navigation</p></div>
+                                </div>
+                                <svg class="qa-arrow" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            </a>
+                            <a href="#" class="qa-card">
+                                <div class="qa-content">
+                                    <div class="qa-icon" style="background:rgba(245,158,11,0.1); color:#f59e0b;"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></div>
+                                    <div class="qa-info"><h3>Backup Content</h3><p>Export documentation</p></div>
+                                </div>
+                                <svg class="qa-arrow" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Main Editor & List Area -->
+                    <div class="panel-card" style="padding: 2rem;">
+                        <div class="panel-card-header">
+                            <div>
+                                <h3 class="panel-card-title">Pages Management</h3>
+                                <p class="panel-card-subtitle">Overview of all pages organized by modules. Drag to reorder.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Functional Create Page Form integrated -->
+                        <div class="file-section" id="createPageSection">
+                            <h2><svg viewBox="0 0 24 24" width="18" height="18"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg> Create New Page</h2>
+                            <div class="create-page-form">
+                                <div class="cp-field">
+                                    <label for="cpTitle">Page Title</label>
+                                    <input type="text" id="cpTitle" placeholder="e.g. Static Foo Tab">
+                                </div>
+                                <div class="cp-field">
+                                    <label for="cpFilename">Filename</label>
+                                    <input type="text" id="cpFilename" placeholder="e.g. docs_static_foo.html">
+                                </div>
+                                <div class="cp-field">
+                                    <label for="cpSection">Sidebar Section</label>
+                                    <select id="cpSection"></select>
+                                </div>
+                                <div class="cp-field" id="cpNewSectionWrap" style="display:none;">
+                                    <label for="cpNewSectionName">New Section Name</label>
+                                    <input type="text" id="cpNewSectionName" placeholder="e.g. My New Group">
+                                </div>
+                                <div class="cp-field">
+                                    <label for="cpSidebarLabel">Sidebar Link Text</label>
+                                    <input type="text" id="cpSidebarLabel" placeholder="e.g. Foo Tab">
+                                </div>
+                                <button type="button" id="cpCreateBtn">+ Create Page</button>
+                                <div id="cpStatus" class="cp-status" style="grid-column: 1 / -1; font-size:0.85rem; color:var(--ink-light);"></div>
+                            </div>
+                        </div>
+
+                        <!-- Functional File Sections rendering target -->
+                        <div id="fileSections"></div>
+                    </div>
+                    
+                    <footer style="text-align: center; padding: 2rem 0; color: var(--ink-light); font-size: 0.8rem;">
+                        <p>© 2026 FracSTAT. All rights reserved. &nbsp; | &nbsp; Admin Panel v2.0.0 &nbsp; | &nbsp; Built with 💜 for better documentation</p>
+                    </footer>
+                </div>
+            </div>
+        </main>
     </div>
 
-    <!-- ================= EDITOR VIEW ================= -->
+    <!-- ================= EDITOR VIEW (Kept for editing functionality) ================= -->
     <div id="editorView" class="hidden">
         <div class="editor-toolbar">
-            <button class="back-btn" id="backBtn"><svg class="svg-icon" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back to file list</button>
+            <button class="back-btn" id="backBtn"><svg class="svg-icon" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back to Dashboard</button>
             <div class="et-title" id="editorTitle">—</div>
             <div class="et-actions">
                 <button class="action btn-undo" id="undoBtn" title="Undo (Ctrl+Z)" disabled><svg class="svg-icon" viewBox="0 0 24 24"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg> Undo</button>
                 <button class="action btn-redo" id="redoBtn" title="Redo (Ctrl+Y)" disabled><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 7v6h-6"></path><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path></svg> Redo</button>
-                <button class="action btn-discard" id="discardBtn"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-9.21l5.75 4.64"></path></svg> Reload (discard changes)</button>
+                <button class="action btn-discard" id="discardBtn"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-9.21l5.75 4.64"></path></svg> Reload</button>
                 <button class="action btn-save" id="saveBtn"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download Page</button>
                 <button class="action btn-github" id="githubBtn"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg> Update In Github</button>
             </div>
@@ -829,12 +632,9 @@
             <button type="button" class="fmt-btn" id="fontDecBtn" title="Decrease font size">A−</button>
             <span class="fmt-sep"></span>
             <button type="button" class="fmt-btn" id="clearFmtBtn" title="Clear formatting">Clear</button>
-            <span class="fmt-sep"></span>
-            <span class="fmt-label" style="text-transform:none; font-weight:500; letter-spacing:normal;">Select text first, then click a button.</span>
         </div>
         <iframe id="editorFrame"></iframe>
     </div>
-
 <script>
 (function () {
     "use strict";
@@ -1624,13 +1424,17 @@
                 var draftBadge = PENDING_NEW_FILES.has(entry.file)
                     ? '<span class="fc-draft-badge">Draft — not pushed yet</span>' : "";
                 card.innerHTML =
-                    '<span class="fc-drag-handle" title="Drag to reorder">' +
-                        '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"></circle><circle cx="15" cy="6" r="1.5"></circle><circle cx="9" cy="12" r="1.5"></circle><circle cx="15" cy="12" r="1.5"></circle><circle cx="9" cy="18" r="1.5"></circle><circle cx="15" cy="18" r="1.5"></circle></svg>' +
-                    '</span>' +
+            '<div style="display:flex; align-items:center;">' +
+                '<span class="fc-drag-handle" title="Drag to reorder"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"></circle><circle cx="15" cy="6" r="1.5"></circle><circle cx="9" cy="12" r="1.5"></circle><circle cx="15" cy="12" r="1.5"></circle><circle cx="9" cy="18" r="1.5"></circle><circle cx="15" cy="18" r="1.5"></circle></svg></span>' +
+                '<div class="fc-info">' +
                     '<div class="fc-title">' + entry.label + '</div>' +
                     '<div class="fc-name">' + entry.file + '</div>' +
-                    draftBadge +
-                    '<button type="button" class="fc-edit"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> Edit Page</button>';
+                '</div>' +
+            '</div>' +
+            '<div class="fc-actions">' +
+                (PENDING_NEW_FILES.has(entry.file) ? '<span class="fc-badge fc-draft-badge">Draft</span>' : '<span class="fc-badge">Published</span>') +
+                '<button type="button" class="fc-edit" title="Edit Page"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>' +
+            '</div>';
                 card.querySelector(".fc-edit").addEventListener("click", function () {
                     openEditor(entry.file, entry.label);
                 });
@@ -3012,6 +2816,44 @@
         }
     }
 })();
+</script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
 </script>
 </body>
 </html>
