@@ -5,51 +5,58 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FracSTAT Docs — Admin Panel</title>
 <link rel="icon" type="image/png" href="https://res.cloudinary.com/hcaqjcqf/image/upload/v1784441772/akioq6cgnbsigsemtf0f.png">
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
     :root {
-        --primary: #6366f1;
-        --primary-light: #818cf8;
-        --primary-dark: #4338ca;
-        --accent: #06b6d4;
-        --accent-warm: #f472b6;
-        --ink: #0f1117;
-        --ink-soft: #1a1d2b;
-        --ink-light: #64748b;
-        --bg: #f4f5fb;
-        --card-bg: #ffffff;
-        --border: #e7e9f3;
+        /* Modern Professional Palette: Black, Grey, White, Blue, Green */
+        --primary: #2563eb; /* Blue */
+        --primary-light: #60a5fa;
+        --primary-dark: #1d4ed8;
+        --accent: #10b981; /* Green */
+        --ink: #111827; /* Dark Black/Grey */
+        --ink-soft: #374151; /* Medium Grey */
+        --ink-light: #6b7280; /* Light Grey */
+        --bg: #f3f4f6; /* Soft Grey Background */
+        --sidebar-bg: #ffffff; /* White */
+        --card-bg: #ffffff; /* White */
+        --border: #e5e7eb;
+        --border-light: #f9fafb;
         --danger: #ef4444;
-        --success: #10b981;
-        --shadow-sm: 0 1px 2px rgba(15, 17, 23, 0.05);
-        --shadow-md: 0 8px 24px -8px rgba(67, 56, 202, 0.18);
-        --shadow-lg: 0 24px 48px -16px rgba(15, 17, 23, 0.22);
-        --radius: 16px;
+        --success: #10b981; /* Green */
+        --success-bg: #ecfdf5;
+        --shadow-sm: 0 1px 2px rgba(17, 24, 39, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(17, 24, 39, 0.05), 0 2px 4px -2px rgba(17, 24, 39, 0.05);
+        --shadow-lg: 0 10px 15px -3px rgba(17, 24, 39, 0.05), 0 4px 6px -4px rgba(17, 24, 39, 0.05);
+        --radius: 12px;
+        --radius-lg: 16px;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+
+    html { scroll-behavior: smooth; }
+
     body {
-        background:
-            radial-gradient(1100px 600px at 8% -10%, rgba(99,102,241,0.14) 0%, rgba(99,102,241,0) 60%),
-            radial-gradient(900px 500px at 105% 10%, rgba(6,182,212,0.14) 0%, rgba(6,182,212,0) 55%),
-            var(--bg);
+        background-color: var(--bg);
         color: var(--ink);
         min-height: 100vh;
+        overflow-x: hidden;
     }
 
-    /* ---------- shared bits ---------- */
     .hidden { display: none !important; }
     button { cursor: pointer; font-family: inherit; }
-    ::selection { background: rgba(99,102,241,0.25); }
+    ::selection { background: rgba(37,99,235,0.25); }
 
-    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #cbd1e6; border-radius: 8px; }
-    ::-webkit-scrollbar-thumb:hover { background: #aab1cf; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+    ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
 
     .svg-icon {
         display: inline-block;
-        width: 1.1em;
-        height: 1.1em;
+        width: 1.2em;
+        height: 1.2em;
         vertical-align: -0.2em;
         fill: none;
         stroke: currentColor;
@@ -58,6 +65,40 @@
         stroke-linejoin: round;
     }
 
+    /* ---------- TOAST NOTIFICATIONS ---------- */
+    #toast-container {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .toast {
+        background: var(--ink);
+        color: white;
+        padding: 14px 20px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transform: translateX(120%);
+        animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        max-width: 350px;
+    }
+    
+    .toast.success { background: var(--success); color: white; }
+    .toast.error { background: var(--danger); color: white; }
+    .toast.info { background: var(--primary); color: white; }
+    
+    @keyframes slideIn { to { transform: translateX(0); } }
+    @keyframes fadeOut { to { opacity: 0; transform: translateY(10px); } }
+
     /* ---------- LOGIN SCREEN ---------- */
     #loginScreen {
         min-height: 100vh;
@@ -65,757 +106,612 @@
         align-items: center;
         justify-content: center;
         padding: 1.5rem;
-        position: relative;
-        overflow: hidden;
-    }
-    #loginScreen::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background:
-            radial-gradient(700px 420px at 15% 20%, rgba(99,102,241,0.20), transparent 60%),
-            radial-gradient(600px 380px at 85% 80%, rgba(244,114,182,0.16), transparent 60%),
-            radial-gradient(500px 320px at 90% 10%, rgba(6,182,212,0.16), transparent 55%);
-        z-index: 0;
+        background: radial-gradient(circle at center, #ffffff 0%, var(--bg) 100%);
     }
     .login-card {
-        position: relative;
-        z-index: 1;
         width: 100%;
-        max-width: 380px;
-        background: rgba(255,255,255,0.85);
-        backdrop-filter: blur(18px);
-        -webkit-backdrop-filter: blur(18px);
-        border: 1px solid rgba(255,255,255,0.6);
-        border-radius: 20px;
-        padding: 2.5rem 2.25rem;
+        max-width: 400px;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 2.5rem;
         box-shadow: var(--shadow-lg);
-        animation: cardIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        text-align: center;
     }
-    @keyframes cardIn {
-        from { opacity: 0; transform: translateY(14px) scale(0.98); }
-        to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-    .login-card h1 {
-        font-size: 1.5rem;
-        margin-bottom: 0.4rem;
-        letter-spacing: -0.02em;
-        display: flex;
-        align-items: center;
-        gap: 0.55rem;
-        color: var(--ink);
-    }
-    .login-card h1 svg {
-        width: 1.3em; height: 1.3em;
-        padding: 6px;
-        border-radius: 10px;
-        background: linear-gradient(135deg, var(--primary), var(--accent));
-        stroke: #fff;
-        box-shadow: 0 6px 16px -4px rgba(99,102,241,0.5);
-    }
-    .login-card p.sub {
-        color: var(--ink-light);
-        font-size: 0.92rem;
-        margin-bottom: 2rem;
-    }
-    .field { margin-bottom: 1.2rem; }
-    .field label {
-        display: block;
-        font-size: 0.8rem;
-        font-weight: 700;
-        color: var(--ink-light);
-        margin-bottom: 0.4rem;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-    }
-    .field input {
-        width: 100%;
-        padding: 0.75rem 0.9rem;
-        border: 1.5px solid var(--border);
-        border-radius: 10px;
-        font-size: 0.95rem;
-        outline: none;
-        background: #fbfbfe;
-        transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
-    }
-    .field input:focus {
-        border-color: var(--primary);
-        background: #fff;
-        box-shadow: 0 0 0 4px rgba(99,102,241,0.14);
-    }
-    .password-wrap {
-        position: relative;
-    }
-    .password-wrap input {
-        padding-right: 2.6rem;
-    }
-    .password-toggle-btn {
-        position: absolute;
-        top: 50%;
-        right: 0.5rem;
-        transform: translateY(-50%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 30px;
-        height: 30px;
-        padding: 0;
-        border: none;
-        background: transparent;
-        border-radius: 8px;
-        color: var(--ink-light);
-        transition: color 0.15s ease, background-color 0.15s ease;
-    }
-    .password-toggle-btn:hover {
-        color: var(--primary);
-        background-color: rgba(99,102,241,0.1);
-    }
-    .password-toggle-btn svg {
-        width: 18px;
-        height: 18px;
-        fill: none;
-        stroke: currentColor;
-        stroke-width: 2;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-    }
-    .login-btn {
-        width: 100%;
-        padding: 0.8rem;
-        border: none;
-        border-radius: 10px;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-        color: #fff;
-        font-weight: 700;
-        font-size: 0.98rem;
-        margin-top: 0.5rem;
-        box-shadow: 0 10px 22px -8px rgba(67,56,202,0.55);
-        transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
-    }
-    .login-btn:hover { transform: translateY(-1px); filter: brightness(1.06); box-shadow: 0 14px 28px -8px rgba(67,56,202,0.6); }
-    .login-btn:active { transform: translateY(0); }
-    #loginError {
-        color: var(--danger);
-        font-size: 0.85rem;
-        margin-top: 0.9rem;
-        min-height: 1.1em;
-        font-weight: 600;
-    }
-    .login-hint {
-        margin-top: 1.6rem;
-        padding-top: 1.2rem;
-        border-top: 1px solid var(--border);
-        font-size: 0.78rem;
-        color: #9aa1b5;
-        line-height: 1.5;
-    }
-
-    /* ---------- DASHBOARD ---------- */
-    #dashboard { min-height: 100vh; }
-    .admin-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 1.15rem 2rem;
-        background: linear-gradient(120deg, #12142a 0%, #1c1f3a 55%, #241a3d 100%);
-        color: #fff;
-        box-shadow: 0 2px 18px rgba(15,17,23,0.18);
-        position: sticky;
-        top: 0;
-        z-index: 30;
-    }
-    .admin-header h1 {
-        font-size: 1.12rem;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 0.6rem;
-        letter-spacing: -0.01em;
-    }
-    .admin-header h1 svg {
-        width: 1.25em; height: 1.25em;
-        padding: 5px;
-        border-radius: 8px;
-        background: linear-gradient(135deg, var(--primary), var(--accent));
-        stroke: #fff;
-    }
-    .admin-header .logout-btn {
-        background: rgba(255,255,255,0.08);
-        color: #e2e8f0;
-        border: 1px solid rgba(255,255,255,0.16);
-        padding: 0.55rem 1rem;
-        border-radius: 9px;
-        font-size: 0.82rem;
-        font-weight: 700;
-        transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
-    }
-    .admin-header .logout-btn:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.3); transform: translateY(-1px); }
-
-    .dashboard-body { padding: 2.25rem; max-width: 1160px; margin: 0 auto; }
-    .dashboard-body > p.intro {
-        color: var(--ink-light);
-        margin-bottom: 2.25rem;
-        max-width: 680px;
-        line-height: 1.6;
-        font-size: 0.98rem;
-    }
-
-    .file-section { margin-bottom: 2.5rem; }
-    .file-section h2 {
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: var(--primary-dark);
-        font-weight: 800;
-        margin-bottom: 1rem;
-        padding-bottom: 0.6rem;
-        border-bottom: 2px solid transparent;
-        border-image: linear-gradient(90deg, var(--primary), var(--accent), transparent) 1;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    .file-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-        gap: 1rem;
-    }
-    .file-card {
-        background: var(--card-bg);
-        border: 1px solid var(--border);
-        border-radius: 14px;
-        padding: 1.2rem 1.25rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.65rem;
-        position: relative;
-        overflow: hidden;
-        transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
-    }
-    .file-card::before {
-        content: "";
-        position: absolute;
-        top: 0; left: 0; right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, var(--primary), var(--accent));
-        opacity: 0;
-        transition: opacity 0.2s ease;
-    }
-    .file-card:hover {
-        box-shadow: var(--shadow-md);
-        transform: translateY(-3px);
-        border-color: rgba(99,102,241,0.3);
-    }
-    .file-card:hover::before { opacity: 1; }
-    .file-card .fc-title { font-weight: 700; font-size: 1rem; color: var(--ink); }
-    .file-card .fc-name {
-        font-size: 0.78rem;
-        color: #94a3b8;
-        font-family: 'Consolas', 'Monaco', monospace;
-        word-break: break-all;
-    }
-    .file-card .fc-edit {
-        margin-top: 0.35rem;
-        align-self: flex-start;
-        padding: 0.45rem 0.95rem;
-        border: none;
-        border-radius: 8px;
-        background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(6,182,212,0.12));
-        color: var(--primary-dark);
-        font-weight: 700;
-        font-size: 0.82rem;
-        display: flex;
-        align-items: center;
-        gap: 0.35rem;
-        transition: background 0.18s ease, color 0.18s ease, transform 0.15s ease;
-    }
-    .file-card .fc-edit:hover {
-        background: linear-gradient(135deg, var(--primary), var(--accent));
-        color: #fff;
-        transform: translateY(-1px);
-    }
-
-    .fc-draft-badge {
-        align-self: flex-start;
-        font-size: 0.72rem;
-        font-weight: 800;
-        color: #92400e;
-        background: linear-gradient(135deg, #fef3c7, #fde68a);
-        padding: 3px 9px;
-        border-radius: 999px;
-        box-shadow: var(--shadow-sm);
-    }
-
-    /* ---------- DRAG & DROP REORDERING ---------- */
-    .file-card[draggable="true"] { cursor: grab; }
-    .file-card.dragging { opacity: 0.4; cursor: grabbing; }
-    .file-card .fc-title { padding-right: 1.6rem; }
-    .file-card .fc-drag-handle {
-        position: absolute;
-        top: 0.65rem;
-        right: 0.7rem;
-        color: #c3c8de;
-        display: flex;
-        transition: color 0.15s ease;
-    }
-    .file-card:hover .fc-drag-handle { color: var(--primary); }
-    .file-card .fc-drag-handle svg { width: 16px; height: 16px; }
-    .file-grid {
-        transition: outline-color 0.15s ease;
+    .login-card .logo-icon {
+        width: 48px; height: 48px;
+        background: var(--primary);
+        color: white;
         border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.5rem; font-weight: 700;
+        margin: 0 auto 1.5rem auto;
     }
-    .file-grid.drag-over {
-        outline: 2px dashed rgba(99,102,241,0.45);
-        outline-offset: 8px;
+    .login-card h1 { font-size: 1.5rem; color: var(--ink); margin-bottom: 0.5rem; }
+    .login-card p.sub { color: var(--ink-light); font-size: 0.95rem; margin-bottom: 2rem; }
+    .field { margin-bottom: 1.25rem; text-align: left; }
+    .field label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--ink-soft); margin-bottom: 0.5rem; }
+    .field input { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.95rem; outline: none; transition: all 0.2s; }
+    .field input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+    .password-wrap { position: relative; }
+    .password-toggle-btn { position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--ink-light); }
+    .password-toggle-btn svg { width: 18px; height: 18px; }
+    .login-btn { width: 100%; padding: 0.85rem; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: 600; font-size: 1rem; transition: background 0.2s; }
+    .login-btn:hover { background: var(--primary-dark); }
+    #loginError { color: var(--danger); font-size: 0.85rem; margin-top: 1rem; font-weight: 500; min-height: 1.2em; }
+
+    /* ---------- NEW DASHBOARD LAYOUT ---------- */
+    #dashboard {
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+        position: relative;
     }
 
-    /* ---------- DRAG & DROP: WHOLE SECTIONS ---------- */
-    /* Mirrors the card-level dragging above, but for an entire sidebar
-       section (its heading + every card inside it) so whole groups can
-       be reordered relative to one another, not just the pages within
-       a single group. */
-    .file-section[draggable="true"] { cursor: grab; }
-    .file-section.dragging-section { opacity: 0.35; cursor: grabbing; }
-    .file-section h2 {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    .fs-drag-handle {
-        display: flex;
-        color: #c3c8de;
-        transition: color 0.15s ease;
-    }
-    .file-section:hover .fs-drag-handle { color: var(--primary); }
-    .fs-drag-handle svg { width: 16px; height: 16px; }
-    #fileSections {
-        transition: outline-color 0.15s ease;
-        border-radius: 14px;
-    }
-    #fileSections.drag-over-sections {
-        outline: 2px dashed rgba(244,114,182,0.45);
-        outline-offset: 10px;
-    }
-
-    /* ---------- SIDEBAR ORDER CARD ---------- */
-    #orderControls {
-        background: var(--card-bg);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        padding: 1.25rem 1.5rem;
-        box-shadow: var(--shadow-sm);
-        margin-bottom: 2.5rem;
+    /* Sidebar */
+    .app-sidebar {
+        width: 260px;
+        background: var(--sidebar-bg);
+        border-right: 1px solid var(--border);
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
+        flex-shrink: 0;
+        z-index: 20;
+        transition: transform 0.3s ease;
     }
-    #orderControls .oc-row {
+    
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(17, 24, 39, 0.5);
+        z-index: 15;
+    }
+
+    .sidebar-header {
+        height: 70px;
+        display: flex;
+        align-items: center;
+        padding: 0 1.5rem;
+        border-bottom: 1px solid var(--border-light);
+    }
+    .brand-logo {
+        width: 32px; height: 32px;
+        background: var(--primary);
+        color: white;
+        border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: 1.1rem;
+        margin-right: 0.75rem;
+    }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-text strong { font-size: 1rem; color: var(--ink); line-height: 1.2; }
+    .brand-text span { font-size: 0.75rem; color: var(--ink-light); }
+
+    .sidebar-nav {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1.5rem 1rem;
+    }
+    .nav-section {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--ink-light);
+        font-weight: 700;
+        margin: 1.5rem 0 0.5rem 0.75rem;
+    }
+    .nav-section:first-child { margin-top: 0; }
+    .nav-item {
+        display: flex;
+        align-items: center;
+        padding: 0.65rem 0.75rem;
+        color: var(--ink-soft);
+        font-size: 0.9rem;
+        font-weight: 500;
+        border-radius: 8px;
+        margin-bottom: 0.25rem;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .nav-item svg { margin-right: 0.75rem; color: var(--ink-light); width: 1.1em; height: 1.1em; }
+    .nav-item:hover { background: var(--border-light); color: var(--ink); }
+    .nav-item.active { background: rgba(37,99,235,0.08); color: var(--primary-dark); }
+    .nav-item.active svg { color: var(--primary); }
+    .nav-item .external-icon { margin-left: auto; width: 0.9em; height: 0.9em; opacity: 0.5; }
+
+    .sidebar-footer {
+        padding: 1rem;
+        border-top: 1px solid var(--border-light);
+    }
+    .user-card {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    .user-avatar {
+        width: 36px; height: 36px;
+        border-radius: 50%;
+        background: var(--primary);
+        color: white;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 600; margin-right: 0.75rem; position: relative;
+    }
+    .user-avatar::after {
+        content: ''; position: absolute; bottom: 0; right: 0;
+        width: 10px; height: 10px; background: var(--success); border: 2px solid white; border-radius: 50%;
+    }
+    .user-info { display: flex; flex-direction: column; }
+    .user-info strong { font-size: 0.9rem; color: var(--ink); }
+    .user-info span { font-size: 0.75rem; color: var(--ink-light); }
+    .logout-btn {
+        width: 100%; display: flex; align-items: center; padding: 0.65rem 0.75rem;
+        color: var(--ink-soft); font-size: 0.9rem; font-weight: 500; border: none; background: none; border-radius: 8px;
+    }
+    .logout-btn svg { margin-right: 0.75rem; width: 1.1em; height: 1.1em; color: var(--ink-light); }
+    .logout-btn:hover { background: var(--border-light); color: var(--danger); }
+
+    /* Main Content Area */
+    .app-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .topbar {
+        height: 70px;
+        background: var(--sidebar-bg);
+        border-bottom: 1px solid var(--border);
         display: flex;
         align-items: center;
         justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-    #orderControls h2 { border: none; padding-bottom: 0; margin-bottom: 0; }
-    #orderControls p.oc-desc { color: var(--ink-light); font-size: 0.9rem; margin: 0; max-width: 640px; line-height: 1.5; }
-    #saveOrderBtn {
+        padding: 0 2rem;
         flex-shrink: 0;
-        padding: 0.65rem 1.3rem;
-        border: none;
-        border-radius: 9px;
-        background: linear-gradient(135deg, var(--accent-warm), #a855f7);
-        color: #fff;
-        font-weight: 700;
-        font-size: 0.85rem;
-        box-shadow: 0 10px 20px -8px rgba(168,85,247,0.5);
-        transition: transform 0.15s ease, filter 0.15s ease;
     }
-    #saveOrderBtn:hover { transform: translateY(-1px); filter: brightness(1.07); }
-    #orderStatus { font-size: 0.85rem; color: var(--ink-light); min-height: 1.2em; }
+    .mobile-menu-btn {
+        display: none;
+        background: none;
+        border: none;
+        color: var(--ink);
+        font-size: 1.5rem;
+        margin-right: 1rem;
+    }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; font-weight: 600; color: var(--ink); }
+    .breadcrumb span { color: var(--ink-light); font-weight: 400; font-size: 0.9rem; }
+    .topbar-actions { display: flex; align-items: center; gap: 1rem; }
+    .icon-btn { position: relative; width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: var(--ink-soft); display: flex; align-items: center; justify-content: center; }
+    .icon-btn:hover { background: var(--border-light); }
+    .icon-btn .badge { position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; background: var(--primary); border-radius: 50%; }
+    .visit-site-btn {
+        display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem;
+        border: 1px solid var(--primary-light); color: var(--primary-dark);
+        border-radius: 8px; font-weight: 600; font-size: 0.85rem; background: rgba(37,99,235,0.05); text-decoration: none;
+    }
+    .visit-site-btn:hover { background: rgba(37,99,235,0.1); }
 
-    /* ---------- CREATE NEW PAGE CARD ---------- */
-    #createPageSection {
+    .content-scroll {
+        flex: 1;
+        overflow-y: auto;
+        padding: 2rem;
+    }
+    .dashboard-grid {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    /* Cards shared */
+    .panel-card {
         background: var(--card-bg);
         border: 1px solid var(--border);
         border-radius: var(--radius);
-        padding: 1.5rem 1.6rem 1.75rem 1.6rem;
+        padding: 1.5rem;
         box-shadow: var(--shadow-sm);
     }
-    #createPageSection h2 { border: none; padding-bottom: 0; margin-bottom: 1.1rem; }
-    .create-page-form {
-        display: flex;
-        flex-direction: column;
-        gap: 0.9rem;
-        max-width: 480px;
+    .panel-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;}
+    .panel-card-title { font-size: 1.1rem; font-weight: 600; color: var(--ink); margin-bottom: 0.25rem; }
+    .panel-card-subtitle { font-size: 0.85rem; color: var(--ink-light); }
+
+    /* Welcome Hero */
+    .welcome-grid { display: block; }
+    .welcome-hero { position: relative; overflow: hidden; padding: 2rem; }
+    .welcome-hero::after {
+        content: ''; position: absolute; top: -50px; right: -50px; width: 300px; height: 300px;
+        background: radial-gradient(circle, rgba(37,99,235,0.08) 0%, rgba(255,255,255,0) 70%); border-radius: 50%; pointer-events: none;
     }
-    .cp-field label {
-        display: block;
-        font-size: 0.78rem;
-        font-weight: 700;
-        color: var(--ink-light);
-        margin-bottom: 0.35rem;
+    .welcome-hero h2 { font-size: 1.75rem; font-weight: 700; color: var(--ink); margin-bottom: 0.5rem; }
+    .welcome-hero p { color: var(--ink-light); font-size: 0.95rem; margin-bottom: 2rem; }
+    
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    .stat-box { border: 1px solid var(--border-light); border-radius: 10px; padding: 1.25rem 1rem; display: flex; align-items: center; gap: 1rem; background: white; }
+    .stat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+    .stat-icon.purple { background: transparent; color: var(--primary); }
+    .stat-icon.green { background: transparent; color: var(--success); }
+    .stat-icon.blue { background: transparent; color: var(--primary); }
+    .stat-icon.orange { background: transparent; color: var(--ink-soft); }
+    .stat-info strong { display: block; font-size: 1.25rem; font-weight: 700; color: var(--ink); line-height: 1; margin-bottom: 0.25rem; }
+    .stat-info span { font-size: 0.75rem; color: var(--ink-light); font-weight: 500; }
+    
+    #saveOrderBtn {
+        padding: 0.5rem 1rem; border: none; border-radius: 6px; background: var(--primary); color: white;
+        font-weight: 600; font-size: 0.85rem; transition: background 0.2s; text-decoration: none; display: inline-flex; align-items: center; white-space: nowrap; flex-shrink: 0;
     }
-    .cp-field input, .cp-field select {
-        width: 100%;
-        padding: 0.65rem 0.8rem;
-        border: 1.5px solid var(--border);
-        border-radius: 9px;
-        font-size: 0.9rem;
-        outline: none;
-        background: #fbfbfe;
-        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    #saveOrderBtn:hover { background: var(--primary-dark); }
+    #orderStatus.oc-save-status { font-size: 0.8rem; color: var(--primary); margin-top: 0; }
+
+    #createPageSection { background: transparent; border: none; padding: 0; box-shadow: none; margin-bottom: 2rem; }
+    #createPageSection h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: var(--ink); }
+    .create-page-form { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-width: 100%; }
+    .cp-field label { font-size: 0.8rem; font-weight: 600; color: var(--ink-soft); margin-bottom: 0.4rem; display: block; }
+    .cp-field input, .cp-field select { width: 100%; padding: 0.65rem 0.8rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; background: #fff; }
+    .cp-field input:focus, .cp-field select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.15); outline: none; }
+    #cpCreateBtn { padding: 0.65rem 1.25rem; border: none; border-radius: 8px; background: rgba(37,99,235,0.1); color: var(--primary-dark); font-weight: 600; font-size: 0.9rem; transition: background 0.2s; align-self: flex-end; height: 42px; }
+    #cpCreateBtn:hover { background: var(--primary); color: white; }
+
+    /* File Grid Styles to match UI */
+    .file-section { margin-bottom: 2rem; }
+    .file-section h2 {
+        font-size: 0.95rem; font-weight: 600; color: var(--ink); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;
+        padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-light);
     }
-    .cp-field input:focus, .cp-field select:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 4px rgba(99,102,241,0.14);
-        background: #fff;
+    .fs-drag-handle { cursor: grab; color: var(--ink-light); }
+    .file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+    .file-grid.drag-over { outline: 2px dashed var(--primary-light); outline-offset: 4px; border-radius: 8px; }
+    
+    .file-card {
+        background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 1rem;
+        display: flex; align-items: center; justify-content: space-between; transition: all 0.2s; position: relative;
     }
-    #cpCreateBtn {
-        align-self: flex-start;
-        padding: 0.65rem 1.3rem;
-        border: none;
-        border-radius: 9px;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-        color: #fff;
-        font-weight: 700;
-        font-size: 0.85rem;
-        box-shadow: 0 10px 20px -8px rgba(67,56,202,0.5);
-        transition: transform 0.15s ease, filter 0.15s ease;
+    .file-card:hover { border-color: var(--primary-light); box-shadow: var(--shadow-sm); }
+    .file-card.dragging { opacity: 0.4; }
+    .fc-drag-handle { cursor: grab; color: var(--ink-light); margin-right: 0.75rem; }
+    .fc-drag-handle:hover { color: var(--primary); }
+    .fc-info { flex: 1; min-width: 0; }
+    .fc-title { font-weight: 600; font-size: 0.95rem; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fc-name { font-size: 0.75rem; color: var(--ink-light); font-family: monospace; margin-top: 0.25rem; }
+    .fc-actions { display: flex; align-items: center; gap: 0.5rem; }
+    
+    .fc-badge {
+        font-size: 0.7rem; font-weight: 600; padding: 0.25rem 0.6rem; border-radius: 20px;
+        background: var(--success-bg); color: var(--success); border: 1px solid rgba(16,185,129,0.2);
     }
-    #cpCreateBtn:hover { transform: translateY(-1px); filter: brightness(1.07); }
-    .cp-status {
-        font-size: 0.85rem;
-        color: var(--ink-light);
-        min-height: 1.2em;
-        line-height: 1.5;
+    .fc-draft-badge { background: #f3f4f6; color: var(--ink-soft); border-color: var(--border); }
+    
+    .fc-edit {
+        background: none; border: none; color: var(--ink-light); padding: 0.4rem; border-radius: 6px; display: flex; align-items: center; justify-content: center;
     }
+    .fc-edit:hover { background: rgba(37,99,235,0.1); color: var(--primary); }
+    .fc-edit svg { width: 1.1em; height: 1.1em; }
+    .fc-edit span { display: none; }
 
     /* ---------- EDITOR VIEW ---------- */
-    #editorView { min-height: 100vh; display: flex; flex-direction: column; }
+    #editorView { min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); }
     .editor-toolbar {
-        display: flex;
-        align-items: center;
-        gap: 0.85rem;
-        padding: 0.9rem 1.5rem;
-        background: linear-gradient(120deg, #12142a 0%, #1c1f3a 55%, #241a3d 100%);
-        color: #fff;
-        flex-wrap: wrap;
-        box-shadow: 0 2px 18px rgba(15,17,23,0.18);
+        display: flex; align-items: center; gap: 0.85rem; padding: 0.75rem 1.5rem; background: var(--sidebar-bg);
+        border-bottom: 1px solid var(--border); color: var(--ink); flex-wrap: wrap;
     }
-    .editor-toolbar .back-btn {
-        background: rgba(255,255,255,0.08);
-        border: 1px solid rgba(255,255,255,0.16);
-        color: #e2e8f0;
-        padding: 0.55rem 0.9rem;
-        border-radius: 9px;
-        font-size: 0.82rem;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 0.3rem;
-        transition: background-color 0.15s ease, transform 0.15s ease;
-    }
-    .editor-toolbar .back-btn:hover { background: rgba(255,255,255,0.16); transform: translateX(-2px); }
-    .editor-toolbar .et-title {
-        font-weight: 700;
-        font-size: 0.95rem;
-        margin-right: auto;
-        color: #f1f5f9;
-    }
-    .editor-toolbar .et-status {
-        font-size: 0.8rem;
-        color: #a5adc6;
-        flex-basis: 100%;
-    }
-    .editor-toolbar .et-actions { display: flex; gap: 0.55rem; }
-    .editor-toolbar button.action {
-        border: none;
-        border-radius: 9px;
-        padding: 0.55rem 0.95rem;
-        font-weight: 700;
-        font-size: 0.82rem;
-        display: flex;
-        align-items: center;
-        gap: 0.35rem;
-        transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
-    }
-    .editor-toolbar button.action:hover { transform: translateY(-1px); }
-    .btn-save { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; box-shadow: 0 8px 18px -8px rgba(99,102,241,0.6); }
-    .btn-save:hover { filter: brightness(1.08); }
+    .editor-toolbar .back-btn { background: var(--bg); border: 1px solid var(--border); color: var(--ink-soft); padding: 0.5rem 0.8rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 0.3rem; }
+    .editor-toolbar .back-btn:hover { background: var(--border-light); }
+    .editor-toolbar .et-title { font-weight: 600; font-size: 1rem; margin-right: auto; color: var(--ink); }
+    .editor-toolbar .et-status { font-size: 0.8rem; color: var(--ink-light); flex-basis: 100%; }
+    .editor-toolbar .et-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .editor-toolbar button.action { border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem 0.8rem; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 0.35rem; background: white; color: var(--ink-soft); }
+    .editor-toolbar button.action:hover { background: var(--bg); }
+    .btn-save { background: var(--primary) !important; color: white !important; border-color: var(--primary-dark) !important; }
+    .btn-save:hover { background: var(--primary-dark) !important; }
+    .btn-github { background: var(--ink) !important; color: white !important; border-color: black !important; }
+    .btn-github:hover { background: black !important; }
 
-    /* New GitHub Button Styles */
-    .btn-github { background: #1b1f27; color: #fff; border: 1px solid #2c313d; }
-    .btn-github:hover { background: #05070c; border-color: #05070c; }
+    .format-toolbar { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1.5rem; background: #fff; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+    .format-toolbar .fmt-label { color: var(--ink-light); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-right: 0.5rem; }
+    .fmt-btn { min-width: 32px; height: 32px; border: 1px solid var(--border); border-radius: 6px; background: #fff; color: var(--ink-soft); font-weight: 600; }
+    .fmt-btn:hover { background: var(--bg); color: var(--ink); }
+    .fmt-sep { width: 1px; height: 20px; background: var(--border); margin: 0 0.2rem; }
 
-    .btn-discard { background: #2a2f45; color: #e2e8f0; }
-    .btn-discard:hover { background: #363c58; }
+    #editorFrame { flex: 1; width: 100%; border: none; background: #fff; }
 
-    .btn-undo, .btn-redo { background: #202538; color: #e2e8f0; }
-    .btn-undo:hover, .btn-redo:hover { background: #2c324a; }
-    .btn-undo:disabled, .btn-redo:disabled { opacity: 0.35; cursor: not-allowed; }
-    .btn-undo:disabled:hover, .btn-redo:disabled:hover { background: #202538; }
-
-    /* ---------- FORMAT TOOLBAR ---------- */
-    .format-toolbar {
-        display: flex;
-        align-items: center;
-        gap: 0.45rem;
-        padding: 0.6rem 1.5rem;
-        background: #171a2c;
-        border-top: 1px solid #2b2f45;
-        flex-wrap: wrap;
-    }
-    .format-toolbar .fmt-label {
-        color: #8b93b0;
-        font-size: 0.75rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        margin-right: 0.3rem;
-    }
-    .fmt-btn {
-        min-width: 34px;
-        height: 34px;
-        padding: 0 0.65rem;
-        border: 1px solid #33395a;
-        border-radius: 8px;
-        background: #12142a;
-        color: #e2e8f0;
-        font-size: 0.88rem;
-        font-weight: 700;
-        transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
-    }
-    .fmt-btn:hover { background: linear-gradient(135deg, var(--primary), var(--accent)); border-color: transparent; color: #fff; transform: translateY(-1px); }
-    .fmt-sep {
-        width: 1px;
-        height: 22px;
-        background: #33395a;
-        margin: 0 0.3rem;
+    /* ---------- RESPONSIVE QUERIES ---------- */
+    @media (max-width: 1024px) {
+        .stats-row { grid-template-columns: repeat(2, 1fr); }
     }
 
-    #editorFrame {
-        flex: 1;
-        width: 100%;
-        border: none;
-        background: #fff;
-    }
-
-    /* ---------- RESPONSIVE / MOBILE ---------- */
-    @media (max-width: 900px) {
-        .dashboard-body { padding: 1.5rem; }
-        .file-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
-    }
-
-    @media (max-width: 720px) {
-        /* Login screen */
-        #loginScreen { padding: 1rem; }
-        .login-card { padding: 1.85rem 1.5rem; max-width: 100%; }
-        .login-card h1 { font-size: 1.25rem; }
-
-        /* Dashboard header */
-        .admin-header {
-            flex-wrap: wrap;
-            row-gap: 0.6rem;
-            padding: 0.85rem 1rem;
+    @media (max-width: 768px) {
+        /* Sidebar & Mobile Menu */
+        .app-sidebar {
+            position: absolute;
+            height: 100%;
+            transform: translateX(-100%);
         }
-        .admin-header h1 { font-size: 0.95rem; }
-        .admin-header .logout-btn { padding: 0.45rem 0.8rem; font-size: 0.78rem; }
-
-        .dashboard-body { padding: 1.1rem; }
-        .dashboard-body > p.intro { font-size: 0.92rem; margin-bottom: 1.5rem; }
-        .file-section h2 { font-size: 0.76rem; }
-        .file-grid { grid-template-columns: 1fr; gap: 0.7rem; }
-        .file-card { padding: 1rem; }
-
-        /* Editor toolbar: title takes its own full-width row, action
-           buttons become a horizontally-scrollable strip so nothing
-           gets clipped or forces the page to zoom out on a phone. */
-        .editor-toolbar {
-            padding: 0.65rem 0.85rem;
+        .app-sidebar.mobile-open {
+            transform: translateX(0);
+        }
+        .sidebar-overlay.active {
+            display: block;
+        }
+        .mobile-menu-btn {
+            display: block;
+        }
+        .topbar { padding: 0 1rem; }
+        .content-scroll { padding: 1rem; }
+        .stats-row { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+        .stat-box { padding: 1rem 0.5rem; gap: 0.5rem; }
+        .stat-info strong { font-size: 1.1rem; }
+        .create-page-form { grid-template-columns: 1fr; }
+        
+        /* =========================================
+           MINIMAL MOBILE EDITOR TOOLBAR
+           ========================================= */
+        .editor-toolbar { 
+            padding: 0.5rem 1rem;
             gap: 0.5rem;
-            flex-wrap: wrap;
         }
+        
         .editor-toolbar .back-btn {
-            order: 1;
-            font-size: 0.78rem;
-            padding: 0.45rem 0.7rem;
+            padding: 0.4rem 0.6rem;
+            font-size: 0.8rem;
         }
-        .editor-toolbar .et-title {
-            order: 3;
-            flex-basis: 100%;
-            margin-right: 0;
+        
+        .et-title { 
             font-size: 0.85rem;
-            white-space: normal;
-            word-break: break-word;
-        }
-        .editor-toolbar .et-actions {
-            order: 4;
-            flex-basis: 100%;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            padding-bottom: 0.2rem;
-            scrollbar-width: thin;
-        }
-        .editor-toolbar .et-actions button.action {
-            flex: 0 0 auto;
             white-space: nowrap;
-            font-size: 0.76rem;
-            padding: 0.45rem 0.7rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 55%; 
         }
-        .editor-toolbar .et-status {
-            order: 5;
-            font-size: 0.75rem;
+        
+        .et-actions { 
+            width: 100%;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            gap: 0.4rem;
+            padding-bottom: 2px;
+            -webkit-overflow-scrolling: touch; 
+            scrollbar-width: none; 
+        }
+        .et-actions::-webkit-scrollbar { display: none; }
+        
+        .editor-toolbar button.action {
+            flex-shrink: 0;
+            padding: 0.4rem 0.6rem;
+            font-size: 0.8rem;
         }
 
-        /* Format toolbar: horizontally scrollable, hide the long hint
-           text that doesn't fit on a phone screen. */
+        /* -----------------------------------------
+           NEW: Hide text for all action buttons 
+           EXCEPT the GitHub button on mobile 
+           ----------------------------------------- */
+        .editor-toolbar button.action:not(.btn-github) {
+            font-size: 0; /* Hides the text */
+            gap: 0; /* Removes spacing between icon and invisible text */
+            padding: 0.4rem 0.6rem; 
+        }
+        .editor-toolbar button.action:not(.btn-github) .svg-icon {
+            font-size: 1rem; /* Restores the icon size so it is visible */
+        }
+        
+        .et-status {
+            width: 100%;
+            font-size: 0.7rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 0;
+        }
+
         .format-toolbar {
-            padding: 0.5rem 0.85rem;
+            padding: 0.4rem 1rem;
             flex-wrap: nowrap;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; 
         }
-        .format-toolbar .fmt-label:last-child { display: none; }
-        .fmt-btn { flex: 0 0 auto; min-width: 32px; height: 32px; }
-
-        #editorFrame { min-height: 0; }
-    }
-
-    @media (max-width: 480px) {
-        .login-card { padding: 1.5rem 1.1rem; }
-        .login-card h1 { font-size: 1.1rem; }
-        .login-btn { padding: 0.7rem; font-size: 0.9rem; }
-
-        .admin-header h1 svg { display: none; }
-        .admin-header h1 { font-size: 0.85rem; }
-
-        .file-card .fc-title { font-size: 0.9rem; }
-        .file-card .fc-name { font-size: 0.72rem; }
-        .file-card .fc-edit { font-size: 0.78rem; padding: 0.35rem 0.7rem; }
-
-        .editor-toolbar .back-btn span,
-        .editor-toolbar .back-btn { font-size: 0.74rem; }
-    }
-
-    /* Larger, easier-to-tap hit areas on touch devices */
-    @media (hover: none) and (pointer: coarse) {
-        .fc-edit, .logout-btn, .back-btn, button.action, .fmt-btn,
-        .password-toggle-btn, .login-btn {
-            min-height: 40px;
-        }
+        .format-toolbar::-webkit-scrollbar { display: none; }
+        .format-toolbar .fmt-label { display: none; } 
+        
+        .fmt-btn { flex-shrink: 0; height: 28px; min-width: 28px; font-size: 0.8rem; }
+        .fmt-sep { height: 16px; margin: 0 0.1rem; }
     }
 </style>
 </head>
 <body>
 
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
     <!-- ================= LOGIN SCREEN ================= -->
     <div id="loginScreen">
         <form class="login-card" id="loginForm">
-            <h1><svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> FracSTAT Docs Admin</h1>
-            <p class="sub">Sign in to edit the documentation pages in your browser.</p>
+            <!-- Updated Logo -->
+            <div class="logo-icon" style="background: transparent;">
+                <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1784441772/akioq6cgnbsigsemtf0f.png" alt="FracSTAT Logo" style="width: 100%; height: 100%; object-fit: contain;">
+            </div>
+            
+            <h1>Welcome Back</h1>
+            <p class="sub">Sign in to FracSTAT Admin Panel</p>
 
             <div class="field">
                 <label for="loginUser">Username</label>
-                <input type="text" id="loginUser" autocomplete="username" required>
+                <input type="text" id="loginUser" autocomplete="username" placeholder="Enter username" required>
             </div>
             <div class="field">
                 <label for="loginPass">Password</label>
                 <div class="password-wrap">
-                    <input type="password" id="loginPass" autocomplete="current-password" required>
-                    <button type="button" class="password-toggle-btn" id="togglePasswordBtn" aria-label="Show password" title="Show password">
-                        <svg id="eyeIconOpen" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                        <svg id="eyeIconClosed" viewBox="0 0 24 24" style="display:none;"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                    <input type="password" id="loginPass" autocomplete="current-password" placeholder="Enter password" required>
+                    <button type="button" class="password-toggle-btn" id="togglePasswordBtn">
+                        <svg id="eyeIconOpen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        <svg id="eyeIconClosed" viewBox="0 0 24 24" style="display:none;" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
                     </button>
                 </div>
             </div>
 
             <button type="submit" class="login-btn">Sign In</button>
             <div id="loginError"></div>
-
-            <div class="login-hint">
-                This is a temporary in-browser editor for the developer's own use.
-            </div>
         </form>
     </div>
 
-    <!-- ================= DASHBOARD ================= -->
+    <!-- ================= DASHBOARD (NEW LAYOUT) ================= -->
     <div id="dashboard" class="hidden">
-        <div class="admin-header">
-            <h1><svg class="svg-icon" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg> FracSTAT Docs — Admin Panel</h1>
-            <button class="logout-btn" id="logoutBtn">Log Out</button>
-        </div>
-        <div class="dashboard-body">
-            <!-- <p class="intro">
-                Pick a page below to open it for editing. You'll be able to click directly
-                into any paragraph, heading, table cell, code snippet, or note/tip box to
-                change its text, and hover an image to replace it. Hover any block to
-                reveal move / duplicate / delete controls, and click the small "+" bar
-                between blocks to insert a new paragraph, heading, list, table, code
-                snippet, note box, tip box, or image anywhere on the page — including
-                directly above or below the code snippet area. Tables get their own
-                "+ Row / − Row / + Col / − Col" controls. When you're done, use
-                "Download Page" to export the updated file and upload it back to your site.
-            </p>  -->
-            <div id="orderControls">
-                <div class="oc-row">
-                    <h2>Sidebar Order</h2>
-                    <button type="button" id="saveOrderBtn">💾 Save Order to Sidebar</button>
-                </div>
-                <p class="oc-desc">
-                    Drag any page card below — within its section, or straight into a different section —
-                    to change the order pages appear in the live sidebar and in the Previous/Next
-                    navigation at the bottom of every docs page. Reordering here is instant on screen but
-                    stays local until you click "Save Order to Sidebar", which pushes the new order to
-                    <code>script.js</code> (sidebar + page order) and <code>admin.html</code>'s own page
-                    registry in a single commit.
-                </p>
-                <div id="orderStatus"></div>
-            </div>
+        
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-            <div class="file-section" id="createPageSection">
-                <h2>Create New Page</h2>
-                <div class="create-page-form">
-                    <div class="cp-field">
-                        <label for="cpTitle">Page Title</label>
-                        <input type="text" id="cpTitle" placeholder="e.g. Static Foo Tab">
-                    </div>
-                    <div class="cp-field">
-                        <label for="cpFilename">Filename</label>
-                        <input type="text" id="cpFilename" placeholder="e.g. docs_static_foo.html">
-                    </div>
-                    <div class="cp-field">
-                        <label for="cpSection">Sidebar Section</label>
-                        <select id="cpSection"></select>
-                    </div>
-                    <div class="cp-field" id="cpNewSectionWrap" style="display:none;">
-                        <label for="cpNewSectionName">New Section Name</label>
-                        <input type="text" id="cpNewSectionName" placeholder="e.g. My New Group">
-                    </div>
-                    <div class="cp-field">
-                        <label for="cpSidebarLabel">Sidebar Link Text</label>
-                        <input type="text" id="cpSidebarLabel" placeholder="e.g. Foo Tab">
-                    </div>
-                    <button type="button" id="cpCreateBtn">+ Create Page</button>
-                    <div id="cpStatus" class="cp-status"></div>
+        <!-- Sidebar -->
+        <aside class="app-sidebar" id="appSidebar">
+            <div class="sidebar-header">
+                <!-- Updated Logo -->
+                <div class="brand-logo" style="background: transparent;">
+                    <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1784441772/akioq6cgnbsigsemtf0f.png" alt="FracSTAT Logo" style="width: 100%; height: 100%; object-fit: contain;">
+                </div>
+                
+                <div class="brand-text">
+                    <strong>FracSTAT</strong>
+                    <span>Admin Panel</span>
                 </div>
             </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">Content Management</div>
+                <a class="nav-item active" id="navDashboard" href="#dashboardTop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> Dashboard</a>
+                <a class="nav-item" id="navCreatePage" href="#createPageSection"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg> Create New Page</a>
 
-            <div id="fileSections"></div>
-        </div>
+                <a class="nav-item" id="navAllPages" href="#fileSections"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> All Pages</a>
+                
+                <div class="nav-section">Quick Links</div>
+                <a class="nav-item" href="introduction.html" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg> View Documentation <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                <a class="nav-item" href="index.html" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg> Visit Website <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                <a class="nav-item" id="backupNavItem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Backup &amp; Export</a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-card">
+                    <div class="user-avatar">A</div>
+                    <div class="user-info">
+                        <strong>Admin</strong>
+                        <span>Administrator</span>
+                    </div>
+                </div>
+                <button class="logout-btn" id="logoutBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    Log Out
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div style="display: flex; align-items: center;">
+                    <button id="mobileMenuToggle" class="mobile-menu-btn">
+                        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                    </button>
+                    <div class="breadcrumb" style="font-size: 1.1rem; color: var(--ink);">
+                        FracSTAT Admin Panel
+                    </div>
+                </div>
+                <div class="topbar-actions">
+                    <a href="index.html" target="_blank" class="visit-site-btn">Visit Site <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>
+                </div>
+            </header>
+
+            <!-- Scrollable Content -->
+            <div class="content-scroll">
+                <div class="dashboard-grid">
+                    
+                    <!-- Welcome Row -->
+                    <div class="welcome-grid" id="dashboardTop">
+                        <div class="panel-card welcome-hero">
+                            <h2 style="display:flex; align-items:center; gap:8px;">Welcome back, Admin <span style="font-size:24px;">👋</span></h2>
+                            <p>Here's what's happening with your documentation today.</p>
+                            
+                            <div class="stats-row">
+                                <div class="stat-box">
+                                    <div class="stat-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg></div>
+                                    <div class="stat-info"><strong id="statTotalPages">—</strong><span>Total Pages</span></div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
+                                    <div class="stat-info"><strong id="statPublished">—</strong><span>Published</span></div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg></div>
+                                    <div class="stat-info"><strong id="statModules">—</strong><span>Modules</span></div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div>
+                                    <div class="stat-info"><strong id="statDrafts">—</strong><span>Drafts</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Editor & List Area -->
+                    <div class="panel-card" style="padding: 2rem;" id="pagesManagementPanel">
+                        <div class="panel-card-header">
+                            <div>
+                                <h3 class="panel-card-title">Pages Management</h3>
+                                <p class="panel-card-subtitle">Overview of all pages organized by modules. Drag to reorder.</p>
+                            </div>
+                            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:0.4rem;">
+                                <button type="button" id="saveOrderBtn">💾 Save Order to Sidebar</button>
+                                <div id="orderStatus" class="oc-save-status"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Functional Create Page Form integrated -->
+                        <div class="file-section" id="createPageSection">
+                            <h2><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg> Create New Page</h2>
+                            <div class="create-page-form">
+                                <div class="cp-field">
+                                    <label for="cpTitle">Page Title</label>
+                                    <input type="text" id="cpTitle" placeholder="e.g. Static Foo Tab">
+                                </div>
+                                <div class="cp-field">
+                                    <label for="cpFilename">Filename</label>
+                                    <input type="text" id="cpFilename" placeholder="e.g. docs_static_foo.html">
+                                </div>
+                                <div class="cp-field">
+                                    <label for="cpSection">Sidebar Section</label>
+                                    <select id="cpSection"></select>
+                                </div>
+                                <div class="cp-field" id="cpNewSectionWrap" style="display:none;">
+                                    <label for="cpNewSectionName">New Section Name</label>
+                                    <input type="text" id="cpNewSectionName" placeholder="e.g. My New Group">
+                                </div>
+                                <div class="cp-field">
+                                    <label for="cpSidebarLabel">Sidebar Link Text</label>
+                                    <input type="text" id="cpSidebarLabel" placeholder="e.g. Foo Tab">
+                                </div>
+                                <button type="button" id="cpCreateBtn">+ Create Page</button>
+                                <div id="cpStatus" class="cp-status" style="grid-column: 1 / -1; font-size:0.85rem; color:var(--ink-light);"></div>
+                            </div>
+                        </div>
+
+                        <!-- Functional File Sections rendering target -->
+                        <div id="fileSections"></div>
+                    </div>
+                    
+                    <footer style="text-align: center; padding: 2rem 0; color: var(--ink-light); font-size: 0.8rem;">
+                        <p>© 2026 FracSTAT. All rights reserved. &nbsp; | &nbsp; Admin Panel v1.0.0 &nbsp; </p>
+                    </footer>
+                </div>
+            </div>
+        </main>
     </div>
 
     <!-- ================= EDITOR VIEW ================= -->
     <div id="editorView" class="hidden">
         <div class="editor-toolbar">
-            <button class="back-btn" id="backBtn"><svg class="svg-icon" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back to file list</button>
+            <button class="back-btn" id="backBtn"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back</button>
             <div class="et-title" id="editorTitle">—</div>
             <div class="et-actions">
-                <button class="action btn-undo" id="undoBtn" title="Undo (Ctrl+Z)" disabled><svg class="svg-icon" viewBox="0 0 24 24"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg> Undo</button>
-                <button class="action btn-redo" id="redoBtn" title="Redo (Ctrl+Y)" disabled><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 7v6h-6"></path><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path></svg> Redo</button>
-                <button class="action btn-discard" id="discardBtn"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-9.21l5.75 4.64"></path></svg> Reload (discard changes)</button>
-                <button class="action btn-save" id="saveBtn"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download Page</button>
-                <button class="action btn-github" id="githubBtn"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg> Update In Github</button>
+                <button class="action btn-undo" id="undoBtn" title="Undo (Ctrl+Z)" disabled><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg> Undo</button>
+                <button class="action btn-redo" id="redoBtn" title="Redo (Ctrl+Y)" disabled><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"></path><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path></svg> Redo</button>
+                <button class="action btn-discard" id="discardBtn"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-9.21l5.75 4.64"></path></svg> Reload</button>
+                <button class="action btn-save" id="saveBtn"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download</button>
+                <button class="action btn-github" id="githubBtn"><svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg> Update In Github</button>
             </div>
             <div class="et-status" id="editorStatus"></div>
         </div>
@@ -829,8 +725,6 @@
             <button type="button" class="fmt-btn" id="fontDecBtn" title="Decrease font size">A−</button>
             <span class="fmt-sep"></span>
             <button type="button" class="fmt-btn" id="clearFmtBtn" title="Clear formatting">Clear</button>
-            <span class="fmt-sep"></span>
-            <span class="fmt-label" style="text-transform:none; font-weight:500; letter-spacing:normal;">Select text first, then click a button.</span>
         </div>
         <iframe id="editorFrame"></iframe>
     </div>
@@ -840,37 +734,64 @@
     "use strict";
 
     // ---------------------------------------------------------
+    // Toast Notification System
+    // ---------------------------------------------------------
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        
+        let icon = '';
+        if (type === 'success') icon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
+        else if (type === 'error') icon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
+        else icon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `${icon} <span>${message}</span>`;
+        
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.animation = 'fadeOut 0.3s forwards';
+            setTimeout(() => toast.remove(), 300);
+        }, 3500);
+    }
+
+    // ---------------------------------------------------------
+    // Mobile Sidebar Logic
+    // ---------------------------------------------------------
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const appSidebar = document.getElementById('appSidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    function toggleMobileMenu() {
+        appSidebar.classList.toggle('mobile-open');
+        sidebarOverlay.classList.toggle('active');
+    }
+
+    if (mobileMenuToggle && appSidebar && sidebarOverlay) {
+        mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+        sidebarOverlay.addEventListener('click', toggleMobileMenu);
+        // Auto-close sidebar on item click for mobile
+        appSidebar.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                if(window.innerWidth <= 768) toggleMobileMenu();
+            });
+        });
+    }
+
+    // ---------------------------------------------------------
     // Config
     // ---------------------------------------------------------
-    // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL BELOW:
     var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr3q4_tW290WNlox3drYx9Xh8gxJdLR1FM-mgUoYGTVcn_RrCWUMOv_DL1IFzy8GR2/exec";
     var SESSION_KEY = "fracstat_admin_session";
     
-    // GITHUB PUSH CONFIGURATION
     var GITHUB_REPO_OWNER = "sachi5908";
     var GITHUB_REPO_NAME = "FracSTAT_Documentation";
     var GITHUB_BRANCH = "main";
 
-    // ---------------------------------------------------------
-    // Cloudinary image hosting — same unsigned-upload-preset flow
-    // used by upload.html. Every "Upload" button in the editor
-    // (replacing an existing figure, or filling in a freshly
-    // inserted Image block) funnels through uploadImageToCloudinary(),
-    // which POSTs the file and resolves with the hosted secure_url
-    // ready to drop straight into an <img src>.
-    // ---------------------------------------------------------
     var CLOUDINARY_CLOUD_NAME = "hcaqjcqf";
     var CLOUDINARY_UPLOAD_PRESET = "FracSTAT";
 
-    // ---------------------------------------------------------
-    // Cache-busting helpers. The admin panel repeatedly re-fetches its
-    // own site files (the page being edited, script.js, admin.html) to
-    // read their latest content before patching and re-publishing them.
-    // Browsers/CDNs (and GitHub Pages in particular) can serve a stale
-    // cached copy of these, which would silently discard recent edits or
-    // show an out-of-date sidebar. Every such fetch should go through
-    // fetchFresh() so it always reaches the server for a live copy.
-    // ---------------------------------------------------------
     function noCacheUrl(url) {
         var sep = url.indexOf("?") === -1 ? "?" : "&";
         return url + sep + "_cb=" + Date.now();
@@ -963,8 +884,6 @@
         return found;
     }
 
-    // Returns {label, section} for a filename already known to FILE_SECTIONS
-    // or NEW_PAGES, or null if unknown.
     function findFileMeta(file) {
         var result = null;
         FILE_SECTIONS.forEach(function (s) {
@@ -978,16 +897,6 @@
         return result;
     }
 
-    // Assembles a complete, brand-new docs page: same navbar/script as every
-    // other page, with a starter H1 + placeholder paragraph the admin can
-    // then edit like any other block.
-    //
-    // NOTE: the <aside id="docsSidebar"> is intentionally left EMPTY here.
-    // The sidebar is no longer baked into each page's static HTML — every
-    // docs page (see script.js) now renders its sidebar client-side at
-    // runtime from the single SIDEBAR_SECTIONS array defined in script.js
-    // (renderSidebar()). So a brand-new page automatically gets the full,
-    // up-to-date sidebar for free, and never needs its own copy patched in.
     function buildNewPageHtml(title) {
         return "<!DOCTYPE html>\n" +
             '<html lang="en">\n' +
@@ -1016,9 +925,6 @@
             "<" + "/html>";
     }
 
-    // Finds the FILE_SECTIONS array literal inside admin.html's own source
-    // and inserts a new entry (or a whole new section) for the given page,
-    // using bracket-depth matching so it works regardless of formatting.
     function patchFileSectionsSource(src, sectionTitle, file, label) {
         var startIdx = src.indexOf("var FILE_SECTIONS");
         if (startIdx === -1) return null;
@@ -1048,9 +954,6 @@
                 else if (arrText[j] === "]") { fdepth--; if (fdepth === 0) { fArrEnd = j; break; } }
             }
             if (fArrEnd === -1) return null;
-            // Trim trailing whitespace/newlines left over before the "]" so
-            // the new entry's comma lands right after the previous entry's
-            // closing brace, instead of dangling alone on its own line.
             var before = arrText.substring(0, fArrEnd).replace(/\s+$/, "");
             var after = arrText.substring(fArrEnd);
             newArrText = before + ",\n            " + newEntry + "\n        " + after;
@@ -1063,50 +966,6 @@
         return src.substring(0, arrStart) + newArrText + src.substring(arrEnd + 1);
     }
 
-    // Best-effort: registers a newly created page permanently inside
-    // admin.html's own FILE_SECTIONS list, so it still shows up in the
-    // dashboard after the admin panel is reloaded. Failures are logged but
-    // never block the rest of the publish flow.
-    // Computes the updated admin.html source needed to register a page in
-    // FILE_SECTIONS, WITHOUT pushing anything to GitHub itself. Returns the
-    // new source string, or null if no admin.html change is needed (already
-    // registered, or the patch couldn't be computed). Pairing this with
-    // computeSidebarPatch() below and pushing both through
-    // commitMultipleFilesToGithub() is what lets several files change
-    // together in one commit instead of one GitHub Pages deployment per file.
-    async function computeAdminHtmlPatch(targetFile, label, sectionTitle) {
-        try {
-            var res = await fetchFresh("admin.html");
-            if (!res.ok) throw new Error("fetch admin.html failed: " + res.status);
-            var src = await res.text();
-
-            if (src.indexOf('"' + targetFile + '"') !== -1) return null; // already registered
-
-            return patchFileSectionsSource(src, sectionTitle, targetFile, label);
-        } catch (err) {
-            console.error("Failed to compute admin.html FILE_SECTIONS patch:", err);
-            return null;
-        }
-    }
-
-    // ---------------------------------------------------------
-    // Single-commit multi-file publishing.
-    //
-    // Previously, creating a new page pushed up to three SEPARATE commits
-    // in a row (the page itself, then script.js, then admin.html), each
-    // one via the Contents API (PUT /contents/{path}). GitHub Pages queues
-    // a fresh build for every commit that lands on the deployed branch, so
-    // three quick commits meant three back-to-back deployments — slower,
-    // and prone to an earlier build finishing (and briefly serving a
-    // stale sidebar) after a later commit had already landed.
-    //
-    // This helper instead uses the lower-level Git Data API to build ONE
-    // commit containing every changed file: read the branch's current
-    // commit/tree, upload a blob per changed file, create a new tree that
-    // layers those blobs onto the existing tree, wrap that in a single new
-    // commit, then fast-forward the branch ref to it. One commit in, one
-    // Pages deployment out, no matter how many files were touched.
-    // ---------------------------------------------------------
     async function commitMultipleFilesToGithub(fileMap, commitMessage) {
         var token = sessionStorage.getItem("github_token");
         if (!token) throw new Error("No GitHub token found. Please log in again.");
@@ -1117,19 +976,16 @@
             "Content-Type": "application/json"
         };
 
-        // 1. Resolve the branch's current commit.
         var refRes = await fetch(apiBase + "/git/ref/heads/" + GITHUB_BRANCH, { headers: headers, cache: "no-store" });
         if (!refRes.ok) throw new Error("Could not read branch ref (HTTP " + refRes.status + ")");
         var refData = await refRes.json();
         var parentSha = refData.object.sha;
 
-        // 2. Resolve that commit's base tree.
         var commitRes = await fetch(apiBase + "/git/commits/" + parentSha, { headers: headers, cache: "no-store" });
         if (!commitRes.ok) throw new Error("Could not read latest commit (HTTP " + commitRes.status + ")");
         var commitData = await commitRes.json();
         var baseTreeSha = commitData.tree.sha;
 
-        // 3. Upload one blob per changed file.
         var treeEntries = [];
         var paths = Object.keys(fileMap);
         for (var i = 0; i < paths.length; i++) {
@@ -1149,7 +1005,6 @@
             treeEntries.push({ path: path, mode: "100644", type: "blob", sha: blobData.sha });
         }
 
-        // 4. Build one new tree layering every changed file onto the base tree.
         var treeRes = await fetch(apiBase + "/git/trees", {
             method: "POST",
             headers: headers,
@@ -1159,7 +1014,6 @@
         if (!treeRes.ok) throw new Error("Failed to create tree");
         var treeData = await treeRes.json();
 
-        // 5. Wrap that tree in a single new commit.
         var newCommitRes = await fetch(apiBase + "/git/commits", {
             method: "POST",
             headers: headers,
@@ -1169,7 +1023,6 @@
         if (!newCommitRes.ok) throw new Error("Failed to create commit");
         var newCommitData = await newCommitRes.json();
 
-        // 6. Fast-forward the branch to the new commit — one deploy, not several.
         var updateRefRes = await fetch(apiBase + "/git/refs/heads/" + GITHUB_BRANCH, {
             method: "PATCH",
             headers: headers,
@@ -1179,178 +1032,6 @@
         if (!updateRefRes.ok) throw new Error("Failed to update branch ref");
 
         return newCommitData.sha;
-    }
-
-    // Finds the SIDEBAR_SECTIONS array literal inside script.js's own
-    // source and inserts a new { href, label } entry (or a whole new
-    // section) for the given page, using bracket-depth matching so it
-    // works regardless of formatting. Mirrors patchFileSectionsSource()
-    // above, but targets script.js's "links"/"href" naming rather than
-    // admin.html's own "files"/"file" naming.
-    function patchScriptJsSidebarSource(src, sectionTitle, file, label) {
-        var startIdx = src.indexOf("const SIDEBAR_SECTIONS");
-        if (startIdx === -1) startIdx = src.indexOf("var SIDEBAR_SECTIONS");
-        if (startIdx === -1) return null;
-        var arrStart = src.indexOf("[", startIdx);
-        if (arrStart === -1) return null;
-
-        var depth = 0, arrEnd = -1;
-        for (var i = arrStart; i < src.length; i++) {
-            if (src[i] === "[") depth++;
-            else if (src[i] === "]") { depth--; if (depth === 0) { arrEnd = i; break; } }
-        }
-        if (arrEnd === -1) return null;
-
-        var arrText = src.substring(arrStart, arrEnd + 1);
-
-        // Already linked? Don't add a duplicate entry.
-        if (arrText.indexOf('"' + file + '"') !== -1) return null;
-
-        var titleNeedle = 'title: "' + sectionTitle + '"';
-        var titleIdx = arrText.indexOf(titleNeedle);
-        var newEntry = '{ href: "' + file + '", label: "' + String(label).replace(/"/g, '\\"') + '" }';
-
-        var newArrText;
-        if (titleIdx !== -1) {
-            var linksIdx = arrText.indexOf("links: [", titleIdx);
-            if (linksIdx === -1) return null;
-            var lArrStart = arrText.indexOf("[", linksIdx);
-            var ldepth = 0, lArrEnd = -1;
-            for (var j = lArrStart; j < arrText.length; j++) {
-                if (arrText[j] === "[") ldepth++;
-                else if (arrText[j] === "]") { ldepth--; if (ldepth === 0) { lArrEnd = j; break; } }
-            }
-            if (lArrEnd === -1) return null;
-            // Trim trailing whitespace/newlines left over before the "]" so
-            // the new entry's comma lands right after the previous entry's
-            // closing brace, instead of dangling alone on its own line.
-            var before = arrText.substring(0, lArrEnd).replace(/\s+$/, "");
-            var after = arrText.substring(lArrEnd);
-            newArrText = before + ",\n            " + newEntry + "\n        " + after;
-        } else {
-            var newSectionText = '{\n        title: "' + String(sectionTitle).replace(/"/g, '\\"') +
-                '",\n        links: [\n            ' + newEntry + "\n        ]\n    }";
-            var inner = arrText.substring(1, arrText.length - 1).replace(/\s*$/, "");
-            newArrText = "[" + inner + ",\n    " + newSectionText + "\n]";
-        }
-
-        return src.substring(0, arrStart) + newArrText + src.substring(arrEnd + 1);
-    }
-
-    // Registers `targetFile` in script.js's SIDEBAR_SECTIONS — the single
-    // shared source of truth every docs page now reads from at runtime
-    // (renderSidebar() in script.js) to build its own sidebar. This
-    // replaces the old approach of patching every individual page's static
-    // HTML: since the sidebar is rendered client-side from this one array,
-    // updating it here instantly puts the new page's link on every page's
-    // sidebar, with just one file to push to GitHub.
-    // Computes the updated script.js source needed to register a page's
-    // sidebar entry, WITHOUT pushing anything to GitHub itself. Returns the
-    // new source string, or null if no change is needed (already registered)
-    // or the patch couldn't be computed. See computeAdminHtmlPatch() above
-    // for why this is split out from the actual push.
-    async function computeSidebarPatch(targetFile) {
-        var meta = findFileMeta(targetFile);
-        if (!meta) return null;
-        try {
-            var localRes = await fetchFresh("script.js");
-            if (!localRes.ok) throw new Error("fetch script.js failed: " + localRes.status);
-            var rawJs = await localRes.text();
-            return patchScriptJsSidebarSource(rawJs, meta.section, targetFile, meta.label);
-        } catch (err) {
-            console.error("Failed to compute script.js sidebar patch:", err);
-            return null;
-        }
-    }
-
-    // Finds the PAGE_ORDER array literal inside script.js and inserts a new
-    // { href, label } entry for the given page. Unlike SIDEBAR_SECTIONS
-    // (grouped into titled sections), PAGE_ORDER is one flat array in linear
-    // reading order — used by renderPaginationNav() in script.js to build
-    // the Previous/Next buttons at the bottom of every docs page. Without an
-    // entry here, a freshly created page's <div class="pagination-nav">
-    // placeholder is left empty forever. The new entry is inserted right
-    // after the last existing entry belonging to the same sidebar section
-    // (falling back to appending at the very end if no sibling from that
-    // section is found), so a new page lands in a sensible reading-order
-    // position without requiring the user to hand-place it.
-    function patchScriptJsPageOrderSource(src, sectionTitle, file, label) {
-        var startIdx = src.indexOf("const PAGE_ORDER");
-        if (startIdx === -1) startIdx = src.indexOf("var PAGE_ORDER");
-        if (startIdx === -1) return null;
-        var arrStart = src.indexOf("[", startIdx);
-        if (arrStart === -1) return null;
-
-        var depth = 0, arrEnd = -1;
-        for (var i = arrStart; i < src.length; i++) {
-            if (src[i] === "[") depth++;
-            else if (src[i] === "]") { depth--; if (depth === 0) { arrEnd = i; break; } }
-        }
-        if (arrEnd === -1) return null;
-
-        var arrText = src.substring(arrStart, arrEnd + 1);
-        if (arrText.indexOf('"' + file + '"') !== -1) return null; // already listed
-
-        var newEntry = '{ href: "' + file + '", label: "' + String(label).replace(/"/g, '\\"') + '" }';
-
-        var section = null;
-        for (var s = 0; s < FILE_SECTIONS.length; s++) {
-            if (FILE_SECTIONS[s].title === sectionTitle) { section = FILE_SECTIONS[s]; break; }
-        }
-
-        // Try to insert right after the last sibling page (by this file's
-        // sidebar section) that already appears in PAGE_ORDER, so the new
-        // page lands near its logical neighbours instead of always at the
-        // very end of the whole documentation set.
-        var insertAfterIdx = -1;
-        if (section) {
-            for (var f = 0; f < section.files.length; f++) {
-                var needle = '"' + section.files[f].file + '"';
-                var pos = arrText.lastIndexOf(needle);
-                if (pos === -1) continue;
-                var braceEnd = arrText.indexOf("}", pos);
-                if (braceEnd !== -1 && braceEnd > insertAfterIdx) insertAfterIdx = braceEnd + 1;
-            }
-        }
-
-        var newArrText;
-        if (insertAfterIdx !== -1) {
-            newArrText = arrText.substring(0, insertAfterIdx) + ",\n    " + newEntry + arrText.substring(insertAfterIdx);
-        } else {
-            var inner = arrText.substring(1, arrText.length - 1).replace(/\s*$/, "");
-            newArrText = "[" + inner + ",\n    " + newEntry + "\n]";
-        }
-
-        return src.substring(0, arrStart) + newArrText + src.substring(arrEnd + 1);
-    }
-
-    // Combines the SIDEBAR_SECTIONS patch and the PAGE_ORDER patch into ONE
-    // read-patch-patch-return pass over script.js, so both changes land in
-    // the same file content (and the same GitHub commit) instead of one
-    // silently overwriting the other if computed independently and pushed
-    // as two separate script.js updates. Use this instead of
-    // computeSidebarPatch() wherever a newly created page is being
-    // registered, so it always gets both a sidebar link AND working
-    // Previous/Next pagination buttons in a single pass.
-    async function computeScriptJsPatch(targetFile) {
-        var meta = findFileMeta(targetFile);
-        if (!meta) return null;
-        try {
-            var localRes = await fetchFresh("script.js");
-            if (!localRes.ok) throw new Error("fetch script.js failed: " + localRes.status);
-            var rawJs = await localRes.text();
-
-            var afterSidebar = patchScriptJsSidebarSource(rawJs, meta.section, targetFile, meta.label);
-            var working = afterSidebar !== null ? afterSidebar : rawJs;
-
-            var afterPageOrder = patchScriptJsPageOrderSource(working, meta.section, targetFile, meta.label);
-            var finalText = afterPageOrder !== null ? afterPageOrder : working;
-
-            return (finalText !== rawJs) ? finalText : null;
-        } catch (err) {
-            console.error("Failed to compute script.js patch (sidebar + page order):", err);
-            return null;
-        }
     }
 
     function populateSectionDropdown() {
@@ -1374,16 +1055,9 @@
     }
 
     var currentFile = null;
-
-    // Session-local state for pages created in this admin session but not
-    // yet pushed to GitHub. NEW_PAGES maps filename -> {html, label, section}.
-    // PENDING_NEW_FILES tracks which filenames don't exist on the server yet
-    // (so the editor loads them via srcdoc instead of fetching a 404).
     var NEW_PAGES = {};
     var PENDING_NEW_FILES = new Set();
 
-    // Exact navbar markup shared by every docs page, used to assemble brand
-    // new pages so they look identical to hand-authored ones.
     var NAVBAR_TEMPLATE = '    <nav class="navbar docs-navbar">\n' +
         '        <div class="logo-container">\n' +
         '            <button id="mobileToggle" class="mobile-toggle-btn">\n' +
@@ -1452,14 +1126,13 @@
         var p = document.getElementById("loginPass").value.trim();
 
         if (!u || !p) {
-            loginError.textContent = "Please enter both username and password.";
+            showToast("Please enter both username and password.", "error");
             return;
         }
 
         loginError.textContent = "Verifying credentials…";
 
         try {
-            // 'text/plain' avoids triggering a strict CORS preflight check
             var response = await fetch(SCRIPT_URL, {
                 method: "POST",
                 headers: {
@@ -1473,18 +1146,20 @@
             if (data.success) {
                 sessionStorage.setItem(SESSION_KEY, "1");
                 
-                // Save the github token if it was provided by the backend script
                 if (data.token) {
                     sessionStorage.setItem("github_token", data.token);
                 }
                 
                 loginError.textContent = "";
+                showToast("Successfully logged in!", "success");
                 showDashboard();
             } else {
                 loginError.textContent = "Incorrect username or password.";
+                showToast("Incorrect username or password.", "error");
             }
         } catch (err) {
             loginError.textContent = "Server connection failed.";
+            showToast("Server connection failed.", "error");
             console.error(err);
         }
     }
@@ -1498,8 +1173,17 @@
         dashboard.classList.add("hidden");
         loginScreen.classList.remove("hidden");
         document.getElementById("loginPass").value = "";
+        showToast("Logged out successfully.", "info");
     });
 
+    // 1. Move these declarations ABOVE the auto-login check
+    var contentScrollEl = document.querySelector(".content-scroll");
+
+    var SCROLLSPY_NAV_IDS = [
+        "navDashboard", "navAllPages", "navCreatePage"
+    ];
+
+    // 2. Now it is safe to check session storage and call showDashboard()
     if (sessionStorage.getItem(SESSION_KEY) === "1") {
         showDashboard();
     }
@@ -1510,6 +1194,68 @@
         dashboard.classList.remove("hidden");
         renderFileSections();
         populateSectionDropdown();
+        updateScrollSpy();
+    }
+
+    function setActiveNavItem(navEl) {
+        if (!navEl) return;
+        SCROLLSPY_NAV_IDS.forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) el.classList.toggle("active", el === navEl);
+        });
+    }
+
+    SCROLLSPY_NAV_IDS.forEach(function (id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener("click", function () {
+            setActiveNavItem(el);
+        });
+    });
+
+    function getScrollSpyTargets() {
+        var targets = [];
+        var dashboardTop = document.getElementById("dashboardTop");
+        if (dashboardTop) targets.push({ el: dashboardTop, navId: "navDashboard" });
+        var filesRoot = document.getElementById("fileSections");
+        if (filesRoot) targets.push({ el: filesRoot, navId: "navAllPages" });
+        var createPage = document.getElementById("createPageSection");
+        if (createPage) targets.push({ el: createPage, navId: "navCreatePage" });
+        
+        return targets;
+    }
+
+    var scrollSpyTicking = false;
+
+    function updateScrollSpy() {
+        var scrollEl = contentScrollEl || document.querySelector(".content-scroll");
+        if (!scrollEl) return;
+        var targets = getScrollSpyTargets();
+        if (!targets.length) return;
+        var containerTop = scrollEl.getBoundingClientRect().top;
+        var threshold = containerTop + 32; 
+        var best = null;
+        var bestTop = Number.NEGATIVE_INFINITY;
+        targets.forEach(function (t) {
+            var top = t.el.getBoundingClientRect().top;
+            if (top <= threshold && top > bestTop) {
+                bestTop = top;
+                best = t;
+            }
+        });
+        if (!best) best = targets[0];
+        setActiveNavItem(document.getElementById(best.navId));
+    }
+
+    if (contentScrollEl) {
+        contentScrollEl.addEventListener("scroll", function () {
+            if (scrollSpyTicking) return;
+            scrollSpyTicking = true;
+            window.requestAnimationFrame(function () {
+                updateScrollSpy();
+                scrollSpyTicking = false;
+            });
+        }, { passive: true });
     }
 
     // ---------------------------------------------------------
@@ -1553,13 +1299,13 @@
             var isNewSection = cpSectionSelect.value === "__new__";
             var sectionTitle = isNewSection ? cpNewSectionName.value.trim() : cpSectionSelect.value;
 
-            if (!title) { cpStatus.textContent = "Please enter a page title."; return; }
+            if (!title) { showToast("Please enter a page title.", "error"); return; }
             if (!filename || !/^[a-z0-9_\-]+\.html$/i.test(filename)) {
-                cpStatus.textContent = "Filename must use letters/numbers/underscores/hyphens and end in .html";
+                showToast("Filename must use letters/numbers/underscores/hyphens and end in .html", "error");
                 return;
             }
-            if (!sectionTitle) { cpStatus.textContent = "Please choose or name a sidebar section."; return; }
-            if (fileExistsAnywhere(filename)) { cpStatus.textContent = "A page with that filename already exists."; return; }
+            if (!sectionTitle) { showToast("Please choose or name a sidebar section.", "error"); return; }
+            if (fileExistsAnywhere(filename)) { showToast("A page with that filename already exists.", "error"); return; }
 
             var section = null;
             for (var i = 0; i < FILE_SECTIONS.length; i++) {
@@ -1581,6 +1327,7 @@
             renderFileSections();
             populateSectionDropdown();
 
+            showToast(`Page <b>${filename}</b> created locally!`, "success");
             cpStatus.innerHTML = "Created <b>" + filename + "</b> locally (not yet on GitHub). Click its " +
                 "<b>Edit Page</b> button below to add content, then use <b>Update In Github</b> inside the " +
                 "editor to publish just the page. Afterwards, drag its card into place below and click " +
@@ -1604,6 +1351,7 @@
             sectionEl.className = "file-section";
             sectionEl.draggable = true;
             sectionEl.dataset.section = section.title;
+            sectionEl.id = "module_" + slugify(section.title);
 
             var h2 = document.createElement("h2");
             h2.innerHTML =
@@ -1624,13 +1372,17 @@
                 var draftBadge = PENDING_NEW_FILES.has(entry.file)
                     ? '<span class="fc-draft-badge">Draft — not pushed yet</span>' : "";
                 card.innerHTML =
-                    '<span class="fc-drag-handle" title="Drag to reorder">' +
-                        '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"></circle><circle cx="15" cy="6" r="1.5"></circle><circle cx="9" cy="12" r="1.5"></circle><circle cx="15" cy="12" r="1.5"></circle><circle cx="9" cy="18" r="1.5"></circle><circle cx="15" cy="18" r="1.5"></circle></svg>' +
-                    '</span>' +
+            '<div style="display:flex; align-items:center;">' +
+                '<span class="fc-drag-handle" title="Drag to reorder"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"></circle><circle cx="15" cy="6" r="1.5"></circle><circle cx="9" cy="12" r="1.5"></circle><circle cx="15" cy="12" r="1.5"></circle><circle cx="9" cy="18" r="1.5"></circle><circle cx="15" cy="18" r="1.5"></circle></svg></span>' +
+                '<div class="fc-info">' +
                     '<div class="fc-title">' + entry.label + '</div>' +
                     '<div class="fc-name">' + entry.file + '</div>' +
-                    draftBadge +
-                    '<button type="button" class="fc-edit"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> Edit Page</button>';
+                '</div>' +
+            '</div>' +
+            '<div class="fc-actions">' +
+                (PENDING_NEW_FILES.has(entry.file) ? '<span class="fc-badge fc-draft-badge">Draft</span>' : '<span class="fc-badge">Published</span>') +
+                '<button type="button" class="fc-edit" title="Edit Page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>' +
+            '</div>';
                 card.querySelector(".fc-edit").addEventListener("click", function () {
                     openEditor(entry.file, entry.label);
                 });
@@ -1642,23 +1394,34 @@
             sectionEl.appendChild(grid);
             fileSectionsEl.appendChild(sectionEl);
         });
+        renderDashboardSummary();
     }
 
-    // ---------------------------------------------------------
-    // Drag-and-drop reordering of page cards.
-    //
-    // Cards are draggable across the whole dashboard (not just within
-    // their own section), so a page can be dragged into a different
-    // sidebar section as well as reordered within one. Every drop
-    // rebuilds FILE_SECTIONS directly from the current DOM order, so
-    // the in-memory model always matches exactly what's on screen —
-    // no separate index bookkeeping to keep in sync.
-    // ---------------------------------------------------------
+    function renderDashboardSummary() {
+        var totalPages = 0;
+        FILE_SECTIONS.forEach(function (s) { totalPages += s.files.length; });
+        var draftCount = 0;
+        FILE_SECTIONS.forEach(function (s) {
+            s.files.forEach(function (f) { if (PENDING_NEW_FILES.has(f.file)) draftCount++; });
+        });
+        var publishedCount = totalPages - draftCount;
+        var glanceSections = FILE_SECTIONS.filter(function (s) { return s.title !== "Getting Started"; });
+
+        var elTotal = document.getElementById("statTotalPages");
+        var elPub = document.getElementById("statPublished");
+        var elMod = document.getElementById("statModules");
+        var elDraft = document.getElementById("statDrafts");
+        if (elTotal) elTotal.textContent = totalPages;
+        if (elPub) elPub.textContent = publishedCount;
+        if (elMod) elMod.textContent = glanceSections.length;
+        if (elDraft) elDraft.textContent = draftCount;
+    }
+
     function bindCardDragEvents(card) {
         card.addEventListener("dragstart", function (e) {
             card.classList.add("dragging");
             e.dataTransfer.effectAllowed = "move";
-            try { e.dataTransfer.setData("text/plain", card.dataset.file || ""); } catch (err) { /* Safari needs a set, ignore failures */ }
+            try { e.dataTransfer.setData("text/plain", card.dataset.file || ""); } catch (err) { }
         });
         card.addEventListener("dragend", function () {
             card.classList.remove("dragging");
@@ -1666,10 +1429,6 @@
         });
     }
 
-    // Finds the card the dragged item should be inserted before, based on
-    // cursor position. Prefers a same-row neighbour (compares X) so drops
-    // within a row land precisely; falls back to the first card whose row
-    // starts below the cursor for drops between rows or into empty space.
     function getDragAfterElement(grid, x, y) {
         var cards = Array.prototype.slice.call(grid.querySelectorAll(".file-card:not(.dragging)"));
         var sameRow = null, sameRowOffset = Number.NEGATIVE_INFINITY;
@@ -1709,33 +1468,16 @@
             e.preventDefault();
             grid.classList.remove("drag-over");
             rebuildFileSectionsFromDom();
-            if (orderStatus) orderStatus.textContent = 'Order changed locally — click "Save Order to Sidebar" to publish it.';
+            showToast('Order changed locally — click "Save Order to Sidebar" to publish.', 'info');
         });
     }
 
-    // ---------------------------------------------------------
-    // Drag-and-drop reordering of WHOLE SECTIONS (e.g. dragging all of
-    // "Dynamic Analyzer" above "Static Analyzer"). This mirrors the
-    // card-level dragging above but operates one level up: the section
-    // itself (heading + every card inside it) is the thing being moved,
-    // and the drop target is computed against other sections' vertical
-    // midpoints rather than a grid of cards.
-    //
-    // A section is made draggable="true" the same way a card is, so
-    // starting a drag from anywhere in its header (the drag-handle icon
-    // included) picks up the whole section; starting a drag from a card
-    // inside it still picks up just that card, since the card is the
-    // closest draggable element to the cursor in that case.
-    // ---------------------------------------------------------
     function bindSectionDragEvents(sectionEl) {
         sectionEl.addEventListener("dragstart", function (e) {
-            // Ignore drags that actually originated on a nested card
-            // (its own dragstart bubbles up through the section too);
-            // only react when the section itself is the drag source.
             if (e.target !== sectionEl) return;
             sectionEl.classList.add("dragging-section");
             e.dataTransfer.effectAllowed = "move";
-            try { e.dataTransfer.setData("text/plain", "section:" + (sectionEl.dataset.section || "")); } catch (err) { /* Safari needs a set, ignore failures */ }
+            try { e.dataTransfer.setData("text/plain", "section:" + (sectionEl.dataset.section || "")); } catch (err) { }
         });
         sectionEl.addEventListener("dragend", function (e) {
             if (e.target !== sectionEl) return;
@@ -1744,9 +1486,6 @@
         });
     }
 
-    // Finds the section the dragged section should be inserted before,
-    // based purely on vertical cursor position (sections always stack
-    // in a single column, unlike the multi-column card grid above).
     function getSectionAfterElement(container, y) {
         var sections = Array.prototype.slice.call(container.querySelectorAll(".file-section:not(.dragging-section)"));
         var closest = null, closestOffset = Number.NEGATIVE_INFINITY;
@@ -1764,7 +1503,7 @@
     function bindSectionsContainerDragEvents(container) {
         container.addEventListener("dragover", function (e) {
             var draggingSection = container.querySelector(".file-section.dragging-section");
-            if (!draggingSection) return; // a card (not a section) is being dragged — leave it to bindGridDropEvents
+            if (!draggingSection) return; 
             e.preventDefault();
             e.dataTransfer.dropEffect = "move";
             container.classList.add("drag-over-sections");
@@ -1781,14 +1520,10 @@
             e.preventDefault();
             container.classList.remove("drag-over-sections");
             rebuildFileSectionsFromDom();
-            if (orderStatus) orderStatus.textContent = 'Section order changed locally — click "Save Order to Sidebar" to publish it.';
+            showToast('Section order changed locally — click "Save Order to Sidebar" to publish.', 'info');
         });
     }
 
-    // Rebuilds FILE_SECTIONS (the single in-memory source of truth also
-    // used by populateSectionDropdown, create-page, etc.) directly from
-    // the current DOM order, so a card dragged into a different section
-    // is correctly re-parented as well as reordered.
     function rebuildFileSectionsFromDom() {
         var newSections = [];
         fileSectionsEl.querySelectorAll(".file-section").forEach(function (sectionEl) {
@@ -1861,7 +1596,6 @@
         saveCurrentFile();
     });
     
-    // Add GitHub Button listener
     githubBtn.addEventListener("click", function () {
         updateInGithub();
     });
@@ -1872,19 +1606,75 @@
         });
     }
 
-    // ---------------------------------------------------------
-    // Publishing a new page order.
-    //
-    // Unlike the insertion-style patches above (patchFileSectionsSource,
-    // patchScriptJsSidebarSource, patchScriptJsPageOrderSource — which
-    // only ever splice ONE new entry into an existing array without
-    // disturbing anything else), reordering means every entry's position
-    // can change at once. Patching that incrementally would be fragile,
-    // so instead these helpers regenerate the ENTIRE FILE_SECTIONS /
-    // SIDEBAR_SECTIONS / PAGE_ORDER array literal from the current
-    // in-memory FILE_SECTIONS model and splice that whole literal back
-    // into the source, leaving everything else in the file untouched.
-    // ---------------------------------------------------------
+    [document.getElementById("backupContentCard"), document.getElementById("backupNavItem")].forEach(function (el) {
+        if (!el) return;
+        el.addEventListener("click", async function (e) {
+            e.preventDefault();
+            
+            // Ensure JSZip is loaded before attempting backup
+            if (typeof JSZip === 'undefined') {
+                showToast("JSZip library is missing. Please add it to your <head>.", "error");
+                return;
+            }
+
+            showToast("Generating backup... This may take a moment.", "info");
+
+            try {
+                var zip = new JSZip();
+                var allFiles = [];
+                
+                // 1. Collect all files currently registered in FILE_SECTIONS
+                FILE_SECTIONS.forEach(function (section) {
+                    section.files.forEach(function (f) {
+                        allFiles.push(f.file);
+                    });
+                });
+                
+                // Optional: Manually add your root system files to the backup
+                // allFiles.push("admin.html", "index.html", "script.js", "style.css");
+
+                // 2. Fetch the content of each file and add it to the ZIP archive
+                for (let i = 0; i < allFiles.length; i++) {
+                    let filename = allFiles[i];
+                    
+                    // If it's a draft page that hasn't been pushed to GitHub yet
+                    if (PENDING_NEW_FILES.has(filename) && NEW_PAGES[filename]) {
+                        zip.file(filename, NEW_PAGES[filename].html);
+                    } else {
+                        // Otherwise, fetch the live file content from the server
+                        let res = await fetchFresh(filename);
+                        if (res.ok) {
+                            let text = await res.text();
+                            zip.file(filename, text);
+                        } else {
+                            console.warn("Could not fetch " + filename + " (HTTP " + res.status + ")");
+                        }
+                    }
+                }
+                
+                // 3. Generate the ZIP file as a blob
+                const zipBlob = await zip.generateAsync({ type: "blob" });
+                
+                // 4. Create a temporary download link and click it programmatically
+                const url = URL.createObjectURL(zipBlob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "FracSTAT_Documentation_Backup.zip";
+                document.body.appendChild(a);
+                a.click();
+                
+                // Clean up the DOM and ObjectURL
+                a.remove();
+                URL.revokeObjectURL(url);
+                
+                showToast("Backup downloaded successfully!", "success");
+
+            } catch (err) {
+                console.error("Backup failed:", err);
+                showToast("Backup failed: " + err.message, "error");
+            }
+        });
+    });
 
     function escapeJsString(s) {
         return String(s).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
@@ -1894,12 +1684,6 @@
         return String(s).replace(/\\"/g, '"').replace(/\\\\/g, "\\");
     }
 
-    // Locates an array literal (e.g. "var FILE_SECTIONS = [ ... ]") by
-    // finding the declaration, then the first "[" after it, then its
-    // matching "]" via bracket-depth counting. Mirrors the approach used
-    // by patchFileSectionsSource()/patchScriptJsSidebarSource() above,
-    // but returns the full [start, end] range instead of assuming a
-    // single insertion point.
     function findArrayLiteralRange(src, declRegex) {
         var m = declRegex.exec(src);
         if (!m) return null;
@@ -1915,11 +1699,6 @@
         return { start: arrStart, end: arrEnd };
     }
 
-    // Recovers { href, label } pairs already present in an existing
-    // PAGE_ORDER array literal, so regenerating it can preserve each
-    // page's current pagination label (which sometimes differs from its
-    // sidebar label, e.g. "Static Map Tab" vs. "Map Tab") rather than
-    // silently overwriting it.
     function parseSimpleHrefLabelEntries(arrText) {
         var entries = [];
         var re = /\{\s*href:\s*"((?:[^"\\]|\\.)*)"\s*,\s*label:\s*"((?:[^"\\]|\\.)*)"\s*\}/g;
@@ -1945,9 +1724,6 @@
         return lines.join("\n");
     }
 
-    // Rewrites admin.html's own FILE_SECTIONS array (the page registry
-    // driving the dashboard grid you just dragged) to match the current
-    // in-memory order exactly.
     function replaceFileSectionsWholeArray(src) {
         var range = findArrayLiteralRange(src, /var\s+FILE_SECTIONS/);
         if (!range) return null;
@@ -1956,10 +1732,6 @@
         return newSrc === src ? null : newSrc;
     }
 
-    // Rewrites script.js's SIDEBAR_SECTIONS (drives every page's live
-    // sidebar) and PAGE_ORDER (drives Previous/Next pagination) arrays
-    // together, from the same FILE_SECTIONS order, in one pass so both
-    // stay mutually consistent.
     function replaceSidebarAndPageOrder(src) {
         var sbRange = findArrayLiteralRange(src, /(?:const|var)\s+SIDEBAR_SECTIONS/);
         var poRange = findArrayLiteralRange(src, /(?:const|var)\s+PAGE_ORDER/);
@@ -2001,9 +1773,6 @@
         poLines.push("]");
         var newPageOrderText = poLines.join("\n");
 
-        // Replace whichever range starts later first, so splicing the
-        // first replacement never shifts the still-unprocessed range's
-        // stored indices out from under it.
         var replacements = [
             { range: sbRange, text: newSidebarText },
             { range: poRange, text: newPageOrderText }
@@ -2036,16 +1805,19 @@
             if (newScriptSrc !== null) filesToCommit["script.js"] = newScriptSrc;
 
             if (Object.keys(filesToCommit).length === 0) {
-                orderStatus.textContent = "No changes to publish — order already matches the live site.";
+                showToast("No changes to publish — order already matches the live site.", "info");
+                orderStatus.textContent = "";
                 return;
             }
 
             orderStatus.textContent = "Pushing new order to GitHub (single commit)…";
-            await commitMultipleFilesToGithub(filesToCommit, "Sidebar Pages Reorder ");
-            orderStatus.textContent = "Order published! (Allow 1-2 minutes for the live site to redeploy.)";
+            await commitMultipleFilesToGithub(filesToCommit, "Reorder sidebar pages via Admin Panel drag-and-drop");
+            showToast("Sidebar Order published successfully!", "success");
+            orderStatus.textContent = "";
         } catch (err) {
             console.error("Failed to save sidebar order:", err);
-            orderStatus.textContent = "Failed to save order: " + err.message;
+            showToast("Failed to save order: " + err.message, "error");
+            orderStatus.textContent = "";
         }
     }
 
@@ -2058,14 +1830,10 @@
         if (doc) redo(doc);
     });
 
-    // Fallback so Ctrl+Z / Ctrl+Y also work if focus happens to be on
-    // the admin chrome (e.g. a toolbar button) rather than inside the
-    // iframe's document. bindHistoryShortcuts() covers the normal case
-    // where focus is on the edited page itself.
     document.addEventListener("keydown", function (e) {
         if (!currentFile) return;
         var doc = editorFrame.contentDocument;
-        if (!doc || doc.hasFocus()) return; // already handled inside the iframe
+        if (!doc || doc.hasFocus()) return; 
         var mod = e.ctrlKey || e.metaKey;
         if (!mod) return;
         var key = e.key ? e.key.toLowerCase() : "";
@@ -2077,8 +1845,6 @@
     // ---------------------------------------------------------
     // Formatting toolbar (Bold / Italic / Underline / font size)
     // ---------------------------------------------------------
-    // mousedown->preventDefault keeps focus (and the text selection)
-    // inside the iframe instead of shifting it to the button being clicked.
     document.querySelectorAll(".format-toolbar .fmt-btn[data-cmd]").forEach(function (btn) {
         btn.addEventListener("mousedown", function (e) { e.preventDefault(); });
         btn.addEventListener("click", function () {
@@ -2127,14 +1893,11 @@
         try {
             range.surroundContents(span);
         } catch (e) {
-            // Selection crosses element boundaries — surroundContents can't
-            // wrap it directly, so extract + re-insert into the new span instead.
             var frag = range.extractContents();
             span.appendChild(frag);
             range.insertNode(span);
         }
 
-        // Keep the resized text selected so repeated clicks keep scaling it.
         sel.removeAllRanges();
         var newRange = doc.createRange();
         newRange.selectNodeContents(span);
@@ -2145,8 +1908,6 @@
         var doc = frame.contentDocument;
         if (!doc) throw new Error("no access to the page's document");
 
-        // Injected purely inside the iframe's own document — never touches
-        // the site's real style.css / script.js files.
         var style = doc.createElement("style");
         style.setAttribute("data-admin-injected", "true");
         style.textContent =
@@ -2158,38 +1919,34 @@
             "[data-admin-editable] { outline: 1px dashed transparent; cursor: text; border-radius: 4px; transition: outline-color .15s ease, background-color .15s ease; }" +
             "[data-admin-editable]:hover { outline-color: #93c5fd; background-color: rgba(37,99,235,0.05); }" +
             "[data-admin-editable]:focus { outline: 2px solid #2563eb; background-color: rgba(37,99,235,0.07); }" +
-            ".admin-img-overlay { position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center; gap: 0.6rem; background: rgba(15,23,42,0.45); opacity: 0; pointer-events: none; transition: opacity .2s ease; }" +
+            ".admin-img-overlay { position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center; gap: 0.6rem; background: rgba(17,24,39,0.45); opacity: 0; pointer-events: none; transition: opacity .2s ease; }" +
             ".figure-img-wrap:hover .admin-img-overlay { opacity: 1; pointer-events: auto; }" +
-            ".admin-img-btn { display: flex; align-items: center; padding: 0.6rem 1.1rem; border: none; border-radius: 8px; background: #fff; color: #0f172a; font-weight: 700; font-size: 0.85rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.25); }" +
+            ".admin-img-btn { display: flex; align-items: center; padding: 0.6rem 1.1rem; border: none; border-radius: 8px; background: #fff; color: #111827; font-weight: 700; font-size: 0.85rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.25); }" +
             ".admin-img-btn .svg-icon { margin-right: 0.4em; width: 1.2em; height: 1.2em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }" +
             ".admin-img-btn:hover { background: #2563eb; color: #fff; }" +
             ".admin-block-wrap { position: relative; }" +
             ".admin-block-toolbar { position: absolute; top: -14px; right: 4px; display: flex; gap: 3px; opacity: 0; pointer-events: none; transition: opacity .15s ease; z-index: 15; }" +
             ".admin-block-wrap:hover > .admin-block-toolbar, .admin-block-wrap:focus-within > .admin-block-toolbar { opacity: 1; pointer-events: auto; }" +
-            ".admin-block-toolbar button { width: 24px; height: 24px; border: none; border-radius: 5px; background: #0f172a; color: #fff; font-size: 12px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.25); }" +
+            ".admin-block-toolbar button { width: 24px; height: 24px; border: none; border-radius: 5px; background: #111827; color: #fff; font-size: 12px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.25); }" +
             ".admin-block-toolbar button svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }" +
             ".admin-block-toolbar button:hover { background: #2563eb; }" +
             ".admin-table-toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin: 0.4rem 0 1.5rem 0; }" +
-            ".admin-table-toolbar button { border: 1px solid #cbd5e1; background: #f8fafc; color: #0f172a; font-size: 0.78rem; font-weight: 600; padding: 4px 10px; border-radius: 6px; cursor: pointer; }" +
+            ".admin-table-toolbar button { border: 1px solid #cbd5e1; background: #f8fafc; color: #111827; font-size: 0.78rem; font-weight: 600; padding: 4px 10px; border-radius: 6px; cursor: pointer; }" +
             ".admin-table-toolbar button:hover { background: #2563eb; color: #fff; border-color: #2563eb; }" +
             ".admin-insert-bar { position: relative; height: 15px; margin: 3px 0; display: flex; align-items: center; justify-content: center; opacity: 0.28; transition: opacity .15s ease; }" +
             ".admin-insert-bar::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: #2563eb; }" +
             ".admin-insert-bar:hover, .admin-insert-bar:focus-within, .admin-insert-bar.admin-bar-active { opacity: 1; }" +
             ".admin-insert-plus { position: relative; width: 22px; height: 22px; border-radius: 50%; border: none; background: #2563eb; color: #fff; font-size: 15px; font-weight: 700; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.3); z-index: 16; }" +
             ".admin-insert-plus:hover { background: #1d4ed8; transform: scale(1.08); }" +
-            ".admin-insert-menu { position: fixed; opacity: 1; background: #fff; border: 1px solid #cbd5e1; border-radius: 10px; box-shadow: 0 12px 24px rgba(15,23,42,0.2); padding: 6px; display: flex; flex-direction: column; gap: 1px; z-index: 50; min-width: 190px; max-width: 240px; text-align: left; }" +
-            ".admin-insert-menu button { display: flex; align-items: center; text-align: left; border: none; background: transparent; padding: 7px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; cursor: pointer; color: #0f172a; }" +
+            ".admin-insert-menu { position: fixed; opacity: 1; background: #fff; border: 1px solid #cbd5e1; border-radius: 10px; box-shadow: 0 12px 24px rgba(17,24,39,0.2); padding: 6px; display: flex; flex-direction: column; gap: 1px; z-index: 50; min-width: 190px; max-width: 240px; text-align: left; }" +
+            ".admin-insert-menu button { display: flex; align-items: center; text-align: left; border: none; background: transparent; padding: 7px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; cursor: pointer; color: #111827; }" +
             ".admin-insert-menu button .svg-icon { margin-right: 0.5em; width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }" +
             ".admin-insert-menu button:hover { background: #eff6ff; color: #2563eb; }" +
             ".admin-hover-blocker { position: fixed; inset: 0; z-index: 45; background: transparent; }" +
-            /* Touch devices have no :hover, so block toolbars and the
-               image-replace overlay must stay reachable via a tap
-               instead of only appearing on mouse-hover. Buttons are
-               also enlarged to a comfortable 44px tap target. */
             "@media (hover: none) and (pointer: coarse) {" +
             "  .admin-block-toolbar { opacity: 0.92; pointer-events: auto; top: -18px; }" +
             "  .admin-block-toolbar button { width: 30px; height: 30px; }" +
-            "  .admin-img-overlay { opacity: 1; pointer-events: auto; background: rgba(15,23,42,0.35); }" +
+            "  .admin-img-overlay { opacity: 1; pointer-events: auto; background: rgba(17,24,39,0.35); }" +
             "  .admin-insert-plus { width: 30px; height: 30px; font-size: 18px; }" +
             "  .admin-table-toolbar button { padding: 8px 12px; }" +
             "}" +
@@ -2203,8 +1960,6 @@
 
         hydrateEditableContent(doc, container);
 
-        // Stop the page's own links/router from navigating the iframe away
-        // from the page currently being edited.
         doc.addEventListener("click", function (e) {
             var link = e.target.closest("a");
             if (link) e.preventDefault();
@@ -2215,9 +1970,6 @@
         updateUndoRedoButtons(doc);
         bindHistoryShortcuts(doc);
 
-        // Any direct text edit (typing inside a contenteditable block)
-        // schedules a debounced snapshot; losing focus captures one
-        // immediately so a quick edit-then-click isn't lost.
         container.addEventListener("input", function () {
             scheduleHistorySnapshot(doc);
         }, true);
@@ -2228,10 +1980,6 @@
         }, true);
     }
 
-    // Re-applies every piece of admin scaffolding (contenteditable
-    // marking, image-replace overlays, block wrappers/toolbars/insert
-    // bars) to whatever HTML currently sits in `container`. Used both
-    // on first load and after an undo/redo restores a clean snapshot.
     function hydrateEditableContent(doc, container) {
         container.querySelectorAll(EDITABLE_SELECTOR).forEach(function (el) {
             el.setAttribute("contenteditable", "true");
@@ -2258,7 +2006,7 @@
         var uploadBtn = doc.createElement("button");
         uploadBtn.type = "button";
         uploadBtn.className = "admin-img-btn";
-        uploadBtn.innerHTML = '<svg class="svg-icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg> Upload';
+        uploadBtn.innerHTML = '<svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg> Upload';
         uploadBtn.addEventListener("click", function (e) {
             e.stopPropagation();
             e.preventDefault();
@@ -2294,7 +2042,7 @@
         var urlBtn = doc.createElement("button");
         urlBtn.type = "button";
         urlBtn.className = "admin-img-btn";
-        urlBtn.innerHTML = '<svg class="svg-icon" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg> Image URL';
+        urlBtn.innerHTML = '<svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg> Image URL';
         urlBtn.addEventListener("click", function (e) {
             e.stopPropagation();
             e.preventDefault();
@@ -2312,34 +2060,24 @@
         wrap.appendChild(overlay);
     }
 
-    // ---------------------------------------------------------
-    // Block editing engine — lets the user insert, reorder,
-    // duplicate, and delete whole content blocks (paragraphs,
-    // headings, lists, tables, code snippets, note/tip boxes,
-    // images) anywhere in the page, plus add/remove table rows
-    // and columns. Every element this engine adds is admin-only
-    // scaffolding and is stripped back out in cleanupAdminBlocks()
-    // before the page is exported in saveCurrentFile().
-    // ---------------------------------------------------------
-
     var BLOCK_TYPES = [
-        ["paragraph", "<svg class='svg-icon' viewBox='0 0 24 24'><path d='M13 4v16'/><path d='M17 4v16'/><path d='M19 4H9.5a4.5 4.5 0 0 0 0 9H13'/></svg> Paragraph"],
-        ["heading2", "<svg class='svg-icon' viewBox='0 0 24 24'><path d='M4 12h8'/><path d='M4 18V6'/><path d='M12 18V6'/><path d='M21 18h-4c0-4 4-3 4-6 0-1.5-2-2.5-4-1'/></svg> H2 Heading"],
-        ["heading3", "<svg class='svg-icon' viewBox='0 0 24 24'><path d='M4 12h8'/><path d='M4 18V6'/><path d='M12 18V6'/><path d='M17.5 10.5c1.7-1 3.5 0 3.5 1.5a2 2 0 0 1-2 2 2 2 0 0 1 2 2c0 1.5-1.8 2.5-3.5 1.5'/></svg> H3 Heading"],
-        ["bulletlist", "<svg class='svg-icon' viewBox='0 0 24 24'><line x1='8' y1='6' x2='21' y2='6'/><line x1='8' y1='12' x2='21' y2='12'/><line x1='8' y1='18' x2='21' y2='18'/><line x1='3' y1='6' x2='3.01' y2='6'/><line x1='3' y1='12' x2='3.01' y2='12'/><line x1='3' y1='18' x2='3.01' y2='18'/></svg> Bulleted list"],
-        ["numberlist", "<svg class='svg-icon' viewBox='0 0 24 24'><line x1='10' y1='6' x2='21' y2='6'/><line x1='10' y1='12' x2='21' y2='12'/><line x1='10' y1='18' x2='21' y2='18'/><path d='M4 6h1v4'/><path d='M4 10h2'/><path d='M6 18H4c0-1 2-2 2-3s-1-1.5-2-1'/></svg> Numbered list"],
-        ["blockquote", "<svg class='svg-icon' viewBox='0 0 24 24'><path d='M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z'/><path d='M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h1c0 1 0 1 0 2v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z'/></svg> Quote"],
-        ["table", "<svg class='svg-icon' viewBox='0 0 24 24'><rect x='3' y='3' width='18' height='18' rx='2' ry='2'/><line x1='3' y1='9' x2='21' y2='9'/><line x1='3' y1='15' x2='21' y2='15'/><line x1='9' y1='3' x2='9' y2='21'/><line x1='15' y1='3' x2='15' y2='21'/></svg> Table"],
-        ["code", "<svg class='svg-icon' viewBox='0 0 24 24'><polyline points='16 18 22 12 16 6'/><polyline points='8 6 2 12 8 18'/></svg> Code snippet"],
-        ["note", "<svg class='svg-icon' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10'/><line x1='12' y1='16' x2='12' y2='12'/><line x1='12' y1='8' x2='12.01' y2='8'/></svg> Note box"],
-        ["tip", "<svg class='svg-icon' viewBox='0 0 24 24'><polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'/></svg> Tip box"],
-        ["image", "<svg class='svg-icon' viewBox='0 0 24 24'><rect x='3' y='3' width='18' height='18' rx='2' ry='2'/><circle cx='8.5' cy='8.5' r='1.5'/><polyline points='21 15 16 10 5 21'/></svg> Image figure"]
+        ["paragraph", "<svg class='svg-icon' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M13 4v16'/><path d='M17 4v16'/><path d='M19 4H9.5a4.5 4.5 0 0 0 0 9H13'/></svg> Paragraph"],
+        ["heading2", "<svg class='svg-icon' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 12h8'/><path d='M4 18V6'/><path d='M12 18V6'/><path d='M21 18h-4c0-4 4-3 4-6 0-1.5-2-2.5-4-1'/></svg> H2 Heading"],
+        ["heading3", "<svg class='svg-icon' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 12h8'/><path d='M4 18V6'/><path d='M12 18V6'/><path d='M17.5 10.5c1.7-1 3.5 0 3.5 1.5a2 2 0 0 1-2 2 2 2 0 0 1 2 2c0 1.5-1.8 2.5-3.5 1.5'/></svg> H3 Heading"],
+        ["bulletlist", "<svg class='svg-icon' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><line x1='8' y1='6' x2='21' y2='6'/><line x1='8' y1='12' x2='21' y2='12'/><line x1='8' y1='18' x2='21' y2='18'/><line x1='3' y1='6' x2='3.01' y2='6'/><line x1='3' y1='12' x2='3.01' y2='12'/><line x1='3' y1='18' x2='3.01' y2='18'/></svg> Bulleted list"],
+        ["numberlist", "<svg class='svg-icon' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><line x1='10' y1='6' x2='21' y2='6'/><line x1='10' y1='12' x2='21' y2='12'/><line x1='10' y1='18' x2='21' y2='18'/><path d='M4 6h1v4'/><path d='M4 10h2'/><path d='M6 18H4c0-1 2-2 2-3s-1-1.5-2-1'/></svg> Numbered list"],
+        ["blockquote", "<svg class='svg-icon' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z'/><path d='M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h1c0 1 0 1 0 2v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z'/></svg> Quote"],
+        ["table", "<svg class='svg-icon' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='2' ry='2'/><line x1='3' y1='9' x2='21' y2='9'/><line x1='3' y1='15' x2='21' y2='15'/><line x1='9' y1='3' x2='9' y2='21'/><line x1='15' y1='3' x2='15' y2='21'/></svg> Table"],
+        ["code", "<svg class='svg-icon' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='16 18 22 12 16 6'/><polyline points='8 6 2 12 8 18'/></svg> Code snippet"],
+        ["note", "<svg class='svg-icon' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><line x1='12' y1='16' x2='12' y2='12'/><line x1='12' y1='8' x2='12.01' y2='8'/></svg> Note box"],
+        ["tip", "<svg class='svg-icon' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'/></svg> Tip box"],
+        ["image", "<svg class='svg-icon' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='2' ry='2'/><circle cx='8.5' cy='8.5' r='1.5'/><polyline points='21 15 16 10 5 21'/></svg> Image figure"]
     ];
 
     function setupBlockControls(doc, container) {
         var children = Array.from(container.children);
         children.forEach(function (el) {
-            if (!el.parentNode) return; // already moved by an earlier iteration
+            if (!el.parentNode) return; 
             if (el.classList && el.classList.contains("pagination-nav")) return;
             if (el.tagName === "SCRIPT") return;
 
@@ -2353,10 +2091,6 @@
         });
     }
 
-    // Wraps `el` (either already in the document, or a freshly created,
-    // still-detached element) in an .admin-block-wrap carrying the
-    // hover toolbar (move / duplicate / delete), plus a row/column
-    // toolbar when `el` is a <table>.
     function buildBlockWrap(doc, el) {
         var wrap = doc.createElement("div");
         wrap.className = "admin-block-wrap";
@@ -2381,10 +2115,10 @@
         var toolbar = doc.createElement("div");
         toolbar.className = "admin-block-toolbar";
         toolbar.innerHTML =
-            '<button type="button" data-act="up" title="Move block up"><svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg></button>' +
-            '<button type="button" data-act="down" title="Move block down"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg></button>' +
-            '<button type="button" data-act="dup" title="Duplicate block"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>' +
-            '<button type="button" data-act="del" title="Delete block"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>';
+            '<button type="button" data-act="up" title="Move block up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg></button>' +
+            '<button type="button" data-act="down" title="Move block down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg></button>' +
+            '<button type="button" data-act="dup" title="Duplicate block"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>' +
+            '<button type="button" data-act="del" title="Delete block"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>';
         toolbar.querySelectorAll("button").forEach(function (btn) {
             btn.addEventListener("mousedown", function (e) { e.preventDefault(); });
             btn.addEventListener("click", function (e) {
@@ -2412,9 +2146,6 @@
         recordHistory(doc);
     }
 
-    // Swaps two arbitrary DOM nodes in place, leaving everything
-    // else around them (including the insert-bars between blocks)
-    // in exactly the same relative order.
     function swapNodes(a, b) {
         var marker = a.ownerDocument.createComment("admin-swap");
         a.parentNode.insertBefore(marker, a);
@@ -2446,9 +2177,6 @@
         recordHistory(doc);
     }
 
-    // ---------------------------------------------------------
-    // Insert bars — the thin "+" strips between every block
-    // ---------------------------------------------------------
     function makeInsertBar(doc) {
         var bar = doc.createElement("div");
         bar.className = "admin-insert-bar";
@@ -2469,7 +2197,7 @@
     function showInsertMenu(doc, bar, btn) {
         var wasForThisBar = doc.__adminActiveInsertBar === bar && !!doc.querySelector(".admin-insert-menu");
         closeInsertMenu(doc);
-        if (wasForThisBar) return; // clicking the same "+" again just closes it
+        if (wasForThisBar) return; 
 
         bar.classList.add("admin-bar-active");
         doc.__adminActiveInsertBar = bar;
@@ -2488,19 +2216,9 @@
             });
         });
 
-        // Appended to <body> and positioned with getBoundingClientRect
-        // (not nested inside the "+" bar) so it always renders at full
-        // opacity — nesting it inside the bar meant the bar's own
-        // low-opacity "unhovered" state visually washed the whole menu
-        // out the instant the pointer left the bar's tiny hit area on
-        // its way down to a menu item.
         doc.body.appendChild(menu);
         positionInsertMenu(doc, menu, btn);
 
-        // A fixed, transparent, full-viewport layer sitting just below
-        // the menu (but above every block's hover-triggered toolbar)
-        // so moving the mouse toward a lower menu item doesn't pass
-        // over — and light up — the block/insert-bar underneath it.
         var blocker = doc.createElement("div");
         blocker.className = "admin-hover-blocker";
         doc.body.appendChild(blocker);
@@ -2527,7 +2245,6 @@
         var left = rect.left + rect.width / 2;
         left = Math.min(Math.max(left, estWidth / 2 + 8), vw - estWidth / 2 - 8);
         var top = rect.bottom + 6;
-        // Flip above the button if there isn't room below.
         if (top + 260 > vh && rect.top > 260) {
             top = rect.top - 6;
             menu.style.transform = "translate(-50%, -100%)";
@@ -2581,7 +2298,7 @@
 
         var focusTarget = (el.matches && el.matches(EDITABLE_SELECTOR)) ? el : el.querySelector("[contenteditable]");
         if (focusTarget) {
-            try { focusTarget.focus(); } catch (err) { /* ignore */ }
+            try { focusTarget.focus(); } catch (err) { }
         }
 
         recordHistory(doc);
@@ -2681,9 +2398,6 @@
         return null;
     }
 
-    // ---------------------------------------------------------
-    // Table row/column controls
-    // ---------------------------------------------------------
     function makeTableToolbar(doc, table) {
         var tb = doc.createElement("div");
         tb.className = "admin-table-toolbar";
@@ -2743,10 +2457,6 @@
         });
     }
 
-    // Strips every piece of admin-only scaffolding (insert bars,
-    // block toolbars, table toolbars, any still-open insert menu,
-    // and the wrapper <div>s themselves) out of a cloned subtree
-    // before it is serialized back out to a downloadable .html file.
     function cleanupAdminBlocks(root) {
         root.querySelectorAll(".admin-insert-bar, .admin-block-toolbar, .admin-table-toolbar, .admin-insert-menu, .admin-hover-blocker").forEach(function (el) {
             el.remove();
@@ -2759,9 +2469,6 @@
         });
     }
 
-    // Returns the fully "clean" (no admin scaffolding, no
-    // contenteditable attributes) HTML for `container` — used both
-    // for the final downloaded file and as an undo/redo snapshot.
     function getCleanHTML(container) {
         var clone = container.cloneNode(true);
         clone.querySelectorAll("[contenteditable]").forEach(function (el) {
@@ -2784,7 +2491,7 @@
         if (!h) return;
         var container = doc.querySelector(".docs-content-inner") || doc.body;
         var html = getCleanHTML(container);
-        if (h.stack[h.index] === html) return; // nothing actually changed
+        if (h.stack[h.index] === html) return; 
         h.stack = h.stack.slice(0, h.index + 1);
         h.stack.push(html);
         h.index = h.stack.length - 1;
@@ -2806,7 +2513,7 @@
         var h = doc.__adminHistory;
         if (!h || h.index <= 0) return;
         clearTimeout(h.debounceTimer);
-        recordHistory(doc); // capture any pending unsaved edit first
+        recordHistory(doc); 
         if (h.index <= 0) return;
         h.index--;
         restoreHistorySnapshot(doc, h);
@@ -2895,33 +2602,31 @@
                 a.remove();
                 URL.revokeObjectURL(url);
 
-                editorStatus.textContent = "Downloaded " + currentFile + " — upload it to your site to replace the original.";
+                editorStatus.textContent = "Downloaded " + currentFile;
+                showToast("Page downloaded successfully!", "success");
             })
             .catch(function (err) {
                 editorStatus.textContent = "Export failed: " + err.message;
-                alert("Couldn't export this page: " + err.message);
+                showToast("Couldn't export this page: " + err.message, "error");
             });
     }
 
-    // ---------------------------------------------------------
-    // Push updates directly to GitHub
-    // ---------------------------------------------------------
     async function updateInGithub() {
         if (!currentFile) return;
         var doc = editorFrame.contentDocument;
         if (!doc) {
-            alert("No editable page is currently loaded.");
+            showToast("No editable page is currently loaded.", "error");
             return;
         }
 
         const token = sessionStorage.getItem("github_token");
         if (!token) {
-            alert("No GitHub token found. Please ensure your token is in the database and log in again.");
+            showToast("No GitHub token found. Please ensure your token is in the database and log in again.", "error");
             return;
         }
         
         if (!GITHUB_REPO_OWNER || !GITHUB_REPO_NAME || GITHUB_REPO_OWNER === "YOUR_GITHUB_USERNAME") {
-            alert("Please configure GITHUB_REPO_OWNER and GITHUB_REPO_NAME in the script.");
+            showToast("Please configure GITHUB_REPO_OWNER and GITHUB_REPO_NAME in the script.", "error");
             return;
         }
 
@@ -2930,13 +2635,9 @@
         editorStatus.textContent = isNewFile ? "Preparing to create this page on GitHub…" : "Preparing upload to GitHub…";
 
         try {
-            // 1. Generate the clean HTML
             var container = doc.querySelector(".docs-content-inner") || doc.body;
             var cleanHtml = getCleanHTML(container);
             
-            // 2. Get the base template to inject the clean HTML into — either
-            //    the real file on disk, or (for a brand-new draft page) the
-            //    in-memory template generated when the page was created.
             var rawHtml;
             if (isNewFile) {
                 rawHtml = NEW_PAGES[currentFile].html;
@@ -2954,14 +2655,6 @@
             var outHtml = "<!DOCTYPE html>\n" + freshDoc.documentElement.outerHTML;
             if (isNewFile) NEW_PAGES[currentFile].html = outHtml;
 
-            // Single-file Contents-API PUT, for both a brand-new page and
-            // an existing one — creates the file on GitHub if it doesn't
-            // exist yet (isNewFile, sha comes back null), or updates it in
-            // place otherwise. This button no longer also patches script.js
-            // (sidebar + page order) or admin.html's FILE_SECTIONS registry;
-            // once a new page's file is on GitHub, drag its card into place
-            // in the dashboard below and click "💾 Save Order to Sidebar" to
-            // register it in the shared navigation in its own commit.
             const encodedContent = btoa(unescape(encodeURIComponent(outHtml)));
 
             editorStatus.textContent = "Connecting to GitHub…";
@@ -2999,16 +2692,18 @@
 
             if (isNewFile) {
                 PENDING_NEW_FILES.delete(currentFile);
+                showToast(`<b>${currentFile}</b> has been created on GitHub.`, "success");
                 editorStatus.innerHTML = `<span style="color: #10b981; font-weight: 700;">🎉 Success!</span> <b>${currentFile}</b> has been created on GitHub. ` +
-                    `<span style="opacity: 0.85;">Drag its card into place on the dashboard and click "💾 Save Order to Sidebar" to add it to the shared navigation. (Please allow 1–2 minutes for the live site to update)</span>`;
+                    `<span style="opacity: 0.85;">Drag its card into place on the dashboard and click "💾 Save Order to Sidebar" to add it to the shared navigation.</span>`;
             } else {
-                editorStatus.innerHTML = `<span style="color: #10b981; font-weight: 700;">🎉 Success!</span> <b>${currentFile}</b> has been pushed to GitHub. <span style="opacity: 0.85;">(Please allow 1–2 minutes for the live site to update)</span>`;
+                showToast(`<b>${currentFile}</b> has been pushed to GitHub.`, "success");
+                editorStatus.innerHTML = `<span style="color: #10b981; font-weight: 700;">🎉 Success!</span> <b>${currentFile}</b> has been pushed to GitHub. <span style="opacity: 0.85;">(Allow 1-2 minutes for live site updates)</span>`;
             }
 
         } catch (err) {
             console.error(err);
             editorStatus.textContent = "GitHub Export failed: " + err.message;
-            alert("Couldn't upload to GitHub: " + err.message);
+            showToast("Couldn't upload to GitHub: " + err.message, "error");
         }
     }
 })();
