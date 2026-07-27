@@ -369,6 +369,34 @@
         outline-offset: 8px;
     }
 
+    /* ---------- DRAG & DROP: WHOLE SECTIONS ---------- */
+    /* Mirrors the card-level dragging above, but for an entire sidebar
+       section (its heading + every card inside it) so whole groups can
+       be reordered relative to one another, not just the pages within
+       a single group. */
+    .file-section[draggable="true"] { cursor: grab; }
+    .file-section.dragging-section { opacity: 0.35; cursor: grabbing; }
+    .file-section h2 {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .fs-drag-handle {
+        display: flex;
+        color: #c3c8de;
+        transition: color 0.15s ease;
+    }
+    .file-section:hover .fs-drag-handle { color: var(--primary); }
+    .fs-drag-handle svg { width: 16px; height: 16px; }
+    #fileSections {
+        transition: outline-color 0.15s ease;
+        border-radius: 14px;
+    }
+    #fileSections.drag-over-sections {
+        outline: 2px dashed rgba(244,114,182,0.45);
+        outline-offset: 10px;
+    }
+
     /* ---------- SIDEBAR ORDER CARD ---------- */
     #orderControls {
         background: var(--card-bg);
@@ -522,8 +550,6 @@
     .btn-discard { background: #2a2f45; color: #e2e8f0; }
     .btn-discard:hover { background: #363c58; }
 
-    .btn-addsidebar { background: linear-gradient(135deg, var(--accent-warm), #a855f7); color: #fff; box-shadow: 0 8px 18px -8px rgba(168,85,247,0.55); }
-    .btn-addsidebar:hover { filter: brightness(1.08); }
     .btn-undo, .btn-redo { background: #202538; color: #e2e8f0; }
     .btn-undo:hover, .btn-redo:hover { background: #2c324a; }
     .btn-undo:disabled, .btn-redo:disabled { opacity: 0.35; cursor: not-allowed; }
@@ -790,7 +816,6 @@
                 <button class="action btn-discard" id="discardBtn"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-9.21l5.75 4.64"></path></svg> Reload (discard changes)</button>
                 <button class="action btn-save" id="saveBtn"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download Page</button>
                 <button class="action btn-github" id="githubBtn"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg> Update In Github</button>
-                <button class="action btn-addsidebar" id="addSidebarBtn" title="Register this page's link in the shared sidebar (script.js), so it appears in every page's navigation"><svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Add to Sidebar</button>
             </div>
             <div class="et-status" id="editorStatus"></div>
         </div>
@@ -895,7 +920,6 @@
         ]},
         { title: "Dynamic Analyzer", files: [
             { file: "docs_dynamic_map.html", label: "Map Tab" },
-            { file: "docs_demo.html", label: "demo" },
             { file: "docs_dynamic_rose.html", label: "Rose Tab" },
             { file: "docs_dynamic_mohr.html", label: "Mohr Tab" },
             { file: "docs_dynamic_stereonet.html", label: "Stereonet Tab" },
@@ -904,6 +928,7 @@
         ]},
         { title: "Uncertainty Analyzer", files: [
             { file: "docs_uncertainty_montecarlo.html", label: "Monte Carlo Tab" },
+            { file: "docs_demo5.html", label: "demo" },
             { file: "docs_uncertainty_lhs.html", label: "LHS Tab" },
             { file: "docs_uncertainty_pce.html", label: "PCE Tab" }
         ]}
@@ -1390,13 +1415,13 @@
     var dashboard = document.getElementById("dashboard");
     var editorView = document.getElementById("editorView");
     var fileSectionsEl = document.getElementById("fileSections");
+    bindSectionsContainerDragEvents(fileSectionsEl);
     var editorFrame = document.getElementById("editorFrame");
     var editorTitle = document.getElementById("editorTitle");
     var editorStatus = document.getElementById("editorStatus");
     var undoBtn = document.getElementById("undoBtn");
     var redoBtn = document.getElementById("redoBtn");
     var githubBtn = document.getElementById("githubBtn");
-    var addSidebarBtn = document.getElementById("addSidebarBtn");
     var saveOrderBtn = document.getElementById("saveOrderBtn");
     var orderStatus = document.getElementById("orderStatus");
 
@@ -1559,7 +1584,8 @@
 
             cpStatus.innerHTML = "Created <b>" + filename + "</b> locally (not yet on GitHub). Click its " +
                 "<b>Edit Page</b> button below to add content, then use <b>Update In Github</b> inside the " +
-                "editor to publish it — that also offers to register it in the shared sidebar (script.js) automatically.";
+                "editor to publish just the page. Afterwards, drag its card into place below and click " +
+                "<b>💾 Save Order to Sidebar</b> to register it in the shared navigation.";
 
             cpTitleInput.value = "";
             cpFilenameInput.value = "";
@@ -1577,11 +1603,16 @@
         FILE_SECTIONS.forEach(function (section) {
             var sectionEl = document.createElement("div");
             sectionEl.className = "file-section";
+            sectionEl.draggable = true;
             sectionEl.dataset.section = section.title;
 
             var h2 = document.createElement("h2");
-            h2.textContent = section.title;
+            h2.innerHTML =
+                '<span class="fs-drag-handle" title="Drag to reorder this whole section">' +
+                    '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"></circle><circle cx="15" cy="6" r="1.5"></circle><circle cx="9" cy="12" r="1.5"></circle><circle cx="15" cy="12" r="1.5"></circle><circle cx="9" cy="18" r="1.5"></circle><circle cx="15" cy="18" r="1.5"></circle></svg>' +
+                '</span><span>' + section.title + '</span>';
             sectionEl.appendChild(h2);
+            bindSectionDragEvents(sectionEl);
 
             var grid = document.createElement("div");
             grid.className = "file-grid";
@@ -1683,6 +1714,78 @@
         });
     }
 
+    // ---------------------------------------------------------
+    // Drag-and-drop reordering of WHOLE SECTIONS (e.g. dragging all of
+    // "Dynamic Analyzer" above "Static Analyzer"). This mirrors the
+    // card-level dragging above but operates one level up: the section
+    // itself (heading + every card inside it) is the thing being moved,
+    // and the drop target is computed against other sections' vertical
+    // midpoints rather than a grid of cards.
+    //
+    // A section is made draggable="true" the same way a card is, so
+    // starting a drag from anywhere in its header (the drag-handle icon
+    // included) picks up the whole section; starting a drag from a card
+    // inside it still picks up just that card, since the card is the
+    // closest draggable element to the cursor in that case.
+    // ---------------------------------------------------------
+    function bindSectionDragEvents(sectionEl) {
+        sectionEl.addEventListener("dragstart", function (e) {
+            // Ignore drags that actually originated on a nested card
+            // (its own dragstart bubbles up through the section too);
+            // only react when the section itself is the drag source.
+            if (e.target !== sectionEl) return;
+            sectionEl.classList.add("dragging-section");
+            e.dataTransfer.effectAllowed = "move";
+            try { e.dataTransfer.setData("text/plain", "section:" + (sectionEl.dataset.section || "")); } catch (err) { /* Safari needs a set, ignore failures */ }
+        });
+        sectionEl.addEventListener("dragend", function (e) {
+            if (e.target !== sectionEl) return;
+            sectionEl.classList.remove("dragging-section");
+            fileSectionsEl.classList.remove("drag-over-sections");
+        });
+    }
+
+    // Finds the section the dragged section should be inserted before,
+    // based purely on vertical cursor position (sections always stack
+    // in a single column, unlike the multi-column card grid above).
+    function getSectionAfterElement(container, y) {
+        var sections = Array.prototype.slice.call(container.querySelectorAll(".file-section:not(.dragging-section)"));
+        var closest = null, closestOffset = Number.NEGATIVE_INFINITY;
+        sections.forEach(function (sectionEl) {
+            var box = sectionEl.getBoundingClientRect();
+            var offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closestOffset) {
+                closestOffset = offset;
+                closest = sectionEl;
+            }
+        });
+        return closest;
+    }
+
+    function bindSectionsContainerDragEvents(container) {
+        container.addEventListener("dragover", function (e) {
+            var draggingSection = container.querySelector(".file-section.dragging-section");
+            if (!draggingSection) return; // a card (not a section) is being dragged — leave it to bindGridDropEvents
+            e.preventDefault();
+            e.dataTransfer.dropEffect = "move";
+            container.classList.add("drag-over-sections");
+            var after = getSectionAfterElement(container, e.clientY);
+            if (after == null) container.appendChild(draggingSection);
+            else if (after !== draggingSection) container.insertBefore(draggingSection, after);
+        });
+        container.addEventListener("dragleave", function (e) {
+            if (!container.contains(e.relatedTarget)) container.classList.remove("drag-over-sections");
+        });
+        container.addEventListener("drop", function (e) {
+            var draggingSection = container.querySelector(".file-section.dragging-section");
+            if (!draggingSection) return;
+            e.preventDefault();
+            container.classList.remove("drag-over-sections");
+            rebuildFileSectionsFromDom();
+            if (orderStatus) orderStatus.textContent = 'Section order changed locally — click "Save Order to Sidebar" to publish it.';
+        });
+    }
+
     // Rebuilds FILE_SECTIONS (the single in-memory source of truth also
     // used by populateSectionDropdown, create-page, etc.) directly from
     // the current DOM order, so a card dragged into a different section
@@ -1762,40 +1865,6 @@
     // Add GitHub Button listener
     githubBtn.addEventListener("click", function () {
         updateInGithub();
-    });
-
-    addSidebarBtn.addEventListener("click", async function () {
-        if (!currentFile) return;
-        var meta = findFileMeta(currentFile);
-        if (!meta) { alert("Couldn't determine this page's sidebar section/label."); return; }
-        if (!confirm('Add "' + currentFile + '" (' + meta.label + ') to the shared sidebar (script.js) and to admin.html\'s own page registry, pushing both as a SINGLE commit to GitHub now?')) return;
-
-        editorStatus.textContent = "Preparing sidebar + registry update…";
-        try {
-            var filesToCommit = {};
-
-            var scriptPatch = await computeScriptJsPatch(currentFile);
-            if (scriptPatch !== null) filesToCommit["script.js"] = scriptPatch;
-
-            var adminPatch = await computeAdminHtmlPatch(currentFile, meta.label, meta.section);
-            if (adminPatch !== null) filesToCommit["admin.html"] = adminPatch;
-
-            if (Object.keys(filesToCommit).length === 0) {
-                editorStatus.textContent = currentFile + " is already registered everywhere — nothing to update.";
-                return;
-            }
-
-            editorStatus.textContent = "Pushing a single combined commit to GitHub…";
-            await commitMultipleFilesToGithub(
-                filesToCommit,
-                "Add " + currentFile + " to shared sidebar + page order + admin registry (via Admin Panel)"
-            );
-            editorStatus.textContent = "Done in one commit — " + currentFile + " now appears on every page's navigation. " +
-                "(Allow 1-2 minutes for the live site to redeploy.)";
-        } catch (err) {
-            console.error("Sidebar/registry update failed:", err);
-            editorStatus.textContent = "Update failed: " + err.message;
-        }
     });
 
     if (saveOrderBtn) {
@@ -2886,83 +2955,57 @@
             var outHtml = "<!DOCTYPE html>\n" + freshDoc.documentElement.outerHTML;
             if (isNewFile) NEW_PAGES[currentFile].html = outHtml;
 
+            // Single-file Contents-API PUT, for both a brand-new page and
+            // an existing one — creates the file on GitHub if it doesn't
+            // exist yet (isNewFile, sha comes back null), or updates it in
+            // place otherwise. This button no longer also patches script.js
+            // (sidebar + page order) or admin.html's FILE_SECTIONS registry;
+            // once a new page's file is on GitHub, drag its card into place
+            // in the dashboard below and click "💾 Save Order to Sidebar" to
+            // register it in the shared navigation in its own commit.
+            const encodedContent = btoa(unescape(encodeURIComponent(outHtml)));
+
+            editorStatus.textContent = "Connecting to GitHub…";
+
+            const apiUrl = `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${filePath}`;
+            const shaRes = await fetch(apiUrl, {
+                headers: { "Authorization": `token ${token}` },
+                cache: "no-store"
+            });
+            let fileSha = null;
+            if (shaRes.ok) {
+                const shaData = await shaRes.json();
+                fileSha = shaData.sha;
+            }
+
+            const updateRes = await fetch(apiUrl, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `token ${token}`,
+                    "Content-Type": "application/json"
+                },
+                cache: "no-store",
+                body: JSON.stringify({
+                    message: (isNewFile ? `Create ${filePath}` : `Update ${filePath}`) + " via Admin Panel",
+                    content: encodedContent,
+                    sha: fileSha,
+                    branch: GITHUB_BRANCH
+                })
+            });
+
+            if (!updateRes.ok) {
+                const errData = await updateRes.json();
+                throw new Error(errData.message || "GitHub upload failed.");
+            }
+
             if (isNewFile) {
-                // A brand-new page also needs script.js (sidebar + page
-                // order, for Previous/Next pagination) and admin.html
-                // (FILE_SECTIONS) updated so it actually shows up in
-                // navigation. Rather than pushing the page, then script.js,
-                // then admin.html as three separate commits (= three separate
-                // GitHub Pages deployments queued back to back), compute all
-                // three file contents first and publish them together in one
-                // commit via the Git Data API.
-                editorStatus.textContent = "Preparing sidebar + registry updates…";
-                var meta = findFileMeta(currentFile);
-                var filesToCommit = {};
-                filesToCommit[filePath] = outHtml;
-
-                var scriptPatch = await computeScriptJsPatch(currentFile);
-                if (scriptPatch !== null) filesToCommit["script.js"] = scriptPatch;
-
-                if (meta) {
-                    var adminPatch = await computeAdminHtmlPatch(currentFile, meta.label, meta.section);
-                    if (adminPatch !== null) filesToCommit["admin.html"] = adminPatch;
-                }
-
-                editorStatus.textContent = "Connecting to GitHub…";
-                await commitMultipleFilesToGithub(
-                    filesToCommit,
-                    "Create " + filePath + " via Admin Panel (page + sidebar + registry)"
-                );
-
                 PENDING_NEW_FILES.delete(currentFile);
-
-                var fileCount = Object.keys(filesToCommit).length;
-                var successMsg = `<span style="color: #10b981; font-weight: 700;">🎉 Success!</span> <b>${currentFile}</b> has been created on GitHub` +
-                    (fileCount > 1 ? `, together with the sidebar/registry updates, in a single commit.` : `.`) +
-                    ` <span style="opacity: 0.85;">(Please allow 1–2 minutes for the live site to update)</span>`;
-                editorStatus.innerHTML = successMsg;
+                editorStatus.innerHTML = `<span style="color: #10b981; font-weight: 700;">🎉 Success!</span> <b>${currentFile}</b> has been created on GitHub. ` +
+                    `<span style="opacity: 0.85;">Drag its card into place on the dashboard and click "💾 Save Order to Sidebar" to add it to the shared navigation. (Please allow 1–2 minutes for the live site to update)</span>`;
             } else {
-                // Existing file: only one file ever changes here, so a plain
-                // single-file Contents-API PUT is simplest and already only
-                // triggers one deployment.
-                const encodedContent = btoa(unescape(encodeURIComponent(outHtml)));
-
-                editorStatus.textContent = "Connecting to GitHub…";
-
-                const apiUrl = `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${filePath}`;
-                const shaRes = await fetch(apiUrl, {
-                    headers: { "Authorization": `token ${token}` },
-                    cache: "no-store"
-                });
-                let fileSha = null;
-                if (shaRes.ok) {
-                    const shaData = await shaRes.json();
-                    fileSha = shaData.sha;
-                }
-
-                const updateRes = await fetch(apiUrl, {
-                    method: "PUT",
-                    headers: {
-                        "Authorization": `token ${token}`,
-                        "Content-Type": "application/json"
-                    },
-                    cache: "no-store",
-                    body: JSON.stringify({
-                        message: `Update ${filePath} via Admin Panel`,
-                        content: encodedContent,
-                        sha: fileSha,
-                        branch: GITHUB_BRANCH
-                    })
-                });
-
-                if (!updateRes.ok) {
-                    const errData = await updateRes.json();
-                    throw new Error(errData.message || "GitHub upload failed.");
-                }
-
                 editorStatus.innerHTML = `<span style="color: #10b981; font-weight: 700;">🎉 Success!</span> <b>${currentFile}</b> has been pushed to GitHub. <span style="opacity: 0.85;">(Please allow 1–2 minutes for the live site to update)</span>`;
             }
-            
+
         } catch (err) {
             console.error(err);
             editorStatus.textContent = "GitHub Export failed: " + err.message;

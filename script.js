@@ -43,7 +43,6 @@ const SIDEBAR_SECTIONS = [
         title: "Dynamic Analyzer",
         links: [
             { href: "docs_dynamic_map.html", label: "Map Tab" },
-            { href: "docs_demo.html", label: "demo" },
             { href: "docs_dynamic_rose.html", label: "Rose Tab" },
             { href: "docs_dynamic_mohr.html", label: "Mohr Tab" },
             { href: "docs_dynamic_stereonet.html", label: "Stereonet Tab" },
@@ -55,6 +54,7 @@ const SIDEBAR_SECTIONS = [
         title: "Uncertainty Analyzer",
         links: [
             { href: "docs_uncertainty_montecarlo.html", label: "Monte Carlo Tab" },
+            { href: "docs_demo5.html", label: "demo" },
             { href: "docs_uncertainty_lhs.html", label: "LHS Tab" },
             { href: "docs_uncertainty_pce.html", label: "PCE Tab" }
         ]
@@ -119,13 +119,13 @@ const PAGE_ORDER = [
     { href: "docs_static_profile.html", label: "Static Profile Tab" },
     { href: "docs_static_results.html", label: "Static Results Tab" },
     { href: "docs_dynamic_map.html", label: "Dynamic Map Tab" },
-    { href: "docs_demo.html", label: "demo" },
     { href: "docs_dynamic_rose.html", label: "Dynamic Rose Tab" },
     { href: "docs_dynamic_mohr.html", label: "Dynamic Mohr Tab" },
     { href: "docs_dynamic_stereonet.html", label: "Dynamic Stereonet Tab" },
     { href: "docs_dynamic_table.html", label: "Dynamic Table Tab" },
     { href: "docs_dynamic_method.html", label: "Dynamic Method Tab" },
     { href: "docs_uncertainty_montecarlo.html", label: "Uncertainty Monte Carlo Tab" },
+    { href: "docs_demo5.html", label: "demo" },
     { href: "docs_uncertainty_lhs.html", label: "Uncertainty LHS Tab" },
     { href: "docs_uncertainty_pce.html", label: "Uncertainty PCE Tab" }
 ];
