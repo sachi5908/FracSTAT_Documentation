@@ -372,8 +372,25 @@
     .fc-drag-handle:hover { color: var(--primary); }
     .fc-info { flex: 1; min-width: 0; }
     .fc-title { font-weight: 600; font-size: 0.95rem; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .fc-name { font-size: 0.75rem; color: var(--ink-light); font-family: monospace; margin-top: 0.25rem; }
-    .fc-actions { display: flex; align-items: center; gap: 0.5rem; }
+    .file-card > div:first-child {
+    flex: 1;
+    min-width: 0;
+        }
+    .fc-name { 
+    font-size: 0.75rem; 
+    color: var(--ink-light); 
+    font-family: monospace; 
+    margin-top: 0.25rem; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    }
+    .fc-actions { 
+    display: flex; 
+    align-items: center; 
+    gap: 0.5rem; 
+    flex-shrink: 0; 
+    }
     
     .fc-badge {
         font-size: 0.7rem; font-weight: 600; padding: 0.25rem 0.6rem; border-radius: 20px;
