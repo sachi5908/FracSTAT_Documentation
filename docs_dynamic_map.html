@@ -99,7 +99,7 @@
                     <code>core/svg_loader.py</code> and <code>core/models.py</code>.
                 </p>
 
-                <h3>1.1 Data Flow</h3>
+                <h3 id="1.1">1.1 Data Flow</h3>
                 <ol class="step-list">
                     <li><code>core.svg_loader.read_svg_segments()</code> or <code>core.excel_loader.read_excel_segments()</code> parse the source file into a list of <code>Segment</code> objects.</li>
                     <li><code>core.calculator.run_calculation()</code> resolves the stress tensor onto each segment, producing columns such as <code>StrikeDeg</code>, <code>DipDeg</code>, <code>SigmaN</code>, <code>Tau</code>, <code>SlipTendency</code>, <code>SlipTendencyNorm</code>, <code>DilationTendency</code>, <code>FractureSusceptibility</code>, <code>FractureSusceptibilityNorm</code>, <code>CriticalStress</code>, <code>CriticalStressValue</code>, <code>X1/Y1/X2/Y2</code>, <code>RawX1…RawY2</code>, <code>Lat</code>, <code>Lon</code>, <code>EventLabel</code>, <code>PlaneName</code>, <code>BeachballURL</code>, and related fields.</li>
@@ -126,7 +126,7 @@
                     expand) and a collapsible settings panel on the right (fixed width, hidden by default).
                 </p>
 
-                <h3>2.1 Toolbar</h3>
+                <h3 id="2.1">2.1 Toolbar</h3>
                 <p>A horizontal toolbar sits above the plot canvas and contains, from left to right:</p>
                 <table>
                     <tr><th>Control</th><th>Type</th><th>Function</th></tr>
@@ -137,7 +137,7 @@
                     <tr><td>Save Image</td><td>Button</td><td>Exports the current figure (including any layout edits) to a PNG file in the project's plot-export folder, at the DPI configured in application settings.</td></tr>
                 </table>
 
-                <h3>2.2 Plot Canvas</h3>
+                <h3 id="2.2">2.2 Plot Canvas</h3>
                 <p>
                     The plot canvas is a Matplotlib Figure (9 × 6 inches at 100 DPI) embedded via
                     <code>FigureCanvasTkAgg</code>, containing one primary Axes object (<code>self.map_ax</code>) for
@@ -148,7 +148,7 @@
                     positions within the figure.
                 </p>
 
-                <h3>2.3 Settings Panel</h3>
+                <h3 id="2.3">2.3 Settings Panel</h3>
                 <p>
                     The settings panel is a <code>CTkScrollableFrame</code>, 230&nbsp;px wide, that is not built into
                     the layout until the user first opens it via the ⚙ Settings toolbar button
@@ -184,23 +184,23 @@
                     <tr><td><code>self.segments[0]._has_map_geometry</code></td><td><code>core.models.Segment</code></td><td>Boolean flag distinguishing genuinely spatial data (True) from orientation-only legacy fracture-plane or Trend/Plunge tables (False).</td></tr>
                 </table>
 
-                <h3>3.1 Required and Optional Columns</h3>
+                <h3 id="3.1">3.1 Required and Optional Columns</h3>
                 <p>Depending on the branch selected, the following results columns are read:</p>
                 <ul>
-                    <li><strong>Cartesian / SVG mode:</strong> <code>X1, Y1, X2, Y2</code> (scaled, real-world units) and <code>RawX1, RawY1, RawX2, RawY2</code> (unscaled SVG pixel coordinates, used only when the profile has not yet been calibrated — see <a href="#maths">Section 5.3</a>).</li>
+                    <li><strong>Cartesian / SVG mode:</strong> <code>X1, Y1, X2, Y2</code> (scaled, real-world units) and <code>RawX1, RawY1, RawX2, RawY2</code> (unscaled SVG pixel coordinates, used only when the profile has not yet been calibrated — see <a href="#5.3">Section 5.3</a>).</li>
                     <li><strong>Orientation-wheel mode:</strong> <code>StrikeDeg</code>, <code>DipDeg</code>, <code>ID</code>.</li>
                     <li><strong>Geographic mode:</strong> <code>Lat</code>, <code>Lon</code>, <code>PlaneName</code>, <code>EventLabel</code>, <code>Region</code>, <code>BeachballURL</code>.</li>
                     <li><strong>All modes:</strong> <code>ID</code> (for selection), plus whichever attribute column is selected for colouring (<code>SlipTendency</code>/<code>SlipTendencyNorm</code>, <code>DilationTendency</code>, <code>FractureSusceptibility</code>/<code>FractureSusceptibilityNorm</code>, or <code>CriticalStressValue</code>).</li>
                 </ul>
 
-                <h3>3.2 Coordinate Calibration Prerequisite</h3>
+                <h3 id="3.2">3.2 Coordinate Calibration Prerequisite</h3>
                 <p>
                     Cartesian rendering assumes the fracture network has been placed within a physically meaningful
                     profile box. If the profile has not yet been calibrated (Width and Length sidebar fields still at
                     their uncalibrated defaults of 260 and 100), the module falls back to plotting the raw, unscaled
                     SVG pixel coordinates so that the original digitized proportions are preserved rather than being
                     artificially stretched to fill a default 260 × 100 box — see the raw-coordinate detection logic
-                    described in <a href="#algorithms">Section 6.2</a>.
+                    described in <a href="#6.2">Section 6.2</a>.
                 </p>
 
                 <!-- ================================================= -->
@@ -211,7 +211,7 @@
                     upon change (<code>preserve_view=True</code>) except where noted.
                 </p>
 
-                <h3>4.1 Display Options</h3>
+                <h3 id="4.1">4.1 Display Options</h3>
                 <table>
                     <tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Line width (SVG/Geo)</td><td>Text entry</td><td>1.8</td><td>Sets the LineCollection stroke width (points) for Cartesian traces, and separately scales the marker size of focal-mechanism event points (base_size = 85 × value) and orientation-wheel tick width.</td></tr>
@@ -219,7 +219,7 @@
                     <tr><td>Show compass (Wheel Map)</td><td>Checkbox</td><td>On</td><td>Toggles the N/E/S/W compass labels drawn around the orientation wheel. Has no visible effect in Cartesian or geographic modes.</td></tr>
                 </table>
 
-                <h3>4.2 Map Elements</h3>
+                <h3 id="4.2">4.2 Map Elements</h3>
                 <table>
                     <tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Outer BG</td><td>Colour swatch</td><td>#F5F7FA</td><td>Figure (outer canvas) background colour.</td></tr>
@@ -231,14 +231,14 @@
                     <tr><td>Boundary width</td><td>Text entry</td><td>1.0</td><td>Line width (points) of the plot border spines.</td></tr>
                 </table>
 
-                <h3>4.3 Colour Bar</h3>
+                <h3 id="4.3">4.3 Colour Bar</h3>
                 <table>
                     <tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
-                    <tr><td>Position</td><td>Dropdown</td><td>Bottom</td><td>Bottom / Top / Left / Right / None. Determines where the colour bar is docked and how the main Axes is resized to make room for it (see <a href="#statistics">Section 8.4</a> for exact geometry).</td></tr>
+                    <tr><td>Position</td><td>Dropdown</td><td>Bottom</td><td>Bottom / Top / Left / Right / None. Determines where the colour bar is docked and how the main Axes is resized to make room for it (see <a href="#8.4">Section 8.4</a> for exact geometry).</td></tr>
                     <tr><td>Length (e.g., 0.8 for 80%)</td><td>Text entry</td><td>0.8</td><td>Fractional length of the colour bar relative to the corresponding figure dimension, clamped to [0.1, 1.0].</td></tr>
                 </table>
 
-                <h3>4.4 Background Image</h3>
+                <h3 id="4.4">4.4 Background Image</h3>
                 <table>
                     <tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Show real photo behind traces</td><td>Checkbox</td><td>Off</td><td>Enables the calibrated background photograph overlay. If no image path is known, checking this box immediately opens a file-selection dialog; if the user cancels, the checkbox is reverted to off.</td></tr>
@@ -247,7 +247,7 @@
                     <tr><td>Image opacity (0–1)</td><td>Text entry</td><td>1.0</td><td>Alpha blending factor applied to the background image via <code>imshow</code>, clamped to [0, 1].</td></tr>
                 </table>
 
-                <h3>4.5 Reset Map Defaults</h3>
+                <h3 id="4.5">4.5 Reset Map Defaults</h3>
                 <p>
                     The <strong>Reset Map Defaults</strong> button restores every Display Options, Map Elements, and
                     Colour Bar control to the factory values listed above and redraws the map with
@@ -261,7 +261,7 @@
                 <!-- ================================================= -->
                 <h2 id="maths">5. Mathematical Background</h2>
 
-                <h3>5.1 Colour-Mapped Attributes</h3>
+                <h3 id="5.1">5.1 Colour-Mapped Attributes</h3>
                 <p>
                     The Map Tab colours every plotted element (line segment, orientation tick, or event marker)
                     according to one of four mechanical attributes, selected via the Display card's "Map Display"
@@ -277,7 +277,7 @@
                     <tr><td>Critical fractures</td><td>CriticalStressValue (binary)</td><td>—</td><td>1 if τ ≥ μ(σₙ − P_f) + C₀, else 0</td></tr>
                 </table>
 
-                <h4>5.1.1 Definition of Terms</h4>
+                <h4 id="5.1">5.1.1 Definition of Terms</h4>
                 <ul>
                     <li><strong>σₙ</strong> — normal stress resolved on the fracture plane (MPa).</li>
                     <li><strong>τ</strong> — shear stress resolved on the fracture plane (MPa).</li>
@@ -290,7 +290,7 @@
                     <li><strong>S_f (Fracture Susceptibility)</strong> — a Mohr-Coulomb failure-margin proxy combining effective normal stress and cohesion-corrected shear stress; lower (more negative) values indicate closer proximity to shear failure.</li>
                 </ul>
 
-                <h4>5.1.2 Normalization</h4>
+                <h4 id="5.1">5.1.2 Normalization</h4>
                 <p>
                     When "Color by normalized Tₛ" is enabled, Slip Tendency is divided by a theoretical maximum
                     Tₛ,max computed analytically from σ₁ and σ₃ alone (independent of the sampled fracture set — see
@@ -302,7 +302,7 @@
                     dimensionless/binary by construction and are never further normalized.
                 </p>
 
-                <h3>5.2 Colour Normalization for Rendering</h3>
+                <h3 id="5.2">5.2 Colour Normalization for Rendering</h3>
                 <p>
                     Once the attribute column is selected, <code>MapTab.attribute_colormap_and_norm()</code>
                     (delegating to <code>SlipTendencyApp._attribute_norm</code> in <code>dynamic_app.py</code>)
@@ -315,7 +315,7 @@
                     <li><code>CriticalStressValue</code> is treated specially: rather than a continuous colormap, a two-colour <code>ListedColormap(["muted", "failure"])</code> is combined with a <code>BoundaryNorm([-0.5, 0.5, 1.5], N)</code> so that the binary 0/1 values are rendered as two crisp, discrete colours ("Stable" and "Critical") rather than a misleading continuous gradient. The colour bar in this mode is relabelled with the ticks "Stable" and "Critical" instead of numeric values.</li>
                 </ul>
 
-                <h3>5.3 Cartesian Coordinate Scaling</h3>
+                <h3 id="5.3">5.3 Cartesian Coordinate Scaling</h3>
                 <p>
                     For SVG-sourced traces, real-world segment endpoints (X1, Y1, X2, Y2) are computed upstream by
                     scaling the raw pixel bounding box of the digitized traces onto the user-specified Profile Width
@@ -329,7 +329,7 @@
                     stretch. Axis labels switch accordingly from "X (unit)"/"Y (unit)" to "X (px)"/"Y (px)".
                 </p>
 
-                <h3>5.4 Orientation-Wheel Geometry</h3>
+                <h3 id="5.4">5.4 Orientation-Wheel Geometry</h3>
                 <p>
                     For legacy Excel/CSV fracture-plane tables with Strike/Dip but no spatial coordinates, each
                     fracture is represented as a short radial tick mark on a unit circle (radius R = 1). Let θ be the
@@ -347,7 +347,7 @@
                     requiring real spatial coordinates.
                 </p>
 
-                <h3>5.5 Geographic (Focal-Mechanism) Projection</h3>
+                <h3 id="5.5">5.5 Geographic (Focal-Mechanism) Projection</h3>
                 <p>
                     For focal-mechanism datasets, event locations are plotted directly in longitude/latitude space.
                     Because one degree of longitude does not span the same physical distance as one degree of
@@ -360,7 +360,7 @@
                     bound of 0.15 to avoid an unbounded aspect ratio near the poles.
                 </p>
 
-                <h3>5.6 Interactive Zoom Mathematics</h3>
+                <h3 id="5.6">5.6 Interactive Zoom Mathematics</h3>
                 <p>
                     Mouse-wheel zooming is implemented as a cursor-anchored rescaling of the current axis limits.
                     Given a zoom factor f (0.85 per "scroll up" step, 1.18 per "scroll down" step) and cursor
@@ -379,7 +379,7 @@
                 <!-- ================================================= -->
                 <h2 id="algorithms">6. Algorithms</h2>
 
-                <h3>6.1 Drawing Dispatch Algorithm</h3>
+                <h3 id="6.1">6.1 Drawing Dispatch Algorithm</h3>
                 <p>
                     Every call to <code>_draw_map()</code> begins by determining which of four internal renderers
                     should handle the current dataset. The decision tree, implemented in <code>_draw_map()</code> and
@@ -427,40 +427,40 @@
                 </div>
                 <p class="ph-caption" style="text-align:left; margin: -1rem 0 1.5rem 0;">Simplified excerpt of the drawing dispatch logic implemented in <code>_draw_map()</code>.</p>
 
-                <h3>6.2 Cartesian Rendering Algorithm (<code>_draw_map_svg</code>)</h3>
+                <h3 id="6.2">6.2 Cartesian Rendering Algorithm (<code>_draw_map_svg</code>)</h3>
                 <ol class="step-list">
                     <li>Preserve the current axis limits if <code>preserve_view</code> is requested and a home view already exists.</li>
                     <li>Clear the plot and colour-bar Axes and apply the outer/inner background colours.</li>
-                    <li>Determine whether raw (uncalibrated) or scaled coordinates should be used, per the heuristic in <a href="#maths">Section 5.3</a>.</li>
+                    <li>Determine whether raw (uncalibrated) or scaled coordinates should be used, per the heuristic in <a href="#5.3">Section 5.3</a>.</li>
                     <li>Reshape the endpoint columns into an (N, 2, 2) array suitable for a Matplotlib <code>LineCollection</code>.</li>
                     <li>Compute the data bounding box and draw the calibrated background photograph, if enabled, beneath the traces (zorder = 0).</li>
                     <li>Apply a 2% padding margin to the bounding box so that boundary segments are not visually clipped.</li>
-                    <li>Resolve the active colouring attribute and its colormap/normalization (<a href="#maths">Sections 5.1–5.2</a>), build the <code>LineCollection</code> with per-segment colour values, and add it to the Axes.</li>
+                    <li>Resolve the active colouring attribute and its colormap/normalization (<a href="#5.1">Sections 5.1–5.2</a>), build the <code>LineCollection</code> with per-segment colour values, and add it to the Axes.</li>
                     <li>If a segment is currently selected (<code>selected_segment_id</code>), redraw it with a two-layer halo-and-core highlight (a thick under-stroke in the text colour, a slightly narrower over-stroke in the failure/accent colour) plus endpoint markers, so the selection remains visible against any colormap.</li>
-                    <li>Position and populate the colour bar according to the chosen dock position (<a href="#statistics">Section 8.4</a>), or hide it and expand the plot Axes if "None" is selected.</li>
+                    <li>Position and populate the colour bar according to the chosen dock position (<a href="#5.4">Section 5.4</a>), or hide it and expand the plot Axes if "None" is selected.</li>
                     <li>Apply axis limits (respecting the Y-axis reversal setting), then set the aspect ratio to 'equal' with <code>adjustable='box'</code> — deliberately applied after the limits so the plot area shrinks to fit the data rather than stretching the data to fill the plot area.</li>
                     <li>Store the resulting (pre-aspect-correction) tight data bounds as the new "home" view for the Reset View button and zoom-percentage calculation.</li>
                     <li>Apply axis labels, title, gridlines, and boundary spine styling; refresh the zoom label; request an idle canvas redraw.</li>
                 </ol>
 
-                <h3>6.3 Orientation-Wheel Rendering Algorithm (<code>_draw_map_excel</code>)</h3>
+                <h3 id="6.3">6.3 Orientation-Wheel Rendering Algorithm (<code>_draw_map_excel</code>)</h3>
                 <ol class="step-list">
                     <li>Draw the unit-circle boundary ring and, if enabled, the four compass labels.</li>
-                    <li>For each fracture, compute its tick centre and half-length per <a href="#maths">Section 5.4</a>, colour it by the active attribute, and collect all ticks into a single <code>LineCollection</code> for efficient rendering.</li>
+                    <li>For each fracture, compute its tick centre and half-length per <a href="#5.4">Section 5.4</a>, colour it by the active attribute, and collect all ticks into a single <code>LineCollection</code> for efficient rendering.</li>
                     <li>If a segment is selected, recompute its tick position and draw the same halo-and-core highlight pattern used in Cartesian mode, plus an "ID n" text annotation offset from the tick.</li>
                     <li>Fix the axis limits to a symmetric [-1.35, 1.35] box (turning off axis ticks and labels, since the wheel has no physical coordinate system), apply the descriptive title, and finalize styling exactly as in Cartesian mode.</li>
                 </ol>
 
-                <h3>6.4 Geographic Rendering Algorithm (<code>_draw_map_geo</code>)</h3>
+                <h3 id="6.4">6.4 Geographic Rendering Algorithm (<code>_draw_map_geo</code>)</h3>
                 <ol class="step-list">
                     <li>Reduce the results table to one representative row per event: rows tagged <code>PlaneName == "FP1"</code> are preferred when present (so two-nodal-plane focal mechanisms are not double-plotted); otherwise rows are de-duplicated on the (Lat, Lon) pair.</li>
                     <li>Resolve the active attribute for colouring and build a single scatter plot of all events, with marker size proportional to the Line width control.</li>
-                    <li>Compute padded longitude/latitude limits (12% of the data range, or a fixed 0.5–1.0° minimum pad for single-point or degenerate datasets) and apply the latitude-corrected aspect ratio from <a href="#maths">Section 5.5</a>.</li>
-                    <li>If a segment/event is selected, draw a double concentric-ring highlight around it, an event-label annotation, and — if a Beachball URL is present for that event — invoke the beachball inset renderer (<a href="#visualization">Section 9.2</a>).</li>
+                    <li>Compute padded longitude/latitude limits (12% of the data range, or a fixed 0.5–1.0° minimum pad for single-point or degenerate datasets) and apply the latitude-corrected aspect ratio from <a href="#5.5">Section 5.5</a>.</li>
+                    <li>If a segment/event is selected, draw a double concentric-ring highlight around it, an event-label annotation, and — if a Beachball URL is present for that event — invoke the beachball inset renderer (<a href="#9.2">Section 9.2</a>).</li>
                     <li>Position the colour bar and finalize styling as in the other two modes.</li>
                 </ol>
 
-                <h3>6.5 Empty-State Algorithm (<code>_draw_map_no_geometry</code>)</h3>
+                <h3 id="6.5">6.5 Empty-State Algorithm (<code>_draw_map_no_geometry</code>)</h3>
                 <p>
                     When the loaded Excel/CSV table has neither spatial coordinates nor latitude/longitude columns
                     (e.g. a legacy fracture-plane file lacking even orientation-wheel-compatible fields, or a
@@ -477,12 +477,12 @@
                     <li>The user loads an SVG or Excel/CSV file, or edits a stress/geometry parameter, or clicks Calculate.</li>
                     <li><code>SlipTendencyApp.calculate()</code> (<code>dynamic_app.py</code>) invokes <code>core.calculator.run_calculation()</code> and stores the returned DataFrame as <code>self.results</code>.</li>
                     <li><code>SlipTendencyApp.refresh_plots()</code> is called, which invokes <code>MapTab._draw_map(preserve_view=...)</code> alongside the Rose, Mohr, and Stereonet tabs' own redraw methods.</li>
-                    <li><code>_draw_map()</code> runs the dispatch algorithm of <a href="#algorithms">Section 6.1</a> and delegates to the appropriate renderer.</li>
+                    <li><code>_draw_map()</code> runs the dispatch algorithm of <a href="#6.1">Section 6.1</a> and delegates to the appropriate renderer.</li>
                     <li>The renderer clears and repopulates the Matplotlib Axes, updates <code>self._map_home_limits</code>, and calls <code>draw_idle()</code> on the <code>FigureCanvasTkAgg</code> for an efficient, non-blocking repaint.</li>
                     <li>Subsequent user interactions — mouse-wheel zoom, click-drag pan, segment selection in this or another tab, or a settings-panel change — call <code>_draw_map(preserve_view=True)</code> so the current pan/zoom state (rather than the freshly computed home view) is retained across cosmetic or selection-only updates.</li>
                 </ol>
 
-                <h3>7.1 Cross-Tab Segment Selection</h3>
+                <h3 id="7.1">7.1 Cross-Tab Segment Selection</h3>
                 <p>
                     Clicking a focal-mechanism event marker (geographic mode only; Cartesian and wheel modes do not
                     currently support direct click-to-select on the map itself) triggers <code>on_map_pick()</code>,
@@ -494,7 +494,7 @@
                     instantly on the map, and vice versa.
                 </p>
 
-                <h3>7.2 State Persistence</h3>
+                <h3 id="7.2">7.2 State Persistence</h3>
                 <p>
                     Several pieces of Map Tab state persist across saves/reloads of a project session (see
                     <code>core/project_state.py</code>): the background-image mode flag, image path, and opacity are
@@ -506,10 +506,10 @@
                 <!-- ================================================= -->
                 <h2 id="statistics">8. Statistical Methods and Colour-Bar Geometry</h2>
 
-                <h3>8.1 Descriptive Range Handling</h3>
+                <h3 id="8.1">8.1 Descriptive Range Handling</h3>
                 <p>
                     For raw (non-normalized) attribute columns, the module relies on the empirical minimum and
-                    maximum of the finite values in the current results table (<a href="#maths">Section 5.2</a>)
+                    maximum of the finite values in the current results table (<a href="#5.2">Section 5.2</a>)
                     rather than any fixed theoretical range. This is a deliberate choice: because Fracture
                     Susceptibility and raw Slip Tendency have stress-tensor-dependent physical ranges, a fixed
                     colour scale would either clip informative variation or waste dynamic range on datasets with a
@@ -518,17 +518,17 @@
                     renders a visible, non-degenerate gradient.
                 </p>
 
-                <h3>8.2 Binary Classification Display</h3>
+                <h3 id="8.2">8.2 Binary Classification Display</h3>
                 <p>
                     The Critical Fractures mode is a two-class statistical summary rather than a continuous field:
                     each segment is classified as "Critical" (τ at or above the Mohr-Coulomb failure threshold) or
                     "Stable" (below it). The Map Tab renders this classification with a fixed two-colour palette and
-                    boundary-normalized colour mapping (<a href="#maths">Section 5.2</a>) so that the discrete nature
+                    boundary-normalized colour mapping (<a href="#5.2">Section 5.2</a>) so that the discrete nature
                     of the result is never misrepresented as a continuous gradient — a common source of
                     misinterpretation in geomechanical figures.
                 </p>
 
-                <h3>8.3 Event De-duplication (Geographic Mode)</h3>
+                <h3 id="8.3">8.3 Event De-duplication (Geographic Mode)</h3>
                 <p>
                     Focal-mechanism datasets may contain one or two nodal-plane rows per physical earthquake. The Map
                     Tab's de-duplication step (preferring the FP1-tagged row, or otherwise the first occurrence of
@@ -537,7 +537,7 @@
                     number of nodal-plane table rows.
                 </p>
 
-                <h3>8.4 Colour-Bar Docking Geometry</h3>
+                <h3 id="8.4">8.4 Colour-Bar Docking Geometry</h3>
                 <p>
                     The exact rectangle occupied by the colour bar Axes, and the corresponding resize of the main
                     plot Axes, is computed from the user-selected Position and Length settings as follows (all
@@ -561,7 +561,7 @@
                 <!-- ================================================= -->
                 <h2 id="visualization">9. Visualization Components</h2>
 
-                <h3>9.1 Line and Marker Rendering</h3>
+                <h3 id="9.1">9.1 Line and Marker Rendering</h3>
                 <p>
                     All fracture segments (or orientation ticks) sharing a common colouring attribute are rendered
                     as a single Matplotlib <code>LineCollection</code> rather than as individually plotted lines.
@@ -570,7 +570,7 @@
                     colour mapping, z-ordering, and anti-aliasing across the entire fracture population.
                 </p>
 
-                <h3>9.2 Beachball Diagram Insets</h3>
+                <h3 id="9.2">9.2 Beachball Diagram Insets</h3>
                 <p>
                     For focal-mechanism datasets that supply a Beachball URL, selecting an event renders an inset
                     diagram card near that event's marker using Matplotlib's offsetbox machinery
@@ -589,7 +589,7 @@
                     effect for visual depth, styled to match the current light/dark appearance mode.
                 </p>
 
-                <h3>9.3 Selection Highlighting</h3>
+                <h3 id="9.3">9.3 Selection Highlighting</h3>
                 <p>
                     Across all three rendering modes, the currently selected fracture is emphasized with a
                     consistent two-layer "halo and core" technique: a wider stroke in the workspace text colour is
@@ -599,7 +599,7 @@
                     wheel modes — a short text label identifying the segment ID or event label is annotated nearby.
                 </p>
 
-                <h3>9.4 Background Photograph Overlay</h3>
+                <h3 id="9.4">9.4 Background Photograph Overlay</h3>
                 <p>
                     The calibrated real-world photograph, when enabled, is drawn beneath all vector content (zorder
                     = 0) using <code>imshow</code> with an extent tuple of (xmin, xmax, ymax, ymin) rather than the
@@ -631,7 +631,7 @@
                 <!-- ================================================= -->
                 <h2 id="advanced">10. Advanced Features</h2>
 
-                <h3>10.1 Move Elements Layout Editor</h3>
+                <h3 id="10.1">10.1 Move Elements Layout Editor</h3>
                 <p>
                     When Move Elements mode is enabled from the shared workspace header (top toolbar, outside this
                     module), clicking and dragging inside the map or colour-bar Axes repositions that Axes' bounding
@@ -646,7 +646,7 @@
                     suppressed while editing is active.
                 </p>
 
-                <h3>10.2 Calibrated Background Photograph Auto-Detection</h3>
+                <h3 id="10.2">10.2 Calibrated Background Photograph Auto-Detection</h3>
                 <p>
                     The module attempts to automatically reattach a background photograph without requiring the user
                     to re-browse for it, using a three-tier fallback search: (1) the path already stored for this
@@ -658,7 +658,7 @@
                     the Dynamic Analyzer's own Scale dialog — becomes available to the Map Tab without repetition.
                 </p>
 
-                <h3>10.3 Asynchronous Beachball Retrieval</h3>
+                <h3 id="10.3">10.3 Asynchronous Beachball Retrieval</h3>
                 <p>
                     Beachball diagram images are fetched over HTTP in a background <code>ThreadPoolExecutor</code>
                     (four worker threads) rather than on the Tkinter main thread, so downloading a diagram from an
@@ -669,7 +669,7 @@
                     map only if the just-loaded image belongs to the currently selected event.
                 </p>
 
-                <h3>10.4 Reference-Image Prefetching</h3>
+                <h3 id="10.4">10.4 Reference-Image Prefetching</h3>
                 <p>
                     <code>prefetch_beachballs()</code> allows the calling code (invoked when an Excel
                     focal-mechanism file is first loaded) to warm the cache for every event's beachball URL in the
@@ -692,7 +692,7 @@
                 <!-- ================================================= -->
                 <h2 id="workflow-examples">12. Practical Examples</h2>
 
-                <h3>12.1 Example 1 — Mapping Slip Tendency on a Digitized Fault Network</h3>
+                <h3 id="12.1">12.1 Example 1 — Mapping Slip Tendency on a Digitized Fault Network</h3>
                 <ol class="step-list">
                     <li>Load a fracture-trace SVG via the workspace header's Load SVG button.</li>
                     <li>Calibrate the profile scale (Scale button) against a known reference length in the source image.</li>
@@ -702,7 +702,7 @@
                     <li>Click a segment of interest in the Table tab to see it highlighted with the halo-and-core marker on the Map, and cross-check its exact Tₛ and Mohr-diagram position in the Mohr tab.</li>
                 </ol>
 
-                <h3>12.2 Example 2 — Visualizing a Legacy Fracture-Plane Spreadsheet</h3>
+                <h3 id="12.2">12.2 Example 2 — Visualizing a Legacy Fracture-Plane Spreadsheet</h3>
                 <ol class="step-list">
                     <li>Load an Excel/CSV file containing only ID, Strike, and Dip columns (no spatial coordinates).</li>
                     <li>The Map Tab automatically falls back to the orientation-wheel renderer, since no genuine geometry is present.</li>
@@ -710,7 +710,7 @@
                     <li>Enable "Show compass (Wheel Map)" to retain the N/E/S/W frame of reference while interpreting tick azimuths as fracture strike.</li>
                 </ol>
 
-                <h3>12.3 Example 3 — Focal-Mechanism Regional Stress Screening</h3>
+                <h3 id="12.3">12.3 Example 3 — Focal-Mechanism Regional Stress Screening</h3>
                 <ol class="step-list">
                     <li>Load a Global-CMT-style Excel file with Lat, Lon, FP1 Strike/Dip/Slip (and optionally FP2) columns.</li>
                     <li>The Map Tab automatically renders a geographic scatter map; enter a candidate regional stress tensor and click Calculate.</li>
@@ -721,7 +721,7 @@
                 <!-- ================================================= -->
                 <h2 id="interpretation">13. Geological Interpretation</h2>
 
-                <h4>13.1 Slip Tendency Maps</h4>
+                <h4 id="13.1">13.1 Slip Tendency Maps</h4>
                 <p>
                     Spatial or angular clusters of high slip tendency indicate structural elements that are
                     mechanically well-oriented for frictional reactivation under the assumed stress field. In
@@ -731,7 +731,7 @@
                     fluid injection.
                 </p>
 
-                <h4>13.2 Dilation Tendency Maps</h4>
+                <h4 id="13.2">13.2 Dilation Tendency Maps</h4>
                 <p>
                     High dilation tendency identifies fracture orientations most prone to opening (rather than
                     shearing) under the current stress state. These orientations are of particular interest in
@@ -740,7 +740,7 @@
                     likely to behave as shear (and potentially seismogenic) structures.
                 </p>
 
-                <h4>13.3 Fracture Susceptibility Maps</h4>
+                <h4 id="13.3">13.3 Fracture Susceptibility Maps</h4>
                 <p>
                     Fracture Susceptibility expresses proximity to the Mohr-Coulomb failure envelope in stress units
                     (MPa) rather than as a dimensionless ratio, making it directly comparable to engineering
@@ -749,7 +749,7 @@
                     the greatest operational caution.
                 </p>
 
-                <h4>13.4 Critical Fracture Maps</h4>
+                <h4 id="13.4">13.4 Critical Fracture Maps</h4>
                 <p>
                     The binary Critical/Stable classification provides an unambiguous, decision-oriented summary
                     suitable for risk communication to non-specialist stakeholders: it answers the direct question
@@ -757,7 +757,7 @@
                     without requiring interpretation of a continuous colour gradient.
                 </p>
 
-                <h4>13.5 Orientation-Wheel Interpretation</h4>
+                <h4 id="13.5">13.5 Orientation-Wheel Interpretation</h4>
                 <p>
                     Because the orientation wheel discards spatial position entirely, it is best interpreted as a
                     structural-domain summary: clusters of ticks at particular azimuths with consistently high-risk
@@ -767,7 +767,7 @@
                     mapped trace.
                 </p>
 
-                <h4>13.6 Focal-Mechanism Maps</h4>
+                <h4 id="13.6">13.6 Focal-Mechanism Maps</h4>
                 <p>
                     Cross-referencing observed earthquake locations and nodal planes against a candidate regional
                     stress tensor via the Critical Fractures colouring and Rake Misfit statistic (Wallace-Bott
@@ -779,7 +779,7 @@
                 <!-- ================================================= -->
                 <h2 id="implementation">14. Implementation Notes</h2>
 
-                <h3>14.1 Key Instance Attributes</h3>
+                <h3 id="14.1">14.1 Key Instance Attributes</h3>
                 <table>
                     <tr><th>Attribute</th><th>Description</th></tr>
                     <tr><td><code>self.map_fig</code> / <code>self.map_ax</code> / <code>self.map_cbar_ax</code></td><td>The Matplotlib Figure and the two Axes objects (main plot and colour bar) that together constitute the Map Tab canvas.</td></tr>
@@ -793,7 +793,7 @@
                     <tr><td><code>self._layout_drag_ax</code> / <code>self._layout_orig_pos</code></td><td>Used to track the Matplotlib Axes currently being repositioned and its original bounding box during Move Elements layout editing.</td></tr>
                 </table>
 
-                <h3>14.2 Design Notes and Caveats</h3>
+                <h3 id="14.2">14.2 Design Notes and Caveats</h3>
                 <ul>
                     <li>The orientation-wheel colour bar is constructed against the same mappable artist object used by the geographic-mode scatter plot (<code>self._map_geo_scatter</code>); in practice this mappable carries the correct colormap and normalization for the wheel's own data because <code>attribute_colormap_and_norm()</code> is recomputed immediately beforehand, but users inspecting the implementation should be aware that this is an internal artist-reuse detail rather than a dedicated wheel-specific mappable.</li>
                     <li>Direct click-to-select on the map canvas itself is currently implemented only for geographic (focal-mechanism) mode; in Cartesian and orientation-wheel modes, segment selection is driven from the Table, Mohr, or Stereonet tabs and reflected onto the map via the shared <code>select_segment()</code> mechanism.</li>
@@ -805,7 +805,7 @@
                 <h2 id="limitations">15. Limitations</h2>
                 <ul>
                     <li>Background-photograph alignment assumes the photograph's full pixel extent corresponds exactly to the calibrated data bounding box; a photograph that does not cover the same physical area as the digitized traces will not register correctly.</li>
-                    <li>The raw-vs-scaled coordinate heuristic (<a href="#maths">Section 5.3</a>) is a tolerance-based inference rather than an explicit calibration flag, and could in principle misclassify a genuinely calibrated profile whose dimensions happen to coincide closely with the uncalibrated 260 × 100 default.</li>
+                    <li>The raw-vs-scaled coordinate heuristic (<a href="#5.3">Section 5.3</a>) is a tolerance-based inference rather than an explicit calibration flag, and could in principle misclassify a genuinely calibrated profile whose dimensions happen to coincide closely with the uncalibrated 260 × 100 default.</li>
                     <li>Very large fracture populations rendered via a single <code>LineCollection</code> remain efficient to draw, but per-segment tooltip/hover interactivity is not implemented in this module (unlike the Mohr tab's point-hover annotation).</li>
                 </ul>
 

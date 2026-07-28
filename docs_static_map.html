@@ -91,7 +91,7 @@
                     prepare and statistically analyse fracture traces.</span>
                 </figure>
 
-                <h3>1.1 Load SVG</h3>
+                <h3 id="1.1">1.1 Load SVG</h3>
                 <p>
                     If your fracture traces are already digitized and saved as an <code>.svg</code> file, click the
                     <strong>Load SVG</strong> tab and select the file. FracSTAT reads the file with
@@ -110,7 +110,7 @@
                     <span class="ph-caption"><strong>Figure 2.2</strong> — Data import using the "Load SVG" tab. Once clicked, users select an SVG file and it is uploaded to the GUI.</span>
                 </figure>
 
-                <h3>1.2 Load Excel</h3>
+                <h3 id="1.2">1.2 Load Excel</h3>
                 <p>
                     If your fracture information already exists as a spreadsheet or CSV, use the
                     <strong>Load Excel</strong> option instead of digitizing anything. The file is parsed by
@@ -142,7 +142,7 @@
                     Real‑world endpoint coordinates for each segment. This is also the format FracSTAT's own exported
                     results use, so a file you exported earlier can be re‑imported directly. Segments loaded this way
                     are flagged internally to keep their real‑world 1:1 scale, exactly like spatial Excel/CSV data
-                    described in <a href="#maths">Section 8.1</a> — no rescaling to a profile box is applied.
+                    described in <a href="#8.1">Section 8.1</a> — no rescaling to a profile box is applied.
                 </p>
                 <table class="excel-format-table">
                     <tr>
@@ -273,7 +273,7 @@
                     <strong>Automatic unit detection:</strong> FracSTAT also scans column headers such as
                     <code>Length_cm</code>, <code>X1_mm</code>, or <code>Y1 (km)</code> and, when a spatial format
                     is detected, automatically sets the <strong>Display units</strong> dropdown
-                    (<a href="#sidebar-controls">Section 5.2</a>) to match — so you don't need to convert units
+                    (<a href="#5.2">Section 5.2</a>) to match — so you don't need to convert units
                     yourself before importing.
                 </div>
 
@@ -287,7 +287,7 @@
                     <span class="ph-caption"><strong>Figure 2.3</strong> — Data import using the "Load Excel" tab. Once clicked, users select the Excel file and it is uploaded to the GUI.</span>
                 </figure>
 
-                <h3>1.3 Trace Map (digitizing a photo)</h3>
+                <h3 id="1.3">1.3 Trace Map (digitizing a photo)</h3>
                 <p>
                     If all you have is a field photograph, use the integrated <strong>Trace Map</strong> tool to
                     digitize fracture traces directly inside FracSTAT. The digitized traces feed straight into the
@@ -313,7 +313,7 @@
                     outcrop photograph or scanned geological image and nothing already in digital form.
                 </p>
 
-                <h3>2.1 Top toolbar</h3>
+                <h3 id="2.1">2.1 Top toolbar</h3>
                 <table>
                     <tr><th>Control</th><th>What it does</th></tr>
                     <tr><td>Open Image</td><td>Opens the field photograph or scanned image that will act as the digitizing reference.</td></tr>
@@ -325,7 +325,7 @@
                     <tr><td>Include Image in SVG</td><td>Optionally embeds the reference image inside the exported SVG file.</td></tr>
                 </table>
 
-                <h3>2.2 Left‑hand tool palette</h3>
+                <h3 id="2.2">2.2 Left‑hand tool palette</h3>
                 <table>
                     <tr><th>Tool</th><th>What it does</th></tr>
                     <tr><td>Select Tool</td><td>Selects existing traces for editing, repositioning, or deletion.</td></tr>
@@ -371,7 +371,7 @@
                 <p>
                     For SVG‑sourced data, raw digitizer coordinates (in pixel units) are linearly rescaled into the
                     physical profile box defined by the <strong>Profile Width</strong> and <strong>Profile Length</strong>
-                    fields (see <a href="#sidebar-controls">Section 5.2</a>). For spatial Excel/CSV data, no rescaling
+                    fields (see <a href="#5.2">Section 5.2</a>). For spatial Excel/CSV data, no rescaling
                     is performed — the coordinates are trusted to already be in real‑world units. The exact formulas
                     are given in <a href="#maths">Section 8</a>.
                 </p>
@@ -403,7 +403,7 @@
                 <h2 id="sidebar-controls">5. Sidebar Controls, Section by Section</h2>
                 <p>The sidebar is organised top‑to‑bottom into collapsible cards. Each is explained below in the order it appears.</p>
 
-                <h3>5.1 Summary</h3>
+                <h3 id="5.1">5.1 Summary</h3>
                 <p>
                     Four tiles give an at‑a‑glance overview of the loaded network, automatically recomputed every
                     time the data or the profile changes:
@@ -415,7 +415,7 @@
                     <li><strong>Total Length</strong> — sum of every segment's length, shown in your chosen display unit.</li>
                 </ul>
 
-                <h3>5.2 Profile &amp; Units</h3>
+                <h3 id="5.2">5.2 Profile &amp; Units</h3>
                 <p>
                     <strong>Profile width</strong> and <strong>Profile length</strong> define the physical size (in
                     the X and Y directions respectively) that the imported pixel geometry is rescaled to. Changing
@@ -425,7 +425,7 @@
                     change the unit, and keeps the Dynamic Analyzer workspace in sync.
                 </p>
 
-                <h3>5.3 Display Mode</h3>
+                <h3 id="5.3">5.3 Display Mode</h3>
                 <table>
                     <tr><th>Control</th><th>What it does</th></tr>
                     <tr><td>Colour segments by</td><td>Chooses how fracture lines are coloured — <em>Traces</em>, <em>Segments by Strike</em>, <em>Segments by Length</em>, or <em>Traces by Length</em>. See <a href="#colour-modes">Section 6</a> for full detail.</td></tr>
@@ -433,10 +433,10 @@
                     <tr><td>Show segment nodes</td><td>Overlays a small marker at every segment endpoint (and at every calculated crossing point), useful for visually checking topology.</td></tr>
                     <tr><td>Flip X axis / Flip Y axis</td><td>Mirrors the map horizontally or vertically — handy if your source image was scanned or photographed with an unexpected orientation.</td></tr>
                     <tr><td>Rotate (° from X axis, CCW+)</td><td>Rotates the whole map counter‑clockwise by the given number of degrees.</td></tr>
-                    <tr><td>Y‑axis azimuth from North (°)</td><td>Tells FracSTAT how the image's vertical (Y) axis relates to true geographic north, so strikes reported everywhere in the software are north‑referenced rather than image‑referenced. See <a href="#maths">Section 8.2</a>.</td></tr>
+                    <tr><td>Y‑axis azimuth from North (°)</td><td>Tells FracSTAT how the image's vertical (Y) axis relates to true geographic north, so strikes reported everywhere in the software are north‑referenced rather than image‑referenced. See <a href="#8.2">Section 8.2</a>.</td></tr>
                 </table>
 
-                <h3>5.4 Plot Options</h3>
+                <h3 id="5.4">5.4 Plot Options</h3>
                 <table>
                     <tr><th>Control</th><th>What it does</th></tr>
                     <tr><td>Custom title</td><td>Overrides the automatic title (e.g. "Fracture segments coloured by strike") with your own text. Leave blank for the automatic title.</td></tr>
@@ -444,7 +444,7 @@
                     <tr><td>Colorbar position</td><td>Places the colour bar at the Bottom, Top, Left, or Right of the map, or hides it entirely ("None").</td></tr>
                 </table>
 
-                <h3>5.5 Map Elements</h3>
+                <h3 id="5.5">5.5 Map Elements</h3>
                 <p>Fine‑tune the cosmetics of the figure without touching the underlying geometry:</p>
                 <table>
                     <tr><th>Control</th><th>What it does</th></tr>
@@ -455,7 +455,7 @@
                     <tr><td>Border Color / Border Width</td><td>Colour and thickness of the axes border (spines).</td></tr>
                 </table>
 
-                <h3>5.6 Background Image</h3>
+                <h3 id="5.6">5.6 Background Image</h3>
                 <p>
                     Enable <strong>Show real photo behind traces</strong> to draw your calibrated field photograph
                     or orthophoto underneath the fracture lines — a quick visual sanity check that the traces line
@@ -471,7 +471,7 @@
                     supported.
                 </div>
 
-                <h3>5.7 Toolbar (above the canvas)</h3>
+                <h3 id="5.7">5.7 Toolbar (above the canvas)</h3>
                 <ul>
                     <li><strong>↺ Reset View</strong> — returns the map to its original zoom/pan position.</li>
                     <li><strong>Save Image</strong> — exports the current figure as a PNG at your configured export DPI.</li>
@@ -527,7 +527,7 @@
                 <h2 id="maths">8. The Maths Behind the Map</h2>
                 <p>This section explains, in plain terms, exactly how FracSTAT turns raw digitized coordinates into the calibrated, north‑referenced map you see on screen.</p>
 
-                <h3>8.1 Pixel‑to‑real‑world scaling (SVG data)</h3>
+                <h3 id="8.1">8.1 Pixel‑to‑real‑world scaling (SVG data)</h3>
                 <p>
                     For SVG‑sourced data, raw digitizer coordinates <em>(x, y)</em>, in SVG pixel units, are
                     linearly rescaled into the physical profile box defined by the Profile Width (W) and Profile
@@ -548,7 +548,7 @@ y' = (y − y_min) · sy
                     scale, on the assumption that they already represent real‑world engineering or geographic units.
                 </p>
 
-                <h3>8.2 Strike (orientation) calculation</h3>
+                <h3 id="8.2">8.2 Strike (orientation) calculation</h3>
                 <p>
                     Field photographs aren't always taken with geographic north pointing to the top of the image.
                     The <strong>Y‑axis azimuth from North</strong> setting corrects for this before any
@@ -573,13 +573,13 @@ strike_N = (image_strike + θn) mod 360°
                     geometric re‑derivation is skipped, preserving numerical consistency with the original computation.
                 </div>
 
-                <h3>8.3 Segment length</h3>
+                <h3 id="8.3">8.3 Segment length</h3>
                 <p>Each segment's length is the Euclidean distance between its rescaled endpoints:</p>
                 <div class="formula-block">
 Ls = sqrt[ (x2' − x1')² + (y2' − y1')² ]
                 </div>
 
-                <h3>8.4 Trace length</h3>
+                <h3 id="8.4">8.4 Trace length</h3>
                 <p>
                     A trace length is the sum of the lengths of every segment sharing the same Trace identifier —
                     computed as a group‑by‑sum aggregation and joined back onto the segment table. This value feeds
@@ -590,7 +590,7 @@ Ls = sqrt[ (x2' − x1')² + (y2' − y1')² ]
 TraceLength = Σ (Length of every segment whose Trace ID matches)
                 </div>
 
-                <h3>8.5 Rotation</h3>
+                <h3 id="8.5">8.5 Rotation</h3>
                 <p>Applying the "Rotate" control spins every rescaled coordinate about the origin by the chosen angle θ (counter‑clockwise positive):</p>
                 <div class="formula-block">
 x_rot = x' · cos(θ) − y' · sin(θ)
@@ -623,14 +623,14 @@ y_rot = x' · sin(θ) + y' · cos(θ)
                 <h2 id="reading-map">10. Reading the Map Geologically</h2>
                 <p>A well‑rendered fracture map encodes a lot of geological information. Work through these observations roughly in order:</p>
 
-                <h4>10.1 Spatial distribution &amp; clustering</h4>
+                <h4 id="10.1">10.1 Spatial distribution &amp; clustering</h4>
                 <p>
                     A uniform scatter of fractures across the area suggests a pervasive, formation‑scale network.
                     Clustering into corridors or bands can indicate proximity to faults, fold hinges, or lithological
                     heterogeneities.
                 </p>
 
-                <h4>10.2 Fracture sets &amp; cross‑cutting relationships</h4>
+                <h4 id="10.2">10.2 Fracture sets &amp; cross‑cutting relationships</h4>
                 <p>
                     Switch "Colour segments by" to <em>Segments by Strike</em> to instantly see how many distinct
                     orientation sets are present, and their relative proportions. Where traces cross (X‑nodes), the
@@ -639,7 +639,7 @@ y_rot = x' · sin(θ) + y' · cos(θ)
                     coeval with, the fracture it grew into.
                 </p>
 
-                <h4>10.3 Length distributions &amp; sampling bias</h4>
+                <h4 id="10.3">10.3 Length distributions &amp; sampling bias</h4>
                 <p>
                     Switching to <em>Segments by Length</em> or <em>Traces by Length</em> highlights two common
                     biases: <strong>truncation bias</strong> (an excess of very short fractures relative to a true
@@ -650,9 +650,9 @@ y_rot = x' · sin(θ) + y' · cos(θ)
                     and CDF tabs.
                 </p>
 
-                <h4>10.4 Network connectivity</h4>
+                <h4 id="10.4">10.4 Network connectivity</h4>
                 <p>
-                    Check the I : Y : X node ratio (Section 9) — an I‑dominated network (e.g. 0.7 : 0.2 : 0.1) implies
+                    Check the I : Y : X node ratio (<a href="#topology">Section 9</a>) — an I‑dominated network (e.g. 0.7 : 0.2 : 0.1) implies
                     poor connectivity, while a Y/X‑dominated network (e.g. 0.1 : 0.4 : 0.5) implies a highly connected,
                     well‑linked flow network. The Connectivity tab visualises this on a standard ternary diagram.
                 </p>

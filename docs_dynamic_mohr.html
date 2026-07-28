@@ -109,7 +109,7 @@
                     "Information" and "Settings", implemented as a nested <code>CTkTabview</code>.
                 </p>
 
-                <h3>2.1 Plot Canvas and Toolbar</h3>
+                <h3 id="2.1">2.1 Plot Canvas and Toolbar</h3>
                 <p>
                     A thin toolbar sits above the Matplotlib canvas. From left to right it presents: a hint label
                     describing the available mouse interactions ("Scroll to zoom &middot; right-drag to box-zoom
@@ -121,7 +121,7 @@
                     and a draggable "Symbols" legend box.
                 </p>
 
-                <h3>2.2 Side Panel &mdash; Information Tab</h3>
+                <h3 id="2.2">2.2 Side Panel &mdash; Information Tab</h3>
                 <p>
                     The Information tab is the primary working panel for day-to-day interpretation. From top to
                     bottom it contains: the Dip Override card (shared with the Stereonet tab), a "Colour Points By"
@@ -131,7 +131,7 @@
                     Map" navigation button.
                 </p>
 
-                <h3>2.3 Side Panel &mdash; Settings Tab</h3>
+                <h3 id="2.3">2.3 Side Panel &mdash; Settings Tab</h3>
                 <p>
                     The Settings tab exposes every cosmetic and layout parameter of the diagram, organized into five
                     cards: Pole Styling, Display Options, Plot Elements, Layout &amp; Sizing, and a final Reset
@@ -170,7 +170,7 @@
                     has run), the tab renders an empty "Mohr diagram" placeholder title and takes no further action.
                 </p>
 
-                <h3>3.1 Dip Override Input</h3>
+                <h3 id="3.1">3.1 Dip Override Input</h3>
                 <p>
                     A dip-override CSV/Excel file may be loaded from the Information tab's Dip Override card (shared
                     logic with the Dynamic Analyzer's Map and Stereonet tabs). The file must supply an
@@ -185,26 +185,26 @@
                 <p>
                     This section documents every interactive control in the Mohr Tab, grouped by the card in which
                     it appears. Unless stated otherwise, every control triggers an immediate redraw of the diagram
-                    (via <code>_draw_mohr</code>, described in Section 7).
+                    (via <code>_draw_mohr</code>, described in <a href="#workflow">Section 7</a>).
                 </p>
 
-                <h3>4.1 Information Tab &mdash; Colour Points By</h3>
+                <h3 id="4.1">4.1 Information Tab &mdash; Colour Points By</h3>
                 <table>
                     <tr><th>Control</th><th>Type</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Slip tendency</td><td>Checkbox (exclusive)</td><td>Unchecked</td><td>Colours poles and the background tendency field by <code>SlipTendencyNorm</code> (normalized) or <code>SlipTendency</code> (raw), depending on the sidebar's normalization toggle.</td></tr>
                     <tr><td>Dilation tendency</td><td>Checkbox (exclusive)</td><td>Unchecked</td><td>Colours by <code>DilationTendency</code>, always on a fixed 0&ndash;1 scale.</td></tr>
                     <tr><td>Fracture susceptibility</td><td>Checkbox (exclusive)</td><td>Unchecked</td><td>Colours by <code>FractureSusceptibility</code> (MPa).</td></tr>
                     <tr><td>Critical stress</td><td>Checkbox (exclusive)</td><td>Unchecked</td><td>Colours by the binary <code>CriticalStressValue</code> using a fixed two-colour stable/critical palette, matching the Rose and Map tabs.</td></tr>
-                    <tr><td>Colour scale dropdown</td><td>Custom colour-swatch dropdown</td><td>Plasma</td><td>Selects the Matplotlib colormap (or the bundled MATLAB-style Parula) applied when any of the four metrics above is active. Ignored when no metric is checked ("no metric" / classic mode, see Section 6.4).</td></tr>
+                    <tr><td>Colour scale dropdown</td><td>Custom colour-swatch dropdown</td><td>Plasma</td><td>Selects the Matplotlib colormap (or the bundled MATLAB-style Parula) applied when any of the four metrics above is active. Ignored when no metric is checked ("no metric" / classic mode, see <a href="#6.4">Section 6.4</a>).</td></tr>
                 </table>
                 <p>
                     The four metric checkboxes are mutually exclusive: selecting one automatically clears the others
                     (<code>change_mohr_metric</code>). Unchecking the active checkbox returns the diagram to "no
                     metric" / classic mode, in which poles are drawn using the fixed stable/near/critical colour
-                    scheme described in Section 6.4 instead of a continuous colour map.
+                    scheme described in <a href="#6.4">Section 6.4</a> instead of a continuous colour map.
                 </p>
 
-                <h3>4.2 Information Tab &mdash; Actions and Status</h3>
+                <h3 id="4.2">4.2 Information Tab &mdash; Actions and Status</h3>
                 <table>
                     <tr><th>Control</th><th>Type</th><th>Effect</th></tr>
                     <tr><td>Clear Selection</td><td>Button</td><td>Deselects the currently highlighted segment across the Mohr, Map, Table, and Stereonet tabs simultaneously (<code>clear_selection</code>).</td></tr>
@@ -213,7 +213,7 @@
                     <tr><td>Show in Map</td><td>Button</td><td>Switches the workspace to the Map tab and centres attention on the currently selected segment (<code>select_segment(..., switch_to_map=True)</code>).</td></tr>
                 </table>
 
-                <h3>4.3 Information Tab &mdash; Closest to Envelope Table</h3>
+                <h3 id="4.3">4.3 Information Tab &mdash; Closest to Envelope Table</h3>
                 <p>
                     This eight-row table lists the fractures whose stress state places them nearest to (or past)
                     the failure envelope, refreshed on every draw by <code>update_mohr_closest_table()</code>.
@@ -226,7 +226,7 @@
                     first); unused rows are blanked with an em-dash.
                 </p>
 
-                <h3>4.4 Settings Tab &mdash; Pole Styling</h3>
+                <h3 id="4.4">4.4 Settings Tab &mdash; Pole Styling</h3>
                 <table>
                     <tr><th>Control</th><th>Type</th><th>Default</th><th>Range / Options</th></tr>
                     <tr><td>Pole shape</td><td>Dropdown</td><td>Circle</td><td>Circle, Diamond, Square, Triangle Up, Star, Cross</td></tr>
@@ -236,16 +236,16 @@
                     <tr><td>Pole boundary width</td><td>Numeric entry</td><td>0.45</td><td>Marker edge line width, in points</td></tr>
                 </table>
 
-                <h3>4.5 Settings Tab &mdash; Display Options</h3>
+                <h3 id="4.5">4.5 Settings Tab &mdash; Display Options</h3>
                 <table>
                     <tr><th>Control</th><th>Type</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Envelope line width</td><td>Numeric entry</td><td>2.0</td><td>Line width, in points, of the Mohr&ndash;Coulomb failure envelope</td></tr>
                     <tr><td>Custom title</td><td>Text entry</td><td>(blank &rarr; auto)</td><td>Overrides the automatic title "Mohr Circle and Coulomb Failure Envelope" (with the active metric name appended when applicable)</td></tr>
-                    <tr><td>Mohr envelope without Pore Pressure</td><td>Checkbox</td><td>Checked</td><td>Toggles the dry-envelope overlay described in Section 6.6 (dashed circles/line using &sigma;&#8345; instead of &sigma;&#8345;&prime;)</td></tr>
+                    <tr><td>Mohr envelope without Pore Pressure</td><td>Checkbox</td><td>Checked</td><td>Toggles the dry-envelope overlay described in <a href="#6.6">Section 6.6</a> (dashed circles/line using &sigma;&#8345; instead of &sigma;&#8345;&prime;)</td></tr>
                     <tr><td>Envelope line in front of Mohr Circle</td><td>Checkbox</td><td>Off (On after Reset Defaults)</td><td>Controls the Matplotlib z-order of the failure-envelope line relative to the shear-stress field / circles, so the line can be forced to always render on top</td></tr>
                 </table>
 
-                <h3>4.6 Settings Tab &mdash; Plot Elements</h3>
+                <h3 id="4.6">4.6 Settings Tab &mdash; Plot Elements</h3>
                 <table>
                     <tr><th>Control</th><th>Type</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Outer background</td><td>Colour swatch</td><td>#F5F7FA</td><td>Figure (page) background colour</td></tr>
@@ -260,7 +260,7 @@
                     <tr><td>Boundary width</td><td>Numeric entry</td><td>1.0</td><td>Width of the plot's outer axis spines, in points</td></tr>
                 </table>
 
-                <h3>4.7 Settings Tab &mdash; Layout and Sizing</h3>
+                <h3 id="4.7">4.7 Settings Tab &mdash; Layout and Sizing</h3>
                 <p>
                     This card controls the physical pixel dimensions of the rendered figure and the geometry of its
                     colour bar. By default the plot canvas fills whatever space is available in its parent panel
@@ -277,10 +277,10 @@
                     <tr><td>Reset to Auto (fill plot area)</td><td>Button</td><td>&mdash;</td><td>Clears the fixed-size mode and returns the canvas to filling its parent panel automatically</td></tr>
                 </table>
 
-                <h3>4.8 Reset Defaults</h3>
+                <h3 id="4.8">4.8 Reset Defaults</h3>
                 <p>
                     The Reset Defaults button at the bottom of the Settings tab restores every colour, width,
-                    toggle, and size field listed in Sections 4.4&ndash;4.7 to its factory value in a single action
+                    toggle, and size field listed in Sections <a href="#4.4">4.4</a>&ndash;<a href="#4.7">4.7</a> to its factory value in a single action
                     and forces two consecutive redraws to guarantee the change is reflected immediately, including
                     the plot returning to automatic (fill-parent) sizing.
                 </p>
@@ -295,7 +295,7 @@
                     internal friction.
                 </p>
 
-                <h3>5.1 Mohr Circle Construction</h3>
+                <h3 id="5.1">5.1 Mohr Circle Construction</h3>
                 <p>For each principal-stress pair (&sigma;&#7522;, &sigma;&#7527;) the corresponding Mohr circle has:</p>
                 <div class="formula-block">
 center = &frac12;(&sigma;i + &sigma;j)          radius = &frac12;(&sigma;i &minus; &sigma;j)</div>
@@ -312,7 +312,7 @@ center = &frac12;(&sigma;i + &sigma;j)          radius = &frac12;(&sigma;i &minu
                     by P_f, radii are unchanged).
                 </p>
 
-                <h3>5.2 Effective Normal Stress and Failure Envelope</h3>
+                <h3 id="5.2">5.2 Effective Normal Stress and Failure Envelope</h3>
                 <div class="formula-block">
 &sigma;n&prime; = &sigma;n &minus; Pf
 
@@ -324,7 +324,7 @@ center = &frac12;(&sigma;i + &sigma;j)          radius = &frac12;(&sigma;i &minu
                     used when auto-scaling the y-axis.
                 </p>
 
-                <h3>5.3 Coulomb Failure Margin and Critical Stress</h3>
+                <h3 id="5.3">5.3 Coulomb Failure Margin and Critical Stress</h3>
                 <div class="formula-block">
 &Delta;&tau; = &tau; &minus; (C0 + &mu;&middot;&sigma;n&prime;)</div>
                 <p>
@@ -342,7 +342,7 @@ center = &frac12;(&sigma;i + &sigma;j)          radius = &frac12;(&sigma;i &minu
                     so its meaning should be re-checked whenever the stress magnitudes change substantially.
                 </p>
 
-                <h3>5.4 Tendency and Susceptibility Metrics</h3>
+                <h3 id="5.4">5.4 Tendency and Susceptibility Metrics</h3>
                 <p>These are computed upstream in <code>core/calculator.py</code> and simply displayed here:</p>
                 <div class="formula-block">
 Slip Tendency:            Ts = &tau; / &sigma;n
@@ -359,7 +359,7 @@ Fracture Susceptibility:  Sf = &sigma;n &minus; Pf &minus; (&tau; &minus; C0)/&m
                     minimum and maximum when the "normalized" display option is active elsewhere in the workspace.
                 </p>
 
-                <h3>5.5 Continuous Tendency Field Over All Orientations</h3>
+                <h3 id="5.5">5.5 Continuous Tendency Field Over All Orientations</h3>
                 <p>
                     In addition to plotting the discrete poles of the loaded fractures, the Mohr Tab shades the
                     background of the diagram with a continuous field showing what the active tendency metric would
@@ -376,17 +376,17 @@ n1 = sin&phi;&middot;cos&theta;,  n2 = sin&phi;&middot;sin&theta;,  n3 = cos&phi
                     with &phi; spanning a 58-point grid over (0.01, &pi;/2 &minus; 0.01) and &theta; spanning a
                     116-point grid over [0, 2&pi;). For every (&phi;, &theta;) pair the appropriate colour metric
                     &mdash; normalized slip tendency, dilation tendency, fracture susceptibility, or the binary
-                    critical-stress indicator &mdash; is evaluated using the same formulas as Section 5.4, each
+                    critical-stress indicator &mdash; is evaluated using the same formulas as <a href="#5.4">Section 5.4</a>, each
                     point is mapped into (&sigma;n&prime;, &tau;) space, and the resulting scattered points are
-                    triangulated and filled with a 28-level contour plot (Section 6.5).
+                    triangulated and filled with a 28-level contour plot (<a href="#6.5">Section 6.5</a>).
                 </p>
 
                 <!-- ================================================= -->
                 <h2 id="algorithms">6. Algorithms</h2>
 
-                <h3>6.1 Field Sampling and Triangulation Masking</h3>
+                <h3 id="6.1">6.1 Field Sampling and Triangulation Masking</h3>
                 <p>
-                    The (&sigma;n&prime;, &tau;) points generated by the polar mesh of Section 5.5 are triangulated
+                    The (&sigma;n&prime;, &tau;) points generated by the polar mesh of <a href="#5.5">Section 5.5</a> are triangulated
                     with Matplotlib's Delaunay-based <code>Triangulation</code>. Because the physically meaningful
                     region of the Mohr plane lies only within the area bounded by the outer Mohr circle and outside
                     the two inner circles, every triangle whose centroid falls inside either the
@@ -395,7 +395,7 @@ n1 = sin&phi;&middot;cos&theta;,  n2 = sin&phi;&middot;sin&theta;,  n3 = cos&phi
                     with the classical three-circle Mohr diagram.
                 </p>
 
-                <h3>6.2 Envelope Extension and Auto-Scaling</h3>
+                <h3 id="6.2">6.2 Envelope Extension and Auto-Scaling</h3>
                 <p>
                     To avoid the visual artefact of the failure-envelope line stopping abruptly within the visible
                     plot area, the envelope is sampled over a domain extending to 10&times; the maximum &sigma;
@@ -405,7 +405,7 @@ n1 = sin&phi;&middot;cos&theta;,  n2 = sin&phi;&middot;sin&theta;,  n3 = cos&phi
                     tail of the envelope line.
                 </p>
 
-                <h3>6.3 Selected-Segment Reticle</h3>
+                <h3 id="6.3">6.3 Selected-Segment Reticle</h3>
                 <p>
                     When a segment is selected (by clicking a point, a Table row, or a Stereonet pole), the Mohr Tab
                     draws a dotted horizontal/vertical crosshair from the axes edges to the point, followed by two
@@ -414,7 +414,7 @@ n1 = sin&phi;&middot;cos&theta;,  n2 = sin&phi;&middot;sin&theta;,  n3 = cos&phi
                     offset so it does not obscure the point itself.
                 </p>
 
-                <h3>6.4 Classic (No-Metric) Colour Mode</h3>
+                <h3 id="6.4">6.4 Classic (No-Metric) Colour Mode</h3>
                 <p>
                     When none of the four colour-metric checkboxes is active, poles are drawn in three fixed groups
                     rather than on a continuous colour scale, each with its own marker shape, size, and transparency
@@ -434,15 +434,15 @@ n1 = sin&phi;&middot;cos&theta;,  n2 = sin&phi;&middot;sin&theta;,  n3 = cos&phi
                     integer segment ID.
                 </p>
 
-                <h3>6.5 Metric-Driven Colour Mode</h3>
+                <h3 id="6.5">6.5 Metric-Driven Colour Mode</h3>
                 <p>
                     When a metric checkbox is active, the workflow is: (1) build the continuous background field as
-                    in Section 5.5 and render it with <code>tricontourf</code> at 28 levels using the selected
+                    in <a href="#5.5">Section 5.5</a> and render it with <code>tricontourf</code> at 28 levels using the selected
                     colormap and a <code>Normalize</code> (or, for the binary critical-stress metric, a two-colour
                     <code>BoundaryNorm</code>/<code>ListedColormap</code> identical to the scheme used elsewhere in
                     the app); (2) scatter every loaded fracture's (&sigma;n&prime;, &tau;) point on top using the
                     user-configured pole shape, size, colour, and edge styling; (3) attach a horizontal colour bar
-                    sized and positioned per the Layout &amp; Sizing settings (Section 4.7), labelled with the
+                    sized and positioned per the Layout &amp; Sizing settings (<a href="#4.7">Section 4.7</a>), labelled with the
                     metric's descriptive name and, for the critical-stress metric, custom tick labels "Stable" /
                     "Critical" instead of numeric ticks.
                 </p>
@@ -476,7 +476,7 @@ def _mohr_field(sigma1, sigma2, sigma3, pore_pressure, cohesion, friction, value
                 </div>
                 <p class="ph-caption" style="text-align:left; margin: -1rem 0 1.5rem 0;">The <code>_mohr_field()</code> helper, evaluating slip tendency, dilation tendency, fracture susceptibility, or critical stress over the full polar/azimuthal mesh of possible plane orientations.</p>
 
-                <h3>6.6 Dry-Envelope Overlay</h3>
+                <h3 id="6.6">6.6 Dry-Envelope Overlay</h3>
                 <p>
                     When "Mohr envelope without Pore Pressure" is enabled, a second, independent overlay is drawn on
                     the same axes using raw (non-effective) stresses: the three Mohr circles are redrawn in a muted,
@@ -486,7 +486,7 @@ def _mohr_field(sigma1, sigma2, sigma3, pore_pressure, cohesion, friction, value
                     (undrained-free) case, without needing to re-run the calculation with P_f = 0.
                 </p>
 
-                <h3>6.7 Symbols Index Construction</h3>
+                <h3 id="6.7">6.7 Symbols Index Construction</h3>
                 <p>
                     The floating "Symbols" legend box is built entirely from primitive Matplotlib artists (a rounded
                     <code>FancyBboxPatch</code>, text labels, marker scatters, and thin separator lines) rather than
@@ -502,7 +502,7 @@ def _mohr_field(sigma1, sigma2, sigma3, pore_pressure, cohesion, friction, value
                     proportionate when the workspace font size is changed in the header.
                 </p>
 
-                <h3>6.8 Hover Tooltip / Nearest-Point Lookup</h3>
+                <h3 id="6.8">6.8 Hover Tooltip / Nearest-Point Lookup</h3>
                 <p>
                     On mouse movement over the axes (when not currently panning, box-zooming, or dragging the
                     Symbols index), the Mohr Tab computes the axes-fraction distance from the cursor to every
@@ -527,24 +527,24 @@ def _mohr_field(sigma1, sigma2, sigma3, pore_pressure, cohesion, friction, value
                     <li>Preserve the current axis limits if <code>preserve_view</code> is requested (used for cosmetic-only redraws so the user's pan/zoom state is not lost).</li>
                     <li>Clear the axes, the colour-bar axes, and any cached pick/hover/drag state.</li>
                     <li>If <code>self.results</code> is empty or <code>self.current_stress</code> has not been populated, render the placeholder title and return early.</li>
-                    <li>Draw the three Mohr circles in effective-stress space (Section 5.1).</li>
-                    <li>Classify every segment as critical / near / stable using the Section 5.3 thresholds.</li>
-                    <li>Branch on whether a colour metric is active: draw either the three fixed-style scatter groups (Section 6.4) or the continuous field plus single scatter layer and colour bar (Section 6.5).</li>
-                    <li>Compute axis extents, including the extended envelope line and its visible-window-only vertical scaling (Section 6.2).</li>
-                    <li>Draw the selected-segment reticle, if any (Section 6.3).</li>
+                    <li>Draw the three Mohr circles in effective-stress space (<a href="#5.1">Section 5.1</a>).</li>
+                    <li>Classify every segment as critical / near / stable using the <a href="#5.3">Section 5.3</a> thresholds.</li>
+                    <li>Branch on whether a colour metric is active: draw either the three fixed-style scatter groups (<a href="#6.4">Section 6.4</a>) or the continuous field plus single scatter layer and colour bar (<a href="#6.5">Section 6.5</a>).</li>
+                    <li>Compute axis extents, including the extended envelope line and its visible-window-only vertical scaling (<a href="#6.2">Section 6.2</a>).</li>
+                    <li>Draw the selected-segment reticle, if any (<a href="#6.3">Section 6.3</a>).</li>
                     <li>Draw the failure-envelope line at the z-order implied by "Envelope line in front of Mohr Circle".</li>
                     <li>Draw the three principal-stress markers.</li>
                     <li>In classic mode only, label the most significant critical/near points with their segment IDs.</li>
-                    <li>Refresh the Closest-to-Envelope table (Section 4.3).</li>
+                    <li>Refresh the Closest-to-Envelope table (<a href="#4.3">Section 4.3</a>).</li>
                     <li>Set the plot title (custom or automatic), axis labels, grid, and spine styling.</li>
-                    <li>Cache the arguments used to build the Symbols index and draw it (Section 6.7).</li>
+                    <li>Cache the arguments used to build the Symbols index and draw it (<a href="#6.7">Section 6.7</a>).</li>
                     <li>Apply either the preserved axis limits or the freshly computed home limits.</li>
                     <li>Update the on-screen zoom percentage label.</li>
-                    <li>If the dry-envelope overlay is enabled, draw it on top (Section 6.6).</li>
+                    <li>If the dry-envelope overlay is enabled, draw it on top (<a href="#6.6">Section 6.6</a>).</li>
                     <li>Request a canvas redraw (<code>draw_idle</code>).</li>
                 </ol>
 
-                <h3>7.1 Segment Selection Propagation</h3>
+                <h3 id="7.1">7.1 Segment Selection Propagation</h3>
                 <p>
                     Selecting a fracture (by clicking a pole in the Mohr Tab, a row in the Table tab, or a pole in
                     the Stereonet tab) calls the shared <code>SlipTendencyApp.select_segment()</code> method, which
@@ -573,7 +573,7 @@ def _mohr_field(sigma1, sigma2, sigma3, pore_pressure, cohesion, friction, value
                 <!-- ================================================= -->
                 <h2 id="visualization">9. Visualization</h2>
 
-                <h3>9.1 Plot Anatomy</h3>
+                <h3 id="9.1">9.1 Plot Anatomy</h3>
                 <p>
                     A single Matplotlib Axes hosts the entire diagram: x-axis "Effective Normal Stress, MPa", y-axis
                     "Shear Stress, MPa". Overlaid elements, from back to front by default, are: the coloured
@@ -603,7 +603,7 @@ def _mohr_field(sigma1, sigma2, sigma3, pore_pressure, cohesion, friction, value
                     <span class="ph-caption"><strong>Figure 9.2</strong> &mdash; Example Mohr diagram in classic (no-metric) mode: stable circles, near-envelope diamonds, and critical stars, each labelled with segment IDs for the most significant points.</span>
                 </figure>
 
-                <h3>9.2 Colour Bar Geometry</h3>
+                <h3 id="9.2">9.2 Colour Bar Geometry</h3>
                 <p>
                     The colour bar is a dedicated secondary Axes (<code>mohr_cbar_ax</code>) whose rectangle [left,
                     bottom, width, height] in figure-fraction coordinates is recomputed on every draw from the
@@ -612,7 +612,7 @@ def _mohr_field(sigma1, sigma2, sigma3, pore_pressure, cohesion, friction, value
                     falls back to a fixed default rectangle.
                 </p>
 
-                <h3>9.3 Save Image</h3>
+                <h3 id="9.3">9.3 Save Image</h3>
                 <p>
                     The toolbar's "Save Image" button calls the shared <code>SlipTendencyApp.save_plot_image()</code>
                     routine, which writes the current figure to
@@ -625,7 +625,7 @@ def _mohr_field(sigma1, sigma2, sigma3, pore_pressure, cohesion, friction, value
                 <!-- ================================================= -->
                 <h2 id="advanced">10. Advanced Features</h2>
 
-                <h3>10.1 Pan, Zoom, and Box-Zoom</h3>
+                <h3 id="10.1">10.1 Pan, Zoom, and Box-Zoom</h3>
                 <table>
                     <tr><th>Interaction</th><th>Trigger</th><th>Behaviour</th></tr>
                     <tr><td>Scroll wheel</td><td>Mouse wheel over the axes</td><td>Zooms in/out centred on the cursor position by a factor of 0.85 (in) / 1.18 (out) per notch</td></tr>
@@ -635,7 +635,7 @@ def _mohr_field(sigma1, sigma2, sigma3, pore_pressure, cohesion, friction, value
                     <tr><td>&#8634; Reset view</td><td>Click</td><td>Restores the axis limits captured as "home" on the most recent full redraw</td></tr>
                 </table>
 
-                <h3>10.2 Move Elements Mode and Draggable Symbols Index</h3>
+                <h3 id="10.2">10.2 Move Elements Mode and Draggable Symbols Index</h3>
                 <p>
                     When the workspace-wide "Move Elements" toggle (in the shared header) is active, a left-click
                     that lands inside the Symbols index box's current footprint begins a drag operation instead of a
@@ -647,7 +647,7 @@ def _mohr_field(sigma1, sigma2, sigma3, pore_pressure, cohesion, friction, value
                     The chosen position persists across subsequent redraws.
                 </p>
 
-                <h3>10.3 Manual Plot Pixel Sizing</h3>
+                <h3 id="10.3">10.3 Manual Plot Pixel Sizing</h3>
                 <p>
                     By default the Mohr canvas is gridded with <code>sticky="nsew"</code> so it automatically fills
                     its parent panel and resizes smoothly with the application window. The first time the user
@@ -661,7 +661,7 @@ def _mohr_field(sigma1, sigma2, sigma3, pore_pressure, cohesion, friction, value
                     to Auto" reverses this by re-enabling sticky-fill behaviour.
                 </p>
 
-                <h3>10.4 Cross-Tab Selection Synchronization</h3>
+                <h3 id="10.4">10.4 Cross-Tab Selection Synchronization</h3>
                 <p>
                     Because segment selection state (<code>self.selected_segment_id</code>) is owned by the parent
                     <code>SlipTendencyApp</code> rather than by any individual tab, clicking a pole here, a row in
@@ -724,7 +724,7 @@ def _mohr_field(sigma1, sigma2, sigma3, pore_pressure, cohesion, friction, value
                     Mode, the geological validity of the Mohr diagram is tied directly to how well the entered
                     principal-stress magnitudes and orientations represent the true in-situ stress tensor at the
                     site; users should treat outputs as conditional on that stress model and re-run sensitivity
-                    cases (Section 12.1) wherever the stress tensor is poorly constrained.
+                    cases (<a href="#12.1">Section 12.1</a>) wherever the stress tensor is poorly constrained.
                 </p>
 
                 <!-- ================================================= -->

@@ -223,19 +223,19 @@
                     record rather than a further stylable visualisation.
                 </p>
 
-                <h3>4.1 Toolbar Controls</h3>
+                <h3 id="4.1">4.1 Toolbar Controls</h3>
                 <table>
                     <tr><th>Control</th><th>Type</th><th>Behaviour</th></tr>
                     <tr><td>"Segment results"</td><td>Static label (bold, 13 pt)</td><td>Section heading; no interactivity.</td></tr>
                     <tr><td>Export Excel</td><td>CTkButton, 120×30 px</td><td>Invokes <code>SlipTendencyApp.export_excel()</code>, which writes <code>self.results</code> to a user-chosen .xlsx workbook (sheet "Segment results") via a native Save dialog. If <code>self.results</code> is empty, an error dialog ("Nothing to export — Run a calculation first.") is shown instead. On success, the status bar and a confirmation dialog report the saved row count and file path.</td></tr>
                 </table>
 
-                <h3>4.2 Data Grid Controls</h3>
+                <h3 id="4.2">4.2 Data Grid Controls</h3>
                 <table>
                     <tr><th>Control</th><th>Type</th><th>Behaviour</th></tr>
-                    <tr><td>Column headers (×15)</td><td>ttk.Treeview "heading" cells</td><td>Display the fixed column captions (see Section 5). The "Length" heading is dynamically rewritten on every refresh to embed the active display unit, e.g. "Length (m)", "Length (cm)".</td></tr>
-                    <tr><td>Row selection</td><td>ttk.Treeview single-row click / arrow-key navigation</td><td>Selecting a row fires the <code>&lt;&lt;TreeviewSelect&gt;&gt;</code> virtual event, handled by <code>on_table_select()</code>, which drives cross-tab highlighting (Section 8).</td></tr>
-                    <tr><td>Vertical scrollbar</td><td>ttk.Scrollbar, orient="vertical"</td><td>Bound bidirectionally to the Treeview's <code>yview</code>; scrolls through all loaded rows (subject to the 1000-row rendering cap, Section 10).</td></tr>
+                    <tr><td>Column headers (×15)</td><td>ttk.Treeview "heading" cells</td><td>Display the fixed column captions (see <a href="#columns">Section 5</a>). The "Length" heading is dynamically rewritten on every refresh to embed the active display unit, e.g. "Length (m)", "Length (cm)".</td></tr>
+                    <tr><td>Row selection</td><td>ttk.Treeview single-row click / arrow-key navigation</td><td>Selecting a row fires the <code>&lt;&lt;TreeviewSelect&gt;&gt;</code> virtual event, handled by <code>on_table_select()</code>, which drives cross-tab highlighting (<a href="#sync">Section 8</a>).</td></tr>
+                    <tr><td>Vertical scrollbar</td><td>ttk.Scrollbar, orient="vertical"</td><td>Bound bidirectionally to the Treeview's <code>yview</code>; scrolls through all loaded rows (subject to the 1000-row rendering cap, <a href="#performance">Section 10</a>).</td></tr>
                 </table>
 
                 <!-- ================================================= -->
@@ -309,7 +309,7 @@ for col in columns:
                     calculations (e.g. legacy MATLAB slip-tendency scripts).
                 </p>
 
-                <h3>6.1 Symbol Definitions</h3>
+                <h3 id="6.1">6.1 Symbol Definitions</h3>
                 <table>
                     <tr><th>Symbol</th><th>Description</th><th>Units</th></tr>
                     <tr><td>σ1, σ2, σ3</td><td>Maximum, intermediate, and minimum principal stress magnitudes (σ1 ≥ σ2 ≥ σ3)</td><td>MPa</td></tr>
@@ -326,7 +326,7 @@ for col in columns:
                     <tr><td>Sf</td><td>Fracture susceptibility (pore-pressure corrected)</td><td>MPa</td></tr>
                 </table>
 
-                <h3>6.2 Stress Resolution (σₙ, τ, α)</h3>
+                <h3 id="6.2">6.2 Stress Resolution (σₙ, τ, α)</h3>
                 <p>
                     For a plane of given strike and dip, the outward unit normal is constructed from the pole
                     azimuth (strike + 90°) and the dip angle. In Andersonian mode (σ1 horizontal along the entered
@@ -348,7 +348,7 @@ for col in columns:
                     division-by-zero downstream.
                 </p>
 
-                <h3>6.3 Slip Tendency (Ts, TsNorm)</h3>
+                <h3 id="6.3">6.3 Slip Tendency (Ts, TsNorm)</h3>
                 <p>
                     Slip tendency, following Morris, Ferrill &amp; Henderson (1996), expresses how close a plane is
                     to frictional sliding under the resolved stress state, independent of any assumed cohesion or
@@ -373,7 +373,7 @@ for col in columns:
                     near-optimal plane, and has been replaced by the closed-form calculation above.
                 </p>
 
-                <h3>6.4 Dilation Tendency (Td)</h3>
+                <h3 id="6.4">6.4 Dilation Tendency (Td)</h3>
                 <div class="formula-block">Td = (σ1 − σₙ) / (σ1 − σ3)</div>
                 <p>
                     Dilation tendency (Ferrill et al., 1999) measures the propensity of a fracture to open (dilate)
@@ -382,7 +382,7 @@ for col in columns:
                     stress differential.
                 </p>
 
-                <h3>6.5 Fracture Susceptibility (Sf, SfLegacy)</h3>
+                <h3 id="6.5">6.5 Fracture Susceptibility (Sf, SfLegacy)</h3>
                 <p>
                     Two historically distinct MATLAB reference formulas exist for fracture susceptibility,
                     differing by exactly the pore-pressure and cohesion terms. The Table Tab reports both
@@ -400,7 +400,7 @@ SfLegacy (original)           =  σₙ − τ / μ
                     envelope; Sf can be negative for critically or super-critically stressed planes.
                 </p>
 
-                <h3>6.6 Coulomb Critical-Stress Flag (CSF)</h3>
+                <h3 id="6.6">6.6 Coulomb Critical-Stress Flag (CSF)</h3>
                 <p>The Mohr–Coulomb failure criterion used throughout FracSTAT is:</p>
                 <div class="formula-block">τ ≥ μ·(σₙ − Pf) + C₀   ⇒   plane is critically stressed</div>
                 <p>
@@ -413,7 +413,7 @@ SfLegacy (original)           =  σₙ − τ / μ
                 <!-- ================================================= -->
                 <h2 id="algorithms">7. Algorithms and Internal Workflow</h2>
 
-                <h3>7.1 Tab Construction — <code>_build_table_tab()</code></h3>
+                <h3 id="7.1">7.1 Tab Construction — <code>_build_table_tab()</code></h3>
                 <p>
                     Executed once, during <code>SlipTendencyApp._build_layout()</code>, after the tab's Tk container
                     frame has been created by the CTkTabview. The method performs, in order:
@@ -422,7 +422,7 @@ SfLegacy (original)           =  σₙ − τ / μ
                     <li><strong>Grid configuration</strong> — row 2 (the data grid row) and column 0 are given
                     weight 1 so the table stretches to fill the tab.</li>
                     <li><strong>Theme application</strong> — <code>configure_table_style()</code> is invoked
-                    immediately so the Treeview's ttk style exists before any rows are inserted (see Section 7.3).</li>
+                    immediately so the Treeview's ttk style exists before any rows are inserted (see <a href="#7.3">Section 7.3</a>).</li>
                     <li><strong>Toolbar construction</strong> — a transparent CTkFrame with the "Segment results"
                     label and Export Excel button, gridded at row 0.</li>
                     <li><strong>Column and heading setup</strong> — the fifteen-element columns tuple is used both
@@ -442,7 +442,7 @@ SfLegacy (original)           =  σₙ − τ / μ
                     <code>refresh_table()</code> call, which normally follows the first successful calculation.
                 </p>
 
-                <h3>7.2 Selection Handling — <code>on_table_select()</code></h3>
+                <h3 id="7.2">7.2 Selection Handling — <code>on_table_select()</code></h3>
                 <p>
                     This callback fires on every change to the Treeview's internal selection, including selections
                     made programmatically by <code>refresh_table()</code> itself when it restores a previously
@@ -462,7 +462,7 @@ SfLegacy (original)           =  σₙ − τ / μ
                     had previously picked — the handler returns without further action, preventing an unnecessary
                     cascade of redraws across the Map, Mohr, and Stereonet tabs.</li>
                     <li>Otherwise, call <code>self.select_segment(segment_id)</code>, the shared cross-tab
-                    selection routine defined on <code>SlipTendencyApp</code> itself (see Section 8).</li>
+                    selection routine defined on <code>SlipTendencyApp</code> itself (see <a href="#sync">Section 8</a>).</li>
                 </ol>
 
                 <div class="code-window">
@@ -484,7 +484,7 @@ SfLegacy (original)           =  σₙ − τ / μ
                 </div>
                 <p class="ph-caption" style="text-align:left; margin: -1rem 0 1.5rem 0;"><code>on_table_select()</code> in full — the short-circuit guards prevent a redundant cascade of redraws whenever the incoming selection already matches the current cross-tab selection.</p>
 
-                <h3>7.3 Theming — <code>configure_table_style()</code></h3>
+                <h3 id="7.3">7.3 Theming — <code>configure_table_style()</code></h3>
                 <p>
                     ttk widgets (unlike CustomTkinter widgets) do not automatically follow FracSTAT's light/dark
                     colour tokens, so this method explicitly configures a <code>ttk.Style</code> object every time
@@ -513,7 +513,7 @@ SfLegacy (original)           =  σₙ − τ / μ
                     be re-enabled.
                 </div>
 
-                <h3>7.4 Refresh Algorithm — <code>refresh_table()</code></h3>
+                <h3 id="7.4">7.4 Refresh Algorithm — <code>refresh_table()</code></h3>
                 <p>
                     <code>refresh_table()</code> is the workhorse of the tab and is called every time
                     <code>self.results</code> changes (after <code>calculate()</code>, after
@@ -539,8 +539,8 @@ SfLegacy (original)           =  σₙ − τ / μ
                     (em dash) instead.</li>
                     <li><strong>Row insertion loop:</strong>
                     <code>self.results.head(1000).itertuples(index=False)</code> iterates at most the first 1000
-                    rows of the results DataFrame (see Section 10 for the rationale). For each row, the displayed
-                    values are formatted (see Section 5's Format column) and inserted with
+                    rows of the results DataFrame (see <a href="#performance">Section 10</a> for the rationale). For each row, the displayed
+                    values are formatted (see <a href="#columns">Section 5</a>'s Format column) and inserted with
                     <code>self.table.insert("", "end", iid=str(int(row.ID)), values=(...))</code>. Using the
                     segment's own ID as the Tk item identifier is what allows <code>on_table_select()</code> to
                     recover the numeric ID directly from the widget's selection state without a separate lookup
@@ -604,7 +604,7 @@ SfLegacy (original)           =  σₙ − τ / μ
                     Clearing the selection — via the Mohr or Stereonet tabs' "Clear Selection" buttons, which call
                     <code>SlipTendencyApp.clear_selection()</code> — sets <code>self.selected_segment_id</code>
                     back to <code>None</code> and calls <code>refresh_table()</code>, which then finds no matching
-                    iid in step 6 of Section 7.4 and leaves the table with no row highlighted.
+                    iid in step 6 of <a href="#7.4">Section 7.4</a> and leaves the table with no row highlighted.
                 </p>
 
                 <!-- ================================================= -->
@@ -621,13 +621,13 @@ SfLegacy (original)           =  σₙ − τ / μ
                     maximum or mean can be located, sorted by eye, and cross-checked row-by-row in the Table Tab.
                 </p>
 
-                <h3>9.1 Interpreting Column Distributions</h3>
+                <h3 id="9.1">9.1 Interpreting Column Distributions</h3>
                 <table>
                     <tr><th>Observation in the Table Tab</th><th>Geomechanical interpretation</th></tr>
                     <tr><td>Many rows with CSF = "Yes"</td><td>The current stress tensor is close to, or exceeds, the assumed failure envelope for a large fraction of the fracture population — indicative of a critically stressed fracture network with elevated potential for fluid flow along reactivated planes.</td></tr>
                     <tr><td>TsNorm clustered near 1.0 for a subset of rows</td><td>Those planes are oriented close to the theoretically optimal slip-prone orientation for the current σ1–σ3 differential; in an Andersonian regime this typically corresponds to strikes sub-parallel to σ1 with dip near the frictional-lock angle (~30° from σ1 for μ ≈ 0.6).</td></tr>
                     <tr><td>Td consistently higher than Ts for the same rows</td><td>Planes are more prone to opening-mode dilation than to frictional slip under the current stress state — relevant when assessing which fractures are more likely to act as open conduits versus shear-reactivated conduits.</td></tr>
-                    <tr><td>Sf and SfLegacy diverging substantially</td><td>Indicates a non-trivial pore-pressure (Pf) or cohesion (C₀) input; the magnitude of the divergence is, by construction, approximately equal to Pf when C₀ = 0 (Section 6.5).</td></tr>
+                    <tr><td>Sf and SfLegacy diverging substantially</td><td>Indicates a non-trivial pore-pressure (Pf) or cohesion (C₀) input; the magnitude of the divergence is, by construction, approximately equal to Pf when C₀ = 0 (<a href="#6.5">Section 6.5</a>).</td></tr>
                 </table>
 
                 <!-- ================================================= -->
@@ -663,7 +663,7 @@ SfLegacy (original)           =  σₙ − τ / μ
                     perceptibly delay the interface.
                 </p>
 
-                <h3>10.1 Practical Implication of the 1000-Row Cap</h3>
+                <h3 id="10.1">10.1 Practical Implication of the 1000-Row Cap</h3>
                 <p>
                     When a dataset exceeds 1000 segments, the on-screen table displays only the first 1000 in
                     DataFrame order (which is the order segments were produced during loading/calculation —
@@ -711,18 +711,17 @@ SfLegacy (original)           =  σₙ − τ / μ
                 <!-- ================================================= -->
                 <h2 id="examples">12. Practical Examples</h2>
 
-                <h3>12.1 Example 1 — Verifying a Slip-Tendency Calculation by Hand</h3>
+                <h3 id="12.1">12.1 Example 1 — Verifying a Slip-Tendency Calculation by Hand</h3>
                 <p>
                     An analyst loads an SVG fracture-trace map, sets σ1 = 104.7 MPa, σ2 = 60.3 MPa, σ3 = 47.1 MPa in
                     Andersonian mode with azimuth 0°, and presses Calculate. To manually verify the reported Tₛ
                     (norm) value for segment ID 12, the analyst locates row ID = 12 in the Table Tab (using the
                     scrollbar or, for large datasets, exporting to Excel and using a spreadsheet find function),
-                    reads off StrikeDeg, DipDeg, σₙ, and τ, and reproduces α, σₙ, τ using the equations of Section
-                    6.2, then Ts and TsNorm using Section 6.3's formulas — including the closed-form Ts,max —
+                    reads off StrikeDeg, DipDeg, σₙ, and τ, and reproduces α, σₙ, τ using the equations of <a href="#6.2">Section 6.2</a>, then Ts and TsNorm using <a href="#6.3">Section 6.3</a>'s formulas — including the closed-form Ts,max —
                     confirming the value shown in the Tₛ (norm) column.
                 </p>
 
-                <h3>12.2 Example 2 — Cross-Referencing a Critical Segment Between Table and Mohr Diagram</h3>
+                <h3 id="12.2">12.2 Example 2 — Cross-Referencing a Critical Segment Between Table and Mohr Diagram</h3>
                 <p>
                     After calculation, the analyst scans the CSF column in the Table Tab for rows marked "Yes",
                     identifying the subset of the fracture population predicted to be critically stressed under the
@@ -734,18 +733,18 @@ SfLegacy (original)           =  σₙ − τ / μ
                     one interactive step.
                 </p>
 
-                <h3>12.3 Example 3 — Comparing Legacy and Corrected Fracture Susceptibility</h3>
+                <h3 id="12.3">12.3 Example 3 — Comparing Legacy and Corrected Fracture Susceptibility</h3>
                 <p>
                     When importing results intended to reproduce an older MATLAB workflow that used the original
                     Sf = σₙ − τ/μ formula (no pore-pressure correction), the analyst compares the Sf (Pf-corr.) and
                     Sf (legacy) columns directly in the Table Tab. If the two differ by a near-constant offset
                     across all rows and the sidebar's Pore press. (MPa) field is non-zero, this offset is expected
-                    and equals approximately Pf (Section 6.5); a non-constant offset instead flags a non-zero
+                    and equals approximately Pf (<a href="#6.5">Section 6.5</a>); a non-constant offset instead flags a non-zero
                     cohesion input interacting with the two formulas differently and should prompt the analyst to
                     check the Failure Criteria card's Cohesion (MPa) field.
                 </p>
 
-                <h3>12.4 Example 4 — Exporting Full Results for a Technical Report</h3>
+                <h3 id="12.4">12.4 Example 4 — Exporting Full Results for a Technical Report</h3>
                 <p>
                     For inclusion of a complete segment-level results appendix in a technical report, the analyst
                     clicks Export Excel, saves the workbook, and opens it in Excel or an equivalent spreadsheet
@@ -804,7 +803,7 @@ SfLegacy (original)           =  σₙ − τ / μ
                     <li><strong>Item identifiers (iids)</strong> — using <code>str(int(row.ID))</code> as the
                     Treeview iid, rather than Tk's default auto-incrementing internal iid, is what allows O(1)
                     mapping between a clicked row and its underlying segment ID, and what allows selection
-                    restoration (Section 7.4, step 6) to work by simple string containment testing ("in
+                    restoration (<a href="#7.4">Section 7.4</a>, step 6) to work by simple string containment testing ("in
                     self.table.get_children()") without maintaining a separate lookup dictionary.</li>
                     <li><strong>Row-value construction</strong> is done with pandas'
                     <code>itertuples(index=False)</code>, which is significantly faster than

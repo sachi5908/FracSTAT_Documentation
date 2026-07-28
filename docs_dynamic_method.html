@@ -133,7 +133,7 @@
                     tendency/failure metrics computed from that resolved stress.
                 </p>
 
-                <h3>4.1 Geometry</h3>
+                <h3 id="4.1">4.1 Geometry</h3>
                 <p>
                     Every digitised SVG trace is converted into one or more straight fracture segments before any
                     stress calculation begins. A line primitive in the source SVG becomes exactly one segment;
@@ -144,7 +144,7 @@
                     downstream stage.
                 </p>
 
-                <h3>4.2 Profile Scaling and Strike Correction</h3>
+                <h3 id="4.2">4.2 Profile Scaling and Strike Correction</h3>
                 <p>
                     Raw SVG coordinates exist only in arbitrary digitiser pixel units. FracSTAT rescales the full
                     coordinate extent of the loaded trace map onto the physical Profile Width and Profile Length
@@ -162,7 +162,7 @@
                 </p>
                 <div class="formula-block">strike_N = image strike + θ</div>
 
-                <h3>4.3 Stress Angle</h3>
+                <h3 id="4.3">4.3 Stress Angle</h3>
                 <p>
                     The maximum principal stress σ₁ is supplied as an azimuth measured from true North. FracSTAT
                     does not resolve stress directly onto the fracture plane's strike direction; it resolves stress
@@ -172,7 +172,7 @@
                 </p>
                 <div class="formula-block">α = strike_N + 90° − azimuth_N(σ₁)</div>
 
-                <h3>4.4 Resolved Stress</h3>
+                <h3 id="4.4">4.4 Resolved Stress</h3>
                 <p>
                     With α defined relative to the fracture normal, the normal stress σₙ and shear stress τ acting
                     on the fracture plane follow directly from the standard two-dimensional Mohr stress
@@ -190,9 +190,9 @@
                     interchangeable term-for-term.
                 </div>
 
-                <h3>4.5 Tendency Metrics</h3>
+                <h3 id="4.5">4.5 Tendency Metrics</h3>
                 <p>
-                    Four derived quantities, each computed directly from the resolved σₙ and τ of Section 4.4, are
+                    Four derived quantities, each computed directly from the resolved σₙ and τ of <a href="#4.4">Section 4.4</a>, are
                     reported throughout the Dynamic Analyzer's Map, Rose, and Table tabs:
                 </p>
                 <table>
@@ -282,9 +282,9 @@ text.configure(state="disabled")</code></pre>
                 </p>
                 <table>
                     <tr><th>Dynamic Analyzer Tab</th><th>What it uses from the Method tab's formulas</th></tr>
-                    <tr><td>Map Tab</td><td>Colours every segment by whichever tendency/failure metric (T<sub>s</sub>, T<sub>d</sub>, S<sub>f</sub>, or CSF) is currently selected, computed via Sections 4.3–4.5.</td></tr>
-                    <tr><td>Rose Tab</td><td>Builds a length-weighted, 10° binned, square-root (equal-area) polar histogram of the same corrected strike_N values described in Section 4.2, mirroring 0–180° strikes into the 180–360° half for full-circle display.</td></tr>
-                    <tr><td>Mohr Tab</td><td>Plots total stress (σₙ, τ), effective stress shifted by pore pressure Pᶠ, individual segment points, and the Coulomb failure envelope τ = C₀ + μσₙ′ using exactly the resolved-stress formulas of Section 4.4; Mohr-diagram point numbers correspond directly to each segment's ID in the Table tab. The quantity Δτ = τ − [C₀ + μ(σₙ − Pᶠ)] is positive wherever a segment's Mohr point touches or crosses the failure envelope.</td></tr>
+                    <tr><td>Map Tab</td><td>Colours every segment by whichever tendency/failure metric (T<sub>s</sub>, T<sub>d</sub>, S<sub>f</sub>, or CSF) is currently selected, computed via Sections <a href="#4.3">4.3</a>–<a href="#4.5">4.5</a>.</td></tr>
+                    <tr><td>Rose Tab</td><td>Builds a length-weighted, 10° binned, square-root (equal-area) polar histogram of the same corrected strike_N values described in <a href="#4.2">Section 4.2</a>, mirroring 0–180° strikes into the 180–360° half for full-circle display.</td></tr>
+                    <tr><td>Mohr Tab</td><td>Plots total stress (σₙ, τ), effective stress shifted by pore pressure Pᶠ, individual segment points, and the Coulomb failure envelope τ = C₀ + μσₙ′ using exactly the resolved-stress formulas of <a href="#4.4">Section 4.4</a>; Mohr-diagram point numbers correspond directly to each segment's ID in the Table tab. The quantity Δτ = τ − [C₀ + μ(σₙ − Pᶠ)] is positive wherever a segment's Mohr point touches or crosses the failure envelope.</td></tr>
                     <tr><td>Table Tab</td><td>Tabulates the per-segment numeric results (strike_N, α, σₙ, τ, T<sub>s</sub>, T<sub>d</sub>, S<sub>f</sub>, CSF) produced by the same pipeline documented here.</td></tr>
                 </table>
 

@@ -98,7 +98,7 @@
                     <span class="ph-caption"><strong>Figure 1.1</strong> — Annotated screenshot of the Connectivity tab showing the main sidebar (left) and the active I-Y-X node map (right).</span>
                 </figure>
 
-                <h3>1.1 Sidebar Card Structure</h3>
+                <h3 id="1.1">1.1 Sidebar Card Structure</h3>
                 <table>
                     <tr><th>Card</th><th>Purpose</th></tr>
                     <tr><td>Plots</td><td>Grouped navigation buttons for switching between the five available diagrams (one Connectivity view, four Ternary views).</td></tr>
@@ -108,7 +108,7 @@
                     <tr><td>Node Colours</td><td>A static colour legend explaining the three node-type colours used on the spatial map.</td></tr>
                 </table>
 
-                <h3>1.2 Plot Navigation</h3>
+                <h3 id="1.2">1.2 Plot Navigation</h3>
                 <p>
                     The Plots card is organised into two labelled groups — Connectivity and Ternary. Clicking a
                     navigation button sets the active plot key, re-highlights the selected button (fill colour
@@ -126,7 +126,7 @@
                     <tr><td>Ternary</td><td><code>ternary_br</code></td><td>Branch Topology (I-I · I-C · C-C)</td></tr>
                 </table>
 
-                <h3>1.3 Plot Area Toolbar</h3>
+                <h3 id="1.3">1.3 Plot Area Toolbar</h3>
                 <p>The toolbar above the plot canvas shows the name of the active diagram on the left and three action buttons on the right.</p>
                 <table>
                     <tr><th>Control</th><th>Action</th></tr>
@@ -138,7 +138,7 @@
                 <!-- ================================================= -->
                 <h2 id="data-input">2. Data Input</h2>
 
-                <h3>2.1 Upstream Data Source</h3>
+                <h3 id="2.1">2.1 Upstream Data Source</h3>
                 <p>
                     The Connectivity tab does not load files directly. It consumes the same per-segment results
                     DataFrame (<code>self.results</code>) produced by the Static Analyzer's shared geometry engine
@@ -147,7 +147,7 @@
                     <code>StaticAnalyzerApp.refresh_all_tabs()</code>.
                 </p>
 
-                <h3>2.2 Required Columns</h3>
+                <h3 id="2.2">2.2 Required Columns</h3>
                 <table>
                     <tr><th>Column</th><th>Description</th></tr>
                     <tr><td><code>Trace</code></td><td>Integer or string identifier grouping segments belonging to the same digitised fracture trace.</td></tr>
@@ -155,7 +155,7 @@
                     <tr><td><code>X1, Y1, X2, Y2</code></td><td>Real-world (scaled) coordinates of each segment's two endpoints, in the project's selected display unit (m, cm, mm, or km).</td></tr>
                 </table>
 
-                <h3>2.3 Data-Source Gating</h3>
+                <h3 id="2.3">2.3 Data-Source Gating</h3>
                 <p>
                     Before any computation is attempted, the tab checks whether the loaded data actually carries
                     genuine spatial geometry. SVG-digitised trace maps and spatial Excel/CSV imports are accepted.
@@ -171,7 +171,7 @@
                     an error.
                 </div>
 
-                <h3>2.4 Unit Handling</h3>
+                <h3 id="2.4">2.4 Unit Handling</h3>
                 <p>
                     The tolerance entry field and all reported lengths and areas automatically track the project's
                     currently selected display unit (obtained from <code>_static_map_unit_var</code>, defaulting to
@@ -182,7 +182,7 @@
                 <!-- ================================================= -->
                 <h2 id="controls">3. Settings and Controls</h2>
 
-                <h3>3.1 Settings Card (Main Sidebar)</h3>
+                <h3 id="3.1">3.1 Settings Card (Main Sidebar)</h3>
                 <table>
                     <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Node snap tolerance</td><td>0.1 (display unit)</td><td>Distance threshold below which two nearby points are treated as the same physical node. Directly controls I/Y/X classification sensitivity. Committed on <kbd>Enter</kbd> or focus-loss; triggers a full recompute.</td></tr>
@@ -197,7 +197,7 @@
                     the size of the largest visible gap between fracture tips that should be treated as touching.
                 </div>
 
-                <h3>3.2 I-Y-X Summary Card</h3>
+                <h3 id="3.2">3.2 I-Y-X Summary Card</h3>
                 <table>
                     <tr><th>Label</th><th>Symbol</th><th>Source</th></tr>
                     <tr><td>I Nodes</td><td>N_I</td><td><code>result.n_i</code> — count of isolated fracture tips</td></tr>
@@ -210,7 +210,7 @@
                     <tr><td>B22</td><td>B₂₂</td><td><code>result.dimensionless_intensity</code> = L²_total / A</td></tr>
                 </table>
 
-                <h3>3.3 Branch Topology Card</h3>
+                <h3 id="3.3">3.3 Branch Topology Card</h3>
                 <table>
                     <tr><th>Label</th><th>Symbol</th><th>Source</th></tr>
                     <tr><td>I-I Branches</td><td>N_II</td><td><code>result.n_ii</code> — branches with both endpoints isolated</td></tr>
@@ -220,7 +220,7 @@
                     <tr><td>C_B</td><td>C_B</td><td>Connections per branch, recomputed locally in <code>_update_branch_stats</code></td></tr>
                 </table>
 
-                <h3>3.4 Display Settings Sidebar</h3>
+                <h3 id="3.4">3.4 Display Settings Sidebar</h3>
                 <p>
                     Clicking "⚙ Settings" hides the main sidebar and reveals a second sidebar of identical width,
                     headed by a "⬅ Back" button and the title "Display Settings". This sidebar exposes cosmetic
@@ -228,13 +228,13 @@
                     results are rendered.
                 </p>
 
-                <h4>3.4.1 Display Options</h4>
+                <h4 id="3.4">3.4.1 Display Options</h4>
                 <table>
                     <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Ternary plot heading</td><td>blank (automatic)</td><td>Custom title overriding the automatic heading on all four ternary diagrams.</td></tr>
                 </table>
 
-                <h4>3.4.2 Plot Elements</h4>
+                <h4 id="3.4">3.4.2 Plot Elements</h4>
                 <table>
                     <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Outer background</td><td>theme background</td><td>Figure-level (canvas) background colour for all five diagrams.</td></tr>
@@ -250,7 +250,7 @@
                     <tr><td>Grid line width</td><td>0.6</td><td>Line width (pt) of gridlines when shown.</td></tr>
                 </table>
 
-                <h4>3.4.3 Background Image</h4>
+                <h4 id="3.4">3.4.3 Background Image</h4>
                 <table>
                     <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Show real photo behind nodes</td><td>Off</td><td>Enables a calibrated photograph drawn behind the spatial node map only (the four ternary diagrams do not use a background image). If no image path is yet known, automatically prompts a file browser or reuses an image already calibrated elsewhere in the project.</td></tr>
@@ -258,7 +258,7 @@
                     <tr><td>Image opacity (0–1)</td><td>1.0</td><td>Alpha blending factor applied to the background image via Matplotlib's <code>imshow(alpha=...)</code>.</td></tr>
                 </table>
 
-                <h4>3.4.4 Reset Defaults</h4>
+                <h4 id="3.4">3.4.4 Reset Defaults</h4>
                 <p>
                     Restores every colour, size, and toggle in the Display Settings sidebar to its factory value
                     and triggers a cosmetic-only redraw. Background-image settings and the underlying
@@ -272,7 +272,7 @@
                     and (x2, y2) belonging to a parent trace.
                 </p>
 
-                <h3>4.1 Node Classes</h3>
+                <h3 id="4.1">4.1 Node Classes</h3>
                 <p>
                     Following the terminology introduced for fracture network topology (Manzocchi, 2002; Sanderson
                     &amp; Nixon, 2015), every distinct point where the network terminates or crosses itself is
@@ -285,7 +285,7 @@
                     <tr><td><strong>X</strong></td><td>Crossing node</td><td>An interior intersection point lying strictly within both intersecting segments, not coincident with either endpoint.</td><td>Two fractures crossed each other, implying both were open/active at the time of intersection or that a younger fracture propagated straight through an older one.</td></tr>
                 </table>
 
-                <h3>4.2 Node-Level Statistics</h3>
+                <h3 id="4.2">4.2 Node-Level Statistics</h3>
                 <div class="formula-block">
 N  = N_I + N_Y + N_X            (total node count)
 
@@ -300,7 +300,7 @@ C̄  = (N_Y + 2·N_X) / N_B       (average connections per branch)</div>
                     weighted by 2 relative to Y in the connections-per-branch statistic.
                 </p>
 
-                <h3>4.3 Dimensionless Intensity (B₂₂)</h3>
+                <h3 id="4.3">4.3 Dimensionless Intensity (B₂₂)</h3>
                 <div class="formula-block">
 B₂₂ = L_total² / A</div>
                 <p>
@@ -310,7 +310,7 @@ B₂₂ = L_total² / A</div>
                     convention used throughout the structural-geology fracture-intensity literature.
                 </p>
 
-                <h3>4.4 Branch Classification</h3>
+                <h3 id="4.4">4.4 Branch Classification</h3>
                 <p>
                     A raw digitised segment is not itself a topological branch whenever it is crossed by another
                     segment partway along its length. The module explicitly splits every segment at each of its
@@ -327,7 +327,7 @@ B₂₂ = L_total² / A</div>
                 <div class="formula-block">
 N_B = N_II + N_IC + N_CC</div>
 
-                <h3>4.5 Line- and Branch-Density Ratios (C_L and C_B)</h3>
+                <h3 id="4.5">4.5 Line- and Branch-Density Ratios (C_L and C_B)</h3>
                 <div class="formula-block">
 N_L  = (N_I + N_Y) / 2               C_L = 2·(N_X + N_Y) / N_L
 
@@ -340,7 +340,7 @@ N_Br = (N_I + 3·N_Y + 4·N_X) / 2    C_B = (3·N_Y + 4·N_X) / N_Br</div>
                     procedure, providing an internal consistency check.
                 </p>
 
-                <h3>4.6 Ternary (Barycentric) Coordinates</h3>
+                <h3 id="4.6">4.6 Ternary (Barycentric) Coordinates</h3>
                 <p>
                     Each of the four ternary diagrams plots a data point inside an equilateral triangle using
                     standard barycentric-to-Cartesian conversion. For any three proportions p_bl, p_br, p_apex
@@ -356,7 +356,7 @@ by = (√3 / 2) · p_apex</div>
                     the apex, p_cc at bottom-right, p_ic at bottom-left.
                 </p>
 
-                <h3>4.7 Theoretical Random-Network Locus (Branch Topology Ternary)</h3>
+                <h3 id="4.7">4.7 Theoretical Random-Network Locus (Branch Topology Ternary)</h3>
                 <p>
                     The Branch Topology diagram overlays a reference curve corresponding to the theoretical
                     relationship expected for a network where node connectivity follows a simple binomial (random)
@@ -376,10 +376,10 @@ p_II = (1 − p_C)²        p_CC = p_C²        p_IC = 2·p_C·(1 − p_C)</div>
                 <p>
                     The complete node-classification and branch-typing pipeline is implemented in
                     <code>core/branch_counter.py</code>, function <code>count_iyx_nodes()</code>, and is called
-                    from the GUI layer only when a recompute is actually required (Section 10).
+                    from the GUI layer only when a recompute is actually required (<a href="#performance">Section 10</a>).
                 </p>
 
-                <h3>5.1 Pre-processing and Validation</h3>
+                <h3 id="5.1">5.1 Pre-processing and Validation</h3>
                 <p>
                     If the results table is empty or missing any of the required geometry columns (Trace, Segment,
                     X1, Y1, X2, Y2), the function immediately returns an all-zero
@@ -390,7 +390,7 @@ p_II = (1 − p_C)²        p_CC = p_C²        p_IC = 2·p_C·(1 − p_C)</div>
                     computed, anchoring both the boundary-exclusion test and the B₂₂ statistic.
                 </p>
 
-                <h3>5.2 Pairwise Segment Intersection</h3>
+                <h3 id="5.2">5.2 Pairwise Segment Intersection</h3>
                 <p>
                     For every distinct pair of segments belonging to different traces (segments sharing the same
                     Trace identifier are never tested against each other), the module solves the standard 2-D
@@ -407,7 +407,7 @@ Otherwise solve for u₁ (ua) and u₂ (ub) algebraically.
 If both u₁, u₂ ∈ [0, 1] (±1×10⁻¹⁰ tolerance) → intersection accepted.</div>
                 <p>The accepted intersection point (x, y) is computed by substitution back into the first segment's parametric equation.</p>
 
-                <h3>5.3 Classifying the Intersection: Abutment vs Crossing</h3>
+                <h3 id="5.3">5.3 Classifying the Intersection: Abutment vs Crossing</h3>
                 <p>
                     Each accepted intersection is tested by <code>_near_any_endpoint()</code>: the intersection
                     point is compared, using Euclidean distance and the user-specified tolerance, against all four
@@ -417,7 +417,7 @@ If both u₁, u₂ ∈ [0, 1] (±1×10⁻¹⁰ tolerance) → intersection accep
                     (X) candidate.
                 </p>
 
-                <h3>5.4 Endpoint (I-node) Extraction and Boundary Exclusion</h3>
+                <h3 id="5.4">5.4 Endpoint (I-node) Extraction and Boundary Exclusion</h3>
                 <p>
                     Independently of the pairwise intersection search, the true endpoints of every trace are
                     extracted by <code>_trace_endpoints()</code>: segments are grouped by Trace and sorted by
@@ -432,7 +432,7 @@ If both u₁, u₂ ∈ [0, 1] (±1×10⁻¹⁰ tolerance) → intersection accep
                     isolated fracture tip — it is an artefact of the finite digitisation window.
                 </p>
 
-                <h3>5.5 Point Clustering</h3>
+                <h3 id="5.5">5.5 Point Clustering</h3>
                 <p>
                     Because floating-point intersection arithmetic and independently listed endpoint candidates can
                     produce several near-duplicate points representing the same physical node, all raw candidate
@@ -443,7 +443,7 @@ If both u₁, u₂ ∈ [0, 1] (±1×10⁻¹⁰ tolerance) → intersection accep
                     new cluster is started.
                 </p>
 
-                <h3>5.6 Priority-Ordered De-duplication Across Classes</h3>
+                <h3 id="5.6">5.6 Priority-Ordered De-duplication Across Classes</h3>
                 <p>
                     After clustering, three independent point sets exist. Any Y candidate also matching an X cluster
                     is removed via <code>_remove_points_near()</code> (a true crossing takes priority over a
@@ -453,7 +453,7 @@ If both u₁, u₂ ∈ [0, 1] (±1×10⁻¹⁰ tolerance) → intersection accep
                     is counted exactly once in its most topologically significant category.
                 </p>
 
-                <h3>5.7 Branch Splitting and Classification</h3>
+                <h3 id="5.7">5.7 Branch Splitting and Classification</h3>
                 <p>
                     The final stage (<code>_classify_branches</code>) re-runs the pairwise intersection search,
                     retaining only interior (X-type) crossings, and records for every original segment the ordered
@@ -515,7 +515,7 @@ If both u₁, u₂ ∈ [0, 1] (±1×10⁻¹⁰ tolerance) → intersection accep
     )</code></pre>
                 </div>
 
-                <h3>5.8 Algorithm Complexity Summary</h3>
+                <h3 id="5.8">5.8 Algorithm Complexity Summary</h3>
                 <table>
                     <tr><th>Stage</th><th>Complexity</th><th>Notes</th></tr>
                     <tr><td>Pairwise intersection search (first pass)</td><td>O(n²)</td><td>n = number of segments; every cross-trace pair is tested once.</td></tr>
@@ -563,10 +563,10 @@ If both u₁, u₂ ∈ [0, 1] (±1×10⁻¹⁰ tolerance) → intersection accep
                     Five complementary Matplotlib diagrams are available, switchable instantly from the Plots
                     navigation card. All share the workspace's global font-size, font-weight, and font-colour
                     settings (<code>matplotlib.rcParams</code>) and honour the Display Settings colour/size
-                    overrides described in Section 3.4.
+                    overrides described in <a href="#3.4">Section 3.4</a>.
                 </p>
 
-                <h3>7.1 I-Y-X Connectivity Nodes (Spatial Map)</h3>
+                <h3 id="7.1">7.1 I-Y-X Connectivity Nodes (Spatial Map)</h3>
                 <p>
                     This is the only diagram drawn in true map (X, Y) coordinates. Every digitised segment is
                     rendered as a thin line (<code>LineCollection</code>, using the theme's spine/border colour),
@@ -587,11 +587,11 @@ If both u₁, u₂ ∈ [0, 1] (±1×10⁻¹⁰ tolerance) → intersection accep
                     <span class="ph-caption"><strong>Figure 7.1</strong> — I-Y-X Connectivity Nodes map: spatial fracture-trace network with red circles at isolated (I) tips, green circles at abutting (Y) junctions, and blue circles at crossing (X) junctions. Legend below the plot.</span>
                 </figure>
 
-                <h3>7.2 I-Y-X Ternary Connectivity</h3>
+                <h3 id="7.2">7.2 I-Y-X Ternary Connectivity</h3>
                 <p>
                     An equilateral-triangle ternary diagram with vertices labelled Y (bottom-left), X
                     (bottom-right), and I (apex). A single orange marker plots the network's (p_i, p_y, p_x)
-                    composition using the barycentric transform of Section 4.6, annotated with a text callout
+                    composition using the barycentric transform of <a href="#4.6">Section 4.6</a>, annotated with a text callout
                     reporting all three fractions to two decimal places (e.g. "I 0.32 &nbsp; Y 0.41 &nbsp; X 0.27").
                     A point sitting close to the Y-X base edge indicates a well-connected network dominated by
                     terminations and crossings rather than dead ends.
@@ -607,7 +607,7 @@ If both u₁, u₂ ∈ [0, 1] (±1×10⁻¹⁰ tolerance) → intersection accep
                     <span class="ph-caption"><strong>Figure 7.2</strong> — I-Y-X Ternary Connectivity diagram. The data point (orange) is annotated with the fractions of I, Y, and X nodes.</span>
                 </figure>
 
-                <h3>7.3 Connections per Line (C_L)</h3>
+                <h3 id="7.3">7.3 Connections per Line (C_L)</h3>
                 <p>
                     The same Y/X/I ternary frame, overlaid with a family of iso-C_L contour lines drawn for
                     C_L = 1, 2, 3, 4, 6, 8, 10, 20, plus a distinguished dashed contour at the frequently cited
@@ -616,7 +616,7 @@ If both u₁, u₂ ∈ [0, 1] (±1×10⁻¹⁰ tolerance) → intersection accep
                     is plotted as an amber marker with an annotated C_L value.
                 </p>
 
-                <h3>7.4 Connections per Branch (C_B)</h3>
+                <h3 id="7.4">7.4 Connections per Branch (C_B)</h3>
                 <p>
                     Structurally identical to the C_L diagram but contoured for C_B = 0.5, 1.0, 1.3, 1.5, 1.7,
                     1.8, 1.9, 1.95, plus the fixed C_B = 2.0 contour, which coincides exactly with the bottom
@@ -625,10 +625,10 @@ If both u₁, u₂ ∈ [0, 1] (±1×10⁻¹⁰ tolerance) → intersection accep
                     with an annotated C_B value.
                 </p>
 
-                <h3>7.5 Branch Topology (I-I · I-C · C-C)</h3>
+                <h3 id="7.5">7.5 Branch Topology (I-I · I-C · C-C)</h3>
                 <p>
                     A ternary diagram with vertices I-C (bottom-left), C-C (bottom-right), and I-I (apex),
-                    overlaid with the theoretical random-network locus described in Section 4.7 (blue curve with
+                    overlaid with the theoretical random-network locus described in <a href="#4.7">Section 4.7</a> (blue curve with
                     C_B tick labels at 0.0–2.0) and the observed branch-population point plotted as a white marker
                     with a dark outline, annotated with its independently computed C_B value derived from the
                     I-I/I-C/C-C proportions.
@@ -644,7 +644,7 @@ If both u₁, u₂ ∈ [0, 1] (±1×10⁻¹⁰ tolerance) → intersection accep
                     <span class="ph-caption"><strong>Figure 7.3</strong> — Branch Topology (I-I · I-C · C-C) ternary diagram showing the theoretical random-network locus (blue curve with C_B tick marks) and the observed branch-population point (white marker).</span>
                 </figure>
 
-                <h3>7.6 Empty and Loading States</h3>
+                <h3 id="7.6">7.6 Empty and Loading States</h3>
                 <p>
                     When no data is loaded, when the data source lacks real map geometry, or while a recomputation
                     is pending but the tab is not the active one, all five axes are cleared and a single centred,
@@ -652,7 +652,7 @@ If both u₁, u₂ ∈ [0, 1] (±1×10⁻¹⁰ tolerance) → intersection accep
                     All sidebar statistic labels are simultaneously reset to "–".
                 </p>
 
-                <h3>7.7 Global Styling Controls</h3>
+                <h3 id="7.7">7.7 Global Styling Controls</h3>
                 <p>
                     Every diagram observes the same background/foreground/grid/border colour variables and the same
                     border line width and grid line width entries, so the five diagrams present a visually
@@ -663,7 +663,7 @@ If both u₁, u₂ ∈ [0, 1] (±1×10⁻¹⁰ tolerance) → intersection accep
                 <!-- ================================================= -->
                 <h2 id="workflow">8. Step-by-Step Example Workflows</h2>
 
-                <h3>8.1 Assessing Reservoir Connectivity from an Outcrop Trace Map</h3>
+                <h3 id="8.1">8.1 Assessing Reservoir Connectivity from an Outcrop Trace Map</h3>
                 <ol class="step-list">
                     <li>Load an SVG trace map (or a spatial Excel/CSV) into the Static Analyzer and confirm the Fracture Map tab renders correctly with calibrated scale.</li>
                     <li>Open the Connectivity tab. Because the data is new, the tab is marked stale and an automatic lazy computation runs immediately with the default 0.1-unit tolerance.</li>
@@ -677,7 +677,7 @@ If both u₁, u₂ ∈ [0, 1] (±1×10⁻¹⁰ tolerance) → intersection accep
                     <li>Use "⬇ Save Image" on each diagram of interest to export 300 dpi PNGs to the project's <code>FracSTAT_plot_exports</code> folder for inclusion in a report or publication.</li>
                 </ol>
 
-                <h3>8.2 Worked Numerical Example</h3>
+                <h3 id="8.2">8.2 Worked Numerical Example</h3>
                 <p>
                     Consider a network reporting I = 10, Y = 20, X = 10 (N = 40 nodes) and, after branch splitting,
                     N_II = 4, N_IC = 12, N_CC = 14 (N_B = 30 branches). The connectivity statistics are:
@@ -702,7 +702,7 @@ C_B  = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82</div>
                 <!-- ================================================= -->
                 <h2 id="interpretation">9. Geological Interpretation</h2>
 
-                <h4>9.1 Connectivity Statistics and Fluid Flow</h4>
+                <h4 id="9.1">9.1 Connectivity Statistics and Fluid Flow</h4>
                 <p>
                     Fracture connectivity, not fracture density alone, is frequently the controlling factor in
                     whether a naturally fractured reservoir, aquifer, or rock mass behaves as an effective flow or
@@ -712,7 +712,7 @@ C_B  = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82</div>
                     fraction, high CF).
                 </p>
 
-                <h4>9.2 Node-Type Ratios and Network Maturity</h4>
+                <h4 id="9.2">9.2 Node-Type Ratios and Network Maturity</h4>
                 <p>
                     Increasing abundance of crossing (X) nodes relative to abutting (Y) nodes is often associated
                     with a more mature, multiply-reactivated fracture system where successive fracture sets have
@@ -723,10 +723,10 @@ C_B  = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82</div>
                     bedding-perpendicular joint set.
                 </p>
 
-                <h4>9.3 Percolation and Effective Connectivity Thresholds</h4>
+                <h4 id="9.3">9.3 Percolation and Effective Connectivity Thresholds</h4>
                 <p>
                     The C_L = 3.57 and C_B ≈ 2 reference values on the ternary diagrams derive from
-                    topological/percolation-theory studies of two-dimensional fracture networks (see Section 13,
+                    topological/percolation-theory studies of two-dimensional fracture networks (see <a href="#references">Section 13</a>,
                     References), where networks below the threshold are statistically unlikely to form a fully
                     connected percolating cluster spanning the sample domain, while networks above typically do.
                     These are heuristic reference values rather than universal physical constants: the true
@@ -735,7 +735,7 @@ C_B  = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82</div>
                     FracSTAT tabs.
                 </p>
 
-                <h4>9.4 Dead-End Branches (I-C) and Hydraulic Significance</h4>
+                <h4 id="9.4">9.4 Dead-End Branches (I-C) and Hydraulic Significance</h4>
                 <p>
                     A large I-C (dead-end spur) fraction indicates that a substantial portion of the mapped
                     fracture length — while nominally connected to the main network at one end — terminates in
@@ -745,7 +745,7 @@ C_B  = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82</div>
                     permeability up-scaling or discrete-fracture-network flow simulation performed outside FracSTAT.
                 </p>
 
-                <h4>9.5 Scale Dependence and Sampling Considerations</h4>
+                <h4 id="9.5">9.5 Scale Dependence and Sampling Considerations</h4>
                 <p>
                     Connectivity statistics are not fully scale-invariant: the observed I-node fraction is
                     sensitive to the size of the mapped domain relative to the mean fracture length, because a
@@ -763,7 +763,7 @@ C_B  = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82</div>
                     while still guaranteeing that displayed statistics are always correct and current.
                 </p>
 
-                <h3>10.1 Result Caching</h3>
+                <h3 id="10.1">10.1 Result Caching</h3>
                 <p>
                     The single <code>ConnectivityResult</code> object produced by the most recent successful call
                     to <code>count_iyx_nodes()</code> is retained in <code>self._fluid_connectivity</code> for
@@ -772,7 +772,7 @@ C_B  = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82</div>
                     recomputing it.
                 </p>
 
-                <h3>10.2 Lazy, On-Demand Computation</h3>
+                <h3 id="10.2">10.2 Lazy, On-Demand Computation</h3>
                 <p>
                     The tab is only ever computed when it is both (a) marked stale by a genuine geometry change
                     and (b) actually the currently visible tab (or explicitly forced via Recalculate or a settings
@@ -781,7 +781,7 @@ C_B  = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82</div>
                     times the profile scale is changed elsewhere in the workspace.
                 </p>
 
-                <h3>10.3 Geometric Fingerprinting</h3>
+                <h3 id="10.3">10.3 Geometric Fingerprinting</h3>
                 <p>
                     Every time <code>refresh_static_fluidflow()</code> is called, it computes a cheap fingerprint
                     of the current results table — the tuple (row count, rounded total segment length). The
@@ -791,7 +791,7 @@ C_B  = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82</div>
                     or grid visibility.
                 </p>
 
-                <h3>10.4 Deferred Execution and UI Responsiveness</h3>
+                <h3 id="10.4">10.4 Deferred Execution and UI Responsiveness</h3>
                 <p>
                     Because the algorithm can take perceptible wall-clock time for dense digitisations, every user
                     action that may trigger a recompute is scheduled through Tkinter's <code>after(100, …)</code>
@@ -800,7 +800,7 @@ C_B  = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82</div>
                     O(n²) search, so the application never appears to freeze without explanation.
                 </p>
 
-                <h3>10.5 Single-Figure-per-Diagram Construction</h3>
+                <h3 id="10.5">10.5 Single-Figure-per-Diagram Construction</h3>
                 <p>
                     All five Matplotlib Figure/Axes/Canvas triples are constructed exactly once at tab-build time
                     and simply shown/hidden thereafter. This avoids the overhead of destroying and rebuilding
@@ -808,7 +808,7 @@ C_B  = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82</div>
                     modest cost of holding five figures in memory simultaneously.
                 </p>
 
-                <h3>10.6 Recommended Practice for Large Data Sets</h3>
+                <h3 id="10.6">10.6 Recommended Practice for Large Data Sets</h3>
                 <p>
                     For SVG traces exceeding several thousand segments, consider increasing the Curve step (px)
                     parameter when loading the SVG to reduce the number of straight-line segments used to
@@ -821,7 +821,7 @@ C_B  = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82</div>
                 <!-- ================================================= -->
                 <h2 id="advanced">11. Advanced Features</h2>
 
-                <h3>11.1 Interactive Pan and Zoom</h3>
+                <h3 id="11.1">11.1 Interactive Pan and Zoom</h3>
                 <p>
                     All five canvases share a common pair of mouse-driven navigation handlers connected at
                     tab-build time. The scroll wheel (<code>_on_scroll_zoom</code>) zooms in or out by a fixed
@@ -833,7 +833,7 @@ C_B  = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82</div>
                     without any recomputation.
                 </p>
 
-                <h3>11.2 Custom Colour Picker</h3>
+                <h3 id="11.2">11.2 Custom Colour Picker</h3>
                 <p>
                     Every colour swatch in the Display Settings sidebar opens the shared FracSTAT colour-picker
                     dialog (<code>_StaticColorButton</code>), which presents a curated 8×5 matrix of 40
@@ -843,7 +843,7 @@ C_B  = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82</div>
                     bound to that colour variable.
                 </p>
 
-                <h3>11.3 Calibrated Background Photograph Overlay</h3>
+                <h3 id="11.3">11.3 Calibrated Background Photograph Overlay</h3>
                 <p>
                     The Connectivity tab supports overlaying a real, scale-calibrated photograph of the outcrop
                     behind the spatial node map (the four ternary diagrams do not use a background image). The
@@ -856,7 +856,7 @@ C_B  = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82</div>
                     fracture geometry, and its opacity controlled by the Image opacity entry.
                 </p>
 
-                <h3>11.4 Module Architecture</h3>
+                <h3 id="11.4">11.4 Module Architecture</h3>
                 <table>
                     <tr><th>File</th><th>Responsibility</th></tr>
                     <tr><td><code>core/branch_counter.py</code></td><td>Pure, GUI-independent geometry/topology engine: <code>ConnectivityResult</code> dataclass and <code>count_iyx_nodes()</code> plus all private helper functions (<code>_segment_intersection</code>, <code>_near_any_endpoint</code>, <code>_trace_endpoints</code>, <code>_cluster_points</code>, <code>_remove_points_near</code>, <code>_on_boundary</code>, <code>_classify_branches</code>, <code>_empty_result</code>).</td></tr>
@@ -871,7 +871,7 @@ C_B  = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82</div>
                     own scale/unit variables without any explicit inter-tab messaging.
                 </p>
 
-                <h3>11.5 Numerical Tolerances Reference</h3>
+                <h3 id="11.5">11.5 Numerical Tolerances Reference</h3>
                 <table>
                     <tr><th>Constant</th><th>Value</th><th>Purpose</th></tr>
                     <tr><td>Segment length floor</td><td>1×10⁻¹²</td><td>Discards degenerate, zero-length segments before intersection testing.</td></tr>

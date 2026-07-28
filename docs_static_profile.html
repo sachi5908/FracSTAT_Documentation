@@ -147,7 +147,7 @@
                     label and a Save Image button.
                 </p>
 
-                <h3>2.1 Left Sidebar — Info Tab</h3>
+                <h3 id="2.1">2.1 Left Sidebar — Info Tab</h3>
                 <p>The Info tab is the primary analysis-configuration panel and is organised into four stacked cards:</p>
                 <ul>
                     <li><strong>Distance ALONG the line</strong> — five checkboxes selecting which along-line attributes to compute and plot, plus a numeric field controlling the number of circular scan windows used for the intensity/density calculation.</li>
@@ -157,7 +157,7 @@
                 </ul>
                 <p>An <strong>Update Graphs</strong> button at the foot of the Info tab forces an immediate redraw using whatever combination of checkboxes and coordinates is currently set.</p>
 
-                <h3>2.2 Left Sidebar — Settings Tab</h3>
+                <h3 id="2.2">2.2 Left Sidebar — Settings Tab</h3>
                 <p>
                     The Settings tab controls the cosmetic appearance of both the map and the output plot: a custom
                     title override, independent legend-position selectors for the map and the output plot, numeric
@@ -168,7 +168,7 @@
                     tab to its factory value.
                 </p>
 
-                <h3>2.3 Plot Card</h3>
+                <h3 id="2.3">2.3 Plot Card</h3>
                 <p>
                     The plot card hosts a single Matplotlib Figure containing two subplots created with
                     <code>add_subplot(121)</code> and <code>add_subplot(122)</code>: the left subplot
@@ -244,7 +244,7 @@
                 <!-- ================================================= -->
                 <h2 id="controls">4. Settings and Controls</h2>
 
-                <h3>4.1 Distance ALONG the Line (Info tab)</h3>
+                <h3 id="4.1">4.1 Distance ALONG the Line (Info tab)</h3>
                 <table>
                     <tr><th>Control</th><th>Type</th><th>Effect</th></tr>
                     <tr><td>Trace length</td><td>Checkbox</td><td>Plots, for every fracture line-scan intersection, the total length of the parent trace against the along-line distance of that intersection (series label "Trace length along").</td></tr>
@@ -255,7 +255,7 @@
                     <tr><td>Number of scan circles</td><td>Numeric entry</td><td>Sets the count of circular sampling windows distributed along the reference line for the P21/P20 calculation; internally clamped to the range 2–200 (default 12).</td></tr>
                 </table>
 
-                <h3>4.2 Distance FROM the Line (Info tab)</h3>
+                <h3 id="4.2">4.2 Distance FROM the Line (Info tab)</h3>
                 <table>
                     <tr><th>Control</th><th>Type</th><th>Effect</th></tr>
                     <tr><td>Trace length</td><td>Checkbox</td><td>Plots each trace's total length against the perpendicular (signed) distance of that trace's length-weighted midpoint from the reference line ("Trace length from").</td></tr>
@@ -263,17 +263,17 @@
                     <tr><td>Segment angle</td><td>Checkbox</td><td>Plots each segment's strike against the perpendicular distance of the segment midpoint from the line ("Segment angle from").</td></tr>
                 </table>
 
-                <h3>4.3 Plot Options and Line End Points</h3>
+                <h3 id="4.3">4.3 Plot Options and Line End Points</h3>
                 <table>
                     <tr><th>Control</th><th>Type</th><th>Effect</th></tr>
                     <tr><td>Join Line</td><td>Checkbox</td><td>When enabled, every selected output series is connected with a thin line in addition to its scatter markers, ordered by ascending X value; the two intensity/density series are always joined regardless of this setting, since they represent a continuous sampled function rather than discrete fracture events.</td></tr>
                     <tr><td>X1 / Y1 / X2 / Y2</td><td>Numeric entries</td><td>Direct numeric specification of the two reference-line endpoints, in the current display unit. Editing any field and pressing Enter or moving focus away immediately redraws both the map and the derived plot.</td></tr>
-                    <tr><td>Select end points</td><td>Button</td><td>Activates interactive on-map picking mode (see Section 10.1); the next two mouse clicks on the fracture map set Point 1 and Point 2 respectively and populate the four coordinate fields automatically.</td></tr>
+                    <tr><td>Select end points</td><td>Button</td><td>Activates interactive on-map picking mode (see <a href="#10.1">Section 10.1</a>); the next two mouse clicks on the fracture map set Point 1 and Point 2 respectively and populate the four coordinate fields automatically.</td></tr>
                     <tr><td>Status label</td><td>Read-only text</td><td>Reports the current stage of interactive picking ("Step 1 of 2…", "Step 2 of 2…", or a confirmation once both points are set).</td></tr>
                     <tr><td>Update Graphs</td><td>Button</td><td>Forces an unconditional redraw of the map and output plot using the current settings; primarily a convenience action, since virtually every other control already triggers a redraw automatically.</td></tr>
                 </table>
 
-                <h3>4.4 Settings Tab — Display and Appearance</h3>
+                <h3 id="4.4">4.4 Settings Tab — Display and Appearance</h3>
                 <table>
                     <tr><th>Control</th><th>Type</th><th>Effect</th></tr>
                     <tr><td>Custom title (blank = auto)</td><td>Text entry</td><td>Overrides the automatically generated titles of both the map ("Selected Scan Line") and the output plot ("Selected Graphs") with a single user-supplied string.</td></tr>
@@ -288,7 +288,7 @@
                     <tr><td>Scan line colour</td><td>Colour picker</td><td>Colour of the reference line drawn on the map (default magenta, #DB2777).</td></tr>
                     <tr><td>Trace colour</td><td>Colour picker</td><td>Colour of the fracture-trace network drawn on the map (default blue, #2563EB).</td></tr>
                     <tr><td>Show grid lines</td><td>Checkbox</td><td>Toggles grid visibility on both subplots.</td></tr>
-                    <tr><td>Show real photo behind map</td><td>Checkbox</td><td>Enables a calibrated background raster image beneath the fracture traces on the map subplot (see Section 10.2).</td></tr>
+                    <tr><td>Show real photo behind map</td><td>Checkbox</td><td>Enables a calibrated background raster image beneath the fracture traces on the map subplot (see <a href="#10.2">Section 10.2</a>).</td></tr>
                     <tr><td>Change Image…</td><td>Button</td><td>Opens a file-selection dialog to choose or replace the background photograph.</td></tr>
                     <tr><td>Image opacity (0–1)</td><td>Numeric entry</td><td>Alpha blending value applied to the background photograph.</td></tr>
                     <tr><td>Reset Defaults</td><td>Button</td><td>Restores every appearance/colour setting in this tab (title, legend positions, widths, and all six colours) to its factory default; background-image settings are not affected.</td></tr>
@@ -300,7 +300,7 @@
                 <!-- ================================================= -->
                 <h2 id="maths">5. Mathematical Background</h2>
 
-                <h3>5.1 Reference Line and Parametric Coordinates</h3>
+                <h3 id="5.1">5.1 Reference Line and Parametric Coordinates</h3>
                 <p>
                     The reference (scan) line is defined by its two endpoints P₁ = (x₁, y₁) and P₂ = (x₂, y₂), both
                     expressed in the calibrated real-world display unit. Its Euclidean length is:
@@ -311,7 +311,7 @@
                     suppresses computation, since no meaningful direction can be defined.
                 </p>
 
-                <h3>5.2 Line–Line Intersection (Distance Along)</h3>
+                <h3 id="5.2">5.2 Line–Line Intersection (Distance Along)</h3>
                 <p>
                     For each fracture segment S, with endpoints Q₁ = (x₃, y₃) and Q₂ = (x₄, y₄), the intersection
                     with the reference line is found using the standard two-parameter linear system. Writing the
@@ -334,7 +334,7 @@ D = (x₁−x₂)(y₃−y₄) − (y₁−y₂)(x₃−x₄)</div>
                     how far the intersection point lies from the P₁ end of the reference line, in real-world units.
                 </p>
 
-                <h3>5.3 Signed Perpendicular Distance (Distance From)</h3>
+                <h3 id="5.3">5.3 Signed Perpendicular Distance (Distance From)</h3>
                 <p>
                     For a point (x, y) — typically a segment or trace midpoint — its signed perpendicular distance
                     from the infinite line through P₁ and P₂ is computed via the two-dimensional cross-product form:
@@ -349,7 +349,7 @@ D = (x₁−x₂)(y₃−y₄) − (y₁−y₂)(x₃−x₄)</div>
                     statistic, where the line represents an axis of reference rather than a bounded sampling window.
                 </p>
 
-                <h3>5.4 Trace and Segment Midpoints</h3>
+                <h3 id="5.4">5.4 Trace and Segment Midpoints</h3>
                 <p>
                     For the "Segment length/angle from" series, the representative point of each segment is its
                     simple geometric midpoint, ((x₃+x₄)/2, (y₃+y₄)/2). For the "Trace length from" series, each
@@ -363,7 +363,7 @@ D = (x₁−x₂)(y₃−y₄) − (y₁−y₂)(x₃−x₄)</div>
                     midpoints.
                 </p>
 
-                <h3>5.5 Circular Scan-Window Distribution</h3>
+                <h3 id="5.5">5.5 Circular Scan-Window Distribution</h3>
                 <p>
                     For the intensity/density series, N circular sampling windows (N = "Number of scan circles")
                     are distributed evenly along the finite reference line. Denoting the user-supplied count as N,
@@ -379,7 +379,7 @@ dₖ are N values linearly spaced between r and L − r,  k = 1 … N</div>
                     vector of the reference line.
                 </p>
 
-                <h3>5.6 Segment–Circle Intersection Count</h3>
+                <h3 id="5.6">5.6 Segment–Circle Intersection Count</h3>
                 <p>
                     For each fracture segment and each scan circle of radius r centred at C = (cₓ, c_y), the module
                     must determine (a) whether either endpoint of the segment lies inside the circle, and (b) how
@@ -398,11 +398,11 @@ a = ‖B−A‖² ,  b = 2[(A−C)·(B−A)] ,  c = ‖A−C‖² − r²</div>
                     circle.
                 </p>
 
-                <h3>5.7 Fracture Intensity (P21) and Density (P20)</h3>
+                <h3 id="5.7">5.7 Fracture Intensity (P21) and Density (P20)</h3>
                 <p>
                     Following the circular-scanline method (after Mauldon, and consistent with the Connectivity and
                     Intensity &amp; Density tabs elsewhere in FracSTAT), each scan circle of radius r accumulates
-                    two counts: N_int, the total number of segment–circle boundary crossings (from Section 5.6,
+                    two counts: N_int, the total number of segment–circle boundary crossings (from <a href="#5.6">Section 5.6</a>,
                     counting a fully interior segment once and a partially interior segment once for its single
                     boundary crossing), and N_end, the total number of segment endpoints that fall strictly inside
                     the circle. The two derived statistics at that scan position are:
@@ -422,7 +422,7 @@ P20 = N_end / (2πr)</div>
                 <!-- ================================================= -->
                 <h2 id="algorithms">6. Algorithms</h2>
 
-                <h3>6.1 Reference-Line Resolution and Validation</h3>
+                <h3 id="6.1">6.1 Reference-Line Resolution and Validation</h3>
                 <p>
                     On every redraw, the four coordinate StringVars (X1, Y1, X2, Y2) are parsed as floating-point
                     numbers. If parsing fails for any field, or if the resulting line length is at or below the
@@ -431,7 +431,7 @@ P20 = N_end / (2πr)</div>
                     the downstream calculations.
                 </p>
 
-                <h3>6.2 Default Line Placement</h3>
+                <h3 id="6.2">6.2 Default Line Placement</h3>
                 <p>
                     If none of the four coordinate fields has ever been populated, a default line is generated
                     automatically by taking the minimum and maximum X and Y values across every segment endpoint in
@@ -440,10 +440,10 @@ P20 = N_end / (2πr)</div>
                     interpretable plot.
                 </p>
 
-                <h3>6.3 Along-Line Intersection Sweep</h3>
+                <h3 id="6.3">6.3 Along-Line Intersection Sweep</h3>
                 <p>
                     The along-line sweep iterates once over every row (segment) of <code>self.results</code>. For
-                    each segment, the parametric line intersection of Section 5.2 is evaluated against the current
+                    each segment, the parametric line intersection of <a href="#5.2">Section 5.2</a> is evaluated against the current
                     reference line. Successful intersections are collected into a list of records containing the
                     along-line distance, the parent trace's total length (looked up from a pre-computed per-trace
                     length aggregation), the segment's own length, and the segment's strike; the list is then
@@ -452,26 +452,26 @@ P20 = N_end / (2πr)</div>
                     the scan line to the other rather than jumping between spatially unrelated points.
                 </p>
 
-                <h3>6.4 From-Line Aggregation</h3>
+                <h3 id="6.4">6.4 From-Line Aggregation</h3>
                 <p>
                     The perpendicular-distance sweep operates in two independent modes. For trace-level output,
                     segments are grouped by their Trace identifier (using a pandas <code>groupby</code>), the
-                    length-weighted centroid of each group is computed as in Section 5.4, and the signed distance
+                    length-weighted centroid of each group is computed as in <a href="#5.4">Section 5.4</a>, and the signed distance
                     of that centroid from the reference line is evaluated once per trace. For segment-level output
                     (length or angle), the signed distance is evaluated directly at every segment's own midpoint,
                     without any grouping.
                 </p>
 
-                <h3>6.5 Circular-Scan Intensity/Density Sweep</h3>
+                <h3 id="6.5">6.5 Circular-Scan Intensity/Density Sweep</h3>
                 <p>
                     This is the most computationally intensive routine in the module. For each of the N scan-circle
-                    centres (Section 5.5), every fracture segment in the dataset is tested for endpoint containment
+                    centres (<a href="#5.5">Section 5.5</a>), every fracture segment in the dataset is tested for endpoint containment
                     (a simple Euclidean-distance-to-centre comparison against the radius) and, where at least one
                     endpoint is outside the circle, for a full segment–circle boundary intersection via the
-                    quadratic of Section 5.6. Segments with both endpoints inside the circle are counted as
+                    quadratic of <a href="#5.6">Section 5.6</a>. Segments with both endpoints inside the circle are counted as
                     endpoint-only contributions (no boundary crossing is possible for a fully interior segment).
                     This is an O(N × M) procedure, where M is the number of fracture segments in the dataset, and
-                    is the dominant computational cost of the module for large fracture networks (see Section 11).
+                    is the dominant computational cost of the module for large fracture networks (see <a href="#performance">Section 11</a>).
                 </p>
                 <div class="code-window">
                     <div class="code-header">
@@ -508,7 +508,7 @@ P20 = N_end / (2πr)</div>
                 </div>
                 <p class="ph-caption" style="text-align:left; margin: -1rem 0 1.5rem 0;">Simplified excerpt of <code>_graphs_intensity_density_along()</code>, showing the per-circle endpoint-containment test and the fallback to the algebraic segment–circle intersection routine for partially interior segments.</p>
 
-                <h3>6.6 Interactive Endpoint Picking State Machine</h3>
+                <h3 id="6.6">6.6 Interactive Endpoint Picking State Machine</h3>
                 <p>
                     The "Select end points" workflow is implemented as a small state machine attached to
                     mouse-click events on the map canvas. Activating the button sets an internal picking flag and
@@ -532,10 +532,10 @@ P20 = N_end / (2πr)</div>
                     <li><strong>Trigger</strong> — a control change (checkbox toggle, Enter/FocusOut on a numeric field, colour selection, map click completing a pair, or the Update Graphs button) invokes the module's central draw routine.</li>
                     <li><strong>Axis reset</strong> — both the map axis and the output-plot axis are cleared and their background colours re-applied from the current colour-picker state.</li>
                     <li><strong>Data availability check</strong> — the shared <code>self.results</code> table is inspected; an empty or missing table, or an Excel/CSV source lacking real spatial coordinates, produces an explanatory empty-state message and the workflow halts.</li>
-                    <li><strong>Default-line seeding</strong> — if no coordinates have ever been entered, the bounding-box diagonal default line (Section 6.2) is computed and written into the coordinate fields.</li>
-                    <li><strong>Line resolution</strong> — the four coordinate fields are parsed and validated (Section 6.1); failure again halts the workflow with an explanatory message.</li>
+                    <li><strong>Default-line seeding</strong> — if no coordinates have ever been entered, the bounding-box diagonal default line (<a href="#6.2">Section 6.2</a>) is computed and written into the coordinate fields.</li>
+                    <li><strong>Line resolution</strong> — the four coordinate fields are parsed and validated (<a href="#6.1">Section 6.1</a>); failure again halts the workflow with an explanatory message.</li>
                     <li><strong>Map rendering</strong> — the full fracture-trace network is drawn as a LineCollection, the reference line is drawn on top in the selected scan-line colour, endpoint markers are added, and — if the intensity/density checkboxes are active — every scan-circle outline is drawn faintly for visual reference. The optional calibrated background photograph is drawn beneath all vector content.</li>
-                    <li><strong>Output collection</strong> — each enabled checkbox invokes its corresponding computation routine (Sections 6.3–6.5); results are assembled into a list of (label, x-values, y-values, colour, marker) tuples.</li>
+                    <li><strong>Output collection</strong> — each enabled checkbox invokes its corresponding computation routine (Sections <a href="#6.3">6.3</a>–<a href="#6.5">6.5</a>); results are assembled into a list of (label, x-values, y-values, colour, marker) tuples.</li>
                     <li><strong>Output rendering</strong> — each collected series is scatter-plotted on the output axis in its assigned colour and marker shape; the intensity/density series are always also line-connected (since they represent a continuous function), while other series are connected only if Join Line is enabled — in which case points are first sorted by X to guarantee a directionally coherent line.</li>
                     <li><strong>Cosmetic finishing</strong> — titles (custom or automatic), axis labels using the active display unit, legends at their configured positions, grid lines, and axis-spine styling are applied to both subplots.</li>
                     <li><strong>Canvas draw</strong> — both subplots are redrawn to the screen via the Matplotlib TkAgg canvas's <code>draw_idle()</code> call, and the parent Figure's <code>tight_layout()</code> is invoked to avoid label clipping.</li>
@@ -546,7 +546,7 @@ P20 = N_end / (2πr)</div>
                 <p>
                     Unlike several other Static Analyzer tabs (Histogram, CDF, Rose Plot), the Profile Cross-section
                     module does not fit theoretical statistical distributions; its statistical content is instead
-                    the raw sampled series described in Section 5, together with the derived P21/P20 areal
+                    the raw sampled series described in <a href="#maths">Section 5</a>, together with the derived P21/P20 areal
                     estimators. The following table summarises every output series that can appear on the
                     right-hand plot, together with its physical units and the geological question it is designed
                     to answer.
@@ -572,7 +572,7 @@ P20 = N_end / (2πr)</div>
                 <!-- ================================================= -->
                 <h2 id="visualization">9. Visualization Components</h2>
 
-                <h3>9.1 Reference-Line Map (Left Subplot)</h3>
+                <h3 id="9.1">9.1 Reference-Line Map (Left Subplot)</h3>
                 <p>
                     The map subplot renders the complete fracture-trace network as a LineCollection in the
                     user-selected trace colour, the reference line as a bold coloured segment in the scan-line
@@ -585,7 +585,7 @@ P20 = N_end / (2πr)</div>
                     that geometric distances and angles are not visually distorted.
                 </p>
 
-                <h3>9.2 Output Plot (Right Subplot)</h3>
+                <h3 id="9.2">9.2 Output Plot (Right Subplot)</h3>
                 <p>
                     The output subplot is a Cartesian scatter plot with an optional connecting line per series,
                     using Matplotlib's automatic colour-differentiated markers (circle, square, triangle, and
@@ -598,7 +598,7 @@ P20 = N_end / (2πr)</div>
                     meaning in that situation.
                 </p>
 
-                <h3>9.3 Legends and Titles</h3>
+                <h3 id="9.3">9.3 Legends and Titles</h3>
                 <p>
                     The map and output-plot legends are positioned independently via their respective dropdown
                     controls. "Outside Right" places the legend just beyond the right edge of the axis using a
@@ -631,7 +631,7 @@ P20 = N_end / (2πr)</div>
                 <!-- ================================================= -->
                 <h2 id="advanced">10. Advanced and Interactive Features</h2>
 
-                <h3>10.1 Interactive On-Map Line Digitizing</h3>
+                <h3 id="10.1">10.1 Interactive On-Map Line Digitizing</h3>
                 <p>
                     Rather than requiring manual coordinate entry, the user may click the "Select end points"
                     button and then click twice directly on the fracture map to define the reference line
@@ -639,12 +639,11 @@ P20 = N_end / (2πr)</div>
                     receives instant visual confirmation; the second click completes the line, writes both
                     coordinate pairs into the numeric entry fields (so they remain editable afterward), and
                     triggers a full recalculation. This workflow is particularly useful for aligning the reference
-                    line with a specific geological feature visible on a loaded background photograph (see Section
-                    10.2), such as a fault trace or bedding contact, without needing to first read off its
+                    line with a specific geological feature visible on a loaded background photograph (see <a href="#10.2">Section 10.2</a>), such as a fault trace or bedding contact, without needing to first read off its
                     coordinates.
                 </p>
 
-                <h3>10.2 Calibrated Background Photograph Overlay</h3>
+                <h3 id="10.2">10.2 Calibrated Background Photograph Overlay</h3>
                 <p>
                     The Settings tab's Background Image sub-section allows a real-world photograph — typically the
                     same calibrated image used to establish the map's pixel-to-real-world scale via the Scale
@@ -665,7 +664,7 @@ P20 = N_end / (2πr)</div>
                     traces to remain legible against a bright or high-contrast photograph.
                 </p>
 
-                <h3>10.3 Move Elements / Free Layout Mode</h3>
+                <h3 id="10.3">10.3 Move Elements / Free Layout Mode</h3>
                 <p>
                     Like every other plot-bearing tab in the Static Analyzer, the Profile Cross-section map and
                     plot participate in the workspace-wide "Move Elements" editing mode (toggled from the shared
@@ -675,7 +674,7 @@ P20 = N_end / (2πr)</div>
                     adjusted without leaving the application.
                 </p>
 
-                <h3>10.4 Save Image Export</h3>
+                <h3 id="10.4">10.4 Save Image Export</h3>
                 <p>
                     The Save Image button exports the full two-panel Figure — map and output plot together, with
                     legends, titles, and any manual layout adjustments included — as a PNG raster at the
@@ -688,13 +687,13 @@ P20 = N_end / (2πr)</div>
                 <!-- ================================================= -->
                 <h2 id="performance">11. Performance Optimization</h2>
                 <p>
-                    The along-line intersection sweep (Section 6.3) and the from-line aggregation (Section 6.4) are
+                    The along-line intersection sweep (<a href="#6.3">Section 6.3</a>) and the from-line aggregation (<a href="#6.4">Section 6.4</a>) are
                     both O(M) in the number of fracture segments M, since each segment is tested against a single
                     fixed reference line exactly once; these therefore scale comfortably even for networks
                     containing many thousands of segments.
                 </p>
                 <p>
-                    The circular-scan intensity/density sweep (Section 6.5) is inherently O(N × M), because every
+                    The circular-scan intensity/density sweep (<a href="#6.5">Section 6.5</a>) is inherently O(N × M), because every
                     one of the N scan circles must be tested against every one of the M segments independently —
                     there is no shared geometric pre-filtering between different circles in the current
                     implementation. Because N (the scan-circle count) is user-controlled and bounded by the
@@ -723,7 +722,7 @@ P20 = N_end / (2πr)</div>
                 <!-- ================================================= -->
                 <h2 id="examples">12. Practical Examples</h2>
 
-                <h3>12.1 Worked Example — Along-Line Intensity Profile Across a Fault Damage Zone</h3>
+                <h3 id="12.1">12.1 Worked Example — Along-Line Intensity Profile Across a Fault Damage Zone</h3>
                 <p>Scenario: a fracture-trace SVG has been digitized from an outcrop photograph spanning a mapped fault trace, with the fault oriented roughly northeast–southwest across the centre of the image.</p>
                 <ol class="step-list">
                     <li>Load the SVG file via the workspace header's Load SVG button, and confirm the profile scale using the Scale tool so that real-world distances are correctly calibrated.</li>
@@ -734,7 +733,7 @@ P20 = N_end / (2πr)</div>
                     <li>Optionally enable "Segment angle along" simultaneously to check whether fracture orientation also changes systematically within the damage zone (e.g. rotation toward parallelism with the fault as the fault core is approached).</li>
                 </ol>
 
-                <h3>12.2 Worked Example — Bedding-Perpendicular Asymmetry Check</h3>
+                <h3 id="12.2">12.2 Worked Example — Bedding-Perpendicular Asymmetry Check</h3>
                 <p>Scenario: the user suspects that fracture length differs systematically above versus below a particular bedding contact visible in the mapped image.</p>
                 <ol class="step-list">
                     <li>Set the reference line to run exactly along the bedding contact, either by typing its two endpoint coordinates directly or by clicking along it on a calibrated background photograph.</li>
@@ -790,7 +789,7 @@ P20 = N_end / (2πr)</div>
                     <code>self.results</code> on every redraw, the displayed output is always guaranteed to be
                     consistent with whatever fracture dataset and profile-scale calibration are currently active
                     elsewhere in the Static Analyzer, at the cost of recomputation on every appearance-only change
-                    (mitigated, as noted in Section 11, by the low cost of the along/from sweeps).
+                    (mitigated, as noted in <a href="#performance">Section 11</a>, by the low cost of the along/from sweeps).
                 </p>
                 <p>
                     Background-image loading is itself cached at the instance level (a simple path-keyed cache

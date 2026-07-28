@@ -93,7 +93,7 @@
                     <span class="ph-caption"><strong>Figure 1.1</strong> — Full view of the Stereonet Plot tab, showing the left‑hand control sidebar (Plot Mode, Display, Dip Override, Options, Colours, Selected Pole, Statistics cards) and the right‑hand plot card containing the equal‑area stereonet and its colour bar.</span>
                 </figure>
 
-                <h3>1.1 Sidebar Card Structure</h3>
+                <h3 id="1.1">1.1 Sidebar Card Structure</h3>
                 <p>The sidebar is subdivided into seven bordered, rounded‑corner "cards", built top‑to‑bottom in the following order:</p>
                 <table>
                     <tr><th>#</th><th>Card</th><th>Function</th></tr>
@@ -106,7 +106,7 @@
                     <tr><td>7</td><td>Statistics</td><td>Read‑only summary of plane count, circular mean strike, mean dip, and total mapped length.</td></tr>
                 </table>
 
-                <h3>1.2 Plot Card</h3>
+                <h3 id="1.2">1.2 Plot Card</h3>
                 <p>
                     The plot card contains a toolbar row (a caption reading "Lower‑hemisphere equal‑area
                     projection" and a Save Image button), the Matplotlib canvas hosting the stereonet itself, and —
@@ -124,7 +124,7 @@
                     <span class="ph-caption"><strong>Figure 1.2</strong> — Close‑up of the stereonet plot area showing the bounding circle, 30° cardinal tick marks, N/E/S/W labels, and a cluster of coloured poles with an active colour bar beneath the diagram.</span>
                 </figure>
 
-                <h3>1.3 Reset Defaults</h3>
+                <h3 id="1.3">1.3 Reset Defaults</h3>
                 <p>
                     A single <strong>Reset Defaults</strong> button at the base of the sidebar restores every
                     styling variable (colours, sizes, toggles, custom title) to its factory value and immediately
@@ -135,7 +135,7 @@
                 <!-- ================================================= -->
                 <h2 id="data-input">2. Data Input</h2>
 
-                <h3>2.1 Source of Fracture Data</h3>
+                <h3 id="2.1">2.1 Source of Fracture Data</h3>
                 <p>
                     The Stereonet Plot tab does not load files itself. It reads directly from <code>self.results</code>,
                     the shared pandas DataFrame populated by the Static Analyzer's map‑geometry engine whenever an
@@ -146,7 +146,7 @@
                     are always mutually consistent for a given dataset.
                 </p>
 
-                <h3>2.2 Required and Optional Columns</h3>
+                <h3 id="2.2">2.2 Required and Optional Columns</h3>
                 <table>
                     <tr><th>Column</th><th>Required</th><th>Description</th></tr>
                     <tr><td><code>StrikeDeg</code></td><td>Yes</td><td>Fracture strike measured from North, stored as a fully‑directed value in the 0–360° domain. Folded to 0–180° internally for orientation statistics where direction of dip is irrelevant, but the full 0–360° value is retained wherever dip direction matters.</td></tr>
@@ -156,7 +156,7 @@
                     <tr><td><code>Length_m</code></td><td>No</td><td>Real‑world segment length in the project's active display unit; used only for the "Length colour" plot mode and the Total Length statistic.</td></tr>
                 </table>
 
-                <h3>2.3 Excel/CSV Orientation Formats Accepted Upstream</h3>
+                <h3 id="2.3">2.3 Excel/CSV Orientation Formats Accepted Upstream</h3>
                 <p>
                     Although the Stereonet Plot tab itself is format‑agnostic (it only ever sees the already‑parsed
                     results table), it is useful to record which upstream input formats can populate
@@ -169,19 +169,19 @@
                     <code>StrikeDeg</code> and <code>DipDeg</code> exist in the results table.
                 </p>
 
-                <h3>2.4 Row‑Level Validation</h3>
+                <h3 id="2.4">2.4 Row‑Level Validation</h3>
                 <p>On every redraw the module performs the following validation sequence before any geometry is computed:</p>
                 <ol class="step-list">
                     <li>Strike values are read and wrapped into the 0–360° domain via a modulo operation, guaranteeing a well‑defined azimuth even if upstream data supplied negative or over‑range values.</li>
                     <li>If a <code>DipDeg</code> column exists, dip values are read directly; otherwise every row is assigned a default dip of 90°.</li>
-                    <li>If a dip‑override dictionary is active (Section 3.3) and the results table carries an ID column, each row's dip is replaced with the corresponding override value wherever a finite override exists for that ID; rows without a matching override retain their original dip.</li>
+                    <li>If a dip‑override dictionary is active (<a href="#3.3">Section 3.3</a>) and the results table carries an ID column, each row's dip is replaced with the corresponding override value wherever a finite override exists for that ID; rows without a matching override retain their original dip.</li>
                     <li>If a <code>DipDirection</code> column is present and finite for a given row, that row's strike is recomputed from the dip‑azimuth relationship described above, superseding the <code>StrikeDeg</code> value for that row only.</li>
                     <li>A combined finite‑value mask (<code>numpy.isfinite</code>) is applied to both strike and dip arrays; rows failing either test are dropped from the plotted set (and from the DataFrame passed onward to selection/statistics).</li>
                     <li>Surviving dip values are clipped to the physically valid 0–90° range with <code>numpy.clip</code>, protecting the projection mathematics from out‑of‑range inputs that could otherwise produce a negative argument to a square root.</li>
                 </ol>
                 <p>
                     If, after this pipeline, zero rows remain, the module displays an explanatory empty‑state
-                    message instead of attempting to draw an empty or degenerate diagram (see Section 7.5).
+                    message instead of attempting to draw an empty or degenerate diagram (see <a href="#7.5">Section 7.5</a>).
                 </p>
                 <!-- ================================================= -->
                 <h2 id="controls">3. Settings and Controls, Card by Card</h2>
@@ -191,14 +191,14 @@
                     "apply" step.
                 </p>
 
-                <h3>3.1 Card 1 — Plot Mode</h3>
+                <h3 id="3.1">3.1 Card 1 — Plot Mode</h3>
                 <table>
                     <tr><th>Control</th><th>Widget</th><th>Default</th><th>Options / Range</th><th>Effect</th></tr>
-                    <tr><td>Colour poles by</td><td>Dropdown</td><td>Strike colour</td><td>Strike colour, Dip colour, Length colour, Solid colour</td><td>Selects which quantity is mapped to pole colour. See Section 4.5 for the exact value and normalisation used by each mode.</td></tr>
+                    <tr><td>Colour poles by</td><td>Dropdown</td><td>Strike colour</td><td>Strike colour, Dip colour, Length colour, Solid colour</td><td>Selects which quantity is mapped to pole colour. See <a href="#4.5">Section 4.5</a> for the exact value and normalisation used by each mode.</td></tr>
                     <tr><td>Colormap</td><td>Custom colour‑gradient dropdown with live 104&times;28&nbsp;px swatch preview</td><td>Viridis</td><td>Any of the 23 named colour scales in the shared colour‑scale catalogue (Turbo, Jet, Parula, Hot, Bone, Viridis, Plasma, Inferno, Magma, Cividis, Coolwarm, HSV, Seismic, Spectral, Red‑Yellow‑Blue, Ocean, Terrain, Earth, Twilight, Copper, Yellow‑Green‑Blue, Grayscale, Blue‑White‑Red, Pink‑Yellow‑Green)</td><td>Determines the Matplotlib colormap object used whenever the active plot mode is not Solid colour. The Parula entry is a bespoke six‑stop MATLAB‑style colormap reproduced without an external dependency.</td></tr>
                 </table>
 
-                <h3>3.2 Card 2 — Display</h3>
+                <h3 id="3.2">3.2 Card 2 — Display</h3>
                 <table>
                     <tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Show poles</td><td>Checkbox</td><td>On</td><td>Toggles rendering of the pole‑point scatter layer. When off, the pick/selection scatter artist is set to <code>None</code> and picking is disabled.</td></tr>
@@ -211,7 +211,7 @@
                     <tr><td>Clear Selection</td><td>Button</td><td>—</td><td>Deselects the currently picked fracture across the Stereonet, Fracture Map, and any other tab that shares <code>selected_segment_id</code>, and redraws all affected views.</td></tr>
                 </table>
 
-                <h3>3.3 Card 3 — Dip Override</h3>
+                <h3 id="3.3">3.3 Card 3 — Dip Override</h3>
                 <p>
                     Because most fracture data enters FracSTAT as a two‑dimensional SVG trace map, every segment is
                     initially assigned a uniform default dip (typically 90°, i.e. vertical). The Dip Override
@@ -228,7 +228,7 @@
                     <tr><td>Clear Dip Override</td><td>Button</td><td>Discards the in‑memory override dictionary, restores every segment to its original (or DipDirection‑derived) dip, and updates the status label to "No dip override loaded."</td></tr>
                 </table>
 
-                <h4>3.3.1 File Parsing and Column Matching</h4>
+                <h4 id="3.3">3.3.1 File Parsing and Column Matching</h4>
                 <p>
                     Column headers are matched case‑insensitively and are tolerant of internal spaces, hyphens, and
                     underscores: the header text is lower‑cased and every non‑alphanumeric character is stripped
@@ -240,7 +240,7 @@
                     rejected with an explanatory error dialog.
                 </p>
 
-                <h4>3.3.2 Validation Rules</h4>
+                <h4 id="3.3">3.3.2 Validation Rules</h4>
                 <ul>
                     <li>Rows with a missing ID or DipDeg value are dropped via <code>pandas.DataFrame.dropna</code> before processing.</li>
                     <li>Every surviving DipDeg value must lie within the closed interval [0°, 90°]; if any row violates this bound, the entire file is rejected with a descriptive error and no partial override is applied.</li>
@@ -248,7 +248,7 @@
                     <li>The status label beneath the buttons is updated to read "Loaded dips for N IDs." on success.</li>
                 </ul>
 
-                <h3>3.4 Card 4 — Options</h3>
+                <h3 id="3.4">3.4 Card 4 — Options</h3>
                 <table>
                     <tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Custom title (blank = auto)</td><td>Text entry</td><td>(empty)</td><td>When non‑empty, replaces the automatically generated title ("Static Stereonet: planes and poles (n=...)") with the user‑supplied text.</td></tr>
@@ -259,7 +259,7 @@
                     <tr><td>Plane opacity</td><td>Numeric entry (0–1)</td><td>0.35</td><td>Alpha transparency applied to plane traces; automatically clamped to the [0, 1] interval.</td></tr>
                 </table>
 
-                <h3>3.5 Card 5 — Colours</h3>
+                <h3 id="3.5">3.5 Card 5 — Colours</h3>
                 <p>
                     Every colour swatch in this card opens the shared FracSTAT colour‑picker dialog (a 40‑swatch
                     preset palette plus a live hex‑code entry with preview) and, when a new colour is confirmed,
@@ -279,7 +279,7 @@
                     <tr><td>Selected Pole</td><td>#00D4FF</td><td>Colour used for the highlight rings, the "P" marker, and (if enabled) the selected plane's great circle when a fracture is picked.</td></tr>
                 </table>
 
-                <h3>3.6 Card 6 — Selected Pole</h3>
+                <h3 id="3.6">3.6 Card 6 — Selected Pole</h3>
                 <p>
                     A read‑only, left‑justified text label reporting five fields for the most recently picked
                     fracture: ID, Plane strike (°), Plane dip (°), Pole trend (°), and Pole plunge (°). Before any
@@ -289,27 +289,27 @@
                     complementary to — the plane's own strike and dip.
                 </p>
 
-                <h3>3.7 Card 7 — Statistics</h3>
+                <h3 id="3.7">3.7 Card 7 — Statistics</h3>
                 <table>
                     <tr><th>Statistic</th><th>Computation</th></tr>
-                    <tr><td>Planes</td><td>Count of valid rows surviving the validation pipeline of Section 2.4 (n).</td></tr>
-                    <tr><td>Mean Strike</td><td>Circular (axial) mean of all strikes folded to the 0–180° domain, computed by the doubling‑angle method described in Section 4.4; reported to one decimal place.</td></tr>
+                    <tr><td>Planes</td><td>Count of valid rows surviving the validation pipeline of <a href="#2.4">Section 2.4</a> (n).</td></tr>
+                    <tr><td>Mean Strike</td><td>Circular (axial) mean of all strikes folded to the 0–180° domain, computed by the doubling‑angle method described in <a href="#4.4">Section 4.4</a>; reported to one decimal place.</td></tr>
                     <tr><td>Mean Dip</td><td>Arithmetic (linear) mean of the dip array, via <code>numpy.nanmean</code>; reported to one decimal place. A linear mean is appropriate for dip because, unlike strike, dip is a bounded, non‑circular quantity.</td></tr>
                     <tr><td>Total Length</td><td>Sum of the <code>Length_m</code> column across all valid rows (0 if the column is absent), reported with the active display unit suffix (m, cm, mm, or km, per the Static Analyzer's profile‑unit selector).</td></tr>
                 </table>
 
-                <h3>3.8 Non‑Sidebar Controls</h3>
+                <h3 id="3.8">3.8 Non‑Sidebar Controls</h3>
                 <table>
                     <tr><th>Control</th><th>Location</th><th>Effect</th></tr>
                     <tr><td>Save Image</td><td>Plot‑card toolbar</td><td>Exports the current figure as a 300&nbsp;dpi PNG (or the project‑configured export DPI) to the project's <code>FracSTAT_plot_exports</code> folder, using the shared <code>save_plot_image</code> routine common to every Static Analyzer tab.</td></tr>
-                    <tr><td>Pole picking (mouse click)</td><td>Directly on the canvas</td><td>Clicking within a marker's pick radius (6&nbsp;px) selects that fracture; see Section 5.4.</td></tr>
-                    <tr><td>Reset Defaults</td><td>Bottom of sidebar</td><td>Restores every styling variable listed in Sections 3.1–3.5 to its factory default (see Section 6.4) and redraws.</td></tr>
+                    <tr><td>Pole picking (mouse click)</td><td>Directly on the canvas</td><td>Clicking within a marker's pick radius (6&nbsp;px) selects that fracture; see <a href="#5.4">Section 5.4</a>.</td></tr>
+                    <tr><td>Reset Defaults</td><td>Bottom of sidebar</td><td>Restores every styling variable listed in Sections <a href="#3.1">3.1</a>–<a href="#3.5">3.5</a> to its factory default (see <a href="#6.4">Section 6.4</a>) and redraws.</td></tr>
                 </table>
 
                 <!-- ================================================= -->
                 <h2 id="maths">4. Mathematical Background</h2>
 
-                <h3>4.1 The Lower‑Hemisphere Equal‑Area (Schmidt) Projection</h3>
+                <h3 id="4.1">4.1 The Lower‑Hemisphere Equal‑Area (Schmidt) Projection</h3>
                 <p>
                     A stereonet is a two‑dimensional projection of the lower half of a reference sphere (the
                     "projection hemisphere") used throughout structural geology to plot the orientation of lines and
@@ -337,7 +337,7 @@ x = r · sin(T)      y = r · cos(T)</div>
                     unit‑radius bounding circle.
                 </p>
 
-                <h3>4.2 From Plane Strike/Dip to Pole Position</h3>
+                <h3 id="4.2">4.2 From Plane Strike/Dip to Pole Position</h3>
                 <p>
                     Every fracture segment in the results table is characterised by a strike (the compass bearing
                     of the horizontal line of intersection between the fracture plane and a horizontal reference
@@ -355,7 +355,7 @@ x = r · sin(T)      y = r · cos(T)</div>
 pole trend = (strike − 90°) mod 360°
 pole plunge = 90° − dip</div>
                 <p>
-                    Substituting these into the colatitude form of Section 4.1 gives θ = 90° − pole plunge = dip, so
+                    Substituting these into the colatitude form of <a href="#4.1">Section 4.1</a> gives θ = 90° − pole plunge = dip, so
                     that the pole radius can be computed directly from dip without an intermediate plunge
                     calculation:
                 </p>
@@ -368,7 +368,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     entire (filtered) fracture population in a single pass rather than looping row by row.
                 </p>
 
-                <h3>4.3 Great‑Circle Trace of a Plane</h3>
+                <h3 id="4.3">4.3 Great‑Circle Trace of a Plane</h3>
                 <p>
                     When "Show planes" (or "Show selected plane only") is enabled, the module draws the complete
                     great‑circle trace of each plane — the projected image of every point on the plane that
@@ -380,7 +380,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     <li>Two orthonormal in‑plane basis vectors are built in an (East, North, Up) coordinate frame: a strike vector s = (sin S, cos S, 0) lying along the horizontal strike line, and a down‑dip vector d = (sin(S+90°)·cos D, cos(S+90°)·cos D, −sin D) pointing down the dip direction into the plane.</li>
                     <li>A parameter t is swept across 140 equally spaced values from 0 to π radians, and for each value a unit vector on the plane is formed by v(t) = s·cos(t) + d·sin(t). Sweeping only 0 to π (rather than the full 0 to 2π) is sufficient because the lower‑hemisphere projection is symmetric: t and t+π map to antipodal points that, for a plane's great circle, coincide with the same lower‑hemisphere trace.</li>
                     <li>Each direction vector v(t) = (v_E, v_N, v_U) is converted to a plunge and trend: plunge = arcsin(−v_U), trend = atan2(v_E, v_N).</li>
-                    <li>Every (trend, plunge) pair is projected with the same equal‑area formula as Section 4.1: radius = √2·sin((90° − plunge)/2), x = radius·sin(trend), y = radius·cos(trend).</li>
+                    <li>Every (trend, plunge) pair is projected with the same equal‑area formula as <a href="#4.1">Section 4.1</a>: radius = √2·sin((90° − plunge)/2), x = radius·sin(trend), y = radius·cos(trend).</li>
                 </ol>
                 <p>
                     The resulting 140‑point polyline, plotted with Matplotlib's standard line‑drawing routine,
@@ -389,7 +389,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     negligible even for a moderately sized fracture population.
                 </p>
 
-                <h3>4.4 Circular (Axial) Mean of Strike</h3>
+                <h3 id="4.4">4.4 Circular (Axial) Mean of Strike</h3>
                 <p>
                     Strike is an axial (180°‑periodic) rather than a directional (360°‑periodic) quantity: a
                     fracture striking 010° is geologically identical to one striking 190°. A naive arithmetic mean
@@ -409,7 +409,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     0–180° recovers the correct axial mean.
                 </p>
 
-                <h3>4.5 Colour Normalisation</h3>
+                <h3 id="4.5">4.5 Colour Normalisation</h3>
                 <p>Depending on the active Plot Mode, pole colours are mapped through a Matplotlib <code>Normalize</code> object with one of the following fixed or data‑driven ranges:</p>
                 <table>
                     <tr><th>Plot Mode</th><th>Quantity Mapped</th><th>Normalisation Range</th></tr>
@@ -422,7 +422,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                 <!-- ================================================= -->
                 <h2 id="algorithms">5. Algorithms</h2>
 
-                <h3>5.1 Data Preparation Pipeline</h3>
+                <h3 id="5.1">5.1 Data Preparation Pipeline</h3>
                 <p>
                     Every invocation of the draw routine (<code>_draw_static_stereonet</code>) begins by
                     re‑deriving the plottable strike/dip arrays from scratch rather than caching a previous
@@ -437,7 +437,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     <li>Clip the surviving dip values into [0°, 90°] with <code>numpy.clip</code> as a final safety net against any residual out‑of‑range values.</li>
                 </ol>
 
-                <h3>5.2 Colour Resolution</h3>
+                <h3 id="5.2">5.2 Colour Resolution</h3>
                 <p>
                     Colour resolution is a two‑stage lazy lookup designed to avoid repeatedly importing the Dynamic
                     Analyzer's colour‑scale catalogue module on every redraw. The user‑facing dropdown stores a
@@ -452,11 +452,11 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     re‑parsing the dropdown text or re‑touching the catalogue.
                 </p>
 
-                <h3>5.3 Pole Colour‑Value Selection</h3>
+                <h3 id="5.3">5.3 Pole Colour‑Value Selection</h3>
                 <p>
                     The helper <code>_static_stereo_values(df, strikes, dips)</code> is a small dispatcher that
                     returns a (values, axis_label, Normalize) triple appropriate to the current Plot Mode,
-                    implementing the normalisation ranges tabulated in Section 4.5. When the plot mode is Dip
+                    implementing the normalisation ranges tabulated in <a href="#4.5">Section 4.5</a>. When the plot mode is Dip
                     colour, it returns the dip array directly. When it is Length colour and a <code>Length_m</code>
                     column exists, it substitutes any non‑finite length with 0.0 (via <code>numpy.where</code>)
                     before computing the data‑driven maximum, preventing a single corrupt or missing value from
@@ -465,7 +465,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     exists) it returns the strike array folded into the 0–180° domain.
                 </p>
 
-                <h3>5.4 Selective Plane Rendering</h3>
+                <h3 id="5.4">5.4 Selective Plane Rendering</h3>
                 <p>
                     The module draws great‑circle traces in one of three mutually exclusive states, resolved before
                     the main pole scatter is built: (a) if "Show planes" is on and "Show selected plane only" is
@@ -477,7 +477,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     leaving only the pole scatter.
                 </p>
 
-                <h3>5.5 Selection Highlight Rendering and Cross‑Tab Synchronisation</h3>
+                <h3 id="5.5">5.5 Selection Highlight Rendering and Cross‑Tab Synchronisation</h3>
                 <p>
                     When <code>self.selected_segment_id</code> matches an ID present in the filtered dataset, the
                     module renders a four‑layer highlight stack directly on top of the ordinary pole scatter, in
@@ -506,7 +506,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     selection, clears the info panel, and triggers the same two‑tab redraw.
                 </p>
 
-                <h3>5.6 Stereonet Frame Construction</h3>
+                <h3 id="5.6">5.6 Stereonet Frame Construction</h3>
                 <p>
                     The frame — the fixed scaffold of circles, grid lines, and labels that gives the plot its
                     stereonet appearance — is built by <code>_format_static_stereonet</code> and is invoked twice
@@ -523,7 +523,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     <li>Render either full 30°‑spaced tick/label sets (optionally cardinal‑letter‑substituted at the four principal directions) or, when the 30°‑labels toggle is off but the cardinal toggle remains on, just the four N/E/S/W letters positioned outside the circle.</li>
                 </ol>
 
-                <h3>5.7 Main Draw Routine — Complete Sequence</h3>
+                <h3 id="5.7">5.7 Main Draw Routine — Complete Sequence</h3>
                 <p>The complete draw sequence executed by <code>_draw_static_stereonet</code>, in order, is:</p>
                 <ol class="step-list">
                     <li>Guard clause: if the Matplotlib Axes has not yet been created (tab not yet built), return immediately.</li>
@@ -532,16 +532,16 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     <li>Set the Figure and Axes background colours from the Outer BG / Plot BG swatches.</li>
                     <li>Call <code>_format_static_stereonet</code> once to establish the frame, boundary circle, and optional grid/crosshair/label elements.</li>
                     <li>Guard clause: if <code>self.results</code> is empty, missing, or lacks a <code>StrikeDeg</code> column, render the empty‑state message and return.</li>
-                    <li>Execute the full data‑preparation pipeline of Section 5.1.</li>
+                    <li>Execute the full data‑preparation pipeline of <a href="#5.1">Section 5.1</a>.</li>
                     <li>Guard clause: if zero rows survive validation, render an alternative empty‑state message ("No valid strike/dip data found") and return.</li>
                     <li>Resolve the active colormap via <code>_static_stereo_cmap()</code>.</li>
                     <li>Branch on plot mode: for Solid colour, set a flat pole_colors value and skip the colour‑bar entirely; otherwise call <code>_static_stereo_values</code> to obtain per‑pole colour values, build a <code>ScalarMappable</code> for the colour bar, and colour each pole via <code>cmap(norm(values))</code>.</li>
-                    <li>If plane rendering is requested (case (a) of Section 5.4), loop over every valid row and plot its great‑circle trace before the poles are drawn, so poles visually sit on top of the plane curves.</li>
-                    <li>Compute pole trend, pole radius, and Cartesian (x, y) for the entire valid population in one vectorised block (Section 4.2).</li>
+                    <li>If plane rendering is requested (case (a) of <a href="#5.4">Section 5.4</a>), loop over every valid row and plot its great‑circle trace before the poles are drawn, so poles visually sit on top of the plane curves.</li>
+                    <li>Compute pole trend, pole radius, and Cartesian (x, y) for the entire valid population in one vectorised block (<a href="#4.2">Section 4.2</a>).</li>
                     <li>If "Show poles" is enabled, draw the full pole scatter with <code>picker=True</code> and <code>pickradius=6</code>, storing the returned artist for the pick_event handler to recognise; otherwise set that artist reference to <code>None</code>, which also disables picking.</li>
-                    <li>If a selection is active and its ID is present in the valid subset, execute the selection‑highlight and (optionally) selected‑plane‑only rendering described in Section 5.4/5.5, and populate the Selected Pole info panel.</li>
+                    <li>If a selection is active and its ID is present in the valid subset, execute the selection‑highlight and (optionally) selected‑plane‑only rendering described in <a href="#5.4">Section 5.4</a>/5.5, and populate the Selected Pole info panel.</li>
                     <li>Call <code>_format_static_stereonet</code> a second time, so frame elements are guaranteed to be layered above the data.</li>
-                    <li>Configure the colour bar via <code>_setup_static_stereo_colorbar</code> (Section 7.4).</li>
+                    <li>Configure the colour bar via <code>_setup_static_stereo_colorbar</code> (<a href="#7.4">Section 7.4</a>).</li>
                     <li>Set the plot title (custom or auto‑generated, embedding the live fracture count n).</li>
                     <li>Call <code>_static_stereonet_update_stats</code> to refresh the Statistics card.</li>
                     <li>Request a canvas redraw via <code>draw_idle()</code>, which defers the actual paint operation to Tkinter's next idle cycle for smoother responsiveness under rapid successive control changes.</li>
@@ -556,16 +556,16 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                 <!-- ================================================= -->
                 <h2 id="statistics">6. Statistical Methods</h2>
 
-                <h3>6.1 Summary of Implemented Statistics</h3>
+                <h3 id="6.1">6.1 Summary of Implemented Statistics</h3>
                 <table>
                     <tr><th>Statistic</th><th>Type</th><th>Formula / Method</th><th>Interpretation</th></tr>
                     <tr><td>Planes (n)</td><td>Count</td><td>Row count of the validated subset</td><td>Effective sample size underlying every other statistic and the colour normalisation.</td></tr>
-                    <tr><td>Mean Strike</td><td>Circular (axial) mean, 180°‑periodic</td><td>Doubling‑angle vector‑resultant method, Section 4.4</td><td>The population's dominant fracture‑strike orientation; robust to the 0°/180° wrap‑around ambiguity inherent to axial (non‑directional) strike data.</td></tr>
+                    <tr><td>Mean Strike</td><td>Circular (axial) mean, 180°‑periodic</td><td>Doubling‑angle vector‑resultant method, <a href="#4.4">Section 4.4</a></td><td>The population's dominant fracture‑strike orientation; robust to the 0°/180° wrap‑around ambiguity inherent to axial (non‑directional) strike data.</td></tr>
                     <tr><td>Mean Dip</td><td>Linear (arithmetic) mean</td><td><code>numpy.nanmean</code>(dip array)</td><td>Average steepness of the fracture population; a linear mean is statistically appropriate because dip is bounded (0–90°) and non‑circular.</td></tr>
                     <tr><td>Total Length</td><td>Sum</td><td>Σ Length_m across valid rows</td><td>Aggregate mapped fracture length in the dataset's active display unit; contextualises the population size in physical (as opposed to purely count‑based) terms.</td></tr>
                 </table>
 
-                <h3>6.2 Why Circular Statistics Are Required for Strike</h3>
+                <h3 id="6.2">6.2 Why Circular Statistics Are Required for Strike</h3>
                 <p>
                     Ordinary (linear) descriptive statistics assume that the underlying measurement scale is
                     unbounded and that a small numerical difference always corresponds to a small physical
@@ -574,12 +574,12 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     almost coincident (both describe an approximately N–S striking fracture set, once the 180°
                     axial periodicity is accounted for). Using an arithmetic mean on such data can produce a wildly
                     misleading result — in the worst case, a mean strike diametrically opposed to the true dominant
-                    orientation. The doubling‑angle technique used here (Section 4.4) is the standard remedy from
+                    orientation. The doubling‑angle technique used here (<a href="#4.4">Section 4.4</a>) is the standard remedy from
                     directional statistics and is used consistently across FracSTAT's Rose Plot, Static Stereonet,
                     and Results‑tab summary statistics.
                 </p>
 
-                <h3>6.3 Statistics as a Quality‑Control Tool</h3>
+                <h3 id="6.3">6.3 Statistics as a Quality‑Control Tool</h3>
                 <p>
                     Because the Statistics card recomputes on every redraw, it functions as a live sanity check for
                     the Dip Override workflow: after loading an override file, a user can immediately verify that
@@ -592,7 +592,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                 <!-- ================================================= -->
                 <h2 id="visualization">7. Visualization &amp; Figure Components</h2>
 
-                <h3>7.1 Figure and Canvas Architecture</h3>
+                <h3 id="7.1">7.1 Figure and Canvas Architecture</h3>
                 <p>
                     The stereonet is rendered on a single Matplotlib Figure (default size 9&times;7 inches at
                     100&nbsp;dpi) embedded in the CustomTkinter plot card via <code>FigureCanvasTkAgg</code>. A
@@ -601,7 +601,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     avoiding the overhead of destroying and rebuilding Axes objects on every redraw.
                 </p>
 
-                <h3>7.2 Visual Element Inventory</h3>
+                <h3 id="7.2">7.2 Visual Element Inventory</h3>
                 <table>
                     <tr><th>Element</th><th>Always Drawn?</th><th>Controlled By</th></tr>
                     <tr><td>Bounding circle</td><td>Yes</td><td>Boundary colour / Boundary width</td></tr>
@@ -627,7 +627,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     <span class="ph-caption"><strong>Figure 7.1</strong> — Annotated stereonet illustrating (left to right, top to bottom) the bounding circle, 30° cardinal labels, a coloured pole cluster mapped by strike with its horizontal colour bar, and a single highlighted (selected) pole with its ID annotation.</span>
                 </figure>
 
-                <h3>7.3 Colour Bar Rendering</h3>
+                <h3 id="7.3">7.3 Colour Bar Rendering</h3>
                 <p>
                     When active, the colour bar is built from the same <code>ScalarMappable</code> object used to
                     colour the poles, guaranteeing an exact, artifact‑free correspondence between marker colour and
@@ -636,7 +636,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     where &lt;unit&gt; is the Static Analyzer's currently selected display unit — m, cm, mm, or km).
                 </p>
 
-                <h3>7.4 Colour‑Bar Layout Management</h3>
+                <h3 id="7.4">7.4 Colour‑Bar Layout Management</h3>
                 <p>
                     <code>_setup_static_stereo_colorbar</code> dynamically repositions both the colour‑bar Axes and
                     the primary stereonet Axes as a matched pair, since adding a colour bar necessarily shrinks the
@@ -657,7 +657,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     plotting area.
                 </p>
 
-                <h3>7.5 Title Construction and Empty/Error States</h3>
+                <h3 id="7.5">7.5 Title Construction and Empty/Error States</h3>
                 <p>
                     If the Custom Title field is left blank, the module auto‑generates a title of the form "Static
                     Stereonet: planes and poles (n={count})", where {count} is the live number of valid, plotted
@@ -669,12 +669,12 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     point: "Load SVG or Excel fracture data" is shown when <code>self.results</code> is absent,
                     empty, or lacks a <code>StrikeDeg</code> column entirely (i.e. no dataset has been loaded at
                     all); "No valid strike/dip data found" is shown when a dataset is loaded but every row failed
-                    the finite‑value validation of Section 2.4. In both cases the colour bar is hidden, the
+                    the finite‑value validation of <a href="#2.4">Section 2.4</a>. In both cases the colour bar is hidden, the
                     Selected Pole panel is cleared, and every Statistics field is reset to a dash placeholder, so
                     the sidebar never displays stale numbers alongside an empty plot.
                 </div>
 
-                <h3>7.6 Image Export</h3>
+                <h3 id="7.6">7.6 Image Export</h3>
                 <p>
                     The Save Image toolbar button calls the Static Analyzer's shared <code>save_plot_image</code>
                     routine, which writes the current Figure to a timestamped PNG file inside a per‑project
@@ -688,7 +688,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                 <!-- ================================================= -->
                 <h2 id="workflow">8. Step‑by‑Step Example Workflows</h2>
 
-                <h3>8.1 Example 1 — Basic Orientation Review of an SVG Trace Map</h3>
+                <h3 id="8.1">8.1 Example 1 — Basic Orientation Review of an SVG Trace Map</h3>
                 <ol class="step-list">
                     <li>Load a digitised fracture trace map via the workspace header's Load SVG button. Every segment initially receives a default dip of 90°.</li>
                     <li>Open the Stereonet Plot tab. With Plot Mode left at its default Solid colour, every pole appears at the outer boundary circle (since dip = 90° corresponds to pole radius = 1), forming a ring pattern that directly visualises the strike distribution around the compass.</li>
@@ -706,7 +706,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     <span class="ph-caption"><strong>Figure 8.1</strong> — Ring‑pattern stereonet typical of an SVG‑only trace map before any dip data has been supplied, with poles concentrated on the outer boundary circle and coloured by strike.</span>
                 </figure>
 
-                <h3>8.2 Example 2 — Incorporating Field‑Measured Dips</h3>
+                <h3 id="8.2">8.2 Example 2 — Incorporating Field‑Measured Dips</h3>
                 <ol class="step-list">
                     <li>Prepare a two‑column spreadsheet with headers ID and DipDeg, where ID values match the segment identifiers shown in the Static Analyzer's Table/Results tab, and DipDeg holds field‑measured dip angles in the 0–90° range.</li>
                     <li>In the Dip Override card, click View Format to confirm the expected layout, then click Load Dip Override and select the prepared file.</li>
@@ -714,14 +714,14 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     <li>Switch Plot Mode to Dip colour to visually audit which segments received an override (moved inward, showing a graded colour) versus which retained the 90° default (fixed at the boundary colour extreme).</li>
                 </ol>
 
-                <h3>8.3 Example 3 — Identifying Conjugate Fracture Sets</h3>
+                <h3 id="8.3">8.3 Example 3 — Identifying Conjugate Fracture Sets</h3>
                 <ol class="step-list">
                     <li>With a fully dip‑populated dataset loaded, enable Show planes to overlay every great‑circle trace.</li>
                     <li>Visually identify two angularly separated pole clusters; enable Show selected plane only and click a representative pole from each cluster in turn (the module keeps only the most recently picked selection, so compare one set at a time) to isolate and inspect each set's individual great circle against the full population.</li>
                     <li>Record the two clusters' mean orientations (readable from the Selected Pole panel for a representative fracture in each, or by filtering the source data and re‑loading a subset) and compute their angular separation to assess whether the pattern is consistent with a conjugate shear‑fracture pair.</li>
                 </ol>
 
-                <h3>8.4 Example 4 — Publication‑Quality Figure Preparation</h3>
+                <h3 id="8.4">8.4 Example 4 — Publication‑Quality Figure Preparation</h3>
                 <ol class="step-list">
                     <li>Set a Custom title describing the dataset (for example, "Outcrop A — Joint Set Orientation, n = 248").</li>
                     <li>In the Colours card, select a colour palette consistent with the target publication's style guide (for example, switching Outer BG and Plot BG to white, and choosing a colour‑blind‑friendly colormap such as Viridis or Cividis for Length colour mode).</li>
@@ -732,7 +732,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                 <!-- ================================================= -->
                 <h2 id="interpretation">9. Geological Interpretation</h2>
 
-                <h4>9.1 Reading Pole Clusters</h4>
+                <h4 id="9.1">9.1 Reading Pole Clusters</h4>
                 <p>
                     A tight cluster of poles indicates a single, well‑defined fracture set with consistent
                     orientation — the geological signature of a systematic joint set formed under a single,
@@ -743,7 +743,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     and non‑systematic (cross) joints.
                 </p>
 
-                <h4>9.2 Girdle (Great‑Circle) Distributions</h4>
+                <h4 id="9.2">9.2 Girdle (Great‑Circle) Distributions</h4>
                 <p>
                     When poles are dispersed along a great‑circle arc rather than clustered at a point, the
                     population is described as a girdle distribution. Geologically, a girdle commonly indicates
@@ -755,14 +755,14 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     planes sharing a common intersection line.
                 </p>
 
-                <h4>9.3 Interpreting Colour‑Coded Attributes</h4>
+                <h4 id="9.3">9.3 Interpreting Colour‑Coded Attributes</h4>
                 <ul>
                     <li><strong>Strike colour</strong> (0–180°, cyclic‑appearing but linearly mapped) highlights orientation domains within a single diagram — useful for visually separating conjugate or cross‑cutting sets without needing a second plot.</li>
                     <li><strong>Dip colour</strong> (fixed 0–90° scale) is particularly informative for datasets combining vertical, SVG‑derived trace‑map fractures (typically defaulted to 90°) with dip‑override or directly measured fracture‑plane data, letting a user instantly distinguish which poles carry genuinely measured dip information versus assumed‑vertical defaults, since the latter will cluster tightly at the deep‑red or deep‑blue end of the fixed scale depending on the chosen colormap.</li>
                     <li><strong>Length colour</strong> reveals whether the longest, most laterally persistent fractures in the network share a common orientation with the shorter, more numerous population — a pattern often associated with a hierarchy of fracture generations (e.g. long master joints versus short cross joints).</li>
                 </ul>
 
-                <h4>9.4 Relationship to the Dynamic Analyzer</h4>
+                <h4 id="9.4">9.4 Relationship to the Dynamic Analyzer</h4>
                 <p>
                     The purely geometric orientation fabric characterised here is the natural precursor to the
                     Dynamic Analyzer's stress‑based slip‑tendency and Mohr‑Coulomb failure analysis: a fracture set
@@ -774,7 +774,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     Override mechanism — before committing to a quantitative stress analysis.
                 </p>
 
-                <h4>9.5 Caution Regarding Default (Assumed) Dips</h4>
+                <h4 id="9.5">9.5 Caution Regarding Default (Assumed) Dips</h4>
                 <div class="note-box">
                     <strong>Note:</strong> any fracture segment lacking an explicit DipDeg value in the source
                     data, or lacking an entry in an uploaded Dip Override file, is plotted at the default dip of
@@ -789,9 +789,9 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                 <!-- ================================================= -->
                 <h2 id="performance">10. Performance Optimization</h2>
 
-                <h3>10.1 Vectorised NumPy Computation</h3>
+                <h3 id="10.1">10.1 Vectorised NumPy Computation</h3>
                 <p>
-                    Every geometric transformation described in Section 4 — strike wrapping, dip‑override
+                    Every geometric transformation described in <a href="#maths">Section 4</a> — strike wrapping, dip‑override
                     substitution, pole trend/radius computation, and coordinate projection — is expressed as
                     array‑level NumPy operations (modulo, where, clip, sin, cos, sqrt) applied to the entire
                     fracture population simultaneously, rather than iterating row by row in pure Python. For
@@ -800,9 +800,9 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     instead dominated by Matplotlib's own artist construction and canvas paint operations.
                 </p>
 
-                <h3>10.2 Great‑Circle Curve Cost Management</h3>
+                <h3 id="10.2">10.2 Great‑Circle Curve Cost Management</h3>
                 <p>
-                    The great‑circle plane‑trace algorithm (Section 4.3) samples 140 points per plane, chosen as a
+                    The great‑circle plane‑trace algorithm (<a href="#4.3">Section 4.3</a>) samples 140 points per plane, chosen as a
                     balance between visual smoothness (no perceptible faceting on a typical screen or print
                     render) and per‑plane computational and memory cost. Because plane rendering is opt‑in (Show
                     planes defaults to off) and is itself vectorisable per plane, enabling it for populations of a
@@ -812,7 +812,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     input data, rather than rendering every great circle at once.
                 </p>
 
-                <h3>10.3 Deferred Canvas Painting</h3>
+                <h3 id="10.3">10.3 Deferred Canvas Painting</h3>
                 <p>
                     The module calls the Matplotlib canvas's <code>draw_idle()</code> method rather than the
                     blocking <code>draw()</code> at the end of every redraw. <code>draw_idle()</code> schedules the
@@ -822,16 +822,16 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     improving perceived UI responsiveness without any explicit debounce logic in this module.
                 </p>
 
-                <h3>10.4 Colormap Resolution Caching</h3>
+                <h3 id="10.4">10.4 Colormap Resolution Caching</h3>
                 <p>
-                    As described in Section 5.2, the resolved Matplotlib colormap identifier is cached in
+                    As described in <a href="#5.2">Section 5.2</a>, the resolved Matplotlib colormap identifier is cached in
                     <code>self.static_stereo_cmap_resolved</code> after the dropdown's on‑change callback fires, so
                     the hot draw path (<code>_static_stereo_cmap</code>) never needs to re‑parse the display name
                     or re‑touch the shared colour‑scale catalogue on every redraw — it performs, at most, a single
                     dictionary‑free conditional check and a call to <code>matplotlib.cm.get_cmap</code>.
                 </p>
 
-                <h3>10.5 Colour‑Bar Axis Reuse and I/O</h3>
+                <h3 id="10.5">10.5 Colour‑Bar Axis Reuse and I/O</h3>
                 <p>
                     Rather than creating and destroying a Matplotlib Axes object every time the colour bar is shown
                     or hidden (an operation with non‑trivial overhead, since Axes creation touches the Figure's
@@ -846,7 +846,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                 <!-- ================================================= -->
                 <h2 id="advanced">11. Advanced Features</h2>
 
-                <h3>11.1 Pole Marker Shape Library</h3>
+                <h3 id="11.1">11.1 Pole Marker Shape Library</h3>
                 <p>Six marker shapes are exposed, mapped internally to Matplotlib single‑character/style codes:</p>
                 <table>
                     <tr><th>Display Name</th><th>Matplotlib Marker Code</th><th>Typical Use</th></tr>
@@ -858,7 +858,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     <tr><td>Cross</td><td>X</td><td>Overlay marker style that remains legible atop dense clusters or a background image.</td></tr>
                 </table>
 
-                <h3>11.2 Dip‑Direction‑Aware Strike Correction</h3>
+                <h3 id="11.2">11.2 Dip‑Direction‑Aware Strike Correction</h3>
                 <p>
                     Certain upstream Excel fracture‑plane files record a plane's orientation via dip azimuth ("Dip
                     Direction") rather than strike. Rather than requiring the user to pre‑convert this column, the
@@ -869,7 +869,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     pre‑processing.
                 </p>
 
-                <h3>11.3 Reset Defaults</h3>
+                <h3 id="11.3">11.3 Reset Defaults</h3>
                 <p>
                     The reset routine (<code>_static_stereonet_reset_defaults</code>) writes the factory value into
                     every corresponding StringVar/BooleanVar in a single pass — Plot mode to Solid colour, Colorbar
@@ -879,7 +879,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     then performs one redraw.
                 </p>
 
-                <h3>11.4 Shared Colour‑Scale Ecosystem</h3>
+                <h3 id="11.4">11.4 Shared Colour‑Scale Ecosystem</h3>
                 <p>
                     The colormap dropdown and its live‑swatch preview are implemented via the same
                     <code>CustomColorDropdown</code> widget and colour‑scale catalogue used throughout FracSTAT
@@ -890,7 +890,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     tab's dropdown without any change to this module.
                 </p>
 
-                <h3>11.5 Cross‑Workspace Dip Override State</h3>
+                <h3 id="11.5">11.5 Cross‑Workspace Dip Override State</h3>
                 <p>
                     Although the Dip Override loaded through this tab is scoped to the Static Analyzer's Stereonet
                     Plot display, the resulting dictionary is also written into the launcher's shared

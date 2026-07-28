@@ -87,7 +87,7 @@
                     <span class="ph-caption"><strong>Figure 1.1</strong> — Overall layout of the Histogram Tab: scrollable settings sidebar (left) and the histogram/cross‑plot canvas with its toolbar (right).</span>
                 </figure>
 
-                <h3>1.1 Sidebar Cards at a Glance</h3>
+                <h3 id="1.1">1.1 Sidebar Cards at a Glance</h3>
                 <table>
                     <tr><th>Card</th><th>Purpose</th><th>Always visible?</th></tr>
                     <tr><td>Data Settings</td><td>Selects which quantity to plot (segment length, trace length, segment angle, or the bivariate Cross Plot) and whether edge‑censoring is applied.</td><td>Yes</td></tr>
@@ -99,7 +99,7 @@
                     <tr><td>Cross Plot Settings</td><td>X‑axis/Y‑axis attribute selectors, colour‑by attribute, marker styling, trend‑line controls, and colour‑scale/colourbar options.</td><td>Cross Plot mode only</td></tr>
                 </table>
 
-                <h3>1.2 Plot Canvas</h3>
+                <h3 id="1.2">1.2 Plot Canvas</h3>
                 <p>
                     The plot canvas is a Matplotlib <code>Figure</code> created with <code>constrained_layout=True</code>,
                     which automatically reserves space for axis labels, titles, and legends on every redraw rather than
@@ -119,7 +119,7 @@
 
                 <!-- ================================================= -->
                 <h2 id="data-input">2. Data Input</h2>
-                <h3>2.1 Upstream Data Source</h3>
+                <h3 id="2.1">2.1 Upstream Data Source</h3>
                 <p>
                     The Histogram Tab does not load files itself. It reads from two attributes maintained by the
                     parent <code>StaticAnalyzerApp</code>: <code>self._static_results</code> (preferred) and, as a
@@ -133,7 +133,7 @@
                     <li><strong>Excel/CSV mode</strong> — fracture planes are supplied as tabular Strike/Dip (optionally with Length and Aperture columns) or as Trend/Plunge pole orientations converted to Strike/Dip. Because no true spatial geometry exists in this format, segment endpoints are synthetic (placed on a unit circle purely to preserve orientation for downstream calculations), and any Length/Aperture values come directly from optional spreadsheet columns rather than being derived from geometry.</li>
                 </ul>
 
-                <h3>2.2 Columns Consumed</h3>
+                <h3 id="2.2">2.2 Columns Consumed</h3>
                 <table>
                     <tr><th>Column</th><th>Type</th><th>Used for</th><th>Notes</th></tr>
                     <tr><td><code>Length_m</code></td><td>float</td><td>Segment‑length histogram; length statistics; Cross Plot "Segment Length" axis</td><td>Real‑world segment length in the currently selected display unit (despite the fixed column‑name suffix "_m").</td></tr>
@@ -145,7 +145,7 @@
                     <tr><td><code>ID</code></td><td>int</td><td>Cross Plot "Segment ID" axis option</td><td>Sequential per‑segment identifier matching the Table/Results tabs.</td></tr>
                 </table>
 
-                <h3>2.3 Handling of Missing or Empty Data</h3>
+                <h3 id="2.3">2.3 Handling of Missing or Empty Data</h3>
                 <p>
                     If no data has been loaded (both <code>self._static_results</code> and <code>self.results</code>
                     are empty or <code>None</code>), both drawing routines display a centred, muted placeholder
@@ -170,21 +170,21 @@
                     cross‑plot renderer according to the current Data Settings selection.
                 </p>
 
-                <h3>3.1 Data Settings Card</h3>
+                <h3 id="3.1">3.1 Data Settings Card</h3>
                 <table>
                     <tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Data Settings dropdown</td><td>Option menu</td><td>Segment lengths</td><td>Chooses the plotted quantity: "Segment lengths", "Trace lengths", "Segment angles", or "Cross Plot". Selecting "Cross Plot" additionally reveals the Cross Plot Settings card; any other choice hides it.</td></tr>
-                    <tr><td>Censor edge traces</td><td>Checkbox</td><td>Unchecked</td><td>When enabled, any trace with at least one segment endpoint numerically coincident with the bounding box of the loaded dataset is excluded from the plotted sample (see <a href="#algorithms">Section 5.2</a>). Applies to Segment lengths, Trace lengths, and Cross Plot (SVG geometry only) modes.</td></tr>
+                    <tr><td>Censor edge traces</td><td>Checkbox</td><td>Unchecked</td><td>When enabled, any trace with at least one segment endpoint numerically coincident with the bounding box of the loaded dataset is excluded from the plotted sample (see <a href="#edge-censoring-algorithm">Section 5.2</a>). Applies to Segment lengths, Trace lengths, and Cross Plot (SVG geometry only) modes.</td></tr>
                 </table>
 
-                <h3>3.2 Options Card</h3>
+                <h3 id="3.2">3.2 Options Card</h3>
                 <table>
                     <tr><th>Control</th><th>Widget</th><th>Default</th><th>Valid range</th><th>Effect</th></tr>
                     <tr><td>Number of bins</td><td>Text entry</td><td>20</td><td>Clamped to 3–200 on commit</td><td>Sets the histogram bin count used to partition the length or angle range into equal‑width intervals. Committed on <kbd>Enter</kbd> or on focus‑out.</td></tr>
                     <tr><td>Update Plot</td><td>Button</td><td>—</td><td>—</td><td>Manually forces a redraw; provided for consistency of interaction pattern even though most controls already redraw automatically.</td></tr>
                 </table>
 
-                <h3>3.3 Plot Appearance Card</h3>
+                <h3 id="3.3">3.3 Plot Appearance Card</h3>
                 <table>
                     <tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Custom title (blank = auto)</td><td>Text entry</td><td>"" (auto title)</td><td>Overrides the automatically generated plot title. The automatic title reports the plotted quantity and sample size n (and, in Cross Plot mode, the X/Y axis labels).</td></tr>
@@ -196,12 +196,12 @@
                     <tr><td>Grid colour</td><td>Colour swatch</td><td>#DDDDDD</td><td>Sets the colour of the gridlines when shown.</td></tr>
                     <tr><td>Grid width</td><td>Text entry (float)</td><td>0.6</td><td>Sets the gridline width, in points.</td></tr>
                     <tr><td>Legend position</td><td>Option menu</td><td>upper right</td><td>One of: upper right, upper left, lower right, lower left, center, Outside Right, Outside Bottom, or None. "Outside Right"/"Outside Bottom" place the legend beyond the axes bounding box using a <code>bbox_to_anchor</code> offset; "None" suppresses the legend entirely.</td></tr>
-                    <tr><td>Plot Area Size — Width (px)</td><td>Text entry (int)</td><td>700</td><td>Sets the target pixel width of the rendered figure by destroying and recreating the canvas at the requested size (see <a href="#algorithms">Section 5.4</a>).</td></tr>
+                    <tr><td>Plot Area Size — Width (px)</td><td>Text entry (int)</td><td>700</td><td>Sets the target pixel width of the rendered figure by destroying and recreating the canvas at the requested size (see <a href="#canvas-rebuild-algorithm">Section 5.4</a>).</td></tr>
                     <tr><td>Plot Area Size — Height (px)</td><td>Text entry (int)</td><td>600</td><td>Sets the target pixel height of the rendered figure, using the same rebuild mechanism as Width.</td></tr>
                     <tr><td>Reset Size to Auto</td><td>Button</td><td>—</td><td>Rebuilds the canvas at the fixed default of 700 × 600 px (7.0 × 6.0 inches at 100 dpi).</td></tr>
                 </table>
 
-                <h3>3.4 Element Styling Card (Histogram Modes)</h3>
+                <h3 id="3.4">3.4 Element Styling Card (Histogram Modes)</h3>
                 <table>
                     <tr><th>Control</th><th>Widget</th><th>Default</th><th>Applies to</th></tr>
                     <tr><td>Bar fill colour</td><td>Colour swatch</td><td>#0000CC</td><td>Histogram bars.</td></tr>
@@ -213,7 +213,7 @@
                     <tr><td>Max line width</td><td>Text entry (float)</td><td>1.4</td><td>Line width of the maximum‑value reference line.</td></tr>
                 </table>
 
-                <h3>3.5 Text &amp; Axis Styling Card (Histogram Modes)</h3>
+                <h3 id="3.5">3.5 Text &amp; Axis Styling Card (Histogram Modes)</h3>
                 <table>
                     <tr><th>Control</th><th>Widget</th><th>Default</th></tr>
                     <tr><td>Frequency (Left) colour</td><td>Colour swatch</td><td>Matches Bar fill colour</td></tr>
@@ -221,7 +221,7 @@
                     <tr><td>X‑axis text colour</td><td>Colour swatch</td><td>Workspace text colour (typically #1F2933)</td></tr>
                 </table>
 
-                <h3>3.6 Statistics Card (Histogram Modes)</h3>
+                <h3 id="3.6">3.6 Statistics Card (Histogram Modes)</h3>
                 <p>The Statistics card is a read‑only report, recomputed on every histogram redraw from the filtered, positive‑valued sample.</p>
                 <table>
                     <tr><th>Field</th><th>Description</th><th>Units</th></tr>
@@ -233,7 +233,7 @@
                     <tr><td>Total Length</td><td>Sum of all plotted lengths (reported only for length‑based modes; computed but not meaningful for the Segment angles mode).</td><td>display unit</td></tr>
                 </table>
 
-                <h3>3.7 Cross Plot Settings Card</h3>
+                <h3 id="3.7">3.7 Cross Plot Settings Card</h3>
                 <p>
                     This card is created hidden and is revealed only when the Data Settings dropdown is set to
                     "Cross Plot"; toggling back to any histogram mode hides it again.
@@ -247,7 +247,7 @@
                     <tr><td>Dot colour</td><td>Colour swatch</td><td>#2563EB</td><td>Marker colour used when "Colour points by" is "None".</td></tr>
                     <tr><td>Dot size</td><td>Text entry (float)</td><td>18</td><td>Marker area, in points², passed to Matplotlib's scatter <code>s</code> parameter.</td></tr>
                     <tr><td>Dot opacity (0–1)</td><td>Text entry (float)</td><td>0.7</td><td>Marker alpha, clamped to [0, 1].</td></tr>
-                    <tr><td>Show trend line (OLS)</td><td>Checkbox</td><td>Unchecked</td><td>Fits and overlays an ordinary‑least‑squares regression line through the plotted points (requires ≥ 2 points); see <a href="#maths">Section 4.3</a>.</td></tr>
+                    <tr><td>Show trend line (OLS)</td><td>Checkbox</td><td>Unchecked</td><td>Fits and overlays an ordinary‑least‑squares regression line through the plotted points (requires ≥ 2 points); see <a href="#cross-plot-ols-trend-line">Section 4.3</a>.</td></tr>
                     <tr><td>Trend line colour</td><td>Colour swatch</td><td>#DC2626</td><td>Colour of the OLS regression line.</td></tr>
                     <tr><td>Trend line width</td><td>Text entry (float)</td><td>1.8</td><td>Line width of the OLS regression line, in points.</td></tr>
                     <tr><td>Colour scale (when colouring by)</td><td>Option menu</td><td>viridis</td><td>Matplotlib colormap name applied when "Colour points by" is not "None". Options include viridis, plasma, inferno, magma, cividis, turbo, jet, hot, coolwarm, RdYlBu, Spectral, YlGnBu, Greys.</td></tr>
@@ -258,7 +258,7 @@
                 <!-- ================================================= -->
                 <h2 id="maths">4. Mathematical Background</h2>
 
-                <h3>4.1 Segment Length and Segment Angle Derivation</h3>
+                <h3 id="4.1">4.1 Segment Length and Segment Angle Derivation</h3>
                 <p>
                     For SVG‑sourced segments, each fracture segment <em>i</em> has real‑world endpoint coordinates
                     (x1, y1) and (x2, y2) after pixel‑to‑unit scaling. Two scalar attributes are used throughout the
@@ -285,7 +285,7 @@ Segment angle (image-ref): θi = atan2( x2 − x1 , −(y2 − y1) )  (mod 180°
                     not.
                 </div>
 
-                <h3>4.2 Histogram Binning</h3>
+                <h3 id="4.2">4.2 Histogram Binning</h3>
                 <p>Given the filtered, positive sample {L₁, ..., Lₙ} and a user‑selected bin count nBins, the module constructs equal‑width bins spanning the sample range:</p>
                 <div class="formula-block">
 step = (Lmax − Lmin) / nBins
@@ -338,7 +338,7 @@ ax_right.set_ylim(0, count_max / n * 100.0 * 1.05)</code></pre>
                 </div>
                 <p class="ph-caption" style="text-align:left; margin: -1rem 0 1.5rem 0;">Simplified excerpt of the binning and dual‑axis logic in <code>_draw_length_histogram()</code>, showing the degenerate single‑bin fallback and the percentage‑axis headroom calculation described above.</p>
 
-                <h3>4.3 Cross‑Plot Ordinary Least‑Squares Trend Line</h3>
+                <h3 id="cross-plot-ols-trend-line">4.3 Cross‑Plot Ordinary Least‑Squares Trend Line</h3>
                 <p>
                     When "Show trend line (OLS)" is enabled, the module fits a first‑degree polynomial (a straight
                     line) to the plotted (x, y) pairs using <code>numpy.polyfit</code>, which solves the ordinary
@@ -357,7 +357,7 @@ R² = corr(x, y)²   (squared Pearson correlation coefficient)
                     homoscedasticity, absence of leverage points) have been independently verified.
                 </p>
 
-                <h3>4.4 Angle Wrapping and Axial Statistics</h3>
+                <h3 id="4.4">4.4 Angle Wrapping and Axial Statistics</h3>
                 <p>
                     All angular quantities handled by the Histogram Tab (StrikeDeg, Strike (°), Trace Angle (°),
                     Segment Angle (°)) are folded to the axial 0–180° domain via the modulo operator
@@ -371,7 +371,7 @@ R² = corr(x, y)²   (squared Pearson correlation coefficient)
                 <!-- ================================================= -->
                 <h2 id="algorithms">5. Algorithms</h2>
 
-                <h3>5.1 Data‑Source Selection and Attribute Resolution</h3>
+                <h3 id="5.1">5.1 Data‑Source Selection and Attribute Resolution</h3>
                 <p>
                     The private helper <code>_cross_col(df, axis_label)</code> is the central attribute‑resolution
                     routine used by Cross Plot mode. Given a human‑readable axis label (e.g. "Segment Length",
@@ -385,7 +385,7 @@ R² = corr(x, y)²   (squared Pearson correlation coefficient)
                     <li>Return <code>None</code> if no resolution path succeeds, allowing the caller to attempt a further SVG‑geometry fallback or, failing that, present the "axis not available" empty state.</li>
                 </ol>
 
-                <h3>5.2 Edge‑Censoring Algorithm</h3>
+                <h3 id="edge-censoring-algorithm">5.2 Edge‑Censoring Algorithm</h3>
                 <p>
                     Real fracture‑trace datasets digitised from a finite map or photograph are subject to a
                     well‑known sampling bias: traces truncated by the edge of the mapped area have an artificially
@@ -407,7 +407,7 @@ R² = corr(x, y)²   (squared Pearson correlation coefficient)
                     to slightly different floats. The proportional tolerance corrects this.
                 </div>
 
-                <h3>5.3 SVG Geometry Reconstruction for Cross Plots</h3>
+                <h3 id="5.3">5.3 SVG Geometry Reconstruction for Cross Plots</h3>
                 <p>
                     The helper <code>_svg_cross_dataframe()</code> rebuilds a minimal geometry table directly from
                     the in‑memory Segment objects (bypassing the asynchronous results table) whenever that table is
@@ -428,7 +428,7 @@ X'i = (Xi − x_min) × scale_x,   Y'i = (Yi − y_min) × scale_y
                     application, rather than in unscaled pixel units.
                 </p>
 
-                <h3>5.4 Canvas Rebuild Algorithm (Custom Plot Sizing)</h3>
+                <h3 id="canvas-rebuild-algorithm">5.4 Canvas Rebuild Algorithm (Custom Plot Sizing)</h3>
                 <p>
                     Because Matplotlib's <code>FigureCanvasTkAgg</code> does not support changing a live canvas's
                     backing pixel dimensions in place without artefacts, the "Plot Area Size" controls operate
@@ -449,7 +449,7 @@ X'i = (Xi − x_min) × scale_x,   Y'i = (Yi − y_min) × scale_y
                     is otherwise free to adjust axis position.
                 </p>
 
-                <h3>5.5 Draggable Legend / Trend‑Line Legend Position Persistence</h3>
+                <h3 id="5.5">5.5 Draggable Legend / Trend‑Line Legend Position Persistence</h3>
                 <p>
                     When FracSTAT's global "Move Elements" editing mode is active, the Matplotlib legend on the
                     histogram or cross‑plot axes becomes draggable. To ensure a manually dragged legend does not
@@ -472,7 +472,7 @@ X'i = (Xi − x_min) × scale_x,   Y'i = (Yi − y_min) × scale_y
                     <tr><td>Censored count</td><td>count of excluded boundary‑touching observations</td><td>Quantifies the magnitude of the truncation‑bias correction; a large censored fraction relative to n signals that the mapped area may be too small relative to the characteristic fracture length for unbiased length statistics.</td></tr>
                 </table>
 
-                <h3>6.1 Relationship to the CDF Tab</h3>
+                <h3 id="6.1">6.1 Relationship to the CDF Tab</h3>
                 <p>
                     The Histogram Tab intentionally limits itself to elementary descriptive statistics and
                     equal‑width binning. Rigorous distributional inference — maximum‑likelihood fitting of power‑law,
@@ -485,7 +485,7 @@ X'i = (Xi − x_min) × scale_x,   Y'i = (Yi − y_min) × scale_y
                     width and placement are well known to bias the visual appearance of heavy‑tailed distributions.
                 </p>
 
-                <h3>6.2 Cross‑Plot Regression Diagnostics</h3>
+                <h3 id="cross-plot-regression-diagnostics">6.2 Cross‑Plot Regression Diagnostics</h3>
                 <p>
                     The R² value reported alongside the OLS trend line is the squared Pearson product‑moment
                     correlation coefficient between the plotted x and y arrays, computed via
@@ -500,7 +500,7 @@ X'i = (Xi − x_min) × scale_x,   Y'i = (Yi − y_min) × scale_y
                 <!-- ================================================= -->
                 <h2 id="visualization">7. Visualization &amp; Figure Components</h2>
 
-                <h3>7.1 Histogram Figure Components</h3>
+                <h3 id="7.1">7.1 Histogram Figure Components</h3>
                 <ul>
                     <li><strong>Bars</strong> — one bar per bin, centred on the bin midpoint, width equal to the bin step, coloured and outlined per the Element Styling card.</li>
                     <li><strong>Left y‑axis (Frequency)</strong> — absolute bin counts, labelled and coloured per the Text &amp; Axis Styling card, with an integer‑only tick locator so fractional count ticks never appear.</li>
@@ -519,7 +519,7 @@ X'i = (Xi − x_min) × scale_x,   Y'i = (Yi − y_min) × scale_y
                     <span class="ph-caption"><strong>Figure 7.1</strong> — Example segment‑length histogram with dual Frequency / Frequency (%) axes, minimum and maximum reference lines, and legend.</span>
                 </figure>
 
-                <h3>7.2 Cross‑Plot Figure Components</h3>
+                <h3 id="7.2">7.2 Cross‑Plot Figure Components</h3>
                 <ul>
                     <li><strong>Scatter markers</strong> — either solid‑coloured or continuously colour‑mapped by the selected third attribute.</li>
                     <li><strong>Colourbar</strong> — rendered on the requested side (Right/Left/Bottom/Top) only when a colour‑by attribute is active, labelled with that attribute's name.</li>
@@ -536,7 +536,7 @@ X'i = (Xi − x_min) × scale_x,   Y'i = (Yi − y_min) × scale_y
                     <span class="ph-caption"><strong>Figure 7.2</strong> — Example Cross Plot: Segment Length vs Aperture, points coloured by Strike (°), with colourbar and an OLS trend‑line overlay.</span>
                 </figure>
 
-                <h3>7.3 Save Image</h3>
+                <h3 id="7.3">7.3 Save Image</h3>
                 <p>
                     The "Save Image" toolbar button calls the shared <code>save_plot_image()</code> helper
                     (implemented once in the parent <code>StaticAnalyzerApp</code> and reused by every tab), which
@@ -549,7 +549,7 @@ X'i = (Xi − x_min) × scale_x,   Y'i = (Yi − y_min) × scale_y
                 <!-- ================================================= -->
                 <h2 id="workflow">8. Step‑by‑Step Example Workflows</h2>
 
-                <h3>8.1 Example 1 — Segment‑Length Distribution from an SVG Trace Map</h3>
+                <h3 id="8.1">8.1 Example 1 — Segment‑Length Distribution from an SVG Trace Map</h3>
                 <ol class="step-list">
                     <li>In the Fracture Map tab, load an SVG containing digitised fracture traces and confirm the profile width/length and display unit are correctly calibrated.</li>
                     <li>Switch to the Histogram Tab. The Data Settings dropdown defaults to "Segment lengths".</li>
@@ -558,7 +558,7 @@ X'i = (Xi − x_min) × scale_x,   Y'i = (Yi − y_min) × scale_y
                     <li>Record the Statistics card's n, Minimum, Maximum, Mean, and Total Length values for the project report, and use "Save Image" to export a publication‑ready PNG of the histogram.</li>
                 </ol>
 
-                <h3>8.2 Example 2 — Comparing Segment vs Trace Length</h3>
+                <h3 id="8.2">8.2 Example 2 — Comparing Segment vs Trace Length</h3>
                 <p>
                     Switching the Data Settings dropdown between "Segment lengths" and "Trace lengths" on the same
                     loaded dataset allows a direct comparison between the length distribution of individual
@@ -570,19 +570,19 @@ X'i = (Xi − x_min) × scale_x,   Y'i = (Yi − y_min) × scale_y
                     step" parameter) rather than a genuine geological signal.
                 </p>
 
-                <h3>8.3 Example 3 — Cross‑Plotting Length against Aperture</h3>
+                <h3 id="8.3">8.3 Example 3 — Cross‑Plotting Length against Aperture</h3>
                 <ol class="step-list">
                     <li>Load an Excel/CSV fracture‑plane table containing Length (m) and Aperture (mm) columns.</li>
                     <li>In the Histogram Tab, set Data Settings to "Cross Plot".</li>
                     <li>Set X axis to "Segment Length" and Y axis to "Aperture (mm)" (these are the pre‑selected defaults whenever Excel/CSV data with these columns is detected).</li>
-                    <li>Enable "Show trend line (OLS)" to obtain a first‑order linear length–aperture scaling estimate and its R² for the loaded population; note the caveat in <a href="#statistics">Section 6.2</a> regarding non‑linear (e.g. power‑law) length–aperture scaling relationships commonly reported in the fracture‑mechanics literature.</li>
+                    <li>Enable "Show trend line (OLS)" to obtain a first‑order linear length–aperture scaling estimate and its R² for the loaded population; note the caveat in <a href="#cross-plot-regression-diagnostics">Section 6.2</a> regarding non‑linear (e.g. power‑law) length–aperture scaling relationships commonly reported in the fracture‑mechanics literature.</li>
                     <li>Optionally set "Colour points by" to "Strike (°)" to visually assess whether length–aperture scaling differs systematically between orientation sets.</li>
                 </ol>
 
                 <!-- ================================================= -->
                 <h2 id="interpretation">9. Geological Interpretation</h2>
 
-                <h4>9.1 Fracture Length Distributions</h4>
+                <h4 id="9.1">9.1 Fracture Length Distributions</h4>
                 <p>
                     Fracture (and joint, vein, and fault) length populations in nature are widely documented to
                     follow heavy‑tailed distributions — commonly approximated by power‑law, log‑normal, or truncated
@@ -595,7 +595,7 @@ X'i = (Xi − x_min) × scale_x,   Y'i = (Yi − y_min) × scale_y
                     is only clearly visible on logarithmic axes.
                 </p>
 
-                <h4>9.2 Truncation and Censoring Bias</h4>
+                <h4 id="9.2">9.2 Truncation and Censoring Bias</h4>
                 <p>
                     Because any finite outcrop, borehole image, or remotely sensed map necessarily has edges,
                     fractures that would naturally extend beyond the mapped area are recorded with an artificially
@@ -607,7 +607,7 @@ X'i = (Xi − x_min) × scale_x,   Y'i = (Yi − y_min) × scale_y
                     underestimate the true population mean.
                 </p>
 
-                <h4>9.3 Segment Angle Histograms and Structural Sets</h4>
+                <h4 id="9.3">9.3 Segment Angle Histograms and Structural Sets</h4>
                 <p>
                     The Segment angles histogram mode provides a linear‑axis (as opposed to the Rose Plot tab's
                     polar/equal‑area) view of the strike‑angle distribution, folded to the 0–180° axial convention.
@@ -620,7 +620,7 @@ X'i = (Xi − x_min) × scale_x,   Y'i = (Yi − y_min) × scale_y
                     orientation populations.
                 </p>
 
-                <h4>9.4 Length–Aperture and Length–Attribute Cross Plots</h4>
+                <h4 id="9.4">9.4 Length–Aperture and Length–Attribute Cross Plots</h4>
                 <p>
                     Positive correlations between fracture length and aperture are frequently reported in the
                     structural geology and reservoir engineering literature and are commonly interpreted in terms of
@@ -642,7 +642,7 @@ X'i = (Xi − x_min) × scale_x,   Y'i = (Yi − y_min) × scale_y
 
                 <!-- ================================================= -->
                 <h2 id="advanced">11. Advanced &amp; Related Capabilities</h2>
-                <h3>11.1 Legacy Column and Unit Compatibility</h3>
+                <h3 id="11.1">11.1 Legacy Column and Unit Compatibility</h3>
                 <p>
                     The attribute‑resolution logic explicitly strips a stray "Â" character sequence and collapses
                     whitespace before matching labels, guarding against the case where the degree symbol (°) has
@@ -651,7 +651,7 @@ X'i = (Xi − x_min) × scale_x,   Y'i = (Yi − y_min) × scale_y
                     previously saved project sessions or exported CSVs that used an older label convention continue
                     to resolve correctly.
                 </p>
-                <h3>11.2 Automatic Default Correction for Mixed Sessions</h3>
+                <h3 id="11.2">11.2 Automatic Default Correction for Mixed Sessions</h3>
                 <p>
                     Because the two supported data modalities (SVG vs Excel/CSV) have different natural default
                     Cross Plot axis pairs, the module detects and silently corrects the situation where a Cross Plot
@@ -660,7 +660,7 @@ X'i = (Xi − x_min) × scale_x,   Y'i = (Yi − y_min) × scale_y
                     SVG‑only data — and resets them to the SVG‑appropriate default pair, Segment Angle (°) vs
                     Segment Length, immediately before resolving columns for that redraw.
                 </p>
-                <h3>11.3 Performance Notes</h3>
+                <h3 id="11.3">11.3 Performance Notes</h3>
                 <ul>
                     <li><strong>Constrained layout over manual <code>tight_layout()</code></strong> — recomputes label/legend spacing analytically on every draw, which is more robust than a single post‑hoc pass when the user is actively changing dimensions, legend position, or the secondary percentage axis.</li>
                     <li><strong>Deferred redraw via <code>draw_idle()</code></strong> — schedules a repaint on the UI event loop rather than forcing an immediate synchronous render, letting several rapid successive setting changes coalesce into fewer actual repaints.</li>
