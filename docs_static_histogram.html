@@ -61,7 +61,7 @@
                         <li><a href="#visualization">7. Visualization &amp; figure components</a></li>
                         <li><a href="#workflow">8. Step‑by‑step example workflows</a></li>
                         <li><a href="#interpretation">9. Geological interpretation</a></li>
-                        <li><a href="#pitfalls">10. Limitations &amp; common pitfalls</a></li>
+                        <li><a href="#limitations">10. Limitations</a></li>
                         <li><a href="#advanced">11. Advanced &amp; related capabilities</a></li>
                     </ul>
                 </div>
@@ -633,16 +633,11 @@ X'i = (Xi − x_min) × scale_x,   Y'i = (Yi − y_min) × scale_y
                 </p>
 
                 <!-- ================================================= -->
-                <h2 id="pitfalls">10. Limitations &amp; Common Pitfalls</h2>
+                <h2 id="limitations">10. Limitations</h2>
                 <table>
-                    <tr><th>Limitation / Pitfall</th><th>Description</th></tr>
-                    <tr><td>No formal distributional fitting</td><td>The module performs no maximum‑likelihood fitting, goodness‑of‑fit testing, or confidence‑interval estimation; such analysis is deferred entirely to the CDF tab.</td></tr>
-                    <tr><td>Equal‑width binning obscures heavy tails</td><td>Linear binning can visually obscure power‑law‑like fracture length distributions, which are frequently better examined on logarithmic axes or via the CDF tab's complementary cumulative distribution plots.</td></tr>
-                    <tr><td>OLS assumes linearity</td><td>The trend line assumes a linear x–y relationship; no alternative functional forms (power‑law, exponential, logarithmic) are offered within the Cross Plot tool itself.</td></tr>
+                    <tr><th>Limitation</th><th>Description</th></tr>
                     <tr><td>Edge‑censoring is a simple heuristic</td><td>It is a boundary‑proximity test based on the dataset's own bounding box; it cannot detect truncation against an irregular (non‑rectangular) mapped‑area boundary, nor truncation caused by cloud cover, image saturation, or other non‑geometric data‑quality limitations.</td></tr>
                     <tr><td>No circular‑statistics correction</td><td>Segment‑angle statistics are computed on the linear (folded) 0–180° domain; near‑boundary orientation populations should be cross‑checked against the Rose Plot tab.</td></tr>
-                    <tr><td>Single third‑attribute colouring</td><td>"Colour points by" supports only one attribute at a time and does not support multivariate (e.g. size‑and‑colour combined) encodings beyond marker colour.</td></tr>
-                    <tr><td>Orientation‑only Excel/CSV data</td><td>Legacy fracture‑plane or Trend/Plunge pole formats with no true spatial coordinates can supply Length and Aperture only when those optional columns are present in the source spreadsheet; when absent, the corresponding statistics and Cross Plot axes show no valid data.</td></tr>
                 </table>
 
                 <!-- ================================================= -->

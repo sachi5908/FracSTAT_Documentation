@@ -218,16 +218,16 @@
                     <tr><th>Control</th><th>Widget</th><th>Variable</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Estimated Intensity, P21 / Estimated Density, P20</td><td>Radio button pair</td><td><code>plot_mode_var</code></td><td>"P21"</td><td>Selects which of the two Mauldon estimators (intensity or density) is displayed as the coloured grid/contour surface and reported as the map title / colour‑bar label.</td></tr>
                     <tr><td>Grid Heatmap / Contour (Filled) / Contour (Lines Only)</td><td>Radio button trio</td><td><code>plot_style_var</code></td><td>"Heatmap"</td><td>Chooses the rendering style: a discrete pcolormesh grid of scan‑circle values, a smoothly interpolated/kriged filled contour, or contour lines only (no fill).</td></tr>
-                    <tr><td>Contour Levels</td><td>Text entry</td><td><code>contour_levels_var</code></td><td>"15"</td><td>Number of contour bands (integer) used for both the Matplotlib MaxNLocator tick calculation and, if a non‑integer step value is supplied, a fixed contour interval in data units (see §6.4).</td></tr>
+                    <tr><td>Contour Levels</td><td>Text entry</td><td><code>contour_levels_var</code></td><td>"15"</td><td>Number of contour bands (integer) used for both the Matplotlib MaxNLocator tick calculation and, if a non‑integer step value is supplied, a fixed contour interval in data units (see <a class="sec-ref" href="#sec-6-4">6.4</a>).</td></tr>
                     <tr><td>Flip X axis / Flip Y axis</td><td>Checkboxes</td><td><code>flip_x_var</code> / <code>flip_y_var</code></td><td>False / False</td><td>Calls <code>ax.invert_xaxis()</code> / <code>ax.invert_yaxis()</code> after the axis limits are set, mirroring the map about the corresponding axis for display purposes only (does not alter underlying geometry).</td></tr>
                     <tr><td>Show scan circles</td><td>Checkbox</td><td><code>show_circles_var</code></td><td>False</td><td>Overlays every individual scan‑circle boundary (unfilled, thin red outline) on the plot so the user can visually verify grid coverage and circle radius relative to fracture spacing.</td></tr>
-                    <tr><td>Number of scan circles</td><td>Text entry</td><td><code>num_circles_var</code></td><td>"12"</td><td>Target circle count along the shorter map dimension; the algorithm (§6.1) derives the full 2‑D grid layout, spacing, and radius from this single value.</td></tr>
+                    <tr><td>Number of scan circles</td><td>Text entry</td><td><code>num_circles_var</code></td><td>"12"</td><td>Target circle count along the shorter map dimension; the algorithm (<a class="sec-ref" href="#sec-6-1">6.1</a>) derives the full 2‑D grid layout, spacing, and radius from this single value.</td></tr>
                     <tr><td>Show fracture traces (Map)</td><td>Checkbox</td><td><code>show_map_var</code></td><td>True</td><td>Toggles the LineCollection overlay of the raw fracture segments on top of (or below) the intensity/density surface.</td></tr>
-                    <tr><td>Traces above Grid / Grid above Traces</td><td>Radio button pair</td><td><code>layer_order_var</code></td><td>"traces_top"</td><td>Sets the Z‑order and, correspondingly, which layer receives the partial‑opacity blend from the slider below (see §4.1.1).</td></tr>
+                    <tr><td>Traces above Grid / Grid above Traces</td><td>Radio button pair</td><td><code>layer_order_var</code></td><td>"traces_top"</td><td>Sets the Z‑order and, correspondingly, which layer receives the partial‑opacity blend from the slider below (see <a class="sec-ref" href="#sec-4-1-1">4.1.1</a>).</td></tr>
                     <tr><td>Upper layer opacity</td><td>Slider (0.1–1.0)</td><td><code>top_opacity_var</code></td><td>0.8</td><td>Alpha applied to whichever layer (traces or grid) is currently on top per Layer stacking order; the lower layer remains fully opaque. Debounced via a 100&nbsp;ms Tk <code>after()</code> timer to avoid re‑triggering the (potentially expensive) kriging step on every pixel of slider drag.</td></tr>
                 </table>
 
-                <h4>4.1.1 Layer Stacking and Opacity Logic</h4>
+                <h4 id="sec-4-1-1">4.1.1 Layer Stacking and Opacity Logic</h4>
                 <p>
                     The two overlay layers — the coloured intensity/density surface ("grid") and the fracture‑trace
                     LineCollection ("traces") — are drawn with fractional Matplotlib z‑order values (1.5 and 2.5, or
@@ -285,7 +285,7 @@
                 <h3>4.5 Global Results Card (Read‑Only)</h3>
                 <table>
                     <tr><th>Field</th><th>Meaning</th></tr>
-                    <tr><td>Grid Layout (X x Y)</td><td>The resolved scan‑circle grid dimensions, xNumCircle × yNumCircle, after the packing algorithm in §6.1 has run.</td></tr>
+                    <tr><td>Grid Layout (X x Y)</td><td>The resolved scan‑circle grid dimensions, xNumCircle × yNumCircle, after the packing algorithm in <a class="sec-ref" href="#sec-6-1">6.1</a> has run.</td></tr>
                     <tr><td>Total Scan Circles</td><td>xNumCircle × yNumCircle, the total number of circular sampling windows used.</td></tr>
                     <tr><td>Global Intensity (P21)</td><td>The single scalar network‑wide intensity, total fracture length divided by mapped area, with a unit⁻¹ superscript matching the active display unit.</td></tr>
                     <tr><td>Global Density (P20)</td><td>The single scalar network‑wide density, fracture‑segment count divided by mapped area, with a unit⁻² superscript.</td></tr>
@@ -314,7 +314,7 @@
                     <tr><td>A_map</td><td>Bounding‑box area of the mapped dataset, (x_max−x_min)×(y_max−y_min).</td><td>[length]²</td></tr>
                 </table>
 
-                <h3>5.2 Circle‑Based P21 (Intensity) Estimator</h3>
+                <h3 id="sec-5-2">5.2 Circle‑Based P21 (Intensity) Estimator</h3>
                 <p>For a single scan circle of radius r, the Mauldon circular‑scanline estimator of areal fracture intensity is:</p>
                 <div class="formula-block">I  =  N / (4 r)</div>
                 <p>
@@ -323,10 +323,10 @@
                     total trace length enclosed, and holds regardless of the internal orientation distribution of
                     the fractures — which is precisely why the method is orientation‑unbiased. In the
                     implementation, N corresponds to <code>N_circle</code>, the count of valid line‑segment/circle‑boundary
-                    root crossings (§6.2), and I corresponds to one entry of the <code>I_grid</code> array.
+                    root crossings (<a class="sec-ref" href="#sec-6-2">6.2</a>), and I corresponds to one entry of the <code>I_grid</code> array.
                 </p>
 
-                <h3>5.3 Circle‑Based P20 (Density) Estimator</h3>
+                <h3 id="sec-5-3">5.3 Circle‑Based P20 (Density) Estimator</h3>
                 <p>The corresponding density estimator, based on counting fracture centers (approximated here by fracture‑segment endpoints falling inside the circle) is:</p>
                 <div class="formula-block">D  =  M / (π r²)</div>
                 <p>
@@ -338,7 +338,7 @@
                     segments are not truncated at the circle boundary.
                 </p>
 
-                <h3>5.4 Global (Network‑Wide) Statistics</h3>
+                <h3 id="sec-5-4">5.4 Global (Network‑Wide) Statistics</h3>
                 <p>
                     In addition to the spatially resolved <code>I_grid</code>/<code>D_grid</code> arrays, the tab
                     reports two single‑value statistics computed directly from the full dataset rather than by
@@ -353,7 +353,7 @@ P20_global  =  n_segments / A_map</div>
                     entire bounding box of the dataset, and are what is displayed in the Global Results card.
                 </p>
 
-                <h3>5.5 Scan‑Circle Packing Geometry</h3>
+                <h3 id="sec-5-5">5.5 Scan‑Circle Packing Geometry</h3>
                 <p>
                     Given a user‑specified target circle count n (<code>num_circles_var</code>) and the data's
                     bounding‑box dimensions Δx&nbsp;=&nbsp;x_max−x_min and Δy&nbsp;=&nbsp;y_max−y_min, the algorithm
@@ -390,17 +390,17 @@ y_j  =  y_min + j × Δy_circle ,   j = 1 … yNumCircle</div>
                     section walks through that pipeline in the sequence it executes.
                 </p>
 
-                <h3>6.1 Step 1 — Validation and Grid Layout</h3>
+                <h3 id="sec-6-1">6.1 Step 1 — Validation and Grid Layout</h3>
                 <ol class="step-list">
                     <li>Verify <code>self.results</code> is non‑empty and, if the data source is Excel, that the segments carry real spatial geometry (not orientation‑only preset strike/dip data).</li>
                     <li>Verify the four required columns (X1, Y1, X2, Y2, Length_m) are present.</li>
                     <li>Parse <code>num_circles_var</code> and <code>contour_levels_var</code> from their text fields, applying documented fallback defaults (12 and 15 respectively) on parse failure, and writing the corrected/parsed value back into the StringVar so the sidebar reflects what was actually used.</li>
                     <li>Compute the dataset bounding box (xMin, xMax, yMin, yMax) from the min/max of both endpoint columns, and derive Δx, Δy (mapArea = Δx × Δy).</li>
-                    <li>Apply the packing geometry of §5.5 to obtain xNumCircle, yNumCircle, rCircle, and the two per‑axis centre‑spacing increments, clamping both circle counts to a minimum of 1.</li>
+                    <li>Apply the packing geometry of <a class="sec-ref" href="#sec-5-5">5.5</a> to obtain xNumCircle, yNumCircle, rCircle, and the two per‑axis centre‑spacing increments, clamping both circle counts to a minimum of 1.</li>
                     <li>Build the 1‑D centre coordinate arrays x_centers, y_centers and combine them into a 2‑D meshgrid (CX, CY), which is then flattened to CX_flat, CY_flat for the vectorised intersection step.</li>
                 </ol>
 
-                <h3>6.2 Step 2 — Vectorised Line‑Circle Intersection Test</h3>
+                <h3 id="sec-6-2">6.2 Step 2 — Vectorised Line‑Circle Intersection Test</h3>
                 <p>
                     Rather than looping over every (segment, circle) pair in Python, the module builds two
                     broadcastable NumPy arrays — one of shape (n_segments, 1) for the segment endpoints and one of
@@ -435,20 +435,20 @@ t1,2 = (−b ∓ √Δ) / (2a)</div>
                 <p>
                     Both <code>N_circle</code> and <code>M_circle</code> are reshaped from a flat (n_circles,)
                     vector back into the 2‑D (yNumCircle, xNumCircle) grid shape matching CX, CY, so that
-                    <code>I_grid</code> and <code>D_grid</code> (per §5.2–§5.3) can be plotted directly with
+                    <code>I_grid</code> and <code>D_grid</code> (per <a class="sec-ref" href="#sec-5-2">5.2</a>–<a class="sec-ref" href="#sec-5-3">5.3</a>) can be plotted directly with
                     <code>pcolormesh</code> or used as scattered input to the kriging/interpolation step.
                 </p>
 
                 <h3>6.3 Step 3 — Global Statistics and Sidebar Update</h3>
                 <p>
                     <code>total_length = Σ(Length_m)</code>, mapArea, global_P21, and global_P20 are computed per
-                    §5.4 and pushed into the four Global Results labels, alongside the resolved grid layout
+                    <a class="sec-ref" href="#sec-5-4">5.4</a> and pushed into the four Global Results labels, alongside the resolved grid layout
                     (xNumCircle × yNumCircle) and total scan‑circle count. The unit suffix (m, cm, mm, or km) is
                     read live from the shared <code>_static_map_unit_var</code> so the displayed units always track
                     the workspace's current display unit.
                 </p>
 
-                <h3>6.4 Step 4 — Rendering Dispatch</h3>
+                <h3 id="sec-6-4">6.4 Step 4 — Rendering Dispatch</h3>
                 <p>Based on <code>plot_style_var</code>, one of three rendering branches executes:</p>
 
                 <h4>6.4.1 Heatmap</h4>
@@ -492,13 +492,13 @@ t1,2 = (−b ∓ √Δ) / (2a)</div>
                     After the primary surface is drawn, the module conditionally adds: the fracture‑trace
                     LineCollection (if Show fracture traces is checked), the individual scan‑circle outlines (if
                     Show scan circles is checked), and the background photograph (if enabled), respecting the
-                    z‑order/opacity rules of §4.1.1. Axis limits are padded by 5% of each dimension, aspect is
+                    z‑order/opacity rules of <a class="sec-ref" href="#sec-4-1-1">4.1.1</a>. Axis limits are padded by 5% of each dimension, aspect is
                     fixed to 'equal', axis flips are applied, grid lines and border/spine styling are applied from
                     the Map Elements card, and finally <code>fig.tight_layout()</code> and
                     <code>canvas.draw_idle()</code> commit the frame.
                 </p>
 
-                <h3>6.6 Caching and Performance Optimisation</h3>
+                <h3 id="sec-6-6">6.6 Caching and Performance Optimisation</h3>
                 <p>
                     Kriging (and, to a lesser extent, cubic griddata interpolation) is computationally the most
                     expensive step in the pipeline, particularly for large scan‑circle grids. To avoid re‑running it
@@ -518,7 +518,7 @@ t1,2 = (−b ∓ √Δ) / (2a)</div>
                     <code>_draw_trace_intensity()</code>.
                 </p>
                 <p>
-                    The core intersection test itself (§6.2) is implemented purely with NumPy array broadcasting
+                    The core intersection test itself (<a class="sec-ref" href="#sec-6-2">6.2</a>) is implemented purely with NumPy array broadcasting
                     rather than nested Python loops, so its cost scales as O(n_segments × n_circles) in vectorised
                     array operations rather than in interpreted Python iterations — a substantial performance
                     benefit for networks with hundreds to thousands of segments sampled by tens of circles.
@@ -531,7 +531,7 @@ t1,2 = (−b ∓ √Δ) / (2a)</div>
                 <p>
                     The tab distinguishes between two distinct statistical operations: (1) unbiased point
                     estimation of P21/P20 at each discrete scan‑circle location using the Mauldon estimators of
-                    §5.2–§5.3, and (2) spatial interpolation between those discrete point estimates for
+                    <a class="sec-ref" href="#sec-5-2">5.2</a>–<a class="sec-ref" href="#sec-5-3">5.3</a>, and (2) spatial interpolation between those discrete point estimates for
                     continuous‑surface visualization (heatmap cell shading is a nearest‑value/no‑interpolation
                     display of the raw grid, whereas the contour styles interpolate). Users should be aware that the
                     interpolated contour surface between scan‑circle centres is a smoothed visual aid, not itself a
@@ -539,7 +539,7 @@ t1,2 = (−b ∓ √Δ) / (2a)</div>
                     only at the discrete circle centres.
                 </p>
 
-                <h3>7.2 Ordinary Kriging</h3>
+                <h3 id="sec-7-2">7.2 Ordinary Kriging</h3>
                 <p>
                     When available, Ordinary Kriging is used for its property of exact interpolation at data points
                     combined with a principled treatment of spatial autocorrelation via the fitted linear variogram
@@ -668,8 +668,8 @@ t1,2 = (−b ∓ √Δ) / (2a)</div>
                 </p>
                 <table>
                     <tr><th>Technique</th><th>Where Applied</th><th>Benefit</th></tr>
-                    <tr><td>Full vectorisation (NumPy broadcasting)</td><td>Line/circle intersection test (§6.2)</td><td>Avoids an explicit Python double loop over every (segment, circle) pair; scales efficiently to networks with thousands of segments.</td></tr>
-                    <tr><td>Single‑entry kriging/interpolation cache</td><td>Contour rendering branch (§6.6)</td><td>Skips the most computationally expensive step (kriging or cubic griddata) whenever only cosmetic settings (colour, title, borders, etc.) have changed.</td></tr>
+                    <tr><td>Full vectorisation (NumPy broadcasting)</td><td>Line/circle intersection test (<a class="sec-ref" href="#sec-6-2">6.2</a>)</td><td>Avoids an explicit Python double loop over every (segment, circle) pair; scales efficiently to networks with thousands of segments.</td></tr>
+                    <tr><td>Single‑entry kriging/interpolation cache</td><td>Contour rendering branch (<a class="sec-ref" href="#sec-6-6">6.6</a>)</td><td>Skips the most computationally expensive step (kriging or cubic griddata) whenever only cosmetic settings (colour, title, borders, etc.) have changed.</td></tr>
                     <tr><td>Debounced opacity slider</td><td>Layer opacity control</td><td>Prevents dozens of redundant full redraws (including potential re‑kriging) while a slider is actively being dragged; only the settled value triggers computation.</td></tr>
                     <tr><td>Colormap‑name resolution caching</td><td><code>_resolve_cmap()</code> / <code>_cmap_resolved</code></td><td>Avoids repeated dynamic imports and string‑matching lookups of the active colormap on every redraw once the dropdown has fired once.</td></tr>
                     <tr><td>Masked‑array rendering</td><td>Heatmap style</td><td><code>np.ma.masked_where()</code> lets Matplotlib skip drawing (and colour‑mapping) cells with no data, reducing rendering overhead and avoiding a misleading colour for zero‑intensity cells.</td></tr>
@@ -750,11 +750,8 @@ t1,2 = (−b ∓ √Δ) / (2a)</div>
                 <table>
                     <tr><th>Limitation</th><th>Description</th></tr>
                     <tr><td>Endpoint‑based P20 proxy</td><td>The P20 estimator implemented here counts fracture‑segment endpoints falling inside each scan circle as a proxy for fracture centers; for very short segments relative to the circle radius, or for fracture traces that were digitised as multiple connected sub‑segments (rather than one segment per physical fracture), this can differ from a strict fracture‑center count and should be interpreted with care.</td></tr>
-                    <tr><td>Fixed variogram model</td><td>The fixed linear‑variogram kriging model (§7.2) is not adaptively fit to each dataset's own spatial autocorrelation structure; it functions as a general‑purpose smoothing interpolator rather than a geostatistically optimal predictor for every possible fracture network.</td></tr>
+                    <tr><td>Fixed variogram model</td><td>The fixed linear‑variogram kriging model (<a class="sec-ref" href="#sec-7-2">7.2</a>) is not adaptively fit to each dataset's own spatial autocorrelation structure; it functions as a general‑purpose smoothing interpolator rather than a geostatistically optimal predictor for every possible fracture network.</td></tr>
                     <tr><td>Indirect grid resolution control</td><td>Grid resolution is controlled indirectly, via the Number of scan circles field, which sets circle count along the shorter map dimension only — very elongated (high aspect‑ratio) datasets may produce an uneven number of circles along the two axes.</td></tr>
-                    <tr><td>2‑D only</td><td>The tab operates strictly on 2‑D trace‑map geometry; no 3‑D fracture‑intensity (P32) conversion, borehole scanline correction, or subsurface/depth information is incorporated.</td></tr>
-                    <tr><td>No orientation‑only support</td><td>Orientation‑only Excel/CSV data (legacy Strike/Dip tables or Trend/Plunge pole files with no real spatial coordinates) cannot be analysed on this tab by design, since circular scanline sampling has no meaning without real X/Y geometry.</td></tr>
-                    <tr><td>First‑redraw cost</td><td>Very large fracture datasets combined with a high scan‑circle count can produce a noticeably slower first redraw (particularly with kriging enabled) before the caching mechanism of §6.6 becomes effective on subsequent cosmetic‑only redraws.</td></tr>
                 </table>
 
                 <!-- ================================================= -->

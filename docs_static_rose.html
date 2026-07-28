@@ -700,13 +700,7 @@ strike_mean = ½ · atan2(S, C)  (mod 180°)</div>
                 <h2 id="limitations">12. Limitations</h2>
                 <table>
                     <tr><th>Limitation</th><th>Description</th></tr>
-                    <tr><td>Axial data only</td><td>The module treats fracture strike strictly as axial (180°-periodic) data. It cannot represent or distinguish directional (0°–360°, polarity-sensitive) information such as dip direction or fault polarity. Users requiring dip-direction-sensitive visualisation should consult the Static Stereonet tab.</td></tr>
                     <tr><td>Dominant bin sensitivity</td><td>The Dominant Bin statistic is a discretised estimate dependent on the chosen Number of bins and on the fixed bin-edge alignment starting at 0°. It is not a continuous-distribution mode estimate (e.g. from kernel density estimation) and can shift between adjacent bins for small changes in bin count on noisy or sparse datasets.</td></tr>
-                    <tr><td>No circular dispersion measures</td><td>No formal circular-statistics dispersion measure (e.g. circular variance, Rayleigh test for uniformity, von Mises concentration parameter) is computed or reported. Only the first-order mean direction and modal bin are provided.</td></tr>
-                    <tr><td>Fixed percentage circle spacing</td><td>The percentage reference circles are calibrated to simple thirds of the maximum plotted radius and are not adjustable in count or fractional spacing through the current interface.</td></tr>
-                    <tr><td>Narrow-range colour contrast</td><td>Colour mapping in FracSTAT mode uses a fixed 0°–180° normalisation. Datasets whose entire fabric is confined to a narrow angular range will be rendered across only a narrow slice of the chosen colormap, which can reduce visual contrast between adjacent bins.</td></tr>
-                    <tr><td>No Terzaghi correction</td><td>The module performs no automatic sampling-bias correction (e.g. Terzaghi weighting for scan-line orientation bias). Any such correction must be performed upstream, prior to import, if required.</td></tr>
-                    <tr><td>Main-thread rendering</td><td>All rendering runs on the main UI thread since Matplotlib's TkAgg backend is not safe to drive concurrently. For very large datasets the redraw cost is bounded by Matplotlib's polar bar-collection rendering performance rather than by the NumPy histogram step.</td></tr>
                 </table>
 
                 <!-- Pagination Navigation -->

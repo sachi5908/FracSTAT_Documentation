@@ -803,10 +803,8 @@ P20 = N_end / (2πr)</div>
                 <h2 id="limitations">15. Limitations</h2>
                 <table>
                     <tr><th>Limitation</th><th>Description</th></tr>
-                    <tr><td>Spatial data only</td><td>The module operates only on genuinely spatial data (SVG traces, or Excel/CSV files carrying real X1/Y1/X2/Y2 coordinates); orientation-only spreadsheet formats (legacy Strike/Dip fracture-plane tables, Trend/Plunge pole tables) cannot be profiled, since they carry no real map position.</td></tr>
                     <tr><td>Unvectorised circular-scan loop</td><td>The circular-scan intensity/density computation is an unvectorised, per-segment Python loop and therefore does not scale as efficiently as the equivalent grid-based Mauldon calculation in the dedicated Intensity &amp; Density tab; very large datasets combined with a high scan-circle count may notice a perceptible delay.</td></tr>
                     <tr><td>Infinite-line "distance from"</td><td>The "distance from" calculation treats the reference line as infinite in both directions, so points far outside the finite segment between the two chosen endpoints still contribute a perpendicular-distance value; this is by design (consistent with treating the line as an axis of reference) but should not be mistaken for a bounded corridor sample.</td></tr>
-                    <tr><td>No formal statistical inference</td><td>No confidence intervals, uncertainty bounds, or theoretical-distribution fitting are provided for any series in this module; all outputs are raw or directly derived geometric measurements. Users requiring rigorous statistical inference on length or intensity distributions should additionally consult the CDF tab's maximum-likelihood fitting tools.</td></tr>
                     <tr><td>Planar assumption</td><td>The module assumes a two-dimensional, effectively planar fracture-trace map; no correction is applied for outcrop-surface curvature, oblique viewing angle, or true 3-D fracture orientation beyond what is already encoded in the loaded strike values.</td></tr>
                 </table>
 

@@ -842,10 +842,7 @@ row_cells[1].text = clean_val</code></pre>
                 <table>
                     <tr><th>Limitation</th><th>Description</th></tr>
                     <tr><td>No independent CDF computation</td><td>The Results tab performs no independent statistical computation for the CDF distribution-fitting section; it is entirely dependent on the CDF tab having been visited (so that its fit cache is populated) at least once during the current session. If no CDF fit has ever been run, the five per-distribution cards remain blank (em-dash placeholders).</td></tr>
-                    <tr><td>No row cap on raw data</td><td>The raw-data table and all raw-data exports are not row-capped, unlike some other FracSTAT tables; extremely large fracture networks (tens of thousands of segments) may take a perceptible amount of time to populate and scroll smoothly.</td></tr>
                     <tr><td>Mode estimates are bin-count sensitive</td><td>Histogram-derived mode estimates (Section 6.1) are sensitive to the chosen bin count; because that bin count is shared with the Histogram tab's own control, changing it there will change the reported Mode values here on the next refresh, which is expected behaviour but can surprise users unaware of the shared setting.</td></tr>
-                    <tr><td>Single active dataset</td><td>The module assumes a single, currently active fracture-network dataset; it has no facility for comparing or exporting statistics across multiple loaded projects simultaneously.</td></tr>
-                    <tr><td>No intensity/density for geographic data</td><td>Geographic (Lat/Lon, focal-mechanism) datasets do not populate the Map Area, Scan Circle Radius, or P21/P20 fields, since circular-scanline intensity/density estimation is only meaningful for planar, metrically-scaled trace geometry.</td></tr>
                 </table>
 
                 <!-- ================================================= -->

@@ -188,7 +188,7 @@
                     Unless stated otherwise, every control triggers an immediate redraw. Controls that would
                     trigger an expensive maximum‑likelihood refit are explicitly flagged, since the module
                     distinguishes <em>style‑only</em> redraws from <em>heavy</em> redraws for performance reasons
-                    (see Section 10).
+                    (see <a href="#performance">Section 10</a>).
                 </p>
 
                 <h3>3.1 Data &amp; Plot Settings</h3>
@@ -293,7 +293,7 @@
                     <tr><td>Kurtosis</td><td>Adjusted excess kurtosis, requires n ≥ 8</td><td>Tail heaviness relative to a normal distribution</td></tr>
                 </table>
 
-                <h3>4.2 Empirical Cumulative Functions</h3>
+                <h3 id="empirical-cumulative-functions">4.2 Empirical Cumulative Functions</h3>
                 <p>For the sorted sample, rank rᵢ = n − i + 1 (i.e. Lᵢ is exceeded by n − i observations). Three empirical curves are available:</p>
                 <div class="formula-block">
 C(x)  = number of observations ≥ x              (Cumulative Frequency)
@@ -363,7 +363,7 @@ P(L > x) = (x / x_min)^(−α + 1)</div>
                 <ol class="step-list">
                     <li>Extract the selected length column (segment or trace) from the current results table.</li>
                     <li>Discard non‑finite and non‑positive values; sort the remainder ascending.</li>
-                    <li>Compute rank‑based frequency/CDF/CCDF arrays as defined in Section 4.2.</li>
+                    <li>Compute rank‑based frequency/CDF/CCDF arrays as defined in <a href="#empirical-cumulative-functions">Section 4.2</a>.</li>
                     <li>Plot the requested representation, applying the chosen axis‑scaling transform.</li>
                 </ol>
 
@@ -432,7 +432,7 @@ for model_name in ALL_MODELS:
                     <li>Repeat n_boot times; report the percentile interval at the requested confidence level for every parameter.</li>
                 </ol>
 
-                <h4>5.4.2 Parametric Bootstrap GOF p‑value</h4>
+                <h4 id="parametric-bootstrap-gof">5.4.2 Parametric Bootstrap GOF p‑value</h4>
                 <p>
                     A conventional (asymptotic) KS p‑value assumes the theoretical CDF was specified in advance
                     of seeing the data, which is not true here. The module therefore computes a refit‑based,
@@ -443,7 +443,7 @@ for model_name in ALL_MODELS:
                     add‑one Laplace smoothing to avoid an impossible p = 0 from a finite simulation).
                 </p>
 
-                <h3>5.5 Interactive x_min Picking</h3>
+                <h3 id="interactive-xmin-picking">5.5 Interactive x_min Picking</h3>
                 <p>
                     When mouse‑picking mode is enabled, the next left‑click registered inside the plot axes is
                     intercepted: its data‑space x‑coordinate is written into the Manual x_min field (to four
@@ -461,7 +461,7 @@ for model_name in ALL_MODELS:
                     <tr><td>KS stat (powerlaw)</td><td>The <code>powerlaw</code> library's internal D statistic, used during x_min selection</td><td>Internal diagnostic consistent with the library's x_min search; primarily useful for comparing candidate x_min values against each other.</td></tr>
                     <tr><td>KS statistic (SciPy)</td><td><code>scipy.stats.ks_1samp</code> against the fitted CDF</td><td>Independently computed, standard one‑sample KS statistic; used as the basis for all AIC/BIC/LRT model ranking in this module.</td></tr>
                     <tr><td>KS p‑value (SciPy asymptotic)</td><td><code>scipy.stats.ks_1samp</code> two‑sided p‑value</td><td>The classical asymptotic p‑value. Reported for reference but is descriptive only, since it does not account for x_min and parameter estimation from the same sample.</td></tr>
-                    <tr><td>GOF p‑value (bootstrap, refit KS)</td><td>Section 5.4.2 parametric bootstrap</td><td>The statistically appropriate goodness‑of‑fit p‑value for an estimated model; requires the Bootstrap CI &amp; GOF card to be run.</td></tr>
+                    <tr><td>GOF p‑value (bootstrap, refit KS)</td><td><a href="#parametric-bootstrap-gof">Section 5.4.2</a> parametric bootstrap</td><td>The statistically appropriate goodness‑of‑fit p‑value for an estimated model; requires the Bootstrap CI &amp; GOF card to be run.</td></tr>
                 </table>
 
                 <div class="note-box">
@@ -731,7 +731,7 @@ band = [ F̂(x) − ε,  F̂(x) + ε ]  clipped to [0, 1]</div>
                 <p>
                     The "Click to Set Fit x_min on Plot" feature turns the fitting cutoff into a directly
                     manipulable, visual parameter rather than a number the analyst must estimate by trial and
-                    error in the sidebar entry field (see Section 5.5 for the full algorithm).
+                    error in the sidebar entry field (see <a href="#interactive-xmin-picking">Section 5.5</a> for the full algorithm).
                 </p>
 
                 <h3>11.4 Draggable Legend and Equation</h3>
@@ -765,13 +765,10 @@ band = [ F̂(x) − ε,  F̂(x) + ε ]  clipped to [0, 1]</div>
                 <h2 id="limitations">12. Limitations</h2>
                 <table>
                     <tr><th>Limitation</th><th>Description</th></tr>
-                    <tr><td>One‑dimensional analysis only</td><td>The module analyses length statistics only; it does not account for spatial clustering, orientation bias, or network connectivity, all of which materially affect the true, unbiased fracture‑size distribution. These are addressed by the Connectivity, Rose Plot, Stereonet, and Intensity &amp; Density tabs.</td></tr>
-                    <tr><td>Asymptotic KS p‑value validity</td><td>The asymptotic SciPy KS p‑value is not statistically valid on its own once x_min and model parameters have been estimated from the same data. Only the bootstrap‑based GOF p‑value (Section 5.4.2) is methodologically appropriate, and it must be computed explicitly.</td></tr>
+                    <tr><td>Asymptotic KS p‑value validity</td><td>The asymptotic SciPy KS p‑value is not statistically valid on its own once x_min and model parameters have been estimated from the same data. Only the bootstrap‑based GOF p‑value (<a href="#parametric-bootstrap-gof">Section 5.4.2</a>) is methodologically appropriate, and it must be computed explicitly.</td></tr>
                     <tr><td>Default bootstrap resample count</td><td>The default of 10 resamples gives unstable confidence intervals and GOF p‑values, chosen for responsiveness during exploratory analysis. This should be increased substantially (200–1000) before any value is quoted in a final report.</td></tr>
-                    <tr><td>Truncated Power‑law numerical integration speed</td><td>The manual‑override's numerical integration of the constrained density can be slower than the unconstrained MLE fit for very large tail samples, since it performs numerical quadrature at every evaluated point of the fitted curve.</td></tr>
                     <tr><td>Censoring not auto‑detected</td><td>Censoring caused by finite outcrop, map, or image extent is not automatically detected or corrected. Users working with edge‑truncated data should consult the Histogram tab's edge‑censoring option before drawing scaling conclusions.</td></tr>
                     <tr><td>Digitisation artefacts</td><td>The module assumes the supplied length column already reflects the desired physical population. It does not itself distinguish artefacts of digitisation (e.g. an SVG curve tessellated into many short straight segments) from genuinely short natural fractures; the Curve Step setting on the Fracture Map sidebar controls this trade‑off upstream.</td></tr>
-                    <tr><td>Session‑local configuration</td><td>The CDF tab's configuration (fit model, bootstrap settings, styling) is session‑local and is not currently part of the project's saved‑session JSON file; reopening a project returns the CDF tab's controls to their defaults.</td></tr>
                     <tr><td>Main‑thread bootstrapping</td><td>All fitting and bootstrap computation runs on the main UI thread rather than a background worker thread, since matplotlib's TkAgg backend is not safe to drive concurrently from a worker thread. Very large bootstrap runs will therefore block interaction with the rest of the application until they complete.</td></tr>
                 </table>
 

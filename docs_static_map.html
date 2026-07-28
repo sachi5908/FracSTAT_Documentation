@@ -61,7 +61,7 @@
                         <li><a href="#topology">9. Fracture topology &amp; node counts</a></li>
                         <li><a href="#reading-map">10. Reading the map geologically</a></li>
                         <li><a href="#exporting">11. Exporting a figure</a></li>
-                        <li><a href="#pitfalls">12. Common pitfalls</a></li>
+                        <li><a href="#limitations">12. Limitations</a></li>
                         <li><a href="#workflow">13. Step‑by‑step example workflow</a></li>
                         <li><a href="#advanced">14. Advanced &amp; related capabilities</a></li>
                     </ul>
@@ -672,28 +672,12 @@ y_rot = x' · sin(θ) + y' · cos(θ)
                 </div>
 
                 <!-- ================================================= -->
-                <h2 id="pitfalls">12. Common Pitfalls</h2>
+                <h2 id="limitations">12. Limitations</h2>
                 <table>
-                    <tr><th>Pitfall</th><th>Description</th><th>How to avoid it</th></tr>
-                    <tr>
-                        <td>Scale dependence</td>
-                        <td>Patterns seen at outcrop scale may not represent patterns at reservoir or field scale.</td>
-                        <td>Document your scan/profile dimensions and compare with the expected fracture spacing; digitize multiple scales if possible.</td>
-                    </tr>
-                    <tr>
-                        <td>Wrong "Reverse Y" or north azimuth</td>
-                        <td>Strikes will be systematically off if the Y‑axis‑from‑North value or Reverse‑Y setting doesn't match how the source image/photo was oriented.</td>
-                        <td>Double‑check the photo's compass orientation before digitizing, and set the north azimuth accordingly.</td>
-                    </tr>
+                    <tr><th>Limitation</th><th>Description</th></tr>
                     <tr>
                         <td>Resolution truncation</td>
                         <td>Very short fractures, below the digitizing pixel resolution, are systematically missed or over‑represented as noise.</td>
-                        <td>Digitize at adequate zoom, and treat very short segments in the Histogram tab with appropriate scepticism.</td>
-                    </tr>
-                    <tr>
-                        <td>Mixing profile units</td>
-                        <td>Switching display units without checking the converted profile width/length can silently change your calibration.</td>
-                        <td>After switching units, glance at the Summary tiles to confirm the total length looks sensible.</td>
                     </tr>
                 </table>
 
