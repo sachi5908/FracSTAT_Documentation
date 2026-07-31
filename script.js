@@ -57,7 +57,28 @@ const SIDEBAR_SECTIONS = [
             { href: "docs_uncertainty_lhs.html", label: "LHS Tab" },
             { href: "docs_uncertainty_pce.html", label: "PCE Tab" }
         ]
+    },
+    {
+        title: "Video Tutorials",
+        href: "tutorial.html",
+        isButton: true
     }
+];
+
+// ---------------------------------------------------------
+// Small-text footer links shown at the very bottom of the sidebar,
+// below every collapsible section — Privacy Policy, License,
+// Disclaimer, Contact. These are deliberately NOT an accordion
+// section: they're rendered as a single row of small, plain-text
+// links (see renderSidebar()'s footer block below and the
+// .sidebar-footer-links rules in style.css).
+// ---------------------------------------------------------
+const SIDEBAR_FOOTER_LINKS = [
+    { href: "privacy-policy.html", label: "Privacy Policy" },
+    { href: "license.html", label: "License" },
+    { href: "disclaimer.html", label: "Disclaimer" },
+    { href: "contact.html", label: "Contact" },
+    { href: "terms-of-use.html", label: "Terms of Use" }
 ];
 
 const CHEVRON_SVG = '<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>';
@@ -68,7 +89,23 @@ function renderSidebar() {
 
     const currentPage = window.location.pathname.split("/").pop() || "introduction.html";
 
-    sidebar.innerHTML = SIDEBAR_SECTIONS.map(section => {
+    const sectionsHtml = SIDEBAR_SECTIONS.map(section => {
+        // Standalone button-style entry — no dropdown, no sub-links,
+        // just a direct link styled as a button (e.g. Video Tutorials).
+        if (section.isButton) {
+            const activeCls = section.href === currentPage ? " active" : "";
+            return `
+                <div class="sidebar-section sidebar-section--button">
+                    <a href="${section.href}" class="sidebar-button-link${activeCls}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                            <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                        </svg>
+                        ${section.title}
+                    </a>
+                </div>`;
+        }
+
         const containsActive = section.links.some(l => l.href === currentPage);
         const linksHtml = section.links.map(l => {
             const activeCls = l.href === currentPage ? ' class="active"' : "";
@@ -84,6 +121,17 @@ function renderSidebar() {
                 <ul class="sidebar-links">${linksHtml}</ul>
             </div>`;
     }).join("");
+
+    // Small plain-text row (Privacy Policy · License · Disclaimer ·
+    // Contact) pinned to the bottom of the sidebar, below every
+    // collapsible section — not a section of its own.
+    const footerLinksHtml = SIDEBAR_FOOTER_LINKS.map(l => {
+        const activeCls = l.href === currentPage ? ' class="active"' : "";
+        return `<a href="${l.href}"${activeCls}>${l.label}</a>`;
+    }).join('<span class="sidebar-footer-sep" aria-hidden="true">&middot;</span>');
+
+    sidebar.innerHTML = sectionsHtml + `
+        <div class="sidebar-footer-links">${footerLinksHtml}</div>`;
 }
 
 // ---------------------------------------------------------
@@ -128,7 +176,15 @@ const PAGE_ORDER = [
 
     { href: "docs_uncertainty_montecarlo.html", label: "Uncertainty Monte Carlo Tab" },
     { href: "docs_uncertainty_lhs.html", label: "Uncertainty LHS Tab" },
-    { href: "docs_uncertainty_pce.html", label: "Uncertainty PCE Tab" }
+    { href: "docs_uncertainty_pce.html", label: "Uncertainty PCE Tab" },
+
+    { href: "tutorial.html", label: "Video Tutorials" },
+    
+    { href: "privacy-policy.html", label: "Privacy Policy" },
+    { href: "license.html", label: "License" },
+    { href: "disclaimer.html", label: "Disclaimer" },
+    { href: "contact.html", label: "Contact" },
+    { href: "terms-of-use.html", label: "Terms of Use" }
 ];
 
 function renderPaginationNav() {
@@ -172,6 +228,256 @@ function renderPaginationNav() {
     }
     nav.innerHTML = prevHtml + nextHtml;
 }
+// ============================================================
+//  Video Tutorials page (tutorial.html) — interactivity
+//  Extracted from tutorial.html's own inline <script> and moved here
+//  because the AJAX docs router (loadPage() below) only swaps
+//  .docs-content-inner's HTML between navigations; a page-specific
+//  <script> block sitting in tutorial.html's own body never re-runs
+//  after that kind of navigation, only on a hard page load/refresh.
+//  This function is called from initDynamicBehaviors() on every page
+//  load AND every AJAX-routed navigation, and guards itself so it is
+//  a harmless no-op on every other (non-tutorial) page.
+// ============================================================
+function initTutorialVideoPage() {
+    "use strict";
+
+    var videoGrid = document.getElementById("videoGrid");
+    if (!videoGrid) return; // not the tutorial page — nothing to do
+
+
+        // ---- 1. Generate a coloured placeholder thumbnail for cards
+        //         that don't supply a real thumb URL.
+        //         Draws a dark gradient + centred play icon on a canvas
+        //         and uses the result as the img src. ----
+        const PLACEHOLDER_PALETTES = [
+            ["#0f172a", "#1e3a8a"],
+            ["#0f172a", "#14532d"],
+            ["#0f172a", "#4c1d95"],
+            ["#1a1a2e", "#0d3b66"],
+            ["#1a0a0a", "#7f1d1d"],
+        ];
+
+        function makePlaceholder(index) {
+            const [c1, c2] = PLACEHOLDER_PALETTES[index % PLACEHOLDER_PALETTES.length];
+            const canvas = document.createElement("canvas");
+            canvas.width = 640;
+            canvas.height = 360;
+            const ctx = canvas.getContext("2d");
+            const grad = ctx.createLinearGradient(0, 0, 640, 360);
+            grad.addColorStop(0, c1);
+            grad.addColorStop(1, c2);
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 640, 360);
+            // Subtle grid
+            ctx.strokeStyle = "rgba(255,255,255,0.04)";
+            ctx.lineWidth = 1;
+            for (let x = 0; x < 640; x += 40) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 360); ctx.stroke();
+            }
+            for (let y = 0; y < 360; y += 40) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(640, y); ctx.stroke();
+            }
+            return canvas.toDataURL("image/png");
+        }
+
+        // ---- 2. Initialise each embed card ----
+        let cardIndex = 0;
+        document.querySelectorAll(".tut-embed-wrap").forEach(function (wrap) {
+            const thumbEl = wrap.querySelector(".tut-thumb");
+            let thumbSrc = wrap.dataset.thumb;
+            const videoSrc = wrap.dataset.src;
+            const dataSource = wrap.dataset.source;
+
+            // Auto-fetch YouTube thumbnail
+            if (!thumbSrc && dataSource === "youtube" && videoSrc) {
+                const match = videoSrc.match(/\/embed\/([^?]+)/);
+                if (match && match[1]) {
+                    const videoId = match[1];
+                    thumbSrc = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+                }
+            }
+            
+            // Auto-fetch Google Drive thumbnail
+            if (!thumbSrc && dataSource === "drive" && videoSrc) {
+                const match = videoSrc.match(/\/d\/([a-zA-Z0-9_-]+)/);
+                if (match && match[1]) {
+                    const driveId = match[1];
+                    thumbSrc = `https://drive.google.com/thumbnail?id=${driveId}&sz=w1280`;
+                }
+            }
+
+            // Supply a generated placeholder when no real thumbnail is given
+            if (!thumbSrc) {
+                thumbEl.src = makePlaceholder(cardIndex);
+                wrap.classList.add("img-loaded");
+            } else {
+                thumbEl.src = thumbSrc;
+                
+                thumbEl.addEventListener("load", function () {
+                    wrap.classList.add("img-loaded");
+                }, { once: true });
+                
+                thumbEl.addEventListener("error", function () {
+                    // Fallbacks
+                    if (dataSource === "youtube" && thumbEl.src.includes("maxresdefault.jpg")) {
+                        thumbEl.src = thumbEl.src.replace("maxresdefault.jpg", "hqdefault.jpg");
+                    } else {
+                        thumbEl.src = makePlaceholder(cardIndex);
+                        wrap.classList.add("img-loaded");
+                    }
+                }, { once: true });
+            }
+            cardIndex++;
+
+            // ---- Expand-to-fullscreen button (only visible once playing) ----
+            const expandBtn = document.createElement("button");
+            expandBtn.type = "button";
+            expandBtn.className = "tut-expand-btn";
+            expandBtn.setAttribute("aria-label", "Expand video");
+            expandBtn.title = "Expand";
+            expandBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>';
+            expandBtn.addEventListener("click", function (e) {
+                e.stopPropagation();
+                const src = wrap.dataset.src;
+                if (!src || src.includes("REPLACE_WITH_FILE_ID")) return;
+                openVideoLightbox(src);
+            });
+            wrap.appendChild(expandBtn);
+
+            // ---- Click to play ----
+            wrap.addEventListener("click", function () {
+                if (wrap.classList.contains("playing")) return;
+
+                // Pause any other active player first
+                document.querySelectorAll(".tut-embed-wrap.playing").forEach(function (other) {
+                    other.classList.remove("playing");
+                    const oldIframe = other.querySelector("iframe");
+                    if (oldIframe) oldIframe.remove();
+                });
+
+                // Build and inject the iframe
+                const src = wrap.dataset.src;
+                if (!src || src.includes("REPLACE_WITH_FILE_ID")) {
+                    alert("No video source has been set for this card yet.\nReplace the data-src attribute with a real embed URL.");
+                    return;
+                }
+                const iframe = document.createElement("iframe");
+                iframe.src = src;
+                iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen";
+                iframe.allowFullscreen = true;
+                wrap.appendChild(iframe);
+                wrap.classList.add("playing");
+            });
+        });
+
+        // ---- 2b. Fullscreen video lightbox ----
+        function ensureVideoLightbox() {
+            let overlay = document.getElementById("tutVideoLightboxOverlay");
+            if (overlay) return overlay;
+
+            overlay = document.createElement("div");
+            overlay.className = "tut-video-lightbox-overlay";
+            overlay.id = "tutVideoLightboxOverlay";
+            overlay.innerHTML =
+                '<button type="button" class="tut-video-lightbox-close" aria-label="Close video">' +
+                    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>' +
+                '</button>' +
+                '<div class="tut-video-lightbox-frame" id="tutVideoLightboxFrame"></div>';
+            document.body.appendChild(overlay);
+
+            overlay.addEventListener("click", function (e) {
+                if (e.target === overlay || e.target.closest(".tut-video-lightbox-close")) {
+                    closeVideoLightbox();
+                }
+            });
+
+            return overlay;
+        }
+
+        function openVideoLightbox(src) {
+            const overlay = ensureVideoLightbox();
+            const frameHolder = document.getElementById("tutVideoLightboxFrame");
+            frameHolder.innerHTML = "";
+            const iframe = document.createElement("iframe");
+            iframe.src = src;
+            iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen";
+            iframe.allowFullscreen = true;
+            frameHolder.appendChild(iframe);
+            overlay.classList.add("active");
+            document.body.classList.add("tut-video-lightbox-open");
+        }
+
+        function closeVideoLightbox() {
+            const overlay = document.getElementById("tutVideoLightboxOverlay");
+            if (!overlay) return;
+            overlay.classList.remove("active");
+            document.body.classList.remove("tut-video-lightbox-open");
+            // Stop playback by clearing the iframe rather than just hiding it
+            const frameHolder = document.getElementById("tutVideoLightboxFrame");
+            if (frameHolder) frameHolder.innerHTML = "";
+        }
+
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape") closeVideoLightbox();
+        });
+
+        // ---- 3. Filter bar ----
+        const filterBtns = document.querySelectorAll(".tut-filter-btn");
+        const cards = document.querySelectorAll(".tut-card");
+        const sectionHeadings = document.querySelectorAll(".tut-section-heading");
+        const emptyState = document.getElementById("emptyState");
+
+        function applyFilter(filter) {
+            // Stop any playing video when switching filter
+            document.querySelectorAll(".tut-embed-wrap.playing").forEach(function (w) {
+                w.classList.remove("playing");
+                const iframe = w.querySelector("iframe");
+                if (iframe) iframe.remove();
+            });
+
+            let visibleCount = 0;
+
+            // Show/hide cards
+            cards.forEach(function (card) {
+                const match = filter === "all" || card.dataset.category === filter;
+                card.style.display = match ? "" : "none";
+                if (match) visibleCount++;
+            });
+
+            // Show/hide section headings.
+            // "All Videos" merges every category into one continuous grid
+            // with no dividing headings; a specific category filter still
+            // shows just its own single heading above the matching cards.
+            sectionHeadings.forEach(function (heading) {
+                if (filter === "all") {
+                    heading.style.display = "none";
+                } else {
+                    const section = heading.dataset.section;
+                    heading.style.display = section === filter ? "" : "none";
+                }
+            });
+
+            // Empty state
+            emptyState.style.display = visibleCount === 0 ? "block" : "none";
+        }
+
+        filterBtns.forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                // Update active state
+                filterBtns.forEach(function (b) { b.classList.remove("active"); });
+                btn.classList.add("active");
+                applyFilter(btn.dataset.filter);
+            });
+        });
+
+        // Apply once immediately: "All Videos" is the default active button
+        // in the markup, so headings must start hidden rather than waiting
+        // for the first click.
+        applyFilter("all");
+
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     // ---------------------------------------------------------
     // 1. Basic Setup & Mobile Toggle
@@ -196,6 +502,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // Rebuild the Previous/Next buttons for whichever page is now
     // current, from the same SIDEBAR_SECTIONS order used above.
     renderPaginationNav();
+
+    // Re-initialise the Video Tutorials page's cards/filters/lightbox.
+    // Safe to call on every page: it no-ops immediately unless the
+    // current .docs-content-inner actually contains #videoGrid (i.e.
+    // we're on tutorial.html), which covers both a hard page load and
+    // an AJAX-routed navigation into/within that page.
+    initTutorialVideoPage();
 
     // A. Bind Copy Buttons
     document.querySelectorAll(".copy-btn").forEach(button => {

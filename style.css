@@ -391,6 +391,8 @@ body {
     padding: 2rem 1.5rem;
     overflow-y: auto;
     transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
 }
 
 /* ==========================================================================
@@ -471,6 +473,91 @@ body {
     color: var(--primary-color);
     font-weight: 600;
     border-left-color: var(--primary-color); 
+}
+
+/* ==========================================================================
+   Sidebar Footer Links — small plain-text row (Privacy Policy, License,
+   Disclaimer, Contact) pinned below every collapsible sidebar section.
+   Deliberately not an accordion/section: just small, quiet inline text
+   links, the way a page footer usually presents legal links.
+   ========================================================================== */
+.sidebar-footer-links {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    row-gap: 0.35rem;
+}
+
+.sidebar-footer-links a {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #94a3b8;
+    text-decoration: none;
+    padding: 0.15rem 0;
+    transition: color 0.2s;
+}
+
+.sidebar-footer-links a:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+.sidebar-footer-links a.active {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.sidebar-footer-sep {
+    color: #cbd5e1;
+    font-size: 0.78rem;
+    margin: 0 0.4rem;
+}
+
+/* ==========================================================================
+   Standalone Sidebar Button (e.g. "Video Tutorials")
+   Used for a top-level sidebar entry with no dropdown/sub-links — just a
+   single, directly-clickable, button-styled link. Rendered by script.js's
+   renderSidebar() when a SIDEBAR_SECTIONS entry has isButton: true.
+   ========================================================================== */
+.sidebar-section--button {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: none;
+}
+
+.sidebar-button-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 0.7rem 1rem;
+    background: var(--primary-color);
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sidebar-button-link:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+}
+
+.sidebar-button-link.active {
+    background: var(--primary-hover);
+}
+
+.sidebar-button-link svg {
+    flex-shrink: 0;
 }
 
 /* ==========================================================================
@@ -884,6 +971,27 @@ body {
     padding-top: 2rem;
     text-align: center;
     font-size: 0.9rem;
+}
+
+.footer-legal-links {
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+}
+
+.footer-legal-links a {
+    color: #94a3b8;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.footer-legal-links a:hover {
+    color: #60a5fa;
+    text-decoration: underline;
+}
+
+.footer-legal-links span {
+    margin: 0 0.5rem;
+    color: #475569;
 }
 
 @media (max-width: 1024px) {
@@ -1500,3 +1608,469 @@ body.lightbox-open {
     pointer-events: none;
     transition: width 0.3s ease-out, opacity 0.25s ease;
 }
+/* ==========================================================================
+   Video Tutorials Page (tutorial.html) — scoped styles
+   Moved here from tutorial.html's own <style> block because the AJAX docs
+   router (see script.js loadPage()) only swaps .docs-content-inner's HTML
+   when navigating between pages; a page-specific <style> tag sitting in
+   tutorial.html's own <head> is never re-applied after that kind of
+   navigation, only on a hard page load. Putting these rules in the shared
+   style.css means they are always active, regardless of how the page was
+   reached (hard load, sidebar click, or Back/Forward).
+   ========================================================================== */
+        /* ============================================================
+           Tutorial page — scoped styles
+           All variable references resolve against :root tokens already
+           defined in style.css so colours stay in sync site-wide.
+        ============================================================ */
+
+        /* ---- Filter / category bar ---- */
+        .tut-filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2.25rem;
+        }
+
+        .tut-filter-btn {
+            padding: 0.45rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 999px;
+            background: #fff;
+            color: #475569;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            white-space: nowrap;
+        }
+
+        .tut-filter-btn:hover {
+            border-color: #bfdbfe;
+            background: #eff6ff;
+            color: var(--primary-color);
+        }
+
+        .tut-filter-btn.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.28);
+        }
+
+        /* ---- Section headings inside the content area ---- */
+        .tut-section-heading {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 2.5rem 0 1.25rem 0;
+            padding-bottom: 0.55rem;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .tut-section-heading svg {
+            flex-shrink: 0;
+            color: var(--primary-color);
+        }
+
+        /* ---- Video card grid ---- */
+        .tut-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* ---- Individual video card ---- */
+        .tut-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tut-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(15,23,42,0.1);
+            border-color: #bfdbfe;
+        }
+
+        /* ---- Embed wrapper (16 : 9 ratio) ---- */
+        .tut-embed-wrap {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%;   /* 9/16 = 56.25% */
+            background: #0f172a;
+            cursor: pointer;
+        }
+
+        /* The actual <iframe> is hidden by default; only shown after the
+           user clicks "play" so we don't auto-load dozens of iframes. */
+        .tut-embed-wrap iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: none;
+        }
+
+        .tut-embed-wrap.playing iframe {
+            display: block;
+        }
+
+        /* Thumbnail image */
+        .tut-thumb {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: opacity 0.25s ease;
+        }
+
+        .tut-embed-wrap.playing .tut-thumb {
+            display: none;
+        }
+
+        /* Play button overlay */
+        .tut-play-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(37, 99, 235, 0.9);
+            border: 3px solid rgba(255,255,255,0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+            transition: transform 0.18s ease, background 0.18s ease;
+            pointer-events: none;
+        }
+
+        .tut-embed-wrap:hover .tut-play-btn {
+            transform: translate(-50%, -50%) scale(1.1);
+            background: var(--primary-color);
+        }
+
+        .tut-embed-wrap.playing .tut-play-btn {
+            display: none;
+        }
+
+        /* Duration badge */
+        .tut-duration {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            padding: 3px 8px;
+            background: rgba(0,0,0,0.72);
+            color: #fff;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            font-family: 'Consolas', monospace;
+            letter-spacing: 0.03em;
+            pointer-events: none;
+        }
+
+        .tut-embed-wrap.playing .tut-duration {
+            display: none;
+        }
+
+        /* Source badge (YouTube / Drive) */
+        .tut-source-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 3px 9px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            pointer-events: none;
+        }
+
+        .tut-source-badge.youtube {
+            background: #dc2626;
+            color: #fff;
+        }
+
+        .tut-source-badge.drive {
+            background: #1d4ed8;
+            color: #fff;
+        }
+
+        .tut-source-badge.vimeo {
+            background: #1ab7ea;
+            color: #fff;
+        }
+
+        .tut-embed-wrap.playing .tut-source-badge {
+            display: none;
+        }
+
+        /* Expand-to-fullscreen button — only shown once a video is playing */
+        .tut-expand-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 32px;
+            height: 32px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            border-radius: 7px;
+            background: rgba(15, 23, 42, 0.72);
+            color: #fff;
+            cursor: pointer;
+            z-index: 3;
+            transition: background 0.18s ease, transform 0.18s ease;
+        }
+
+        .tut-expand-btn:hover {
+            background: var(--primary-color);
+            transform: scale(1.06);
+        }
+
+        .tut-embed-wrap.playing .tut-expand-btn {
+            display: flex;
+        }
+
+        /* ---- Fullscreen video lightbox (built dynamically by tutorial.html's script) ---- */
+        .tut-video-lightbox-overlay {
+            position: fixed;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2.5rem;
+            background-color: rgba(8, 11, 20, 0.94);
+            z-index: 1000;
+        }
+
+        .tut-video-lightbox-overlay.active {
+            display: flex;
+        }
+
+        .tut-video-lightbox-frame {
+            position: relative;
+            width: min(92vw, 1280px);
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .tut-video-lightbox-frame iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .tut-video-lightbox-close {
+            position: fixed;
+            top: 24px;
+            right: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            border: none;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .tut-video-lightbox-close:hover {
+            background-color: rgba(255, 255, 255, 0.24);
+        }
+
+        body.tut-video-lightbox-open {
+            overflow: hidden;
+        }
+
+        @media (max-width: 640px) {
+            .tut-video-lightbox-overlay {
+                padding: 1rem;
+            }
+        }
+
+        /* ---- Card body ---- */
+        .tut-card-body {
+            padding: 1rem 1.1rem 1.1rem 1.1rem;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .tut-card-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.45rem;
+        }
+
+        .tut-tag {
+            padding: 2px 9px;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            background: #eff6ff;
+            color: #2563eb;
+            border: 1px solid #bfdbfe;
+        }
+
+        .tut-tag.static    { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
+        .tut-tag.dynamic   { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
+        .tut-tag.uncertainty { background: #faf5ff; color: #7e22ce; border-color: #e9d5ff; }
+        .tut-tag.general   { background: #f8fafc; color: #475569; border-color: #e2e8f0; }
+
+        .tut-card-level {
+            margin-left: auto;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tut-card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.35;
+            margin-bottom: 0.45rem;
+        }
+
+        .tut-card-desc {
+            font-size: 0.88rem;
+            color: #64748b;
+            line-height: 1.55;
+            flex: 1;
+            margin-bottom: 0.85rem;
+        }
+
+        .tut-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 0.75rem;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .tut-card-author {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .tut-open-link {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: gap 0.15s ease;
+        }
+
+        .tut-open-link:hover {
+            gap: 7px;
+            text-decoration: underline;
+        }
+
+        /* ---- Empty state ---- */
+        .tut-empty {
+            grid-column: 1 / -1;
+            padding: 3rem 1rem;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 1rem;
+            display: none;
+        }
+
+        .tut-empty svg {
+            margin: 0 auto 1rem auto;
+            display: block;
+            opacity: 0.35;
+        }
+
+        /* ---- Intro banner ---- */
+        .tut-hero {
+            background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+            border: 1px solid #bfdbfe;
+            border-radius: 14px;
+            padding: 1.5rem 1.75rem;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1.25rem;
+            align-items: flex-start;
+        }
+
+        .tut-hero-icon {
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
+            background: var(--primary-color);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+
+        .tut-hero h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0 0 0.35rem 0;
+            border: none;
+            padding: 0;
+        }
+
+        .tut-hero p {
+            font-size: 0.93rem;
+            color: #475569;
+            margin: 0;
+            line-height: 1.55;
+        }
+
+        /* ---- Responsive ---- */
+        @media (max-width: 640px) {
+            .tut-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tut-hero {
+                flex-direction: column;
+                gap: 0.85rem;
+            }
+        }

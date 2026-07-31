@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disclaimer | FracSTAT Docs</title>
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/hcaqjcqf/image/upload/v1784441772/akioq6cgnbsigsemtf0f.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="docs-body">
+    <nav class="navbar docs-navbar">
+        <div class="logo-container">
+            <button id="mobileToggle" class="mobile-toggle-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+            <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1784441778/zgskue8vqbh15i7pnnev.png" alt="FracSTAT Logo" class="logo-img">
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="introduction.html" class="active">Docs</a></li>
+            <li>
+                <a href="https://github.com/sachi5908/FracSTAT" target="_blank" class="github-link">
+                    <svg height="20" width="20" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+                    </svg>
+                    GitHub
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="docs-layout">
+
+        <aside class="docs-sidebar" id="docsSidebar"></aside>
+
+        <main class="docs-content">
+            <div class="docs-content-inner">
+                <h1>Disclaimer</h1>
+                <p>
+                    FracSTAT is a research and analysis tool developed by, and for, the structural geology
+                    and rock-mechanics community. This page sets out, in plain terms, the limits of what the
+                    software and this documentation can responsibly claim to do.
+                </p>
+
+                <div class="toc-box">
+                    <p>On this page</p>
+                    <ul>
+                        <li><a href="#no-warranty">1. No Warranty</a></li>
+                        <li><a href="#not-professional-advice">2. Not a Substitute for Professional Judgment</a></li>
+                        <li><a href="#accuracy">3. Accuracy of Calculations and Statistics</a></li>
+                        <li><a href="#data-quality">4. Dependence on Input Data Quality</a></li>
+                        <li><a href="#safety-critical">5. Safety-Critical and Regulatory Use</a></li>
+                        <li><a href="#docs-accuracy">6. Accuracy of This Documentation</a></li>
+                        <li><a href="#external-links">7. External Links and Third-Party Content</a></li>
+                        <li><a href="#liability">8. Limitation of Liability</a></li>
+                    </ul>
+                </div>
+
+                <h2 id="no-warranty">1. No Warranty</h2>
+                <p>
+                    As stated in the software's <a href="license.html">MIT License</a>, FracSTAT is provided
+                    "as is," without warranty of any kind, express or implied — including, without
+                    limitation, any warranty of merchantability, fitness for a particular purpose, or
+                    non-infringement. The authors make no guarantee that the software is free of bugs, that
+                    any specific calculation is numerically exact in every edge case, or that any given
+                    release is fit for any specific project's requirements.
+                </p>
+
+                <h2 id="not-professional-advice">2. Not a Substitute for Professional Judgment</h2>
+                <p>
+                    FracSTAT computes geometric statistics (length, orientation, connectivity, intensity),
+                    stress-resolution metrics (slip tendency, dilation tendency, fracture susceptibility,
+                    Mohr–Coulomb failure state), and uncertainty-quantification outputs from the data and
+                    stress assumptions a user supplies. Every output described throughout this documentation
+                    — for example the tendency and failure-state metrics explained on the
+                    <a href="docs_dynamic_method.html">Method Tab</a> page, or the distribution-fitting
+                    results on the <a href="docs_static_cdf.html">CDF Tab</a> page — is conditional on the
+                    input geometry and stress model actually entered, and is intended as a decision-support
+                    aid, not a decision by itself. Interpretation of any result requires the judgment of a
+                    qualified structural geologist, geotechnical engineer, or geomechanics specialist
+                    familiar with the specific field area, dataset, and intended application.
+                </p>
+
+                <h2 id="accuracy">3. Accuracy of Calculations and Statistics</h2>
+                <p>
+                    Wherever practical, this documentation reproduces the exact formulas FracSTAT implements
+                    (for example, the Mohr–Coulomb stress-resolution equations, the Mauldon circular-scanline
+                    intensity/density estimators, and the maximum-likelihood distribution-fitting procedure
+                    used on the CDF tab) so that results can, in principle, be independently verified by
+                    hand or with separate software. Numerical results nonetheless depend on floating-point
+                    arithmetic, on the specific numerical tolerances and clamping rules documented in each
+                    tab's own page (e.g. the segment-intersection tolerances described on the
+                    <a href="docs_static_connectivity.html">Connectivity Tab</a> page), and on any
+                    third-party library FracSTAT depends on (NumPy, SciPy, the <code>powerlaw</code>
+                    package, and others). Users performing safety- or economically-significant work are
+                    encouraged to cross-check key results against an independent calculation.
+                </p>
+
+                <h2 id="data-quality">4. Dependence on Input Data Quality</h2>
+                <p>
+                    Every statistic FracSTAT reports is only as reliable as the digitized trace map, Excel/CSV
+                    table, or calibrated photograph supplied to it. Digitization resolution, sampling-area
+                    edge-truncation and censoring effects, scale-calibration accuracy, and dip-override data
+                    quality (all discussed in their respective tab pages, e.g. the edge-censoring discussion
+                    on the <a href="docs_static_histogram.html">Histogram Tab</a> page) directly propagate
+                    into every downstream statistic, plot, and export. FracSTAT does not, and cannot,
+                    independently verify the geological accuracy of data a user chooses to load.
+                </p>
+
+                <h2 id="safety-critical">5. Safety-Critical and Regulatory Use</h2>
+                <p>
+                    FracSTAT is not certified, warranted, or represented as suitable for any specific
+                    regulatory submission, safety case, reservoir-development decision, or engineering
+                    design without independent professional review. Any use of FracSTAT's outputs to inform
+                    decisions with safety, financial, or regulatory consequences — including but not limited
+                    to slope-stability assessments, injection-induced seismicity screening, or reservoir
+                    development planning — remains the sole responsibility of the practitioner and
+                    organization making that decision.
+                </p>
+
+                <h2 id="docs-accuracy">6. Accuracy of This Documentation</h2>
+                <p>
+                    This documentation is maintained alongside the software and describes FracSTAT's
+                    behaviour to the best of the authors' knowledge at the time of writing. Because FracSTAT
+                    is under active development, a specific control, default value, or algorithmic detail
+                    described here may occasionally lag behind, or run ahead of, the exact behaviour of the
+                    version of FracSTAT you are running. When in doubt, the source code linked from the
+                    <a href="license.html">License</a> page is the authoritative reference.
+                </p>
+
+                <h2 id="external-links">7. External Links and Third-Party Content</h2>
+                <p>
+                    This site links to third-party resources — including Python's own download page, GitHub,
+                    and embedded YouTube/Google Drive videos on the <a href="tutorial.html">Video Tutorials</a>
+                    page. FracSTAT's authors do not control, and are not responsible for, the content,
+                    availability, or accuracy of any external site or service linked from these pages.
+                </p>
+
+                <h2 id="liability">8. Limitation of Liability</h2>
+                <p>
+                    To the fullest extent permitted by law, and consistent with the
+                    <a href="license.html">MIT License</a> under which FracSTAT is distributed, the authors
+                    and their affiliated institutions (listed on the <a href="introduction.html">Introduction</a>
+                    page) shall not be liable for any claim, damages, or other liability arising from, out
+                    of, or in connection with the software, this documentation, or the use of either.
+                </p>
+
+                <!-- Pagination Navigation -->
+                <div class="pagination-nav"></div>
+            </div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -868,10 +868,19 @@
             { file: "docs_uncertainty_montecarlo.html", label: "Monte Carlo Tab" },
             { file: "docs_uncertainty_lhs.html", label: "LHS Tab" },
             { file: "docs_uncertainty_pce.html", label: "PCE Tab" }
+        ]},
+        { title: "Legal", files: [
+            { file: "privacy-policy.html", label: "Privacy Policy" },
+            { file: "license.html", label: "License" },
+            { file: "disclaimer.html", label: "Disclaimer" },
+            { file: "contact.html", label: "Contact" }
+        ]},
+        { title: "Video Tutorials", files: [
+            { file: "tutorial.html", label: "Video Tutorials" }
         ]}
     ];
 
-    var EDITABLE_SELECTOR = "p, li, h1, h2, h3, h4, td, th, .ph-caption, figcaption, blockquote, .note-box, .tip-box, .code-lang, pre code";
+    var EDITABLE_SELECTOR = "p, li, h1, h2, h3, h4, td, th, .ph-caption, figcaption, blockquote, .note-box, .tip-box, .code-lang, pre code, .tut-card-title, .tut-card-desc, .tut-tag, .tut-duration";
 
     // ---------------------------------------------------------
     // Create-new-page helpers
@@ -1970,7 +1979,12 @@
             "@media (max-width: 600px) {" +
             "  .admin-insert-menu { min-width: 160px; max-width: min(240px, 90vw); }" +
             "  .admin-table-toolbar { gap: 8px; }" +
-            "}";
+            "}" +
+            ".admin-video-overlay { position: absolute; inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; background: rgba(17,24,39,0.7); opacity: 0; transition: opacity .2s ease; border-radius: inherit; pointer-events: none; }" +
+            ".tut-embed-wrap:hover .admin-video-overlay { opacity: 1; pointer-events: auto; }" +
+            ".admin-video-btn { padding: 0.4rem 0.8rem; border: none; border-radius: 6px; background: #fff; color: #111827; font-weight: 600; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.25); }" +
+            ".admin-video-btn .svg-icon { margin-right: 0.4em; width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }" +
+            ".admin-video-btn:hover { background: #2563eb; color: #fff; }";
         doc.head.appendChild(style);
 
         var container = doc.querySelector(".docs-content-inner") || doc.body;
@@ -2005,6 +2019,11 @@
 
         container.querySelectorAll(".figure-img-wrap").forEach(function (wrap) {
             addImageOverlay(doc, wrap);
+        });
+
+        // Initialize video controls for tutorial.html
+        container.querySelectorAll(".tut-card").forEach(function (card) {
+            addVideoOverlay(doc, card);
         });
 
         setupBlockControls(doc, container);
@@ -2091,6 +2110,98 @@
         ["image", "<svg class='svg-icon' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='2' ry='2'/><circle cx='8.5' cy='8.5' r='1.5'/><polyline points='21 15 16 10 5 21'/></svg> Image figure"]
     ];
 
+    function addVideoOverlay(doc, card) {
+        if (card.querySelector(".admin-video-overlay")) return;
+        var wrap = card.querySelector(".tut-embed-wrap");
+        if (!wrap) return;
+
+        if (!wrap.style.position) wrap.style.position = "relative";
+
+        var overlay = doc.createElement("div");
+        overlay.className = "admin-video-overlay";
+
+        // --- Edit Link Button ---
+        var editBtn = doc.createElement("button");
+        editBtn.type = "button";
+        editBtn.className = "admin-video-btn";
+        editBtn.innerHTML = '<svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg> Edit Link';
+        editBtn.addEventListener("click", function (e) {
+            e.stopPropagation(); e.preventDefault();
+            var current = wrap.getAttribute("data-src") || "";
+            var link = window.prompt("Paste YouTube or Google Drive Share Link:", current);
+            if (link && link.trim() !== "") {
+                link = link.trim();
+                var embedUrl = link;
+                var source = "youtube";
+                
+                // Auto-convert standard share links to embed formats
+                if (link.includes("youtube.com/watch?v=")) {
+                    var vid = new RegExp("[?&]v=([^&#]*)").exec(link);
+                    if(vid) embedUrl = "https://www.youtube.com/embed/" + vid[1] + "?rel=0";
+                } else if (link.includes("youtu.be/")) {
+                    var vid = link.split("youtu.be/")[1].split("?")[0];
+                    embedUrl = "https://www.youtube.com/embed/" + vid + "?rel=0";
+                } else if (link.includes("drive.google.com/file/d/")) {
+                    source = "drive";
+                    var fid = link.split("/d/")[1].split("/")[0];
+                    embedUrl = "https://drive.google.com/file/d/" + fid + "/preview";
+                }
+
+                wrap.setAttribute("data-src", embedUrl);
+                wrap.setAttribute("data-source", source);
+                
+                // Update the direct Open link at the bottom of the card
+                var openLnk = card.querySelector(".tut-open-link");
+                if (openLnk) openLnk.href = link;
+                
+                recordHistory(doc);
+            }
+        });
+
+        // --- Duplicate (Add New) Button ---
+        var dupBtn = doc.createElement("button");
+        dupBtn.type = "button";
+        dupBtn.className = "admin-video-btn";
+        dupBtn.innerHTML = '<svg class="svg-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Duplicate';
+        dupBtn.addEventListener("click", function (e) {
+            e.stopPropagation(); e.preventDefault();
+            var clone = card.cloneNode(true);
+            var exOver = clone.querySelector(".admin-video-overlay");
+            if (exOver) exOver.remove();
+            
+            // Insert clone right after current card
+            card.parentNode.insertBefore(clone, card.nextSibling);
+            
+            // Make clone editable
+            addVideoOverlay(doc, clone);
+            clone.querySelectorAll(EDITABLE_SELECTOR).forEach(function(el) {
+                el.setAttribute("contenteditable", "true");
+                el.setAttribute("data-admin-editable", "true");
+            });
+            
+            recordHistory(doc);
+        });
+
+        // --- Delete Button ---
+        var delBtn = doc.createElement("button");
+        delBtn.type = "button";
+        delBtn.className = "admin-video-btn";
+        delBtn.style.color = "#ef4444";
+        delBtn.innerHTML = '<svg class="svg-icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Delete';
+        delBtn.addEventListener("click", function (e) {
+            e.stopPropagation(); e.preventDefault();
+            if (window.confirm("Delete this video card?")) {
+                card.remove();
+                recordHistory(doc);
+            }
+        });
+
+        overlay.appendChild(editBtn);
+        overlay.appendChild(dupBtn);
+        overlay.appendChild(delBtn);
+        wrap.appendChild(overlay);
+    }
+    
     function setupBlockControls(doc, container) {
         var children = Array.from(container.children);
         children.forEach(function (el) {
@@ -2492,7 +2603,7 @@
             el.removeAttribute("contenteditable");
             el.removeAttribute("data-admin-editable");
         });
-        clone.querySelectorAll(".admin-img-overlay").forEach(function (el) { el.remove(); });
+        clone.querySelectorAll(".admin-img-overlay, .admin-video-overlay").forEach(function (el) { el.remove(); });
         cleanupAdminBlocks(clone);
         return clone.innerHTML;
     }
