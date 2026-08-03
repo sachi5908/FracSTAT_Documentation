@@ -502,7 +502,7 @@ P20 = N_end / (2πr²)</div>
                     (x1, y1, x2, y2), (cx, cy), radius)
 
         intensity.append(n_intersections / max(4.0 * radius, 1e-12))
-        density.append(n_endpoints / max(2.0 * math.pi * radius, 1e-12))
+        density.append(n_endpoints / max(2.0 * math.pi * radius ** 2, 1e-12))
 
     return distances, intensity, density</code></pre>
                 </div>
