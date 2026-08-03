@@ -250,7 +250,7 @@
                     <tr><td>X min / X max / Y min / Y max</td><td>Numeric entries (blank = auto)</td><td>Overrides matplotlib's automatic axis limits on the corresponding axis. Only applied when both a lower and upper value are supplied and the lower value is smaller than the upper.</td></tr>
                     <tr><td>Reset Bounds to Auto</td><td>Button</td><td>Clears all four manual bound fields.</td></tr>
                     <tr><td>Plot Area Size — Width / Height (px)</td><td>Numeric entries</td><td>Rebuilds the matplotlib Figure and its Tkinter canvas at an explicit pixel size (default 700 × 850, a portrait‑leaning box matching the conventional aspect of published CDF/CCDF figures).</td></tr>
-                    <tr><td>Reset Size to Auto</td><td>Button</td><td>Returns to the default 700 × 850 canvas.</td></tr>
+                    <tr><td>Reset Size to Auto</td><td>Button</td><td>Resets the Width/Height entry fields to 700 × 850 px. Note: the canvas rebuild triggered by this button currently reconstructs the figure at 1000 × 1000 px rather than the 700 × 850 px shown in the fields — a known discrepancy between the displayed defaults and the rebuilt canvas size.</td></tr>
                 </table>
 
                 <h3 id="3.7">3.7 Statistics Summary Panel</h3>
@@ -327,13 +327,17 @@ P(L > x) = (x / x_min)^(−α + 1)</div>
                 <p>β is the shape parameter (β = 1 recovers the exponential model) and λ is a scale parameter. FracSTAT labels this Weibull in the user interface because that is the more familiar name in geoscience and reliability contexts.</p>
 
                 <h3 id="4.7">4.7 Truncated Power‑law Model</h3>
-                <div class="formula-block">p(x) ∝ x^(−α) · e^(−λx)     for x ≥ x_min</div>
+                <div class="formula-block">P(L &gt; x) = C · x^(−α+1) · e^(−λx)     for x ≥ x_min</div>
                 <p>
                     This model superimposes an exponential cutoff on a power‑law scaling regime and is frequently
                     invoked when a genuinely scale‑invariant fracturing process is bounded by a finite physical
-                    control, such as mechanical layer thickness. The module supports fixing either α or λ by the
-                    user, in which case the free parameter is re‑optimised by direct maximisation of the
-                    truncated‑power‑law log‑likelihood subject to the fixed value.
+                    control, such as mechanical layer thickness. The <code>powerlaw</code> library internally stores
+                    the scaling exponent as <code>α_raw</code> (where <code>α_raw = α − 1.0</code> relative to the
+                    conventional notation). FracSTAT displays the conventional α on the plot annotation by adding
+                    1.0 to the library's internal value, so the annotated equation reads
+                    <code>P(L &gt; x) = C·x^(−α+1)·e^(−λx)</code> with the conventional exponent. The module supports
+                    fixing either α or λ by the user, in which case the free parameter is re‑optimised by direct
+                    maximisation of the truncated‑power‑law log‑likelihood subject to the fixed value.
                 </p>
 
                 <h3 id="4.8">4.8 Maximum Likelihood Estimation and x_min Selection</h3>

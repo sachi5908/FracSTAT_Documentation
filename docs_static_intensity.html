@@ -328,12 +328,13 @@
 
                 <h3 id="sec-5-3">5.3 Circle‑Based P20 (Density) Estimator</h3>
                 <p>The corresponding density estimator, based on counting fracture centers (approximated here by fracture‑segment endpoints falling inside the circle) is:</p>
-                <div class="formula-block">D  =  M / (π r²)</div>
+                <div class="formula-block">D  =  M / (2π r²)</div>
                 <p>
-                    which the implementation evaluates as D = M / (2πr²) × 2 in spirit, but is coded directly as
+                    where M is the count of fracture‑segment endpoints (a proxy for fracture centers) falling
+                    inside the circle. This is coded directly as
                     <code>M_circle / (2 * π * rCircle**2)</code>; note that the code's normalization constant of
-                    2πr² (rather than πr²) reflects that each fracture segment endpoint lying inside the window is
-                    counted once per endpoint (two endpoints per whole segment), so the effective
+                    2πr² (rather than the naive πr²) reflects that each fracture segment endpoint lying inside the
+                    window is counted once per endpoint (two endpoints per whole segment), so the effective
                     per‑fracture‑center density remains consistent with the conventional P20 definition when
                     segments are not truncated at the circle boundary.
                 </p>

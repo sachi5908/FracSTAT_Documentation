@@ -198,7 +198,7 @@
                 <table>
                     <tr><th>Symbol</th><th>Name</th><th>Formula</th></tr>
                     <tr><td>T<sub>s</sub></td><td>Slip tendency</td><td>T<sub>s</sub> = τ / σₙ</td></tr>
-                    <tr><td>T<sub>d</sub></td><td>Dilation tendency</td><td>T<sub>d</sub> = (σ₁ − σₙ) / (σ₁ − σ₂)</td></tr>
+                    <tr><td>T<sub>d</sub></td><td>Dilation tendency</td><td>T<sub>d</sub> = (σ₁ − σₙ) / (σ₁ − σ₃)</td></tr>
                     <tr><td>S<sub>f</sub></td><td>Susceptibility / fracture stability margin</td><td>S<sub>f</sub> = σₙ − Pᶠ − (τ − C₀) / μ</td></tr>
                     <tr><td>CSF</td><td>Critical stress flag</td><td>True where τ ≥ μ(σₙ − Pᶠ) + C₀</td></tr>
                 </table>
@@ -207,7 +207,7 @@
                     three Coulomb failure-envelope parameters used to draw the failure line on the Mohr diagram.
                     Slip tendency T<sub>s</sub> is the ratio of resolved shear to resolved normal stress and
                     increases toward frictional failure; dilation tendency T<sub>d</sub> measures how close a
-                    fracture's normal stress sits to the least principal stress σ₂, with values near 1 indicating a
+                    fracture's normal stress sits to the least principal stress σ₃, with values near 1 indicating a
                     fracture oriented favourably for opening-mode dilation; the susceptibility/stability margin
                     S<sub>f</sub> and the boolean CSF flag both express distance from, or crossing of, the
                     effective-stress Coulomb failure envelope.

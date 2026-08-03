@@ -36,14 +36,35 @@
         <main class="docs-content">
             <div class="docs-content-inner">
                 <h1>Uncertainty Monte Carlo Tab</h1>
-                
+
+                <div class="note-box">
+                    <strong>Under construction in v1.0.0.</strong> The Uncertainty Analyzer module — and this
+                    Monte Carlo Simulation tab specifically — is currently a reserved placeholder workspace in the
+                    FracSTAT launcher (shown with a "Coming Soon" badge). Opening the module currently displays an
+                    "Under Construction: Monte Carlo Simulation" frame with no interactive controls; the profile
+                    width/height/unit variables and the shared header (Load SVG, Load Excel, Scale, Trace Map,
+                    Switch to Dynamic/Static Mode) are already wired up, but the tab itself performs no
+                    calculations yet.
+                </div>
+                <p>
+                    Monte Carlo Simulation is planned to let users propagate uncertainty in stress-tensor inputs
+                    (σ₁, σ₂, σ₃, pore pressure, cohesion, friction) and/or fracture orientation measurements through
+                    the Dynamic Analyzer's slip‑ and dilation‑tendency calculations by repeatedly resampling input
+                    distributions and aggregating the resulting output distributions (e.g. probability of critical
+                    stress state) across many random trials.
+                </p>
                 <div class="code-window">
                     <div class="code-header">
                         <span class="code-lang">python</span>
                         <button class="copy-btn">Copy</button>
                     </div>
                     <pre><code class="language-python">
-                        DEMO OF CODE SNIPPET
+class UncertaintyMonteCarloTab:
+    title = "Monte Carlo Simulation"
+
+    @staticmethod
+    def build(app):
+        app._build_placeholder_tab(UncertaintyMonteCarloTab.title)
                     </code></pre>
                 </div>
                 <!-- Pagination Navigation -->

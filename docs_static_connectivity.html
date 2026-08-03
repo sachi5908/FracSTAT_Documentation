@@ -190,6 +190,13 @@
                     <tr><td>Show node labels</td><td>Off</td><td>Overlays a small text label (e.g. "I3", "Y12", "X1") beside every plotted node on the spatial map. Cosmetic only; does not trigger recomputation.</td></tr>
                     <tr><td>↻ Recalculate</td><td>—</td><td>Forces an explicit, user-initiated recompute; shows the global loading overlay while the O(n²) intersection search runs.</td></tr>
                 </table>
+                <div class="note-box">
+                    <strong>Note:</strong> the "Include boundary I-nodes" switch maps <em>inversely</em> onto the
+                    backend parameter it drives: with the switch off (default), the code calls
+                    <code>count_iyx_nodes(..., exclude_boundary_i=True)</code>; with the switch on, it calls
+                    <code>count_iyx_nodes(..., exclude_boundary_i=False)</code>. See
+                    <a href="#5.4">Section 5.4</a> for the extraction logic this parameter controls.
+                </div>
 
                 <div class="tip-box">
                     <strong>Tip:</strong> the Node Snap Tolerance help icon (?) opens a floating card explaining
@@ -206,7 +213,7 @@
                     <tr><td>Total Nodes</td><td>N</td><td><code>result.total_nodes</code> = N_I + N_Y + N_X</td></tr>
                     <tr><td>Branches</td><td>N_B</td><td><code>result.branch_count</code> = n_ii + n_ic + n_cc</td></tr>
                     <tr><td>Connected Fraction</td><td>CF</td><td><code>result.connected_fraction</code> = (N_Y + N_X) / N</td></tr>
-                    <tr><td>Connections / Branch</td><td>C̄</td><td><code>result.connections_per_branch</code> = (N_Y + 2N_X) / N_B</td></tr>
+                    <tr><td>Connections / Branch</td><td>C̄</td><td><code>result.connections_per_branch</code> = (3·N_Y + 4·N_X) / N_B, where N_B = (N_I + 3·N_Y + 4·N_X) / 2</td></tr>
                     <tr><td>B22</td><td>B₂₂</td><td><code>result.dimensionless_intensity</code> = L²_total / A</td></tr>
                 </table>
 
@@ -287,17 +294,21 @@
 
                 <h3 id="4.2">4.2 Node-Level Statistics</h3>
                 <div class="formula-block">
-N  = N_I + N_Y + N_X            (total node count)
+N  = N_I + N_Y + N_X                         (total node count)
 
-CF = (N_Y + N_X) / N            (connected fraction)
+CF = (N_Y + N_X) / N                         (connected fraction)
 
-C̄  = (N_Y + 2·N_X) / N_B       (average connections per branch)</div>
+N_B = (N_I + 3·N_Y + 4·N_X) / 2              (total branches)
+
+C̄  = (3·N_Y + 4·N_X) / N_B                  (average connections per branch)</div>
                 <p>
                     The connected fraction CF expresses what proportion of all identified nodes actually represent
                     a connection between two or more fractures, as opposed to a dead end. It ranges from 0 (a
-                    network of entirely isolated fractures) to 1 (every node is a connection). Because a crossing
-                    (X) node links four branch ends while an abutting (Y) node links three, the X contribution is
-                    weighted by 2 relative to Y in the connections-per-branch statistic.
+                    network of entirely isolated fractures) to 1 (every node is a connection). The average connections
+                    per branch C̄ counts the total number of branch ends that terminate at Y- or X-nodes (3 per Y-node,
+                    4 per X-node) and divides by the total number of branches N_B. Isolated I-nodes contribute only
+                    to the denominator, depressing C̄; a fully connected lattice with no I-nodes would approach the
+                    theoretical maximum C̄ = 2.
                 </p>
 
                 <h3 id="4.3">4.3 Dimensionless Intensity (B₂₂)</h3>
@@ -404,17 +415,42 @@ denominator = dy₂·dx₁ − dx₂·dy₁
 If |denominator| &lt; 1×10⁻¹² → segments are parallel; no intersection recorded.
 
 Otherwise solve for u₁ (ua) and u₂ (ub) algebraically.
-If both u₁, u₂ ∈ [0, 1] (±1×10⁻¹⁰ tolerance) → intersection accepted.</div>
-                <p>The accepted intersection point (x, y) is computed by substitution back into the first segment's parametric equation.</p>
+
+L₁ = length(A),  L₂ = length(B)
+tol_a = tol / L₁,  tol_b = tol / L₂
+
+Intersection accepted if both:
+  −(tol_a + ε) ≤ ua ≤ 1 + (tol_a + ε)
+  −(tol_b + ε) ≤ ub ≤ 1 + (tol_b + ε)
+where ε = 1×10⁻¹⁰.</div>
+                <p>
+                    The tolerance is converted from an absolute map distance into a <em>fractional parametric
+                    extension</em> (tol_a = tol / L₁, tol_b = tol / L₂) so that the snap distance scales correctly
+                    with segment length. The accepted point is then computed by substitution back into the first
+                    segment's parametric equation, with ua and ub clamped to [0, 1].
+                </p>
 
                 <h3 id="5.3">5.3 Classifying the Intersection: Abutment vs Crossing</h3>
                 <p>
-                    Each accepted intersection is tested by <code>_near_any_endpoint()</code>: the intersection
-                    point is compared, using Euclidean distance and the user-specified tolerance, against all four
-                    endpoints of the two participating segments. If the intersection lies within tolerance of any
-                    one of those four endpoints, it is classified as an abutting (Y) candidate. Otherwise, provided
-                    u₁ and u₂ both lie strictly within the open interval (0, 1), it is classified as a crossing
-                    (X) candidate.
+                    Each accepted intersection is tested independently against the endpoints of <em>each</em>
+                    participating segment via <code>_near_own_endpoint()</code>: the intersection point is compared,
+                    using Euclidean distance and the user-specified tolerance, against the two endpoints of one
+                    segment only. This yields two booleans — <code>near_i</code> (the point lies within tolerance
+                    of an endpoint of segment <em>i</em>) and <code>near_j</code> (same for segment <em>j</em>).
+                    The classification then follows a four-way decision table:
+                </p>
+                <table>
+                    <tr><th>near_i</th><th>near_j</th><th>Node class</th><th>Segment splits</th></tr>
+                    <tr><td>True</td><td>True</td><td>Y (both terminate)</td><td>none</td></tr>
+                    <tr><td>True</td><td>False</td><td>Y (segment <em>i</em> terminates)</td><td>segment <em>j</em> at ub</td></tr>
+                    <tr><td>False</td><td>True</td><td>Y (segment <em>j</em> terminates)</td><td>segment <em>i</em> at ua</td></tr>
+                    <tr><td>False</td><td>False</td><td>X (strict interior crossing)</td><td>both segments at their respective u-values</td></tr>
+                </table>
+                <p>
+                    In the bottom-right case the intersection is accepted as an X-node only when <em>both</em>
+                    clamped parametric coordinates lie strictly inside (0, 1). When one segment terminates at the
+                    intersection, the other is treated as being <em>crossed</em> there, and the crossing coordinate
+                    (ua or ub) is stored in the per-segment <code>seg_splits</code> table for later branch splitting.
                 </p>
 
                 <h3 id="5.4">5.4 Endpoint (I-node) Extraction and Boundary Exclusion</h3>
@@ -455,13 +491,14 @@ If both u₁, u₂ ∈ [0, 1] (±1×10⁻¹⁰ tolerance) → intersection accep
 
                 <h3 id="5.7">5.7 Branch Splitting and Classification</h3>
                 <p>
-                    The final stage (<code>_classify_branches</code>) re-runs the pairwise intersection search,
-                    retaining only interior (X-type) crossings, and records for every original segment the ordered
-                    list of parametric u-values at which it is crossed. Each segment is split into sub-segments at
-                    these u-positions (sorted ascending), and each resulting sub-segment (branch) has both
-                    endpoints tested for membership in the final merged X∪Y node set via
-                    <code>is_connected()</code>. The branch is assigned to the I-I, I-C, or C-C class according
-                    to the connectivity of its two endpoints.
+                    The final stage (<code>_classify_branches</code>) receives the <code>seg_splits</code> dictionary
+                    that was accumulated during the first pairwise intersection pass (Section 5.3). For each original
+                    segment, the stored split coordinates are sorted by their parametric u-value, deduplicated
+                    (points closer than the tolerance threshold are merged into a single split), and used to cut
+                    the segment into sub-segments (branches). Each resulting branch has both endpoints tested for
+                    proximity to the final merged X∪Y node set via <code>is_connected()</code>. Branches shorter
+                    than the tolerance are discarded as degenerate. The surviving branches are assigned to the I-I,
+                    I-C, or C-C class according to the connectivity of their two endpoints.
                 </p>
 
                 <div class="code-window">
@@ -469,49 +506,84 @@ If both u₁, u₂ ∈ [0, 1] (±1×10⁻¹⁰ tolerance) → intersection accep
                         <span class="code-lang">python</span>
                         <button class="copy-btn">Copy</button>
                     </div>
-                    <pre><code class="language-python">def count_iyx_nodes(results_df, tolerance=0.1, include_boundary_i=False):
-    """Main entry point: classify I/Y/X nodes and I-I/I-C/C-C branches."""
-    if results_df is None or results_df.empty:
+                    <pre><code class="language-python">def count_iyx_nodes(results, tolerance=1.0, exclude_boundary_i=True, progress_callback=None):
+    """Classify I/Y/X nodes and I-I/I-C/C-C branches from spatial trace data."""
+    if results is None or results.empty:
         return _empty_result()
 
-    # Coerce coordinate columns; discard degenerate rows
+    cols = ("Trace", "Segment", "X1", "Y1", "X2", "Y2")
+    missing = [c for c in cols if c not in results.columns]
+    if missing:
+        raise ValueError(f"Missing geometry column(s): {', '.join(missing)}")
+
+    segs = results[list(cols)].copy()
     for col in ("X1", "Y1", "X2", "Y2"):
-        results_df[col] = pd.to_numeric(results_df[col], errors="coerce")
-    results_df = results_df.dropna(subset=["X1", "Y1", "X2", "Y2"])
-    lengths = np.hypot(results_df.X2 - results_df.X1, results_df.Y2 - results_df.Y1)
-    results_df = results_df[lengths > 1e-12]
-    tolerance = max(tolerance, 0.0)
+        segs[col] = pd.to_numeric(segs[col], errors="coerce")
+    segs = segs.dropna(subset=["X1", "Y1", "X2", "Y2"])
+
+    xy = segs[["X1", "Y1", "X2", "Y2"]].to_numpy(dtype=float)
+    traces = segs["Trace"].to_numpy()
+    lengths = np.hypot(xy[:, 2] - xy[:, 0], xy[:, 3] - xy[:, 1])
+    valid = lengths > 1e-12
+    xy, traces, segs, lengths = xy[valid], traces[valid], segs.iloc[np.nonzero(valid)[0]], lengths[valid]
+
+    tol = max(float(tolerance), 0.0)
+    xs, ys = np.concatenate([xy[:, 0], xy[:, 2]]), np.concatenate([xy[:, 1], xy[:, 3]])
+    bounds = (float(xs.min()), float(ys.min()), float(xs.max()), float(ys.max()))
+    sample_area = max((bounds[2] - bounds[0]) * (bounds[3] - bounds[1]), 0.0)
+
+    x_candidates, y_candidates = [], []
+    seg_splits = defaultdict(list)
 
     # Pairwise intersection search (O(n^2), cross-trace pairs only)
-    x_raw, y_raw = [], []
-    for (row_i, row_j) in cross_trace_pairs(results_df):
-        pt, ua, ub = _segment_intersection(row_i, row_j)
-        if pt is None:
-            continue
-        if _near_any_endpoint(pt, row_i, row_j, tolerance):
-            y_raw.append(pt)            # abutting (Y) candidate
-        elif 0 < ua < 1 and 0 < ub < 1:
-            x_raw.append(pt)            # crossing (X) candidate
+    for i in range(len(xy)):
+        for j in range(i + 1, len(xy)):
+            if traces[i] == traces[j]:
+                continue
+            hit = _segment_intersection(xy[i], xy[j], tol)
+            if hit is None:
+                continue
+            x, y, ua, ub = hit
 
-    # Cluster, then de-duplicate with priority X > Y > I
-    x_nodes = _cluster_points(x_raw, tolerance)
-    y_nodes  = _cluster_points(
-        _remove_points_near(y_raw, x_nodes, tolerance), tolerance)
-    i_tips   = _trace_endpoints(results_df)
-    if not include_boundary_i:
-        i_tips = [p for p in i_tips if not _on_boundary(p, results_df, tolerance)]
-    i_nodes  = _cluster_points(
-        _remove_points_near(i_tips, x_nodes + y_nodes, tolerance), tolerance)
+            near_i = _near_own_endpoint(x, y, xy[i], tol)
+            near_j = _near_own_endpoint(x, y, xy[j], tol)
 
-    # Branch split and classify into I-I / I-C / C-C
-    n_ii, n_ic, n_cc = _classify_branches(
-        results_df, x_nodes, y_nodes, tolerance)
+            if near_i and near_j:
+                y_candidates.append((x, y))
+            elif near_i and not near_j:
+                y_candidates.append((x, y))
+                if 0.0 < ub < 1.0:
+                    seg_splits[j].append((ub, x, y))
+            elif near_j and not near_i:
+                y_candidates.append((x, y))
+                if 0.0 < ua < 1.0:
+                    seg_splits[i].append((ua, x, y))
+            elif 0.0 < ua < 1.0 and 0.0 < ub < 1.0:
+                x_candidates.append((x, y))
+                seg_splits[i].append((ua, x, y))
+                seg_splits[j].append((ub, x, y))
+
+    # Cluster and de-duplicate with priority X > Y > I
+    x_nodes = _cluster_points(x_candidates, tol)
+    y_nodes = _remove_points_near(_cluster_points(y_candidates, tol), x_nodes, tol)
+
+    endpoint_candidates = _trace_endpoints(segs)
+    if exclude_boundary_i:
+        endpoint_candidates = [p for p in endpoint_candidates if not _on_boundary(p, bounds, tol)]
+    i_nodes = _cluster_points(endpoint_candidates, tol)
+    i_nodes = _remove_points_near(i_nodes, x_nodes, tol)
+    i_nodes = _remove_points_near(i_nodes, y_nodes, tol)
+
+    # Branch classification using pre-computed seg_splits
+    n_ii, n_ic, n_cc = _classify_branches(xy, x_nodes, y_nodes, tol, seg_splits)
+    branch_count = n_ii + n_ic + n_cc
 
     return ConnectivityResult(
-        i_nodes=np.array(i_nodes), y_nodes=np.array(y_nodes),
-        x_nodes=np.array(x_nodes), n_ii=n_ii, n_ic=n_ic, n_cc=n_cc,
-        total_length=lengths.sum(),
-        sample_area=_bounding_box_area(results_df),
+        i_nodes=i_nodes, y_nodes=y_nodes, x_nodes=x_nodes,
+        bounds=bounds, trace_count=int(pd.Series(traces).nunique()),
+        segment_count=int(len(xy)), branch_count=branch_count,
+        total_length=float(lengths.sum()), sample_area=float(sample_area),
+        n_ii=n_ii, n_ic=n_ic, n_cc=n_cc,
     )</code></pre>
                 </div>
 
@@ -521,7 +593,7 @@ If both u₁, u₂ ∈ [0, 1] (±1×10⁻¹⁰ tolerance) → intersection accep
                     <tr><td>Pairwise intersection search (first pass)</td><td>O(n²)</td><td>n = number of segments; every cross-trace pair is tested once.</td></tr>
                     <tr><td>Point clustering</td><td>O(k²) per class</td><td>k = raw candidate count for that node class, typically ≪ n².</td></tr>
                     <tr><td>Boundary exclusion</td><td>O(m)</td><td>m = number of trace-tip candidates (2 per trace).</td></tr>
-                    <tr><td>Branch split &amp; classify (second pass)</td><td>O(n²)</td><td>Repeats the interior-crossing search to build the per-segment split table.</td></tr>
+                    <tr><td>Branch split &amp; classify</td><td>O(n · s)</td><td>s = splits per segment; uses seg_splits accumulated during the first pass, so no repeated O(n²) intersection search.</td></tr>
                 </table>
                 <p>
                     The dominant cost is quadratic in the number of segments. For very dense SVG traces (many
@@ -859,7 +931,7 @@ C_B  = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82</div>
                 <h3 id="11.4">11.4 Module Architecture</h3>
                 <table>
                     <tr><th>File</th><th>Responsibility</th></tr>
-                    <tr><td><code>core/branch_counter.py</code></td><td>Pure, GUI-independent geometry/topology engine: <code>ConnectivityResult</code> dataclass and <code>count_iyx_nodes()</code> plus all private helper functions (<code>_segment_intersection</code>, <code>_near_any_endpoint</code>, <code>_trace_endpoints</code>, <code>_cluster_points</code>, <code>_remove_points_near</code>, <code>_on_boundary</code>, <code>_classify_branches</code>, <code>_empty_result</code>).</td></tr>
+                    <tr><td><code>core/branch_counter.py</code></td><td>Pure, GUI-independent geometry/topology engine: <code>ConnectivityResult</code> dataclass and <code>count_iyx_nodes()</code> plus all private helper functions (<code>_segment_intersection</code>, <code>_near_own_endpoint</code>, <code>_trace_endpoints</code>, <code>_cluster_points</code>, <code>_remove_points_near</code>, <code>_on_boundary</code>, <code>_classify_branches</code>, <code>_empty_result</code>).</td></tr>
                     <tr><td><code>static_analyzer/tabs/static_connectivity_tab.py</code></td><td>GUI mixin class <code>StaticFluidFlowTab</code>: sidebar and settings construction, the five Matplotlib diagrams and their drawing routines, caching/staleness logic, background-image handling, pan/zoom interaction, and sidebar statistics refresh.</td></tr>
                 </table>
                 <p>
@@ -887,7 +959,6 @@ C_B  = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82</div>
                     <tr><td>Greedy point-clustering</td><td>The order-dependent greedy clustering algorithm can produce weakly order-dependent cluster centroids in rare pathological configurations of closely spaced, nearly-collinear candidate points. In practice, at sensible tolerances, this has negligible effect on reported statistics.</td></tr>
                     <tr><td>Heuristic reference contours</td><td>The C_L = 3.57 and C_B ≈ 2 reference contours are values drawn from the published topological fracture-network literature and are not dynamically recalculated for the specific length or orientation distribution of the loaded data set.</td></tr>
                     <tr><td>Rectangular boundary assumption</td><td>Boundary I-node exclusion uses the simple rectangular bounding box of all digitised endpoints as the sample-domain boundary. For irregularly shaped mapped areas, this can over- or under-exclude genuine edge-truncated tips relative to the true panel boundary.</td></tr>
-                    <tr><td>Main-thread computation</td><td>All fitting and intersection computation runs on the main UI thread since Matplotlib's TkAgg backend is not safe to drive concurrently from a worker thread. Very large networks will therefore block interaction until the computation completes, mitigated only by the loading overlay.</td></tr>
                 </table>
 
                 <!-- ================================================= -->

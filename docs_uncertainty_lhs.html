@@ -36,14 +36,34 @@
         <main class="docs-content">
             <div class="docs-content-inner">
                 <h1>Uncertainty LHS Tab</h1>
-                
+
+                <div class="note-box">
+                    <strong>Under construction in v1.0.0.</strong> The Uncertainty Analyzer module — and this
+                    Latin Hypercube Sampling (LHS) tab specifically — is currently a reserved placeholder workspace
+                    in the FracSTAT launcher (shown with a "Coming Soon" badge). Opening the module currently
+                    displays an "Under Construction: Latin Hypercube Sampling" frame with no interactive controls;
+                    the profile width/height/unit variables and the shared header (Load SVG, Load Excel, Scale,
+                    Trace Map, Switch to Dynamic/Static Mode) are already wired up, but the tab itself performs no
+                    calculations yet.
+                </div>
+                <p>
+                    Latin Hypercube Sampling is planned as a stratified, lower‑variance alternative to plain Monte
+                    Carlo sampling for propagating uncertainty through the Dynamic Analyzer's stress‑resolution
+                    calculations, aiming to reach stable output distributions (e.g. for slip tendency or dilation
+                    tendency) with fewer simulation trials than unstratified random sampling requires.
+                </p>
                 <div class="code-window">
                     <div class="code-header">
                         <span class="code-lang">python</span>
                         <button class="copy-btn">Copy</button>
                     </div>
                     <pre><code class="language-python">
-                        DEMO OF CODE SNIPPET
+class UncertaintyLHSTab:
+    title = "Latin Hypercube Sampling"
+
+    @staticmethod
+    def build(app):
+        app._build_placeholder_tab(UncertaintyLHSTab.title)
                     </code></pre>
                 </div>
                 <!-- Pagination Navigation -->

@@ -271,7 +271,7 @@
                     <tr><th>Control</th><th>Type</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Plot Width (px)</td><td>Numeric entry</td><td>1000</td><td>Forces the rendered figure to this pixel width once edited</td></tr>
                     <tr><td>Plot Height (px)</td><td>Numeric entry</td><td>800</td><td>Forces the rendered figure to this pixel height once edited</td></tr>
-                    <tr><td>Colour bar Length (0.0&ndash;1.0)</td><td>Numeric entry</td><td>0.72</td><td>Fractional length of the horizontal colour bar relative to the figure width</td></tr>
+                    <tr><td>Colour bar Length (0.0&ndash;1.0)</td><td>Numeric entry</td><td>1.0</td><td>Fractional length of the horizontal colour bar relative to the figure width</td></tr>
                     <tr><td>Colour bar Thickness (0.0&ndash;1.0)</td><td>Numeric entry</td><td>0.025</td><td>Fractional thickness of the colour bar</td></tr>
                     <tr><td>Colour bar Bottom Margin</td><td>Numeric entry</td><td>0.09</td><td>Fractional vertical offset of the colour bar from the bottom of the figure</td></tr>
                     <tr><td>Reset to Auto (fill plot area)</td><td>Button</td><td>&mdash;</td><td>Clears the fixed-size mode and returns the canvas to filling its parent panel automatically</td></tr>
@@ -345,10 +345,11 @@ center = &frac12;(&sigma;i + &sigma;j)          radius = &frac12;(&sigma;i &minu
                 <h3 id="5.4">5.4 Tendency and Susceptibility Metrics</h3>
                 <p>These are computed upstream in <code>core/calculator.py</code> and simply displayed here:</p>
                 <div class="formula-block">
-Slip Tendency:            Ts = &tau; / &sigma;n
-Normalized Ts:            Ts,norm = Ts / Ts,max
-Dilation Tendency:        Td = (&sigma;1 &minus; &sigma;n) / (&sigma;1 &minus; &sigma;3)
-Fracture Susceptibility:  Sf = &sigma;n &minus; Pf &minus; (&tau; &minus; C0)/&mu;</div>
+Slip Tendency:               Ts = &tau; / &sigma;n
+Normalized Ts:                Ts,norm = Ts / Ts,max
+Dilation Tendency:            Td = (&sigma;1 &minus; &sigma;n) / (&sigma;1 &minus; &sigma;3)
+Fracture Susceptibility:      Sf = &sigma;n &minus; Pf &minus; (&tau; &minus; C0)/&mu;
+Fracture Susceptibility (legacy):  Sf,legacy = &sigma;n &minus; &tau;/&mu;</div>
                 <p>
                     Ts,max is the theoretical maximum &tau;/&sigma;n achievable over every possible fracture
                     orientation for the given stress tensor &mdash; a closed-form function of &sigma;&#8321; and
@@ -357,6 +358,17 @@ Fracture Susceptibility:  Sf = &sigma;n &minus; Pf &minus; (&tau; &minus; C0)/&m
                     dilate/open) to 1 (most likely). Fracture susceptibility is expressed directly in MPa and is not
                     bounded to [0, 1]; the Mohr Tab's colour mapping normalizes it per-dataset using its observed
                     minimum and maximum when the "normalized" display option is active elsewhere in the workspace.
+                </p>
+                <p>
+                    <code>calculator.py</code> actually computes <strong>two</strong> Sf values side by side, one
+                    per historical version of the reference MATLAB script: <code>FractureSusceptibility</code> is
+                    the updated formula shown above (pore pressure and cohesion corrected), while
+                    <code>FractureSusceptibilityLegacy</code> reproduces the original script's <code>&sigma;n &minus;
+                    &tau;/&mu;</code>, with no pore-pressure or cohesion term. The two differ by exactly the pore
+                    pressure Pf when cohesion is zero. The Mohr Tab's colour-by and background-field options use only
+                    the updated <code>FractureSusceptibility</code> value; the legacy value is carried through for
+                    cross-checking against older MATLAB output and is surfaced in the <strong>Table tab</strong>
+                    as its own column so both figures are available without re-running the calculation.
                 </p>
 
                 <h3 id="5.5">5.5 Continuous Tendency Field Over All Orientations</h3>
@@ -748,6 +760,15 @@ def _mohr_field(sigma1, sigma2, sigma3, pore_pressure, cohesion, friction, value
                     lazily initialized in <code>_mohr_init_vars()</code>, which only creates a variable if it does
                     not already exist &mdash; this makes the initialization function safe to call repeatedly (e.g.
                     across a project session restore) without discarding values the user has already set.
+                </p>
+                <p>
+                    <code>core/calculator.py</code> computes fracture susceptibility twice per run &mdash;
+                    <code>FractureSusceptibility</code> (pore-pressure and cohesion corrected) and
+                    <code>FractureSusceptibilityLegacy</code> (the original, uncorrected MATLAB formula) &mdash; so
+                    that results can be cross-checked against either version of the reference script without
+                    re-running the calculation (see <a href="#5.4">Section 5.4</a>). Only the corrected column feeds
+                    the Mohr Tab's own displays; both columns are populated in <code>self.results</code> and are
+                    available to the Table tab.
                 </p>
 
                 <!-- ================================================= -->

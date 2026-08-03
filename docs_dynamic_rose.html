@@ -235,7 +235,7 @@
                 <h3 id="4.1">4.1 Data &amp; Bins Card</h3>
                 <table>
                     <tr><th>Control</th><th>Variable</th><th>Type / Range</th><th>Default</th><th>Effect</th></tr>
-                    <tr><td>Bins</td><td><code>rose_bins_var</code></td><td>Dropdown: 10, 18, 24, 36, 45, 72, 90, 180</td><td>36</td><td>Number of equal-width angular bins spanning the 0–180° (half rose) or 0–360° (full rose) range. Clamped internally to [4, 360] even if a value were entered programmatically outside the dropdown list.</td></tr>
+                    <tr><td>Bins</td><td><code>rose_bins_var</code></td><td>Entry (default 36, range 4–360)</td><td>36</td><td>Number of equal-width angular bins spanning the 0–180° (half rose) or 0–360° (full rose) range. Clamped internally to [4, 360] even if a value were entered programmatically outside the dropdown list.</td></tr>
                     <tr><td>Weight by</td><td><code>rose_weight_var</code></td><td>Dropdown: Length, Count, Equal</td><td>Length</td><td>Selects the per-segment weight fed into the weighted histogram (see <a href="#6.2">Section 6.2</a>).</td></tr>
                     <tr><td>Angle unit</td><td><code>rose_angle_unit_var</code></td><td>Dropdown: Degrees, Radians, Gradians</td><td>Degrees</td><td>Controls the numeric format of the angular tick labels only; the underlying binning is always performed in radians and is unaffected.</td></tr>
                     <tr><td>Custom title (blank = auto)</td><td><code>rose_title_var</code></td><td>Free text</td><td>"" (empty)</td><td>When non-blank and Show plot title is enabled, overrides the automatically generated title string.</td></tr>

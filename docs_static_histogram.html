@@ -221,8 +221,30 @@
                     <tr><td>X‑axis text colour</td><td>Colour swatch</td><td>Workspace text colour (typically #1F2933)</td></tr>
                 </table>
 
-                <h3 id="3.6">3.6 Statistics Card (Histogram Modes)</h3>
-                <p>The Statistics card is a read‑only report, recomputed on every histogram redraw from the filtered, positive‑valued sample.</p>
+                <h3 id="3.6">3.6 Statistics Card</h3>
+                <p>The Statistics card is a read‑only report, recomputed on every redraw from the filtered, positive‑valued sample. The displayed fields depend on the active plot mode.</p>
+
+                <h4>Length Histogram Modes (Segment lengths / Trace lengths)</h4>
+                <table>
+                    <tr><th>Field</th><th>Description</th><th>Units</th></tr>
+                    <tr><td>Max</td><td>Sample maximum of the plotted attribute.</td><td>display unit</td></tr>
+                    <tr><td>Min</td><td>Sample minimum of the plotted attribute.</td><td>display unit</td></tr>
+                    <tr><td>Median</td><td>Median value of the sample.</td><td>display unit</td></tr>
+                    <tr><td>Mode</td><td>Most frequent value (dominant bin midpoint).</td><td>display unit</td></tr>
+                    <tr><td>Std Dev</td><td>Standard deviation of the sample.</td><td>display unit</td></tr>
+                </table>
+
+                <h4>Segment Angles Mode</h4>
+                <table>
+                    <tr><th>Field</th><th>Description</th><th>Units</th></tr>
+                    <tr><td>Max</td><td>Maximum strike angle (0–180°).</td><td>degrees</td></tr>
+                    <tr><td>Min</td><td>Minimum strike angle (0–180°).</td><td>degrees</td></tr>
+                    <tr><td>CircMean</td><td>180°‑periodic circular axial mean of strike angles, computed by double‑angle vector summation.</td><td>degrees</td></tr>
+                    <tr><td>CircStdDev</td><td>Circular standard deviation of the strike distribution.</td><td>degrees</td></tr>
+                    <tr><td>Dominant</td><td>Orientation of the modal bin (highest frequency).</td><td>degrees</td></tr>
+                </table>
+
+                <h4>Cross Plot Mode</h4>
                 <table>
                     <tr><th>Field</th><th>Description</th><th>Units</th></tr>
                     <tr><td>n (count)</td><td>Number of observations remaining in the plotted sample after filtering non‑finite and non‑positive values, and after any edge‑censoring.</td><td>count</td></tr>
@@ -230,7 +252,7 @@
                     <tr><td>Minimum</td><td>Sample minimum of the plotted attribute.</td><td>display unit or degrees</td></tr>
                     <tr><td>Maximum</td><td>Sample maximum of the plotted attribute.</td><td>display unit or degrees</td></tr>
                     <tr><td>Mean</td><td>Arithmetic mean of the plotted attribute.</td><td>display unit or degrees</td></tr>
-                    <tr><td>Total Length</td><td>Sum of all plotted lengths (reported only for length‑based modes; computed but not meaningful for the Segment angles mode).</td><td>display unit</td></tr>
+                    <tr><td>Total Length</td><td>Sum of all plotted lengths.</td><td>display unit</td></tr>
                 </table>
 
                 <h3 id="3.7">3.7 Cross Plot Settings Card</h3>
@@ -254,6 +276,14 @@
                     <tr><td>Colorbar position</td><td>Option menu</td><td>Right</td><td>Right, Left, Bottom, Top, or None; controls placement of the colourbar associated with the "Colour points by" mapping.</td></tr>
                     <tr><td>Colorbar bg colour</td><td>Colour swatch</td><td>Matches Outer background</td><td>Background colour behind the colourbar axis.</td></tr>
                 </table>
+                <div class="note-box">
+                    <strong>Note:</strong> the X axis and Y axis defaults shown above are the values applied once
+                    <strong>SVG</strong> fracture data has been loaded (Segment Angle (°) vs Segment Length). At
+                    construction, before any data is loaded, the card instead initialises to Segment Length vs
+                    Aperture (mm). When Excel/CSV data containing length/aperture columns is loaded instead of SVG,
+                    the axes are set (or reset) to this Segment Length vs Aperture (mm) pairing rather than the
+                    SVG default.
+                </div>
 
                 <!-- ================================================= -->
                 <h2 id="maths">4. Mathematical Background</h2>
@@ -362,10 +392,12 @@ R² = corr(x, y)²   (squared Pearson correlation coefficient)
                     All angular quantities handled by the Histogram Tab (StrikeDeg, Strike (°), Trace Angle (°),
                     Segment Angle (°)) are folded to the axial 0–180° domain via the modulo operator
                     (<code>value % 180.0</code>) at the point of column resolution, consistent with the
-                    fracture‑orientation convention used throughout the Static Analyzer. No axial (circular) mean is
-                    computed by the Histogram Tab itself for angle data; users seeking a length‑weighted axial mean
-                    strike should consult the Rose Plot tab, which implements the appropriate circular‑statistics
-                    formula (double‑angle vector summation) for that purpose.
+                    fracture‑orientation convention used throughout the Static Analyzer. When the plot mode is set
+                    to <strong>Segment angles</strong>, the tab computes and displays the circular axial mean
+                    (CircMean) and circular standard deviation (CircStdDev) using 180°‑periodic double‑angle vector
+                    summation, together with the dominant bin orientation (Dominant), directly on the Statistics
+                    card. For length‑weighted axial mean strike, consult the Rose Plot tab, which implements the
+                    same circular‑statistics formula weighted by segment length.
                 </p>
 
                 <!-- ================================================= -->

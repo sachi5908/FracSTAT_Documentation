@@ -36,14 +36,35 @@
         <main class="docs-content">
             <div class="docs-content-inner">
                 <h1>Uncertainty PCE Tab</h1>
-                
+
+                <div class="note-box">
+                    <strong>Under construction in v1.0.0.</strong> The Uncertainty Analyzer module — and this
+                    Polynomial Chaos Expansion (PCE) tab specifically — is currently a reserved placeholder
+                    workspace in the FracSTAT launcher (shown with a "Coming Soon" badge). Opening the module
+                    currently displays an "Under Construction: Polynomial Chaos Expansion (PCE)" frame with no
+                    interactive controls; the profile width/height/unit variables and the shared header (Load SVG,
+                    Load Excel, Scale, Trace Map, Switch to Dynamic/Static Mode) are already wired up, but the tab
+                    itself performs no calculations yet.
+                </div>
+                <p>
+                    Polynomial Chaos Expansion is planned as a spectral surrogate‑modelling approach for uncertainty
+                    propagation, aiming to approximate the response of Dynamic Analyzer stress‑resolution outputs
+                    (e.g. slip/dilation tendency, Coulomb failure margin) to uncertain stress‑tensor and orientation
+                    inputs using a polynomial basis expansion, as a faster alternative to large‑sample Monte Carlo
+                    or LHS runs once implemented.
+                </p>
                 <div class="code-window">
                     <div class="code-header">
                         <span class="code-lang">python</span>
                         <button class="copy-btn">Copy</button>
                     </div>
                     <pre><code class="language-python">
-                        DEMO OF CODE SNIPPET
+class UncertaintyPCETab:
+    title = "Polynomial Chaos Expansion (PCE)"
+
+    @staticmethod
+    def build(app):
+        app._build_placeholder_tab(UncertaintyPCETab.title)
                     </code></pre>
                 </div>
                 <!-- Pagination Navigation -->

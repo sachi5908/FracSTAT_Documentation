@@ -237,23 +237,27 @@
                 </p>
                 <table class="excel-format-table">
                     <tr>
-                        <th class="req">ID</th><th class="req">Lat</th><th class="req">Lon</th>
+                        <th class="opt">ID</th><th class="req">Lat</th><th class="req">Lon</th>
                         <th class="req">FP1 Strike</th><th class="req">FP1 Dip</th><th class="opt">FP1 Slip</th><th class="opt">Region</th>
                     </tr>
                     <tr>
-                        <td class="req">ev001</td><td class="req">34.12</td><td class="req">76.45</td>
+                        <td class="opt">ev001</td><td class="req">34.12</td><td class="req">76.45</td>
                         <td class="req">032</td><td class="req">70</td><td class="opt">−92</td><td class="opt">Kashmir</td>
                     </tr>
                     <tr>
-                        <td class="req">ev002</td><td class="req">33.88</td><td class="req">77.10</td>
+                        <td class="opt">ev002</td><td class="req">33.88</td><td class="req">77.10</td>
                         <td class="req">118</td><td class="req">55</td><td class="opt">84</td><td class="opt">Ladakh</td>
                     </tr>
                 </table>
                 <table class="excel-meta-table">
-                    <tr><th>Required</th><td>ID, Lat, Lon, FP1 Strike, FP1 Dip</td></tr>
-                    <tr><th>Optional</th><td>FP1 Slip/Rake, FP2 Strike, FP2 Dip, FP2 Slip/Rake, Region, Beachball URL</td></tr>
+                    <tr><th>Required</th><td>Lat, Lon, FP1 Strike, FP1 Dip</td></tr>
+                    <tr><th>Optional</th><td>ID, FP1 Slip/Rake, FP2 Strike, FP2 Dip, FP2 Slip/Rake, Region, Beachball URL</td></tr>
                     <tr><th>Feeds</th><td>Nodal‑plane resolving stress matrices, spatial map pinning, structural records</td></tr>
                 </table>
+                <div class="note-box">
+                    <strong>Note:</strong> if the ID column is omitted, each event is labelled with its
+                    integer event index (1, 2, 3, …) in load order instead of a spreadsheet‑supplied ID.
+                </div>
                 <div class="note-box">
                     <strong>Note:</strong> Lat must be between −90° and 90°, and Lon between −180° and 360°.
                     When a slip/rake value is supplied, FracSTAT resolves the kinematically‑consistent shear stress
@@ -418,11 +422,13 @@
                 <h3 id="5.2">5.2 Profile &amp; Units</h3>
                 <p>
                     <strong>Profile width</strong> and <strong>Profile length</strong> define the physical size (in
-                    the X and Y directions respectively) that the imported pixel geometry is rescaled to. Changing
-                    either value and pressing <kbd>Enter</kbd> re‑runs the geometry calculation and refreshes every
-                    tab. <strong>Display units</strong> lets you switch between metres, centimetres, millimetres and
-                    kilometres — FracSTAT automatically converts the profile width/length values for you when you
-                    change the unit, and keeps the Dynamic Analyzer workspace in sync.
+                    the X and Y directions respectively) that the imported pixel geometry is rescaled to. Before any
+                    scale calibration is performed, these fields default to <strong>260&nbsp;m (Width) × 100&nbsp;m
+                    (Length)</strong>. Changing either value and pressing <kbd>Enter</kbd> re‑runs the geometry
+                    calculation and refreshes every tab. <strong>Display units</strong> lets you switch between
+                    metres, centimetres, millimetres and kilometres — FracSTAT automatically converts the profile
+                    width/length values for you when you change the unit, and keeps the Dynamic Analyzer workspace
+                    in sync.
                 </p>
 
                 <h3 id="5.3">5.3 Display Mode</h3>
