@@ -162,33 +162,55 @@
                 </p>
                 <div class="formula-block">strike_N = image strike + θ</div>
 
-                <h3 id="4.3">4.3 Stress Angle</h3>
+                <h3 id="4.3">4.3 Fracture-Plane Normal and Stress Angle</h3>
                 <p>
-                    The maximum principal stress σ₁ is supplied as an azimuth measured from true North. FracSTAT
-                    does not resolve stress directly onto the fracture plane's strike direction; it resolves stress
-                    onto the plane's pole (its outward normal), which by definition sits 90° from the corrected
-                    strike. The stress angle α used in every subsequent Mohr transformation is therefore the
-                    angular difference between that normal direction and the σ₁ azimuth:
+                    The maximum principal stress σ₁ is supplied as an azimuth measured from true North (or, in
+                    fully orthogonal 3D mode, as its own trend and plunge — see below). FracSTAT does not resolve
+                    stress directly onto the fracture plane's strike direction; it resolves stress onto the plane's
+                    pole, or outward normal, which is built from the corrected strike <em>and the fracture's
+                    dip</em> in an (East, North, Up) basis:
                 </p>
-                <div class="formula-block">α = strike_N + 90° − azimuth_N(σ₁)</div>
+                <div class="formula-block">n = ( sin(dip)·sin(strike_N + 90°), sin(dip)·cos(strike_N + 90°), cos(dip) )</div>
+                <p>
+                    The normal's vertical component depends directly on dip: a vertical fracture (dip = 90°) has a
+                    purely horizontal normal, while a shallowly dipping fracture's normal points mostly upward. The
+                    stress angle α reported throughout the app is the angle between this normal and the σ₁ axis,
+                    α = arccos(|n·σ̂₁|) — dip therefore already enters the calculation at this first stage, not just
+                    the resolved-stress step that follows.
+                </p>
 
                 <h3 id="4.4">4.4 Resolved Stress</h3>
                 <p>
-                    With α defined relative to the fracture normal, the normal stress σₙ and shear stress τ acting
-                    on the fracture plane follow directly from the standard two-dimensional Mohr stress
-                    transformation:
+                    With the normal n defined above, FracSTAT projects each of the three principal stresses onto n
+                    and recombines them into the resolved normal and shear stress. In the default Andersonian mode
+                    (σ₁ and σ₃ horizontal, σ₂ vertical), the three direction cosines are:
                 </p>
                 <div class="formula-block">
-σₙ = ½(σ₁ + σ₂) + ½(σ₁ − σ₂)·cos(2α)
-τ  = | −½(σ₁ − σ₂)·sin(2α) |</div>
+c₁ = n · σ̂₁   (horizontal component, along the σ₁ azimuth)
+c₂ = n_z      (vertical component of n — i.e. along σ₂)
+c₃ = n · σ̂₃   (horizontal component, perpendicular to σ₁)</div>
+                <p>and the resolved stresses follow from:</p>
+                <div class="formula-block">
+σₙ = σ₁c₁² + σ₂c₂² + σ₃c₃²
+τ  = √( σ₁²c₁² + σ₂²c₂² + σ₃²c₃² − σₙ² )</div>
                 <div class="tip-box">
-                    <strong>Sign convention:</strong> the σₙ equation carries a <em>plus</em> sign on its second term
-                    because α is measured to the fracture normal, not to the fracture plane itself. Formulas quoted
-                    elsewhere in the structural-geology literature that instead define the angle relative to the
-                    fracture plane will show this same cosine term with a minus sign — the two conventions are
-                    equivalent once the 90° offset between plane and normal is accounted for, but they are not
-                    interchangeable term-for-term.
+                    <strong>This is a full 3D transformation, not a 2D one.</strong> Unlike a plane-stress formula
+                    written purely in terms of σ₁, σ₂ and α, both σₙ and τ here depend on dip (through c₂) and on
+                    all three principal stresses, not just two of them. A vertical fracture (dip = 90°) has c₂ = 0,
+                    which removes σ₂ from the calculation entirely and reduces the problem to two stress axes; as
+                    dip decreases from vertical, σ₂ increasingly contributes to the resolved stress. Two fractures
+                    with the same strike and stress angle α but different dip will, in general, be resolved onto
+                    different (σₙ, τ) points — dip is not a free parameter that can be ignored when checking a
+                    reported value by hand.
                 </div>
+                <p>
+                    This is implemented as <code>stress_on_plane_3d()</code> in <code>core/models.py</code>. When a
+                    fully orthogonal (non-Andersonian) stress frame is supplied instead — i.e. σ₁ trend/plunge and
+                    σ₃ trend/plunge are entered directly rather than just a σ₁ azimuth — the same σₙ/τ formulas are
+                    used, but c₁, c₂, c₃ become the normal's dot products with three independently oriented unit
+                    axes rather than being tied to the horizontal‑σ₁/σ₃, vertical‑σ₂ assumption; this variant is
+                    <code>stress_on_plane_3d_general()</code>.
+                </p>
 
                 <h3 id="4.5">4.5 Tendency Metrics</h3>
                 <p>
@@ -211,6 +233,14 @@
                     fracture oriented favourably for opening-mode dilation; the susceptibility/stability margin
                     S<sub>f</sub> and the boolean CSF flag both express distance from, or crossing of, the
                     effective-stress Coulomb failure envelope.
+                </p>
+                <p>
+                    <code>core/calculator.py</code> actually computes a second susceptibility value alongside
+                    S<sub>f</sub>: <code>FractureSusceptibilityLegacy</code>, matching the original (pre
+                    pore-pressure-correction) reference-script formula S<sub>f,legacy</sub> = σₙ − τ/μ. The two
+                    differ by exactly Pᶠ when cohesion is zero. Only the corrected S<sub>f</sub> above feeds the
+                    app's own colour-by and Mohr-field options; the legacy value is carried through for
+                    cross-checking against older reference output and appears as its own column in the Table tab.
                 </p>
 
                 <!-- ================================================= -->
