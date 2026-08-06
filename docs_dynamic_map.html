@@ -217,6 +217,14 @@
                     <tr><td>Line width (SVG/Geo)</td><td>Text entry</td><td>1.8</td><td>Sets the LineCollection stroke width (points) for Cartesian traces, and separately scales the marker size of focal-mechanism event points (base_size = 85 × value) and orientation-wheel tick width.</td></tr>
                     <tr><td>Custom title (blank = auto)</td><td>Text entry</td><td>(empty)</td><td>Overrides the automatically generated plot title. When blank, a descriptive title is automatically generated based on the map mode (e.g., "Slip tendency by fracture segment" for Cartesian maps, "Slip tendency — fracture orientation wheel" for legacy Excel files, or "Slip tendency — focal mechanism map" for geographic data).</td></tr>
                     <tr><td>Show compass (Wheel Map)</td><td>Checkbox</td><td>On</td><td>Toggles the N/E/S/W compass labels drawn around the orientation wheel. Has no visible effect in Cartesian or geographic modes.</td></tr>
+                    <tr><td>Map Style (<code>map_plot_style_var</code>)</td><td>Dropdown</td><td>Fracture segments</td><td>Selects the surface rendering mode for Cartesian maps: <strong>Fracture segments</strong> (the default vector <code>LineCollection</code> rendering described in <a href="#6.2">Section 6.2</a>, no interpolation), <strong>Grid Heatmap</strong> (a Kriged/interpolated <code>pcolormesh</code> surface), <strong>Contour (Filled)</strong> (filled contour bands with optional line overlay), or <strong>Contour (Lines Only)</strong> (labelled contour lines with no fill). See <a href="#6.6">Section 6.6</a>.</td></tr>
+                    <tr><td>Contour Levels (<code>map_contour_levels_var</code>)</td><td>Text entry</td><td>15</td><td>Requested number of contour bands/lines when Map Style is one of the two contour modes; passed to <code>_map_contour_levels()</code> (<a href="#6.6">Section 6.6</a>). Reverts to 15 if the entered value cannot be parsed.</td></tr>
+                    <tr><td>Show fracture traces / points (<code>map_show_traces_var</code>)</td><td>Checkbox</td><td>On</td><td>Toggles whether the underlying fracture segments (or selection markers) are drawn on top of/underneath an interpolated surface. When Map Style is "Fracture segments" this is the only visible content; in surface modes it overlays the raw data on the Kriged surface for QC.</td></tr>
+                    <tr><td>Layer Order (<code>map_layer_order_var</code>)</td><td>Dropdown</td><td>Traces above surface</td><td>"Traces above surface" or "Surface above traces". Controls the stacking (z-order) of the fracture traces relative to the interpolated surface when both are shown together.</td></tr>
+                    <tr><td>Upper Layer Opacity (<code>map_top_layer_opacity_var</code>)</td><td>Slider</td><td>0.8 (80%)</td><td>Alpha blending factor (10%–100%) applied to whichever layer — traces or surface — is currently on top, per the Layer Order setting, allowing the underlying layer to remain partially visible.</td></tr>
+                    <tr><td>Kriging Variogram Model (<code>map_kriging_model_var</code>)</td><td>Dropdown</td><td>linear</td><td>The variogram model passed to PyKrige's <code>OrdinaryKriging</code>: <code>linear</code>, <code>power</code>, <code>gaussian</code>, <code>spherical</code>, or <code>exponential</code>. Governs how spatial correlation is assumed to decay with distance during interpolation (<a href="#6.6">Section 6.6</a>).</td></tr>
+                    <tr><td>Grid Resolution (<code>map_grid_resolution_var</code>)</td><td>Text entry</td><td>150</td><td>Number of interpolation grid points per axis (valid range 30–400) used when computing the Kriged/interpolated surface. Higher values produce smoother surfaces at increased computation cost.</td></tr>
+                    <tr><td>Sample along segment length (<code>map_segment_sampling_var</code>)</td><td>Checkbox</td><td>On</td><td>When enabled, each fracture segment contributes three sample points (start, midpoint, end) to the interpolation input rather than just its midpoint, preventing long traces from collapsing to a single point and distorting the surface (<a href="#6.6">Section 6.6</a>).</td></tr>
                 </table>
 
                 <h3 id="4.2">4.2 Map Elements</h3>
@@ -229,6 +237,8 @@
                     <tr><td>Grid line width</td><td>Text entry</td><td>0.6</td><td>Line width (points) of gridlines; alpha is fixed internally at 0.6.</td></tr>
                     <tr><td>Boundary Color</td><td>Colour swatch</td><td>#1F2933</td><td>Colour applied to all four Axes spines (the plot border).</td></tr>
                     <tr><td>Boundary width</td><td>Text entry</td><td>1.0</td><td>Line width (points) of the plot border spines.</td></tr>
+                    <tr><td>Contour Line Color (<code>map_contour_line_color_var</code>)</td><td>Colour swatch</td><td>#000000</td><td>Stroke colour applied to contour line overlays, both in "Contour (Lines Only)" mode and for the optional line overlay drawn on top of "Contour (Filled)" surfaces.</td></tr>
+                    <tr><td>Contour Line Width (<code>map_contour_line_width_var</code>)</td><td>Text entry</td><td>0.5</td><td>Line width (points) of contour lines, clamped to a minimum of 0.1.</td></tr>
                 </table>
 
                 <h3 id="4.3">4.3 Colour Bar</h3>
@@ -236,6 +246,7 @@
                     <tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Position</td><td>Dropdown</td><td>Bottom</td><td>Bottom / Top / Left / Right / None. Determines where the colour bar is docked and how the main Axes is resized to make room for it (see <a href="#8.4">Section 8.4</a> for exact geometry).</td></tr>
                     <tr><td>Length (e.g., 1.0 for 100%)</td><td>Text entry</td><td>1.0</td><td>Fractional length of the colour bar relative to the corresponding figure dimension, clamped to [0.1, 1.0].</td></tr>
+                    <tr><td>Force 0 to 1 scale (<code>map_normalize_01_var</code>)</td><td>Checkbox</td><td>Off</td><td>When enabled, forces the colour scale normalization to a strict [0.0, 1.0] range regardless of the attribute column's actual data range, overriding the empirical min/max behaviour described in <a href="#5.2">Section 5.2</a>. Useful for visually comparing surfaces or maps across different datasets on a common scale.</td></tr>
                 </table>
 
                 <h3 id="4.4">4.4 Background Image</h3>
@@ -470,6 +481,56 @@
                     orientation and stress results remain fully available.
                 </p>
 
+                <h3 id="6.6">6.6 Kriging &amp; Surface Interpolation Engine</h3>
+                <p>
+                    When Map Style is set to Grid Heatmap or either Contour mode, the Cartesian renderer
+                    (<code>_draw_map_svg</code>) delegates surface construction to <code>_krige_map_surface()</code>
+                    rather than drawing the raw <code>LineCollection</code> alone. This engine interpolates the
+                    selected attribute across a regular grid spanning the data bounding box:
+                </p>
+                <ol class="step-list">
+                    <li><strong>Sample-point extraction</strong> — each fracture segment contributes one (midpoint-only) or three (start, midpoint, end — see <a href="#6.6b">below</a>) spatial sample points, depending on the "Sample along segment length" setting, each tagged with the segment's value for the active colouring attribute.</li>
+                    <li><strong>Cache lookup</strong> — a BLAKE2b hash is computed over the sample dataset, the selected value column, the spatial bounds, the chosen variogram model, and the grid resolution. If an identical hash is found in <code>self._map_krige_cache</code>, the previously computed grid is reused immediately and no recomputation occurs — this makes toggling between Map Style options or cosmetic settings instantaneous after the first interpolation.</li>
+                    <li><strong>Asynchronous computation</strong> — on a cache miss, <code>_show_map_kriging_loader()</code> displays a progress overlay on the plot canvas and the interpolation itself is dispatched to a background daemon thread, keeping the Tkinter main thread (and therefore the rest of the UI) responsive while the surface is computed.</li>
+                    <li><strong>Interpolation fallback chain</strong> — the engine first attempts <code>OrdinaryKriging</code> from the PyKrige library using the selected variogram model. If PyKrige is not installed, or the kriging system is singular for the current sample configuration (raising a <code>LinAlgWarning</code>), the engine falls back to SciPy's <code>griddata</code>, itself attempted in order of decreasing interpolation quality: <code>cubic</code> → <code>linear</code> → <code>nearest</code>, so that a surface is always produced even for degenerate or sparse sample sets.</li>
+                    <li><strong>Result caching and marshalling</strong> — once the background thread completes, the resulting grid is stored in <code>self._map_krige_cache</code> keyed by the hash computed in step 2, and the map is redrawn; the redraw call that triggered the original cache miss will, on completion, hit the now-populated cache.</li>
+                </ol>
+
+                <h4 id="6.6b">6.6.1 Three-Point Segment Sampling</h4>
+                <p>
+                    A naive interpolation input would sample each fracture segment only at its midpoint. For long
+                    traces this can misrepresent the spatial footprint of the fracture, effectively collapsing an
+                    extended linear feature into a single point during interpolation. When "Sample along segment
+                    length" is enabled, each segment instead contributes three points, parameterized along its
+                    length by t ∈ {0.0, 0.5, 1.0} (start, midpoint, end), all carrying the same attribute value.
+                    This more faithfully represents long traces spanning multiple grid cells and reduces artefacts
+                    where a long fracture would otherwise appear as an isolated data point in the interpolated
+                    surface.
+                </p>
+
+                <h3 id="6.7">6.7 Surface Rendering Algorithm (<code>_draw_map_surface</code>)</h3>
+                <p>
+                    Once <code>_krige_map_surface()</code> has returned a grid, <code>_draw_map_surface()</code>
+                    renders it according to the selected Map Style:
+                </p>
+                <ul>
+                    <li><strong>Grid Heatmap</strong> — the interpolated grid is drawn with <code>pcolormesh</code>, coloured by the active attribute's colormap and normalization (<a href="#5.1">Sections 5.1–5.2</a>).</li>
+                    <li><strong>Contour (Filled)</strong> — the grid is drawn with <code>contourf</code> using levels computed by <code>_map_contour_levels()</code>, optionally with a thin <code>contour</code> line overlay on top in the configured Contour Line Color/Width for band-boundary clarity.</li>
+                    <li><strong>Contour (Lines Only)</strong> — only <code>contour</code> is called (no fill), with each line styled per the Contour Line Color/Width controls and directly labelled with its numerical value via Matplotlib's contour-label mechanism.</li>
+                </ul>
+                <p>
+                    <code>_map_contour_levels()</code> determines the tick/level values passed to <code>contourf</code>/<code>contour</code>: it uses Matplotlib's <code>MaxNLocator</code> (or, when "Force 0 to 1 scale" is enabled, fixed interval steps across [0, 1]) to generate the requested number of levels (Contour Levels setting) spanning the surface's data-driven or forced min/max.
+                </p>
+                <p>
+                    Finally, <code>_show_map_colorbar()</code> decides whether the colour bar is drawn at all for the current style: it is automatically suppressed in "Contour (Lines Only)" mode, since the contour lines are already individually labelled with their values and a colour bar would be redundant and add visual clutter; the colour bar is shown normally for Grid Heatmap, Contour (Filled), and the default Fracture segments style.
+                </p>
+                <p>
+                    When both a surface and the fracture traces/points are shown (Show fracture traces / points
+                    enabled), the Layer Order and Upper Layer Opacity controls determine which is drawn on top and
+                    how transparent that top layer is, allowing the raw data to be cross-checked visually against
+                    the interpolated surface without one completely obscuring the other.
+                </p>
+
                 <!-- ================================================= -->
                 <h2 id="workflow">7. Internal Workflow</h2>
                 <p>The Map Tab participates in the broader Dynamic Analyzer refresh cycle as follows:</p>
@@ -687,6 +748,8 @@
                     <tr><td>Background-image pixel cache</td><td><code>_load_bg_image_array</code> via <code>_bg_image_cache</code> tuple (path, array)</td><td>The photograph is decoded from disk only once per unique path; repeated redraws (pan, zoom, cosmetic changes) reuse the cached NumPy array.</td></tr>
                     <tr><td>Threaded network I/O</td><td>Beachball image downloads</td><td>HTTP fetches (up to 8-second timeout each) run off the UI thread in a 4-worker pool, keeping the interface responsive while multiple diagrams load concurrently.</td></tr>
                     <tr><td><code>preserve_view</code> flag</td><td>All redraw call sites</td><td>Avoids unnecessarily recomputing and resetting the home view / axis limits on every cosmetic change, preserving the user's current pan/zoom position and avoiding a jarring view reset.</td></tr>
+                    <tr><td>BLAKE2b-keyed surface cache (<code>_map_krige_cache</code>)</td><td>Kriged/interpolated surfaces (Grid Heatmap, Contour styles)</td><td>Interpolation is only recomputed when the dataset, value column, spatial bounds, variogram model, or grid resolution actually change; toggling between Map Style options or unrelated cosmetic settings reuses the cached grid instantly.</td></tr>
+                    <tr><td>Background-thread kriging</td><td><code>_krige_map_surface()</code></td><td>The (potentially expensive) interpolation computation runs on a daemon thread rather than the Tkinter main thread, so the UI remains responsive and a progress overlay can be shown while a new surface is computed.</td></tr>
                 </table>
 
                 <!-- ================================================= -->
@@ -790,6 +853,7 @@
                     <tr><td><code>self._beachball_executor</code></td><td>The 4-worker <code>ThreadPoolExecutor</code> used for all beachball HTTP downloads.</td></tr>
                     <tr><td><code>self._map_bg_image_cache</code></td><td>A (path, decoded-array) tuple caching the most recently loaded background photograph.</td></tr>
                     <tr><td><code>self._map_settings_open</code></td><td>Boolean flag tracking whether the settings panel is currently shown or hidden.</td></tr>
+                    <tr><td><code>self._map_krige_cache</code></td><td>A (cache-key, result-grid) tuple caching the most recently computed Kriged/interpolated surface, keyed by a BLAKE2b hash of the sample dataset, value column, spatial bounds, variogram model, and grid resolution (<a href="#6.6">Section 6.6</a>).</td></tr>
                     <tr><td><code>self._layout_drag_ax</code> / <code>self._layout_orig_pos</code></td><td>Used to track the Matplotlib Axes currently being repositioned and its original bounding box during Move Elements layout editing.</td></tr>
                 </table>
 
