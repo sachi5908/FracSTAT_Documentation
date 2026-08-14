@@ -60,7 +60,17 @@
                      To add a new video, copy a .tut-card block and update:
                        data-category  — one of: general | static | dynamic | uncertainty
                        data-src       — the full embed URL
-                       data-thumb     — thumbnail image URL (or leave empty for solid BG)
+                       data-thumb     — manually-set thumbnail image URL. Leave
+                                        empty ("") to auto-fetch a YouTube/Drive
+                                        thumbnail, or fall back to a generated
+                                        placeholder if none is found (see
+                                        initTutorialVideoPage() in script.js).
+                                        Once a video card exists, the easiest way
+                                        to set/replace this is from the Admin
+                                        Panel: open this page in the editor,
+                                        hover the video's thumbnail, and use the
+                                        "Upload Thumbnail" (or "Thumbnail URL")
+                                        button — no manual HTML editing needed.
                        data-source    — "youtube" | "drive" | "vimeo"
                        data-duration  — display string e.g. "12:34"
                        data-level     — "Beginner" | "Intermediate" | "Advanced"
@@ -84,8 +94,8 @@
 
                     <!-- Card 1 — Installation walkthrough -->
                     <div class="tut-card" data-category="general">
-                        <div class="tut-embed-wrap img-loaded" data-src="https://drive.google.com/file/d/1EjwWwB2D_XAo_iE5Yjv57IarZsbOEO9U/preview" data-thumb="" data-source="drive" data-duration="8:42" style="position: relative;">
-                            <img class="tut-thumb" src="https://img.youtube.com/vi/S8PiPfHptbU/maxresdefault.jpg" alt="Installation walkthrough thumbnail">
+                        <div class="tut-embed-wrap img-loaded" data-src="https://drive.google.com/file/d/1EjwWwB2D_XAo_iE5Yjv57IarZsbOEO9U/preview" data-thumb="https://res.cloudinary.com/hcaqjcqf/image/upload/v1786704983/lyavpigeb4jitavxtlah.png" data-source="drive" data-duration="8:42" style="position: relative;">
+                            <img class="tut-thumb" src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1786704983/lyavpigeb4jitavxtlah.png" alt="Installation walkthrough thumbnail">
                             <span class="tut-duration">8:42</span>
                             <div class="tut-play-btn" aria-hidden="true">
                                 <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
@@ -99,8 +109,8 @@
                                     Beginner
                                 </span>
                             </div>
-                            <div class="tut-card-title">Installing FracSTAT on Windows, macOS &amp; Linux</div>
-                            <div class="tut-card-desc">A full walkthrough of cloning the repository, setting up a Python environment, installing dependencies via <code>pip</code>, and launching the application for the first time on all three operating systems.</div>
+                            <div class="tut-card-title">FracSTAT: A Modern Software for Fracture Network Analysis</div>
+                            <div class="tut-card-desc"><strong data-start="0" data-end="61" data-is-only-node="">FracSTAT</strong>&nbsp;is an open-source, Python-based software designed for the analysis and characterization of fracture networks. It provides an integrated environment for <span data-start="214" data-end="333" style="">fracture mapping, statistical analysis, structural visualization, stress-based analysis, and uncertainty assessment</span>.</div>
                             <div class="tut-card-footer">
                                 <span class="tut-card-author">
                                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"></path></svg>
@@ -481,5 +491,43 @@
     </div><!-- /.docs-layout -->
 
     <script src="script.js"></script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
 
-</body></html>
+s</body></html>
