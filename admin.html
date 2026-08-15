@@ -2244,6 +2244,39 @@
             recordHistory(doc);
         });
 
+        // --- Edit Duration Button ---
+        // The duration is stored twice — as the data-duration attribute on
+        // the wrap (kept for reference/future use) and as the visible text
+        // inside the .tut-duration badge — so both must be kept in sync.
+        var durationBtn = doc.createElement("button");
+        durationBtn.type = "button";
+        durationBtn.className = "admin-video-btn";
+        durationBtn.innerHTML = '<svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Edit Duration';
+        durationBtn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            var current = wrap.getAttribute("data-duration") || "";
+            var value = window.prompt("Enter the video duration (e.g. 12:34 or 1:05:30):", current);
+            if (value === null) return; // cancelled
+            value = value.trim();
+            if (value === "") {
+                window.alert("Duration can't be empty.");
+                return;
+            }
+            wrap.setAttribute("data-duration", value);
+            var durationEl = wrap.querySelector(".tut-duration");
+            if (durationEl) {
+                durationEl.textContent = value;
+            } else {
+                // Card was built without a duration badge (rare) — create one
+                durationEl = doc.createElement("span");
+                durationEl.className = "tut-duration";
+                durationEl.textContent = value;
+                wrap.appendChild(durationEl);
+            }
+            recordHistory(doc);
+        });
+
         // --- Duplicate (Add New) Button ---
         var dupBtn = doc.createElement("button");
         dupBtn.type = "button";
@@ -2286,6 +2319,7 @@
         overlay.appendChild(thumbUploadBtn);
         overlay.appendChild(thumbUrlBtn);
         overlay.appendChild(thumbResetBtn);
+        overlay.appendChild(durationBtn);
         overlay.appendChild(dupBtn);
         overlay.appendChild(delBtn);
         wrap.appendChild(overlay);
