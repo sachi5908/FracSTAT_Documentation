@@ -10,6 +10,35 @@ if ("scrollRestoration" in history) {
     history.scrollRestoration = "manual";
 }
 
+// Home page preloader. It lives only in index.html, so the docs are never
+// delayed. Let the animated mark finish its opening sequence, but always
+// release the page if a slow asset prevents the normal load event.
+(function initHomePreloader() {
+    const preloader = document.getElementById("preloader");
+    if (!preloader) return;
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const minimumVisibleMs = reduceMotion ? 0 : 2500;
+    const startedAt = performance.now();
+    let dismissed = false;
+
+    function dismissPreloader() {
+        if (dismissed) return;
+        dismissed = true;
+
+        const remaining = Math.max(0, minimumVisibleMs - (performance.now() - startedAt));
+        window.setTimeout(function () {
+            preloader.classList.add("pl-hide");
+            preloader.addEventListener("transitionend", function () {
+                preloader.remove();
+            }, { once: true });
+        }, remaining);
+    }
+
+    window.addEventListener("load", dismissPreloader, { once: true });
+    window.setTimeout(dismissPreloader, 5500);
+}());
+
 // ---------------------------------------------------------
 // Single source of truth for the sidebar — edit this array only.
 // Every page's <aside id="docsSidebar"></aside> gets its contents
@@ -860,3 +889,111 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 });
+
+// -------------------------------------------------------------------------
+// Landing-page fracture background
+// Uses the same deterministic branching-network method as the Presentation
+// page. It only runs when index.html's #heroFracture SVG is present.
+// -------------------------------------------------------------------------
+(function renderLandingFractures() {
+    const svg = document.getElementById("heroFracture");
+    if (!svg || svg.dataset.rendered === "true") return;
+
+    const NS = "http://www.w3.org/2000/svg";
+    const W = 1200;
+    const H = 800;
+
+    function mulberry32(seed) {
+        return function () {
+            seed |= 0;
+            seed = seed + 0x6D2B79F5 | 0;
+            let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+            t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+            return ((t ^ t >>> 14) >>> 0) / 4294967296;
+        };
+    }
+
+    function growCrack(x, y, angle, depth, maxDepth, random, segments, generation) {
+        if (depth >= maxDepth || x < -40 || x > W + 40 || y < -40 || y > H + 40) return;
+
+        const steps = 3 + Math.floor(random() * 3);
+        const segmentLength = (maxDepth - depth) * 15 + random() * 16;
+        const points = [[x, y]];
+        let currentX = x;
+        let currentY = y;
+        let currentAngle = angle;
+
+        for (let i = 0; i < steps; i += 1) {
+            currentAngle += (random() - 0.5) * 0.85;
+            currentX += Math.cos(currentAngle) * (segmentLength / steps);
+            currentY += Math.sin(currentAngle) * (segmentLength / steps);
+            points.push([currentX, currentY]);
+        }
+
+        segments.push({ points, generation });
+
+        if (depth < maxDepth - 2 && random() < 0.5) {
+            growCrack(currentX, currentY, currentAngle + (random() < 0.5 ? 1 : -1) * (0.5 + random() * 0.7), depth + 1, maxDepth, random, segments, generation + 1);
+        }
+        if (random() < 0.28) {
+            growCrack(currentX, currentY, currentAngle + (random() - 0.5) * 1.1, depth + 1, maxDepth, random, segments, generation + 1);
+        }
+        growCrack(currentX, currentY, currentAngle, depth + 1, maxDepth, random, segments, generation);
+    }
+
+    function buildNetwork(seed, seeds, maxDepth) {
+        const random = mulberry32(seed);
+        const segments = [];
+
+        for (let i = 0; i < seeds; i += 1) {
+            const edge = Math.floor(random() * 4);
+            let x;
+            let y;
+
+            if (edge === 0) { x = random() * W; y = -10; }
+            else if (edge === 1) { x = W + 10; y = random() * H; }
+            else if (edge === 2) { x = random() * W; y = H + 10; }
+            else { x = -10; y = random() * H; }
+
+            growCrack(x, y, random() * Math.PI * 2, 0, maxDepth, random, segments, 0);
+        }
+
+        return segments;
+    }
+
+    function toPath(points) {
+        return points.map((point, index) => (index === 0 ? "M" : "L") + point[0].toFixed(1) + "," + point[1].toFixed(1)).join(" ");
+    }
+
+    const colors = ["#C1642F", "#1F8577", "#8A9A57", "rgba(193,100,47,0.5)"];
+    const network = document.createElementNS(NS, "g");
+    network.setAttribute("class", "fracture-network");
+
+    buildNetwork(11, 12, 6).forEach((segment, index) => {
+        const path = document.createElementNS(NS, "path");
+        path.setAttribute("d", toPath(segment.points));
+        path.setAttribute("pathLength", "1");
+        path.setAttribute("class", "fracture-path");
+        path.style.stroke = colors[index % colors.length];
+        path.style.strokeWidth = String(Math.max(0.5, 2.2 - segment.generation * 0.45));
+        path.style.setProperty("--delay", Math.min(index * 0.07, 3.8).toFixed(2) + "s");
+        network.appendChild(path);
+
+        // First-generation endpoints become the small active nodes seen in
+        // the presentation network. The formula keeps their placement stable.
+        if (segment.generation <= 1 && index % 3 === 0) {
+            const endpoint = segment.points[segment.points.length - 1];
+            const node = document.createElementNS(NS, "circle");
+            node.setAttribute("cx", endpoint[0].toFixed(1));
+            node.setAttribute("cy", endpoint[1].toFixed(1));
+            node.setAttribute("r", "2.6");
+            node.setAttribute("class", "fracture-node");
+            node.style.fill = "#C1642F";
+            node.style.setProperty("--delay", Math.min(index * 0.07 + 0.3, 4.1).toFixed(2) + "s");
+            network.appendChild(node);
+        }
+    });
+
+    svg.appendChild(network);
+    svg.dataset.rendered = "true";
+}());

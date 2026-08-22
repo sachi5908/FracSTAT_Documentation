@@ -8,6 +8,16 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Home-page loader: animated FracSTAT mark with lightweight status. -->
+    <div id="preloader" role="status" aria-live="polite" aria-label="Loading FracSTAT">
+        <div class="preloader-inner">
+            <iframe class="preloader-logo" src="animated_logo_loader.html" title="" aria-hidden="true" tabindex="-1"></iframe>
+            <p class="pl-word">FracSTAT</p>
+            <p class="pl-status">Loading <span class="pl-dots" aria-hidden="true"><i></i><i></i><i></i></span></p>
+            <div class="pl-bar" aria-hidden="true"><div class="pl-bar-fill"></div></div>
+        </div>
+    </div>
+
     <nav class="navbar">
         <div class="logo-container">
             <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1784441778/zgskue8vqbh15i7pnnev.png" alt="FracSTAT Logo" class="logo-img">
@@ -29,6 +39,11 @@
     <header class="hero">
         <!-- Subtle modern grid background -->
         <div class="hero-bg-grid"></div>
+        <!-- Animated fracture network, kept decorative so it never distracts
+             from the page's actual content or assistive technology. -->
+        <div class="hero-fracture-art" aria-hidden="true">
+            <svg id="heroFracture" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" role="presentation" focusable="false"></svg>
+        </div>
         
         <div class="hero-content">
             <div class="badge">
@@ -36,7 +51,7 @@
                 v1.0.0 is now available
             </div>
             
-            <h1 class="gradient-text">Advanced Fracture <br> Statistical Analysis</h1>
+            <h1 class="gradient-text">Unified <em>Fracture Network</em> Analyzer</h1>
             <p>Comprehensive, high-performance tools for static, dynamic, and uncertainty analysis of complex fracture networks.</p>
             
             <div class="hero-buttons">
@@ -150,7 +165,6 @@
         </div>
     </section>
 
-    <footer class="modern-footer">
     <footer class="modern-footer">
         <div class="footer-grid">
             <!-- Brand Column -->
