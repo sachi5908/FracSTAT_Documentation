@@ -214,7 +214,7 @@
                     <tr><td>Branches</td><td>N_B</td><td><code>result.branch_count</code> = n_ii + n_ic + n_cc</td></tr>
                     <tr><td>Connected Fraction</td><td>CF</td><td><code>result.connected_fraction</code> = (N_Y + N_X) / N</td></tr>
                     <tr><td>Connections / Branch</td><td>C̄</td><td><code>result.connections_per_branch</code> = (3·N_Y + 4·N_X) / N_B, where N_B = (N_I + 3·N_Y + 4·N_X) / 2</td></tr>
-                    <tr><td>B22</td><td>B₂₂</td><td><code>result.dimensionless_intensity</code> = L²_total / A</td></tr>
+                    <tr><td>B22</td><td>B₂₂</td><td><code>result.dimensionless_branch_intensity</code> = L²_total / (A · N_B)</td></tr>
                 </table>
 
                 <h3 id="3.3">3.3 Branch Topology Card</h3>
@@ -311,14 +311,21 @@ C̄  = (3·N_Y + 4·N_X) / N_B                  (average connections per branch)
                     theoretical maximum C̄ = 2.
                 </p>
 
-                <h3 id="4.3">4.3 Dimensionless Intensity (B₂₂)</h3>
+                <h3 id="4.3">4.3 Dimensionless Intensity (B₂₂ and P₂₂)</h3>
                 <div class="formula-block">
-B₂₂ = L_total² / A</div>
+B₂₂ = L_total² / (A · N_B)          (branch-normalised intensity — result.dimensionless_branch_intensity)
+
+P₂₂ = L_total² / (A · N_traces)     (trace-normalised intensity — result.dimensionless_trace_intensity)</div>
                 <p>
-                    B₂₂ is the square of the cumulative trace length L_total divided by the sample bounding-box
-                    area A. It is a scale-independent measure of overall fracture density that can be compared
-                    directly between outcrops of different sizes, following the P₂₂ dimensionless-intensity
-                    convention used throughout the structural-geology fracture-intensity literature.
+                    B₂₂ is the square of the cumulative trace length L_total, divided by the sample bounding-box
+                    area A and further normalised by the total branch count N_B. It is a scale-independent measure
+                    of overall fracture density that can be compared directly between outcrops of different sizes,
+                    following the dimensionless-intensity convention used throughout the structural-geology
+                    fracture-intensity literature. <code>ConnectivityResult</code> also exposes a companion,
+                    trace-normalised measure, P₂₂, computed the same way but dividing by the number of distinct
+                    traces (<code>trace_count</code>) instead of the branch count. P₂₂ is available on the result
+                    object for programmatic use but is not currently surfaced as a sidebar statistic in the
+                    Connectivity tab.
                 </p>
 
                 <h3 id="4.4">4.4 Branch Classification</h3>
@@ -878,6 +885,17 @@ C_B  = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82</div>
                     and simply shown/hidden thereafter. This avoids the overhead of destroying and rebuilding
                     Matplotlib canvases every time the analyst switches between the five available diagrams, at the
                     modest cost of holding five figures in memory simultaneously.
+                </p>
+
+                <h3 id="10.6a">10.6a Session Restore Behaviour</h3>
+                <p>
+                    Restoring a saved session sets the active tab via <code>tabs.set()</code>, which does not fire
+                    the same tab-click handler that normally triggers a draw when the analyst manually switches to
+                    the Connectivity tab. To prevent the diagrams from appearing blank until the analyst clicks
+                    away and back, <code>refresh_static_fluidflow()</code> now checks whether a cached
+                    <code>ConnectivityResult</code> already exists for a non-stale, non-active Connectivity tab and,
+                    if so, draws it immediately (<code>recalculate=False</code>) so the plots are ready the instant
+                    the tab is opened.
                 </p>
 
                 <h3 id="10.6">10.6 Recommended Practice for Large Data Sets</h3>
