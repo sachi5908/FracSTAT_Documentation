@@ -52,8 +52,9 @@
                     The scientific purpose of the Table Tab is threefold. First, it provides an auditable numerical
                     record of every quantity the Dynamic Analyzer computes for every input fracture segment or
                     fracture plane — orientation, resolved stress, and the four principal geomechanical attributes
-                    (slip tendency, dilation tendency, fracture susceptibility, and the Coulomb critical-stress
-                    flag) — so results can be verified, spot-checked against hand calculations, or cross-referenced
+                    (slip tendency, dilation tendency, fracture susceptibility, and the four-tier Coulomb
+                    critical-fracture classification) — so results can be verified, spot-checked against hand
+                    calculations, or cross-referenced
                     with the underlying reference implementation in <code>calculator.py</code>. Second, it acts as
                     the authoritative tabular export source: the "Export Excel" action writes the same DataFrame
                     that populates the table directly to a Microsoft Excel workbook for use in external reporting,
@@ -154,12 +155,12 @@
 
                 <figure class="figure-block">
                     <div class="figure-img-wrap">
-                        <img src="put_your_img_here.png" alt="Full view of the Table Tab showing the toolbar and the fifteen column results grid" loading="lazy">
+                        <img src="put_your_img_here.png" alt="Full view of the Table Tab showing the toolbar and the sixteen column results grid" loading="lazy">
                         <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
                         </button>
                     </div>
-                    <span class="ph-caption"><strong>Figure 2.1</strong> — Screenshot of the Table Tab: toolbar with "Segment results" label and "Export Excel" button at top; the fifteen-column results grid below, with the currently selected row highlighted and scrolled into view.</span>
+                    <span class="ph-caption"><strong>Figure 2.1</strong> — Screenshot of the Table Tab: toolbar with "Segment results" label and "Export Excel" button at top; the sixteen-column results grid below, with the currently selected row highlighted and scrolled into view.</span>
                 </figure>
 
                 <!-- ================================================= -->
@@ -208,7 +209,7 @@
                     <tr><td>SlipTendency, SlipTendencyNorm</td><td><code>calculator.py</code>; normalised by the closed-form theoretical maximum</td><td>All sources</td></tr>
                     <tr><td>DilationTendency</td><td><code>calculator.py</code></td><td>All sources</td></tr>
                     <tr><td>FractureSusceptibility, FractureSusceptibilityLegacy</td><td><code>calculator.py</code>, two historical MATLAB formula variants</td><td>All sources</td></tr>
-                    <tr><td>CriticalStress, CriticalStressValue</td><td><code>calculator.py</code> Coulomb comparison</td><td>All sources</td></tr>
+                    <tr><td>CriticalStress, CriticalStressValue, CriticalFactor, CriticalState</td><td><code>calculator.py</code> Coulomb comparison (<code>critical_factor_and_state()</code> for the latter two)</td><td>All sources</td></tr>
                 </table>
 
                 <!-- ================================================= -->
@@ -233,7 +234,7 @@
                 <h3 id="4.2">4.2 Data Grid Controls</h3>
                 <table>
                     <tr><th>Control</th><th>Type</th><th>Behaviour</th></tr>
-                    <tr><td>Column headers (×15)</td><td>ttk.Treeview "heading" cells</td><td>Display the fixed column captions (see <a href="#columns">Section 5</a>). The "Length" heading is dynamically rewritten on every refresh to embed the active display unit, e.g. "Length (m)", "Length (cm)".</td></tr>
+                    <tr><td>Column headers (×16)</td><td>ttk.Treeview "heading" cells</td><td>Display the fixed column captions (see <a href="#columns">Section 5</a>). The "Length" heading is dynamically rewritten on every refresh to embed the active display unit, e.g. "Length (m)", "Length (cm)".</td></tr>
                     <tr><td>Row selection</td><td>ttk.Treeview single-row click / arrow-key navigation</td><td>Selecting a row fires the <code>&lt;&lt;TreeviewSelect&gt;&gt;</code> virtual event, handled by <code>on_table_select()</code>, which drives cross-tab highlighting (<a href="#sync">Section 8</a>).</td></tr>
                     <tr><td>Vertical scrollbar</td><td>ttk.Scrollbar, orient="vertical"</td><td>Bound bidirectionally to the Treeview's <code>yview</code>; scrolls through all loaded rows (subject to the 1000-row rendering cap, <a href="#performance">Section 10</a>).</td></tr>
                 </table>
@@ -241,7 +242,7 @@
                 <!-- ================================================= -->
                 <h2 id="columns">5. Column Reference and Symbol Table</h2>
                 <p>
-                    Fifteen fixed columns are defined at build time and never added to or removed from at runtime;
+                    Sixteen fixed columns are defined at build time and never added to or removed from at runtime;
                     only their contents are refreshed. Each column has a physical width of 90 px and centre-anchored
                     text. The table below gives the internal DataFrame field, the on-screen heading (including any
                     Unicode mathematical symbol used), the physical unit or dimensionless status, the numeric
@@ -272,7 +273,8 @@
                     <tr><td>12</td><td>Td</td><td>Td</td><td>0.000 (3 dp)</td><td>dimensionless, 0–1</td><td>Dilation tendency, DilationTendency.</td></tr>
                     <tr><td>13</td><td>Sf</td><td>S_f (Pf-corr.)</td><td>0.00 (2 dp)</td><td>MPa</td><td>Fracture susceptibility including pore-pressure and cohesion correction, FractureSusceptibility.</td></tr>
                     <tr><td>14</td><td>SfLegacy</td><td>S_f (legacy)</td><td>0.00 (2 dp) or "—"</td><td>MPa</td><td>Original (pre-correction) MATLAB-formula fracture susceptibility, FractureSusceptibilityLegacy; shown as an em-dash if absent.</td></tr>
-                    <tr><td>15</td><td>CSF</td><td>CSF</td><td>"Yes" / "No"</td><td>boolean</td><td>Whether the segment is critically stressed under the active Mohr–Coulomb failure envelope, CriticalStress.</td></tr>
+                    <tr><td>15</td><td>Factor</td><td>Critical factor</td><td>0.000 (3 dp)</td><td>dimensionless</td><td>The friction coefficient required to resist the resolved shear stress, (τ − C₀) / (σₙ − Pf), CriticalFactor. Compare against the sidebar's entered friction coefficient μ to gauge how close a plane is to failure.</td></tr>
+                    <tr><td>16</td><td>State</td><td>State</td><td>text</td><td>—</td><td>The four-tier critical-fracture classification, CriticalState: "Stable" (Factor/μ &lt; 50%), "Near Critical" (50–75%), "Critical" (75–100%), or "Unstable" (&gt;100%); see <a href="#6.6">Section 6.6</a>.</td></tr>
                 </table>
 
                 <div class="code-window">
@@ -282,7 +284,7 @@
                     </div>
                     <pre><code class="language-python">columns = ("ID", "Trace", "Segment", "Strike", "Dip", "Length",
            "Alpha", "SigmaN", "Tau", "Ts", "TsNorm", "Td", "Sf",
-           "SfLegacy", "CSF")
+           "SfLegacy", "Factor", "State")
 self.table = ttk.Treeview(tab, columns=columns, show="headings")
 headings = {
     "ID": "ID", "Trace": "Trace", "Segment": "Segment",
@@ -291,13 +293,13 @@ headings = {
     "Ts": "Tₛ (raw)", "TsNorm": "Tₛ (norm)",
     "Td": "Td",
     "Sf": "S_f (Pf-corr.)", "SfLegacy": "S_f (legacy)",
-    "CSF": "CSF",
+    "Factor": "Critical factor", "State": "State",
 }
 for col in columns:
     self.table.heading(col, text=headings[col])
     self.table.column(col, width=90, anchor="center")</code></pre>
                 </div>
-                <p class="ph-caption" style="text-align:left; margin: -1rem 0 1.5rem 0;">Column and heading construction excerpted from <code>_build_table_tab()</code>, showing the fixed fifteen-column definition and the fixed-width, centre-anchored layout applied to every column.</p>
+                <p class="ph-caption" style="text-align:left; margin: -1rem 0 1.5rem 0;">Column and heading construction excerpted from <code>_build_table_tab()</code>, showing the fixed sixteen-column definition and the fixed-width, centre-anchored layout applied to every column.</p>
 
                 <!-- ================================================= -->
                 <h2 id="maths">6. Mathematical Background</h2>

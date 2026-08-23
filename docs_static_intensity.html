@@ -151,11 +151,26 @@
                     The canvas is a single Matplotlib Axes (<code>self.p21_ax</code>) hosted inside a Figure
                     (<code>self.p21_fig</code>) at 9×6 inches / 100&nbsp;DPI. Depending on the selected style, the
                     axes displays a <code>pcolormesh</code> heatmap, a filled/line contour plot (optionally kriged),
-                    the fracture trace network as a <code>LineCollection</code>, scan‑circle outlines, and — if
-                    enabled — a background photograph. A colour bar is attached via Matplotlib's constrained
-                    axes‑relative positioning (<code>fig.colorbar(..., location=...)</code>), not the manual
-                    axis‑rectangle technique used in some of FracSTAT's other tabs.
+                    the fracture trace network as a <code>LineCollection</code>, scan‑circle outlines, an optional
+                    scale bar in the lower‑right corner, and — if enabled — a background photograph. A colour bar is
+                    attached via <code>fig.colorbar(..., location=...)</code>, but its position is then explicitly
+                    overridden by a custom alignment routine, <code>_align_colorbar_to_plot()</code>, rather than
+                    being left at Matplotlib's default constrained‑layout slot — see the note below.
                 </p>
+                <div class="note-box">
+                    <strong>Canvas layout synchronisation:</strong> because this tab's plot card is hosted inside a
+                    <code>CTkTabview</code> page, the canvas widget only receives its final, real‑world pixel
+                    dimensions from Tkinter after the page is actually shown — an initial draw performed while the
+                    page is still hidden uses provisional (often zero‑sized) bounds, which would leave the
+                    equal‑aspect plot clipped and the colour bar misaligned. To correct this, the tab binds both
+                    <code>&lt;Configure&gt;</code> and <code>&lt;Map&gt;</code> events on the canvas widget to
+                    <code>_schedule_p21_layout_sync()</code>, which debounces via <code>after_idle()</code> and
+                    calls <code>_sync_p21_layout()</code> once Tk settles. <code>_sync_p21_layout()</code> re‑runs
+                    only the inexpensive layout portion — <code>fig.tight_layout()</code> followed by
+                    <code>_align_colorbar_to_plot()</code> — rather than the full, potentially expensive redraw, so
+                    the plot and colour bar snap into correct alignment the moment the tab becomes visible or is
+                    resized, without re‑running the scan‑circle calculation or kriging.
+                </div>
 
                 <!-- ================================================= -->
                 <h2 id="data-input">3. Data Input Requirements</h2>
@@ -255,10 +270,34 @@
                     <tr><td>Trace Color</td><td><code>trace_color_var</code></td><td>#1E3A8A</td><td>Colour of the fracture‑trace LineCollection overlay.</td></tr>
                     <tr><td>Contour Line Color</td><td><code>contour_line_color_var</code></td><td>#000000</td><td>Colour of contour isolines (and their inline numeric labels) in either contour rendering style.</td></tr>
                     <tr><td>Show grid lines</td><td><code>grid_var</code></td><td>True</td><td>Toggles <code>ax.grid()</code> with the configured colour and 0.6 alpha.</td></tr>
+                    <tr><td>Show scale</td><td><code>show_scale_var</code></td><td>False</td><td>Toggles a data‑accurate scale bar in the lower‑right of the map — see <a href="#sec-4-3-1">Section 4.3.1</a>.</td></tr>
+                    <tr><td>Scale Color</td><td><code>scale_color_var</code></td><td>#1F2933</td><td>Colour used to draw the scale bar (and its label/ticks).</td></tr>
+                    <tr><td>Scale style</td><td><code>scale_style_var</code></td><td>"Solid bar"</td><td>Chooses how the scale bar is rendered — Solid bar (single filled block), Segmented bar (alternating filled/unfilled quarters), or Ticked line (a plain line with end ticks and no fill).</td></tr>
                     <tr><td>Border Color</td><td><code>border_color_var</code></td><td>#475569</td><td>Colour applied to all four Matplotlib Axes spines.</td></tr>
                     <tr><td>Border Width</td><td><code>border_width_var</code></td><td>"1.0"</td><td>Line width (points) applied to all spines; invalid entries silently fall back to 1.0.</td></tr>
                     <tr><td>Contour Line Width</td><td><code>contour_line_width_var</code></td><td>"0.5"</td><td>Line width used for contour isolines; invalid entries fall back to 0.5.</td></tr>
                 </table>
+
+                <h4 id="sec-4-3-1">4.3.1 Scale Bar Rendering (<code>_add_intensity_scale_bar</code>)</h4>
+                <p>
+                    When "Show scale" is enabled, <code>_add_intensity_scale_bar()</code> adds a data‑accurate
+                    <code>mpl_toolkits.axes_grid1.anchored_artists.AnchoredSizeBar</code> anchored to the lower‑right
+                    corner of the map (<code>loc="lower right"</code>). The bar's physical length is chosen by a
+                    "nice number" heuristic — the largest value of the form <em>1, 2, or 5 × 10ⁿ</em> that does not
+                    exceed 22% of the current X‑axis span — so the labelled length is always a round, easily read
+                    figure rather than an arbitrary fraction of the map width.
+                </p>
+                <p>
+                    The bar's label automatically converts units: if the project's display unit is metres and the
+                    computed bar length is 1000 or greater, the label is shown in kilometres (e.g. "2 km") instead
+                    of an unwieldy metre value (e.g. "2000 m"); for any other unit, or a length under 1000&nbsp;m,
+                    the label uses the display unit unchanged. The three "Scale style" options are all drawn from
+                    the same underlying bar: <em>Solid bar</em> leaves the default filled rectangle as‑is;
+                    <em>Segmented bar</em> hides that rectangle and rebuilds it as four alternating
+                    filled/unfilled quarter‑segments in the chosen scale colour and the Plot BG colour;
+                    <em>Ticked line</em> suppresses the vertical bar height entirely, leaving only the horizontal
+                    line and its end ticks.
+                </p>
 
                 <h3 id="4.4">4.4 Background Image Card</h3>
                 <p>
@@ -495,8 +534,13 @@ t1,2 = (−b ∓ √Δ) / (2a)</div>
                     Show scan circles is checked), and the background photograph (if enabled), respecting the
                     z‑order/opacity rules of <a  href="#sec-4-1-1">Section 4.1.1</a>. Axis limits are padded by 5% of each dimension, aspect is
                     fixed to 'equal', axis flips are applied, grid lines and border/spine styling are applied from
-                    the Map Elements card, and finally <code>fig.tight_layout()</code> and
-                    <code>canvas.draw_idle()</code> commit the frame.
+                    the Map Elements card, and the scale bar is added last via
+                    <code>_add_intensity_scale_bar()</code> (see <a href="#sec-4-3-1">Section 4.3.1</a>) so it sits
+                    above every other map layer. Finally <code>fig.tight_layout()</code> and
+                    <code>_align_colorbar_to_plot()</code> commit the layout before
+                    <code>canvas.draw_idle()</code> renders the frame; the same tight‑layout/alignment pair is
+                    re‑run independently by the canvas layout‑sync handler described in <a href="#2.3">Section
+                    2.3</a> whenever the tab is resized or first shown.
                 </p>
 
                 <h3 id="sec-6-6">6.6 Caching and Performance Optimisation</h3>
@@ -583,7 +627,8 @@ t1,2 = (−b ∓ √Δ) / (2a)</div>
                     <tr><td>Fracture trace overlay</td><td><code>matplotlib.collections.LineCollection</code></td><td>All digitized fracture segments drawn as a single vectorised line collection for performance, coloured per Map Elements &gt; Trace Color.</td></tr>
                     <tr><td>Scan‑circle outlines</td><td><code>matplotlib.patches.Circle</code> (unfilled)</td><td>One outline per scan‑circle centre, only drawn when "Show scan circles" is enabled; useful for auditing grid coverage and spacing.</td></tr>
                     <tr><td>Background photograph</td><td><code>ax.imshow()</code></td><td>Optional calibrated field photo drawn beneath (z‑order 0) all data layers.</td></tr>
-                    <tr><td>Colour bar</td><td><code>fig.colorbar(mappable, ax=ax, location=…)</code></td><td>Axis‑anchored (not manually positioned) colour bar with configurable side and 4% padding / 4.6% fraction of the parent axes.</td></tr>
+                    <tr><td>Scale bar</td><td><code>mpl_toolkits.axes_grid1.anchored_artists.AnchoredSizeBar</code></td><td>Optional data‑accurate scale bar anchored to the lower‑right of the map, drawn last (above all other layers); see <a href="#sec-4-3-1">Section 4.3.1</a>.</td></tr>
+                    <tr><td>Colour bar</td><td><code>fig.colorbar(mappable, ax=ax, location=…)</code></td><td>Attached via Matplotlib's axis‑anchored colorbar API, but its final position, width, and axes locator are explicitly overridden by the custom <code>_align_colorbar_to_plot()</code> method to keep it thin and flush against the map rather than leaving Matplotlib's default (and often oversized) empty band beside it. Its tick formatter also has <code>set_scientific(False)</code> and <code>set_useOffset(False)</code> applied, so intensity/density values are always shown as plain decimal numbers instead of scientific notation or an offset.</td></tr>
                 </table>
 
                 <figure class="figure-block">

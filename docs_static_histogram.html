@@ -136,13 +136,14 @@
                 <h3 id="2.2">2.2 Columns Consumed</h3>
                 <table>
                     <tr><th>Column</th><th>Type</th><th>Used for</th><th>Notes</th></tr>
-                    <tr><td><code>Length_m</code></td><td>float</td><td>Segment‑length histogram; length statistics; Cross Plot "Segment Length" axis</td><td>Real‑world segment length in the currently selected display unit (despite the fixed column‑name suffix "_m").</td></tr>
-                    <tr><td><code>StrikeDeg</code></td><td>float</td><td>Segment‑angle histogram; Cross Plot "Segment/Strike angle" axis</td><td>Stored fully‑directed (0–360°); the tab folds it to the 0–180° fracture‑orientation convention with modulo arithmetic before plotting.</td></tr>
+                    <tr><td><code>Length_m</code></td><td>float</td><td>Segment‑length histogram; length statistics; Cross Plot "Segment Length" axis</td><td>Real‑world segment length in the currently selected display unit (despite the fixed column‑name suffix "_m"). Falls back to <code>Length</code> when <code>Length_m</code> is absent.</td></tr>
+                    <tr><td><code>StrikeDeg</code></td><td>float</td><td>Segment‑angle histogram; Cross Plot "Segment/Strike angle" axis</td><td>Stored fully‑directed (0–360°); the tab folds it to the 0–180° fracture‑orientation convention with modulo arithmetic before plotting. Falls back to <code>SegmentAngle</code>, then <code>Angle</code>, when <code>StrikeDeg</code> is absent.</td></tr>
                     <tr><td><code>Trace</code></td><td>int</td><td>Trace‑length aggregation; edge‑censoring grouping</td><td>Used with a pandas <code>groupby</code> to sum segment lengths per trace.</td></tr>
                     <tr><td><code>TraceLengthM</code></td><td>float</td><td>Trace‑length histogram (fast path)</td><td>Precomputed total length per trace when present; otherwise derived on demand via <code>groupby("Trace")["Length_m"].sum()</code>.</td></tr>
                     <tr><td><code>X1, Y1, X2, Y2</code></td><td>float</td><td>Edge‑censoring bounding‑box test; SVG fallback cross‑plot geometry</td><td>Real‑world (scaled) segment endpoints for SVG‑sourced data.</td></tr>
                     <tr><td><code>Aperture</code></td><td>float</td><td>Cross Plot Y‑axis default for Excel/CSV data</td><td>Only populated when the source spreadsheet supplies an Aperture column; otherwise NaN.</td></tr>
-                    <tr><td><code>ID</code></td><td>int</td><td>Cross Plot "Segment ID" axis option</td><td>Sequential per‑segment identifier matching the Table/Results tabs.</td></tr>
+                    <tr><td><code>DipDeg</code></td><td>float</td><td>Cross Plot "Dip (°)" axis option</td><td>Falls back to a plain <code>Dip</code> column when <code>DipDeg</code> is absent.</td></tr>
+                    <tr><td><code>ID</code></td><td>int</td><td>Cross Plot "Segment ID" axis option</td><td>Sequential per‑segment identifier matching the Table/Results tabs. Falls back to a <code>Segment</code> column when <code>ID</code> is absent.</td></tr>
                 </table>
 
                 <h3 id="2.3">2.3 Handling of Missing or Empty Data</h3>
@@ -160,6 +161,15 @@
                     focal‑mechanism dataset with no Segment Length/Aperture information while the default Cross Plot
                     axes are still selected), the module shows "No valid data for the selected X/Y axes" and clears
                     every statistics label rather than attempting to compute a minimum/maximum on an empty array.
+                </div>
+                <div class="note-box">
+                    <strong>Note:</strong> two further edge‑case messages cover scenarios not caught by the guard
+                    above. If the requested Cross Plot X or Y axis cannot be resolved from the loaded dataset at
+                    all (neither a matching results‑table column nor SVG fallback geometry is available), the
+                    plot area shows "Selected axis not available for this dataset" instead of attempting to plot
+                    <code>None</code> values. Separately, in any Histogram mode, if enabling "Censor edge traces"
+                    removes every remaining valid data point, the module shows "No valid data remaining after
+                    censoring" rather than a blank or crashed histogram axis.
                 </div>
 
                 <!-- ================================================= -->
@@ -264,7 +274,7 @@
                     <tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>X axis</td><td>Option menu</td><td>Segment Angle (°)</td><td>Selects the attribute plotted on the horizontal axis. Options: Segment Angle (°), Segment Length, Trace Angle (°), Trace Length, Strike (°), Length, Aperture (mm), Dip (°), Segment ID, Trace ID.</td></tr>
                     <tr><td>Y axis</td><td>Option menu</td><td>Segment Length</td><td>Selects the attribute plotted on the vertical axis, from the same option list as X axis.</td></tr>
-                    <tr><td>Colour points by</td><td>Option menu</td><td>None</td><td>Optionally colours each scatter point by a third attribute using a continuous colormap; "None" plots all points in a single solid colour.</td></tr>
+                    <tr><td>Colour points by</td><td>Option menu</td><td>None</td><td>Optionally colours each scatter point by a third attribute using a continuous colormap; "None" plots all points in a single solid colour. Options: None, Segment Angle (°), Segment Length, Trace Angle (°), Trace Length, Strike (°), Length, Aperture (mm), Dip (°), Trace ID.</td></tr>
                     <tr><td>Custom title (blank = auto)</td><td>Text entry</td><td>""</td><td>Overrides the automatic "X‑label vs Y‑label (n=...)" title.</td></tr>
                     <tr><td>Dot colour</td><td>Colour swatch</td><td>#2563EB</td><td>Marker colour used when "Colour points by" is "None".</td></tr>
                     <tr><td>Dot size</td><td>Text entry (float)</td><td>18</td><td>Marker area, in points², passed to Matplotlib's scatter <code>s</code> parameter.</td></tr>
@@ -283,6 +293,14 @@
                     Aperture (mm). When Excel/CSV data containing length/aperture columns is loaded instead of SVG,
                     the axes are set (or reset) to this Segment Length vs Aperture (mm) pairing rather than the
                     SVG default.
+                </div>
+                <div class="note-box">
+                    <strong>Dynamic unit labelling:</strong> whichever attribute is selected for the X axis, Y
+                    axis, or "Colour points by" — Segment Length, Trace Length, or Length — has the workspace's
+                    currently active display unit appended automatically to its axis/colourbar label (e.g.
+                    "Segment Length (m)"), via an internal <code>_label_with_unit</code> helper. Every other
+                    option (angles, Aperture, Dip, IDs) is shown with its label unchanged, since those attributes
+                    are not affected by the display‑unit setting.
                 </div>
 
                 <!-- ================================================= -->
@@ -304,6 +322,27 @@ Segment angle (image-ref): θi = atan2( x2 − x1 , −(y2 − y1) )  (mod 180°
                     increases in the opposite sense. The resulting angle is reduced modulo 180° because fracture
                     strike is an axial (undirected line) quantity — a segment trending 040° is geometrically
                     identical to one trending 220°.
+                </p>
+                <p>
+                    This raw‑geometry fallback also respects the same workspace structural‑map adjustments that
+                    the Fracture Map tab's own geometry pipeline applies, so an angle recomputed here from
+                    endpoints always agrees with the pre‑computed <code>StrikeDeg</code> value for the same
+                    segment regardless of how the map has been reoriented:
+                </p>
+                <div class="formula-block">
+dx = x2 − x1;              dx → −dx  if "Flip X" is enabled
+dy = y2 − y1;              dy → −dy  if "Reverse Y" is enabled (default: enabled)
+θi = ( atan2(dx, dy) + Y‑axis azimuth‑from‑North ) mod 180°
+                </div>
+                <p>
+                    The <strong>Flip X</strong> and <strong>Reverse Y</strong> toggles and the
+                    <strong>Y‑axis azimuth‑from‑North</strong> value are read live from the Fracture Map tab's own
+                    settings (<code>_static_map_flip_x_var</code>, <code>reverse_y_var</code>, and
+                    <code>_static_map_y_axis_north_var</code> respectively); if any of these are unavailable the
+                    module falls back to no flip, Y reversed, and 0° azimuth. Without this adjustment, a
+                    Segment Angle computed from raw coordinates would silently ignore the workspace's Flip X,
+                    Flip Y, and north‑referencing settings and disagree with every other angle shown elsewhere in
+                    the application whenever those settings differed from their defaults.
                 </p>
                 <div class="note-box">
                     <strong>Note:</strong> when the pre‑computed <code>StrikeDeg</code> column already exists in

@@ -55,8 +55,8 @@
                     every internal intersection into one of three topological node types (I, Y, X); splits every
                     digitised segment at its crossing points to obtain true topological branches and classifies each
                     branch by the connectedness of its endpoints; computes a battery of scalar connectivity
-                    statistics; and renders five complementary diagrams — a spatial node map and four ternary
-                    diagrams — that let the analyst see at a glance where the network sits on the spectrum between
+                    statistics; and renders six selectable diagrams — a spatial node map, four individual ternary
+                    diagrams, and a combined 2×2 ternary dashboard — that let the analyst see at a glance where the network sits on the spectrum between
                     a poorly connected "scattered" network and a well-connected "lattice" network.
                 </p>
 
@@ -101,7 +101,7 @@
                 <h3 id="1.1">1.1 Sidebar Card Structure</h3>
                 <table>
                     <tr><th>Card</th><th>Purpose</th></tr>
-                    <tr><td>Plots</td><td>Grouped navigation buttons for switching between the five available diagrams (one Connectivity view, four Ternary views).</td></tr>
+                    <tr><td>Plots</td><td>Grouped navigation buttons for switching between the six available diagrams (one Connectivity view, five Ternary views including the 2×2 dashboard).</td></tr>
                     <tr><td>Settings</td><td>Node snap tolerance entry, "Include boundary I-nodes" switch, "Show node labels" switch, and a Recalculate button.</td></tr>
                     <tr><td>I-Y-X Summary</td><td>Eight live numeric read-outs: I Nodes, Y Nodes, X Nodes, Total Nodes, Branches, Connected Fraction, Connections / Branch, B22.</td></tr>
                     <tr><td>Branch Topology</td><td>Five live numeric read-outs: I-I Branches, I-C Branches, C-C Branches, C_L, C_B.</td></tr>
@@ -114,12 +114,13 @@
                     navigation button sets the active plot key, re-highlights the selected button (fill colour
                     changes to light blue, text turns bold and coloured), swaps the visible canvas via
                     <code>grid()</code>/<code>grid_remove()</code>, and updates the toolbar label above the plot.
-                    Because all five Matplotlib canvases are constructed once at tab-build time and simply hidden
+                    Because all six Matplotlib canvases are constructed once at tab-build time and simply hidden
                     or shown, switching between diagrams is instantaneous and requires no recomputation.
                 </p>
                 <table>
                     <tr><th>Group</th><th>Plot Key</th><th>Diagram</th></tr>
                     <tr><td>Connectivity</td><td><code>connectivity</code></td><td>I-Y-X Connectivity Nodes (spatial map)</td></tr>
+                    <tr><td>Ternary</td><td><code>ternary_grid</code></td><td>Ternary Dashboard (2×2) — all four ternary diagrams below, laid out on a single canvas</td></tr>
                     <tr><td>Ternary</td><td><code>ternary_iyx</code></td><td>I-Y-X Ternary Connectivity</td></tr>
                     <tr><td>Ternary</td><td><code>ternary_cl</code></td><td>Connections per Line (C_L)</td></tr>
                     <tr><td>Ternary</td><td><code>ternary_cb</code></td><td>Connections per Branch (C_B)</td></tr>
@@ -166,7 +167,7 @@
                     Excel loader for orientation-only formats.
                 </p>
                 <div class="note-box">
-                    <strong>Note:</strong> when an orientation-only format is detected, all five canvases display
+                    <strong>Note:</strong> when an orientation-only format is detected, all six canvases display
                     "I-Y-X connectivity needs map geometry; load an SVG or spatial CSV/Excel" rather than raising
                     an error.
                 </div>
@@ -230,46 +231,119 @@
                 <h3 id="3.4">3.4 Display Settings Sidebar</h3>
                 <p>
                     Clicking "⚙ Settings" hides the main sidebar and reveals a second sidebar of identical width,
-                    headed by a "⬅ Back" button and the title "Display Settings". This sidebar exposes cosmetic
-                    and stylistic controls that do not affect the underlying topological computation — only how the
-                    results are rendered.
+                    headed by a "⬅ Back" button and a title that reads either "Map Settings" or "Ternary Settings".
+                    The sidebar automatically swaps between two entirely independent panels depending on which
+                    diagram is currently active: the <strong>Map Settings</strong> panel is shown only while the
+                    spatial "I-Y-X Connectivity Nodes" plot is active, and the <strong>Ternary Settings</strong>
+                    panel is shown for all five Ternary-group plots (the dashboard and the four individual
+                    diagrams), which share one common set of controls. Every control in both panels is cosmetic
+                    and stylistic — none of them affect the underlying topological computation, only how the
+                    results are rendered. The two panels use separate colour/size variables under the hood, so
+                    styling the map does not affect the ternary diagrams and vice versa.
                 </p>
 
-                <h4 id="3.4">3.4.1 Display Options</h4>
+                <h4 id="3.4">3.4.1 Map Settings — Plot Elements</h4>
                 <table>
                     <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
-                    <tr><td>Ternary plot heading</td><td>blank (automatic)</td><td>Custom title overriding the automatic heading on all four ternary diagrams.</td></tr>
-                </table>
-
-                <h4 id="3.4">3.4.2 Plot Elements</h4>
-                <table>
-                    <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
-                    <tr><td>Outer background</td><td>theme background</td><td>Figure-level (canvas) background colour for all five diagrams.</td></tr>
-                    <tr><td>Plot background</td><td>theme panel</td><td>Axes-level background colour.</td></tr>
-                    <tr><td>Grid colour</td><td>theme grid</td><td>Colour of gridlines on the map and ternary reference grids.</td></tr>
-                    <tr><td>I-Node colour</td><td>#DC2626 (red)</td><td>Marker colour for isolated nodes on the spatial map and in ternary vertex labels.</td></tr>
-                    <tr><td>Y-Node colour</td><td>#16A34A (green)</td><td>Marker colour for abutting (Y) nodes.</td></tr>
-                    <tr><td>X-Node colour</td><td>#2563EB (blue)</td><td>Marker colour for crossing (X) nodes.</td></tr>
-                    <tr><td>Border colour</td><td>#475569</td><td>Colour of axis spines / plot borders.</td></tr>
-                    <tr><td>Border width</td><td>1.0</td><td>Line width (pt) of axis spines, applied via <code>palette['border_lw']</code>.</td></tr>
+                    <tr><td>Outer background</td><td>theme background</td><td>Figure-level (canvas) background colour of the spatial map.</td></tr>
+                    <tr><td>Plot background</td><td>theme panel</td><td>Axes-level background colour of the spatial map.</td></tr>
+                    <tr><td>Grid colour</td><td>theme grid</td><td>Colour of the coordinate gridlines on the map.</td></tr>
+                    <tr><td>I-Node colour</td><td>#DC2626 (red)</td><td>Marker colour for isolated nodes on the spatial map.</td></tr>
+                    <tr><td>Y-Node colour</td><td>#16A34A (green)</td><td>Marker colour for abutting (Y) nodes on the spatial map.</td></tr>
+                    <tr><td>X-Node colour</td><td>#2563EB (blue)</td><td>Marker colour for crossing (X) nodes on the spatial map.</td></tr>
+                    <tr><td>Border colour</td><td>#475569</td><td>Colour of the map's axis spines / plot border.</td></tr>
+                    <tr><td>Border width</td><td>1.0</td><td>Line width (pt) of the map's axis spines.</td></tr>
                     <tr><td>Base Node Size</td><td>36</td><td>Base marker area (Matplotlib <code>s</code> parameter, in points²) for I, Y, and X node scatter markers on the spatial map.</td></tr>
-                    <tr><td>Show grid lines</td><td>Off</td><td>Toggles gridlines on all diagrams.</td></tr>
-                    <tr><td>Grid line width</td><td>0.6</td><td>Line width (pt) of gridlines when shown.</td></tr>
+                    <tr><td>Show scale</td><td>Off</td><td>Toggles a data‑accurate scale bar in the lower‑right of the spatial map, drawn in the project's current display unit.</td></tr>
+                    <tr><td>Scale Color</td><td>#000000</td><td>Colour used to draw the scale bar (and its label/ticks).</td></tr>
+                    <tr><td>Scale style</td><td>Solid bar</td><td>Chooses how the scale bar is rendered — <em>Solid bar</em> (single filled block), <em>Segmented bar</em> (alternating filled/unfilled blocks), or <em>Ticked line</em> (a plain line with end ticks).</td></tr>
+                    <tr><td>Show grid lines</td><td>Off</td><td>Toggles gridlines on the map.</td></tr>
+                    <tr><td>Grid line width</td><td>0.6</td><td>Line width (pt) of the map's gridlines when shown.</td></tr>
                 </table>
 
-                <h4 id="3.4">3.4.3 Background Image</h4>
+                <h4 id="3.4">3.4.2 Map Settings — Background Image</h4>
                 <table>
                     <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
-                    <tr><td>Show real photo behind nodes</td><td>Off</td><td>Enables a calibrated photograph drawn behind the spatial node map only (the four ternary diagrams do not use a background image). If no image path is yet known, automatically prompts a file browser or reuses an image already calibrated elsewhere in the project.</td></tr>
+                    <tr><td>Show real photo behind nodes</td><td>Off</td><td>Enables a calibrated photograph drawn behind the spatial node map (the ternary diagrams do not use a background image). If no image path is yet known, automatically prompts a file browser or reuses an image already calibrated elsewhere in the project.</td></tr>
                     <tr><td>Change Image…</td><td>—</td><td>Opens a file dialog to (re)select the background photograph.</td></tr>
                     <tr><td>Image opacity (0–1)</td><td>1.0</td><td>Alpha blending factor applied to the background image via Matplotlib's <code>imshow(alpha=...)</code>.</td></tr>
                 </table>
 
-                <h4 id="3.4">3.4.4 Reset Defaults</h4>
+                <h4 id="3.4">3.4.3 Ternary Settings — Display Options</h4>
+                <table>
+                    <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
+                    <tr><td>Ternary plot heading</td><td>blank (automatic)</td><td>Custom title overriding the automatic heading on all five ternary diagrams (dashboard and individual views alike).</td></tr>
+                </table>
+
+                <h4 id="3.4">3.4.4 Ternary Settings — Plot Elements</h4>
+                <table>
+                    <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
+                    <tr><td>Outer background</td><td>theme background</td><td>Figure-level (canvas) background colour of the ternary diagrams.</td></tr>
+                    <tr><td>Plot background</td><td>theme panel</td><td>Axes-level background colour of the ternary diagrams.</td></tr>
+                    <tr><td>Grid colour</td><td>theme grid</td><td>Colour of the ternary reference grid lines.</td></tr>
+                    <tr><td>I-Node colour</td><td>#DC2626 (red)</td><td>Colour used for I-related vertex labels/markers on the ternary diagrams.</td></tr>
+                    <tr><td>Y-Node colour</td><td>#16A34A (green)</td><td>Colour used for Y-related vertex labels/markers on the ternary diagrams.</td></tr>
+                    <tr><td>X-Node colour</td><td>#2563EB (blue)</td><td>Colour used for X-related vertex labels/markers on the ternary diagrams.</td></tr>
+                    <tr><td>Border colour</td><td>#475569</td><td>Colour of the ternary axes' spines / plot borders.</td></tr>
+                    <tr><td>Border width</td><td>1.0</td><td>Line width (pt) of the ternary axes' spines.</td></tr>
+                    <tr><td>Show grid lines</td><td>Off</td><td>Toggles the ternary reference grid.</td></tr>
+                    <tr><td>Grid line width</td><td>0.6</td><td>Line width (pt) of the ternary gridlines when shown.</td></tr>
+                </table>
+
+                <h4 id="3.4">3.4.5 Ternary Settings — Grid &amp; Axis Controls</h4>
+                <table>
+                    <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
+                    <tr><td>Grid interval</td><td>0.2</td><td>Spacing between reference gridlines on the ternary axes — a choice of 0.1, 0.2, or 0.25.</td></tr>
+                    <tr><td>Grid line pattern</td><td>Dashed</td><td>Line style of the ternary reference grid — Solid, Dashed, Dotted, or Dash‑Dot.</td></tr>
+                    <tr><td>Show edge tick marks</td><td>Off</td><td>Toggles small tick marks along the triangle's edges at each grid interval.</td></tr>
+                    <tr><td>Tick direction</td><td>Outward</td><td>Draws the edge tick marks pointing Outward, Inward, or as a Cross through the edge.</td></tr>
+                    <tr><td>Show edge labels</td><td>Off</td><td>Toggles numeric labels (e.g. "0.2", "0.4", …) alongside the edge tick marks.</td></tr>
+                    <tr><td>Dashboard horizontal gap</td><td>0.10</td><td>Horizontal spacing (Matplotlib <code>wspace</code>) between the four subplots of the 2×2 Ternary Dashboard.</td></tr>
+                    <tr><td>Dashboard vertical gap</td><td>0.10</td><td>Vertical spacing (Matplotlib <code>hspace</code>) between the four subplots of the 2×2 Ternary Dashboard.</td></tr>
+                </table>
+
+                <h4 id="3.4">3.4.6 Ternary Settings — Data &amp; Reference Elements</h4>
+                <table>
+                    <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
+                    <tr><td>Show point coordinates</td><td>Off</td><td>Annotates the observed data point on each ternary diagram with its raw coordinate values.</td></tr>
+                    <tr><td>Marker style</td><td>—</td><td>Shape of the observed data point marker — Circle, Square, Triangle, or Diamond.</td></tr>
+                    <tr><td>Marker size</td><td>—</td><td>Size of the observed data point marker.</td></tr>
+                    <tr><td>Marker colour</td><td>—</td><td>Fill colour of the observed data point marker.</td></tr>
+                    <tr><td>Marker border colour</td><td>—</td><td>Outline colour of the observed data point marker.</td></tr>
+                    <tr><td>Marker border width</td><td>—</td><td>Outline thickness of the observed data point marker.</td></tr>
+                    <tr><td>Show contour / locus lines</td><td>Off</td><td>Toggles the iso-value contour families (C_L, C_B) or the theoretical random-network locus (Branch Topology), depending on the active diagram.</td></tr>
+                    <tr><td>Contour colour</td><td>—</td><td>Colour used to draw the contour / locus lines.</td></tr>
+                    <tr><td>Show summary box</td><td>On</td><td>Toggles the small annotated text box (e.g. "C_L = 3.12") drawn on the C_L, C_B, and Branch Topology diagrams — see <a href="#3.4">Section 3.4.7</a> for its drag behaviour.</td></tr>
+                </table>
+
+                <h4 id="3.4">3.4.7 Interactive Dragging</h4>
                 <p>
-                    Restores every colour, size, and toggle in the Display Settings sidebar to its factory value
-                    and triggers a cosmetic-only redraw. Background-image settings and the underlying
-                    tolerance/boundary-inclusion settings are not affected by this reset.
+                    When the workspace's "Move Layout Elements" edit mode is enabled, two figure annotations become
+                    click-and-draggable so they can be repositioned to avoid overlapping the underlying data:
+                </p>
+                <table>
+                    <tr><th>Element</th><th>Where it appears</th><th>Behaviour</th></tr>
+                    <tr><td>Ternary summary box</td><td>C_L, C_B, and Branch Topology ternary diagrams</td><td>The annotated summary text (e.g. C_L, C_B value) can be dragged anywhere within its plot. Its position is tracked independently per diagram (<code>cl</code>, <code>cb</code>, <code>br</code>) and persists across redraws.</td></tr>
+                    <tr><td>Map scale bar</td><td>Spatial connectivity map</td><td>When "Show scale" is enabled, the scale bar can be dragged to any position on the map; its anchor point is preserved across pan/zoom and redraw operations.</td></tr>
+                </table>
+                <p>
+                    Dragging either element suppresses the global "drag whole plot" pan handler for the duration of
+                    the drag, so repositioning an annotation never accidentally pans the underlying axes.
+                </p>
+
+                <h4 id="3.4">3.4.8 Reset Defaults</h4>
+                <p>
+                    Because the Map Settings and Ternary Settings panels are independent, each has its own reset
+                    button, and only the button for the panel currently on screen is shown:
+                </p>
+                <table>
+                    <tr><th>Button</th><th>Shown when</th><th>Effect</th></tr>
+                    <tr><td>Reset Map Defaults</td><td>Map Settings panel active</td><td>Restores every colour, size, and toggle in the Map Settings panel to its factory value and triggers a cosmetic-only redraw of the spatial map. Background-image settings are not affected.</td></tr>
+                    <tr><td>Reset Ternary Defaults</td><td>Ternary Settings panel active</td><td>Restores every colour, size, and toggle in the Ternary Settings panel to its factory value and triggers a cosmetic-only redraw of the ternary diagrams.</td></tr>
+                </table>
+                <p>
+                    Neither button affects the underlying tolerance/boundary-inclusion settings that drive the
+                    topological computation.
                 </p>
 
                 <!-- ================================================= -->
@@ -639,10 +713,12 @@ where ε = 1×10⁻¹⁰.</div>
                 <!-- ================================================= -->
                 <h2 id="visualization">7. Visualization &amp; Figure Components</h2>
                 <p>
-                    Five complementary Matplotlib diagrams are available, switchable instantly from the Plots
+                    Six selectable Matplotlib diagrams are available, switchable instantly from the Plots
                     navigation card. All share the workspace's global font-size, font-weight, and font-colour
-                    settings (<code>matplotlib.rcParams</code>) and honour the Display Settings colour/size
-                    overrides described in <a href="#3.4">Section 3.4</a>.
+                    settings (<code>matplotlib.rcParams</code>), and each honours the Display Settings colour/size
+                    overrides for its own family — the spatial map reads the Map Settings panel, and the four
+                    ternary diagrams plus the dashboard all read the shared Ternary Settings panel — described in
+                    <a href="#3.4">Section 3.4</a>.
                 </p>
 
                 <h3 id="7.1">7.1 I-Y-X Connectivity Nodes (Spatial Map)</h3>
@@ -666,7 +742,19 @@ where ε = 1×10⁻¹⁰.</div>
                     <span class="ph-caption"><strong>Figure 7.1</strong> — I-Y-X Connectivity Nodes map: spatial fracture-trace network with red circles at isolated (I) tips, green circles at abutting (Y) junctions, and blue circles at crossing (X) junctions. Legend below the plot.</span>
                 </figure>
 
-                <h3 id="7.2">7.2 I-Y-X Ternary Connectivity</h3>
+                <h3 id="7.2">7.2 Ternary Dashboard (2×2)</h3>
+                <p>
+                    Selected via the <code>ternary_grid</code> plot key, this diagram draws all four ternary plots
+                    described in Sections 7.3–7.6 together as a single 2×2 grid of subplots on one canvas, so the
+                    full ternary picture — connectivity, C_L, C_B, and Branch Topology — can be compared at a
+                    glance without switching between individual views. Each subplot is drawn with the same
+                    routine used for its full-size counterpart, so any Ternary Settings change (colours, grid,
+                    markers, contours) applies identically to the dashboard and to the individual diagrams. The
+                    spacing between the four subplots is controlled independently via the "Dashboard horizontal
+                    gap" and "Dashboard vertical gap" settings (see <a href="#3.4">Section 3.4.5</a>).
+                </p>
+
+                <h3 id="7.3">7.3 I-Y-X Ternary Connectivity</h3>
                 <p>
                     An equilateral-triangle ternary diagram with vertices labelled Y (bottom-left), X
                     (bottom-right), and I (apex). A single orange marker plots the network's (p_i, p_y, p_x)
@@ -686,7 +774,7 @@ where ε = 1×10⁻¹⁰.</div>
                     <span class="ph-caption"><strong>Figure 7.2</strong> — I-Y-X Ternary Connectivity diagram. The data point (orange) is annotated with the fractions of I, Y, and X nodes.</span>
                 </figure>
 
-                <h3 id="7.3">7.3 Connections per Line (C_L)</h3>
+                <h3 id="7.4">7.4 Connections per Line (C_L)</h3>
                 <p>
                     The same Y/X/I ternary frame, overlaid with a family of iso-C_L contour lines drawn for
                     C_L = 1, 2, 3, 4, 6, 8, 10, 20, plus a distinguished dashed contour at the frequently cited
@@ -695,7 +783,7 @@ where ε = 1×10⁻¹⁰.</div>
                     is plotted as an amber marker with an annotated C_L value.
                 </p>
 
-                <h3 id="7.4">7.4 Connections per Branch (C_B)</h3>
+                <h3 id="7.5">7.5 Connections per Branch (C_B)</h3>
                 <p>
                     Structurally identical to the C_L diagram but contoured for C_B = 0.5, 1.0, 1.3, 1.5, 1.7,
                     1.8, 1.9, 1.95, plus the fixed C_B = 2.0 contour, which coincides exactly with the bottom
@@ -704,7 +792,7 @@ where ε = 1×10⁻¹⁰.</div>
                     with an annotated C_B value.
                 </p>
 
-                <h3 id="7.5">7.5 Branch Topology (I-I · I-C · C-C)</h3>
+                <h3 id="7.6">7.6 Branch Topology (I-I · I-C · C-C)</h3>
                 <p>
                     A ternary diagram with vertices I-C (bottom-left), C-C (bottom-right), and I-I (apex),
                     overlaid with the theoretical random-network locus described in <a href="#4.7">Section 4.7</a> (blue curve with
@@ -723,20 +811,23 @@ where ε = 1×10⁻¹⁰.</div>
                     <span class="ph-caption"><strong>Figure 7.3</strong> — Branch Topology (I-I · I-C · C-C) ternary diagram showing the theoretical random-network locus (blue curve with C_B tick marks) and the observed branch-population point (white marker).</span>
                 </figure>
 
-                <h3 id="7.6">7.6 Empty and Loading States</h3>
+                <h3 id="7.7">7.7 Empty and Loading States</h3>
                 <p>
                     When no data is loaded, when the data source lacks real map geometry, or while a recomputation
-                    is pending but the tab is not the active one, all five axes are cleared and a single centred,
+                    is pending but the tab is not the active one, all six axes are cleared and a single centred,
                     muted-colour text message is drawn by <code>_fluid_empty_state()</code> explaining the reason.
                     All sidebar statistic labels are simultaneously reset to "–".
                 </p>
 
-                <h3 id="7.7">7.7 Global Styling Controls</h3>
+                <h3 id="7.8">7.8 Global Styling Controls</h3>
                 <p>
-                    Every diagram observes the same background/foreground/grid/border colour variables and the same
-                    border line width and grid line width entries, so the five diagrams present a visually
-                    consistent, publication-ready style suite. Corner labels and axis titles automatically scale
-                    with the workspace's global font-size control (<code>mpl.rcParams['axes.titlesize']</code>).
+                    The spatial map and the ternary diagrams each observe their own independent set of
+                    background/foreground/grid/border colour variables and their own border line width and grid
+                    line width entries (see <a href="#3.4">Section 3.4</a>), so the two families can be styled
+                    completely independently. Within a family, though, every diagram shares one consistent,
+                    publication-ready style suite — the four individual ternary diagrams and the 2×2 dashboard all
+                    read the same Ternary Settings. Corner labels and axis titles automatically scale with the
+                    workspace's global font-size control (<code>mpl.rcParams['axes.titlesize']</code>).
                 </p>
 
                 <!-- ================================================= -->

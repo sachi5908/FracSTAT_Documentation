@@ -44,7 +44,7 @@
                     of every fracture plane currently loaded into the workspace, plotted as poles (points
                     representing the plane normal). Superimposed on the same projection is a continuous colour
                     field showing how a chosen stress-derived attribute — slip tendency, dilation tendency,
-                    fracture susceptibility, or a binary critical-stress classification — would vary across every
+                    fracture susceptibility, or a four-tier critical-fracture-state classification — would vary across every
                     conceivable plane orientation for the stress tensor currently defined in the sidebar. The
                     combination of discrete, data-derived poles and a continuous theoretical field is what makes
                     the Stereonet Tab a genuinely predictive tool rather than a simple plotting utility: it lets
@@ -57,7 +57,7 @@
                     <code>self.results</code> DataFrame that feeds the Map, Rose, Mohr, and Table tabs, and it
                     shares the same stress-resolution outputs (<code>SlipTendencyNorm</code>,
                     <code>DilationTendency</code>, <code>FractureSusceptibility</code>,
-                    <code>CriticalStressValue</code>) produced by <code>calculator.run_calculation()</code>. It
+                    <code>CriticalStateValue</code>) produced by <code>calculator.run_calculation()</code>. It
                     therefore requires no independent data entry: any SVG trace map or Excel/CSV orientation
                     table already loaded for the Map tab is automatically available here. The module's scope is
                     strictly the stereographic (angular) domain — it does not compute spatial statistics (that is
@@ -184,7 +184,7 @@
                     <tr><td><code>SlipTendencyNorm</code></td><td>Wallace–Bott resolved shear/normal ratio, normalised by the theoretical maximum</td><td>One of four selectable colour-by metrics.</td></tr>
                     <tr><td><code>DilationTendency</code></td><td>(σ1 − σn)/(σ1 − σ3)</td><td>One of four selectable colour-by metrics.</td></tr>
                     <tr><td><code>FractureSusceptibility</code></td><td>σn − Pf − (τ − C0)/μ</td><td>One of four selectable colour-by metrics.</td></tr>
-                    <tr><td><code>CriticalStressValue</code></td><td>Boolean Coulomb test cast to 0/1</td><td>One of four selectable colour-by metrics; forces a discrete two-colour scale.</td></tr>
+                    <tr><td><code>CriticalStateValue</code></td><td>Four-tier friction-demand classification (0&ndash;3)</td><td>One of four selectable colour-by metrics; forces a discrete four-colour scale.</td></tr>
                     <tr><td><code>EffectiveSigmaN, Tau</code></td><td>Resolved normal/shear stress at the current stress tensor</td><td>Displayed verbatim in the Pole Inspector card.</td></tr>
                 </table>
 
@@ -313,7 +313,7 @@ nU = −cos(colat)</div>
                     <tr><td>Slip tendency (normalised)</td><td>Ts = τ / max(σn, 10⁻¹²)</td><td>Divided by the maximum Ts found on the grid so the field spans 0–1.</td></tr>
                     <tr><td>Dilation tendency</td><td>Td = (σ1 − σn) / (σ1 − σ3)</td><td>Already dimensionless, 0–1 by construction.</td></tr>
                     <tr><td>Fracture susceptibility</td><td>Sf = σn − Pf − (τ − C0)/μ</td><td>Displayed in stress units (e.g. MPa); colour range set from data min/max.</td></tr>
-                    <tr><td>Critical stress (binary)</td><td>1 if τ ≥ C0 + μ(σn − Pf), else 0</td><td>Two-colour discrete scale (stable / critical).</td></tr>
+                    <tr><td>Critical fractures</td><td>threshold_ratio = [(τ − C₀) / (σn − Pf)] / μ, banded to 0=Stable, 1=Near Critical, 2=Critical, 3=Unstable at the 50%/75%/100% thresholds</td><td>Discrete four-colour scale (Stable / Near Critical / Critical / Unstable).</td></tr>
                 </table>
                 <p>
                     This same field-evaluation logic is shared with the Mohr tab's own contour computation,
@@ -396,9 +396,9 @@ field_x, field_y = (radius*np.sin(trend)).ravel(), (radius*np.cos(trend)).ravel(
                     <li>Build a meshgrid of 64 colatitude values (0.01 to π/2 − 0.01) by 128 trend values (0 to 2π, endpoint excluded).</li>
                     <li>Compute the unit normal-vector components at every grid node (<a href="#section-3-4">Section 3.4</a>).</li>
                     <li>Project each normal onto the active principal-stress frame to obtain direction cosines.</li>
-                    <li>Evaluate σn and τ, then the selected scalar field value (Ts, Td, Sf, or the binary critical-stress test).</li>
+                    <li>Evaluate σn and τ, then the selected scalar field value (Ts, Td, Sf, or the four-tier critical-fracture-state classification).</li>
                     <li>Convert every grid node's (colatitude, trend) into equal-area (x, y) plotting coordinates using the same radius formula as the poles.</li>
-                    <li>Triangulate the resulting scattered point cloud with <code>matplotlib.tri.Triangulation</code> and render it with <code>ax.tricontourf</code> at 24 discrete colour levels.</li>
+                    <li>Triangulate the resulting scattered point cloud with <code>matplotlib.tri.Triangulation</code> and render it with <code>ax.tricontourf</code> at 24 discrete colour levels (or, for the Critical fractures metric, at the fixed boundary levels [-0.5, 0.5, 1.5, 2.5, 3.5] so the four states render as crisp bands rather than a smoothed gradient).</li>
                 </ol>
                 <p>
                     Because the triangulation is built once per redraw directly from the analytic grid (not from
@@ -469,12 +469,14 @@ field_x, field_y = (radius*np.sin(trend)).ravel(), (radius*np.cos(trend)).ravel(
 
                 <h3 id="section-5-1">5.1 Colour Metric (shared with the Mohr Tab)</h3>
                 <p>
-                    Four checkboxes — Slip tendency, Dilation tendency, Fracture susceptibility, Critical stress —
+                    Four checkboxes — Slip tendency, Dilation tendency, Fracture susceptibility, Critical fractures —
                     are mutually exclusive (selecting one automatically clears the others) and are bound to the
                     same <code>mohr_slip_var</code> / <code>mohr_dilation_var</code> / <code>mohr_fracture_var</code>
                     / <code>mohr_critical_var</code> variables used by the Mohr tab, via the shared
                     <code>change_mohr_metric()</code> callback. This deliberate sharing means changing the active
-                    metric on either tab updates both simultaneously.
+                    metric on either tab updates both simultaneously; the Stereonet Tab does not maintain its own
+                    independent copy of the "Critical fractures" state, so the four-tier classification and its
+                    thresholds are always identical between the two tabs for a given stress state.
                 </p>
 
                 <h3 id="section-5-2">5.2 Settings Card — General Appearance</h3>
@@ -749,7 +751,7 @@ field_x, field_y = (radius*np.sin(trend)).ravel(), (radius*np.cos(trend)).ravel(
                 <h3 id="section-11-3">11.3 Example — Comparing Fracture Sets Against a Focal Mechanism Catalogue</h3>
                 <ol class="step-list">
                     <li>Load a Global CMT-style focal-mechanism Excel/CSV file alongside (in a separate session) or instead of an outcrop dataset.</li>
-                    <li>Enable "Show All Planes" to visualise the family of nodal-plane great circles, then toggle Critical stress as the colour metric to see which nodal planes are predicted to be critically stressed under the entered regional stress tensor.</li>
+                    <li>Enable "Show All Planes" to visualise the family of nodal-plane great circles, then toggle Critical fractures as the colour metric to see which nodal planes fall into the Critical or Unstable bands under the entered regional stress tensor.</li>
                 </ol>
 
                 <figure class="figure-block">
@@ -776,7 +778,7 @@ field_x, field_y = (radius*np.sin(trend)).ravel(), (radius*np.cos(trend)).ravel(
                     <li>A tight cluster of poles indicates a single, well-defined fracture set (consistent formation mechanism and stress history); a girdle (poles distributed along a great circle) suggests folding or a rotational deformation history superimposed on an originally more uniform set.</li>
                     <li>Poles coinciding with the high-Ts (hot) region of the field, typically forming two conjugate bands roughly 20–30° from the σ1 direction depending on the friction coefficient μ, are the orientations most favourable for shear reactivation under the current stress state — classic Andersonian conjugate shear-fracture geometry.</li>
                     <li>Poles coinciding with high dilation tendency (near σ3) are those most favourable for tensile opening or hydraulic-fracture propagation, relevant for fluid-flow and permeability assessment.</li>
-                    <li>A Critical stress colouring that shows most poles in the "stable" colour, despite reasonable stress magnitudes, may indicate either a genuinely low-permeability, mechanically stable fracture network, or that the assumed pore pressure Pf or friction coefficient μ is too conservative for the field setting.</li>
+                    <li>A Critical fractures colouring that shows most poles in the "Stable" band, despite reasonable stress magnitudes, may indicate either a genuinely low-permeability, mechanically stable fracture network, or that the assumed pore pressure Pf or friction coefficient μ is too conservative for the field setting; poles falling in the "Near Critical" band are worth particular attention, since a modest change in either parameter could shift them into "Critical" or "Unstable".</li>
                 </ul>
                 <p>
                     Because the field is recomputed live from the sidebar stress tensor, the Stereonet Tab also

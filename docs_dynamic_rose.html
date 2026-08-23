@@ -44,7 +44,7 @@
                     is to render an equal-area, strike-frequency rose diagram of the fracture population currently
                     loaded into the workspace, with each angular petal coloured according to the resolved stress
                     attribute selected elsewhere in the application (slip tendency, dilation tendency, fracture
-                    susceptibility, or a binary critical-stress classification).
+                    susceptibility, or a four-tier critical-fracture-state classification).
                 </p>
                 <p>
                     Unlike the Static Analyzer's Rose Plot tab, which characterises fracture-network geometry alone
@@ -134,7 +134,7 @@
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
                         </button>
                     </div>
-                    <span class="ph-caption"><strong>Figure 2.1</strong> — Overall layout of the Rose Tab: polar rose diagram (left) with toolbar, and the scrollable settings panel (right) grouped into five labelled cards.</span>
+                    <span class="ph-caption"><strong>Figure 2.1</strong> — Overall layout of the Rose Tab: polar rose diagram (left) with toolbar, and the scrollable settings panel (right) topped by the fracture-state classification table and grouped below it into five labelled cards.</span>
                 </figure>
 
                 <h3 id="2.1">2.1 Plot Card</h3>
@@ -147,11 +147,12 @@
 
                 <h3 id="2.2">2.2 Settings Panel</h3>
                 <p>
-                    The settings panel is a CTkScrollableFrame subdivided into five visually separated cards, each
-                    with a bold section header and a thin horizontal rule. Every control is wired directly to
-                    <code>self._draw_rose()</code>, so changes are reflected in the plot immediately (no separate
-                    "Apply" step), with the exception of colour-swatch pickers, which redraw as soon as a colour is
-                    confirmed in the picker dialog.
+                    The settings panel is a CTkScrollableFrame topped by a fixed fracture-state classification
+                    table (<a href="#2.2.1">Section 2.2.1</a>) and subdivided below it into five visually separated
+                    cards, each with a bold section header and a thin horizontal rule. Every control is wired
+                    directly to <code>self._draw_rose()</code>, so changes are reflected in the plot immediately
+                    (no separate "Apply" step), with the exception of colour-swatch pickers, which redraw as soon
+                    as a colour is confirmed in the picker dialog.
                 </p>
                 <table>
                     <tr><th>Card</th><th>Controls contained</th></tr>
@@ -164,8 +165,44 @@
                 <p>
                     A "Reset to Defaults" button is docked at the bottom of the settings panel and restores every
                     control listed above to its factory value in a single action (see <a href="#4.7">Section 4.7</a> for the precise
-                    reset values, which differ subtly from the tab's initial construction defaults).
+                    reset values, which differ subtly from the tab's initial construction defaults). The
+                    classification table is not a user-configurable control and is unaffected by Reset to
+                    Defaults; it simply reflects whatever data is currently loaded.
                 </p>
+
+                <h3 id="2.2.1">2.2.1 Fracture-State Classification Table</h3>
+                <p>
+                    Docked at the very top of the settings panel, above the five cards described in
+                    <a href="#2.2">Section 2.2</a>, is a fixed four-row summary table (built by
+                    <code>_build_rose_classification_table()</code>) with columns "Classification state",
+                    "Fractures (percentage)", and "Dominant trends". Unlike the rest of the settings panel, this
+                    table is not a set of input controls — it is a read-only summary that is refreshed on every
+                    redraw (<code>_update_rose_classification_table()</code>, called from <code>_draw_rose()</code>
+                    with the diagram's current bin count) and is always visible regardless of which Map Display
+                    metric is currently selected for petal colouring.
+                </p>
+                <p>
+                    For each of the four states &mdash; Stable, Near Critical, Critical, Unstable, colour-coded to
+                    match the palette used elsewhere in the app &mdash; the table reports:
+                </p>
+                <ul>
+                    <li><strong>Fractures (percentage)</strong> &mdash; the count and percentage of all loaded
+                    segments (regardless of orientation) whose <code>CriticalState</code> string column equals
+                    that state, e.g. "34.2% (128)".</li>
+                    <li><strong>Dominant trends</strong> &mdash; among just the segments in that state, the strikes
+                    are folded to 0&ndash;180&deg; and binned into the same number of angular bins as the current
+                    rose diagram; the modal bin's centre and its axial conjugate (offset by 180&deg;) are reported
+                    as a "NNN&deg; / NNN&deg;" pair. This identifies which strike orientation is most represented
+                    within that risk tier, independent of the strike distribution of the population as a whole.
+                    Empty states display "&ndash;" in both columns.</li>
+                </ul>
+                <p>
+                    Because it is always driven by <code>CriticalState</code> irrespective of the active colouring
+                    metric, this table lets an analyst check the dataset's overall risk profile (e.g. "12% of
+                    fractures are Critical or Unstable, concentrated around 040&deg;/220&deg;") even while the rose
+                    diagram itself is coloured by, say, Slip tendency or Fracture susceptibility.
+                </p>
+
 
                 <!-- ================================================= -->
                 <h2 id="data-input">3. Data Input</h2>
@@ -180,7 +217,7 @@
                     <tr><th>Column</th><th>Type</th><th>Used for</th></tr>
                     <tr><td><code>StrikeDeg</code></td><td>float, 0–360°</td><td>Base orientation of each segment/plane; folded to 0–180° before binning.</td></tr>
                     <tr><td><code>Length_m</code></td><td>float</td><td>Optional length weighting when Weight by = Length.</td></tr>
-                    <tr><td>&lt;attribute column&gt;</td><td>float or bool</td><td>Whichever column <code>self._selected_attribute()</code> resolves to (SlipTendency[Norm], DilationTendency, FractureSusceptibility[Norm], or CriticalStressValue); used to colour each petal.</td></tr>
+                    <tr><td>&lt;attribute column&gt;</td><td>float or bool</td><td>Whichever column <code>self._selected_attribute()</code> resolves to (SlipTendency[Norm], DilationTendency, FractureSusceptibility[Norm], or CriticalStateValue); used to colour each petal.</td></tr>
                 </table>
 
                 <h3 id="3.1">3.1 Data Provenance and Column Semantics</h3>
@@ -300,7 +337,7 @@
                     <tr><td>Dilation tendency</td><td>n/a</td><td><code>DilationTendency</code></td><td>Dilation tendency Td</td></tr>
                     <tr><td>Fracture susceptibility</td><td>Yes</td><td><code>FractureSusceptibilityNorm</code></td><td>Normalized fracture susceptibility</td></tr>
                     <tr><td>Fracture susceptibility</td><td>No</td><td><code>FractureSusceptibility</code></td><td>Fracture susceptibility Sf, MPa</td></tr>
-                    <tr><td>Critical fractures</td><td>n/a</td><td><code>CriticalStressValue</code></td><td>Critically stressed: 0 no, 1 yes</td></tr>
+                    <tr><td>Critical fractures</td><td>n/a</td><td><code>CriticalStateValue</code></td><td>Critical fracture state: 0=Stable, 1=Near Critical, 2=Critical, 3=Unstable</td></tr>
                 </table>
 
                 <h3 id="4.7">4.7 Reset to Defaults</h3>
@@ -372,7 +409,7 @@
                 <h3 id="5.4">5.4 Colour-Mapped Attribute Aggregation</h3>
                 <p>
                     Each petal's fill colour represents the mean value of the selected mechanical attribute A (one
-                    of Tₛ, Td, Sf, or the binary critical-stress flag) among all segments falling in that bin:
+                    of Tₛ, Td, Sf, or the four-tier critical-fracture-state value) among all segments falling in that bin:
                 </p>
                 <div class="formula-block">Ā_k = nanmean{ A_i : e_k ≤ φ_i &lt; e_(k+1) }</div>
                 <p>
@@ -387,15 +424,18 @@
                 <p>
                     Continuous attributes (SlipTendency, SlipTendencyNorm, DilationTendency,
                     FractureSusceptibility, FractureSusceptibilityNorm) are mapped through a standard linear
-                    Normalize instance. Columns whose name ends in "Norm", together with DilationTendency and
-                    CriticalStressValue, are fixed to the domain [0, 1]; all other continuous columns use the
+                    Normalize instance. Columns whose name ends in "Norm", together with DilationTendency,
+                    are fixed to the domain [0, 1]; all other continuous columns use the
                     finite data-driven minimum and maximum, with a small symmetric padding applied when the data
-                    range collapses to a single value (to avoid a degenerate colour scale). The binary
-                    CriticalStressValue attribute instead uses a two-colour BoundaryNorm over {muted, failure} at
-                    the boundaries [-0.5, 0.5, 1.5], guaranteeing that 0 ("Stable") and 1 ("Critical") map
-                    unambiguously to two flat colour swatches rather than a continuous gradient, and the colour bar
-                    in this special case is manually re-ticked to read "Stable" / "Critical" instead of numeric
-                    values.
+                    range collapses to a single value (to avoid a degenerate colour scale). The
+                    CriticalStateValue attribute instead uses a discrete four-colour colormap/norm banding its
+                    integer codes 0&ndash;3 (Stable, Near Critical, Critical, Unstable), guaranteeing that each
+                    state maps unambiguously to its own flat colour swatch rather than a continuous gradient, and
+                    the colour bar in this special case is manually re-ticked to read "Stable" / "Near Critical" /
+                    "Critical" / "Unstable" instead of numeric values. Because each petal's colour value Ā_k is a
+                    <em>mean</em> of the per-segment state codes in that bin (<a href="#5.4">Section 5.4</a>), a
+                    petal spanning a mix of states can render at a boundary or blended position on the discrete
+                    scale rather than falling cleanly into a single band.
                 </p>
 
                 <!-- ================================================= -->
@@ -595,7 +635,7 @@ color_values = np.array(color_values)</code></pre>
                 <h3 id="8.4">8.4 Handling of Empty Bins</h3>
                 <p>
                     Bins containing zero segments are assigned Ā_k = 0.0, and will typically render as either the
-                    coolest end of the active colormap or, for the binary critical-stress mode, the "Stable"
+                    coolest end of the active colormap or, for the critical-fracture-state metric, the "Stable"
                     colour swatch. Users comparing colour intensity across bins with very different populations
                     (e.g., a dominant fracture set with hundreds of members versus a minor set with two or three)
                     should cross-reference petal length before drawing mechanical conclusions from colour alone,
@@ -631,11 +671,11 @@ color_values = np.array(color_values)</code></pre>
                 <h3 id="9.4">9.4 Colour Bar</h3>
                 <p>
                     The colour bar is a standard matplotlib Colorbar object bound to the ScalarMappable created
-                    from the resolved colormap and norm. For the binary CriticalStressValue metric, its ticks are
-                    explicitly overridden to the two labelled positions [0, 1] with text labels "Stable" and
-                    "Critical" rather than a numeric scale, which is essential because the underlying BoundaryNorm
-                    would otherwise present as a continuous-looking gradient despite representing a strictly binary
-                    classification.
+                    from the resolved colormap and norm. For the CriticalStateValue metric, its ticks are
+                    explicitly overridden to the four labelled positions [0, 1, 2, 3] with text labels "Stable",
+                    "Near Critical", "Critical", and "Unstable" rather than a numeric scale, which is essential
+                    because the underlying discrete norm would otherwise present as a continuous-looking gradient
+                    despite representing a fixed four-state classification.
                 </p>
 
                 <h3 id="9.5">9.5 Title</h3>
@@ -741,7 +781,7 @@ color_values = np.array(color_values)</code></pre>
                     <li>Load an SVG trace map or Excel orientation table and click Calculate with a representative in-situ stress tensor.</li>
                     <li>In the sidebar, set Map Display to "Critical fractures".</li>
                     <li>Switch to the Rose tab; set Weight by = Length and Bins = 36 for a balanced angular resolution.</li>
-                    <li>Observe which petal(s) are both large (abundant/long fractures at that strike) and coloured with the "Critical" swatch — these represent the strike orientations most likely to be actively slipping or on the verge of Coulomb failure under the assumed stress state.</li>
+                    <li>Observe which petal(s) are both large (abundant/long fractures at that strike) and coloured with the "Critical" or "Unstable" swatch — these represent the strike orientations most likely to be actively slipping or on the verge of Coulomb failure under the assumed stress state.</li>
                 </ol>
 
                 <h3 id="12.2">12.2 Example 2 — Comparing Frequency- vs. Length-Weighted Orientation Distributions</h3>
@@ -773,8 +813,8 @@ color_values = np.array(color_values)</code></pre>
                     (approximately 2θ_opt = arctan(1/μ) from σ1, i.e. roughly 25°–35° for typical friction
                     coefficients) exhibit the highest ratio of shear to effective normal stress and are therefore
                     the most prone to frictional reactivation. A petal that is both prominent (high frequency or
-                    cumulative length) and coloured toward high slip tendency or the "Critical" classification at
-                    approximately this optimal angular offset is a strong candidate for active
+                    cumulative length) and coloured toward high slip tendency or the "Critical"/"Unstable"
+                    classification at approximately this optimal angular offset is a strong candidate for active
                     or potentially active slip under the assumed stress state.
                 </p>
 
@@ -794,7 +834,7 @@ color_values = np.array(color_values)</code></pre>
                     and friction into a single margin-to-failure metric (see <a href="#maths">Section 5</a> of the Method tab
                     documentation for the full formula). Colouring the rose by susceptibility allows an analyst to
                     rank strike sets by their overall geomechanical risk in a single view, complementing the
-                    strictly binary Critical fractures classification with a continuous gradation useful for
+                    four-tier Critical fractures classification with a continuous gradation useful for
                     sensitivity or what-if stress-scenario comparisons.
                 </p>
 

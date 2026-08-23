@@ -157,7 +157,7 @@
                 </p>
                 <table>
                     <tr><th>Attribute</th><th>Role</th></tr>
-                    <tr><td><code>self.results</code></td><td>The pandas DataFrame returned by <code>core/calculator.py</code>'s <code>run_calculation()</code>, containing one row per fracture segment or fracture plane with columns including <code>StrikeDeg</code>, <code>DipDeg</code>, <code>SigmaN</code>, <code>EffectiveSigmaN</code>, <code>Tau</code>, <code>FailureTau</code>, <code>CoulombMargin</code>, <code>EnvelopeDistance</code>, <code>SlipTendency</code>, <code>SlipTendencyNorm</code>, <code>DilationTendency</code>, <code>FractureSusceptibility</code>, <code>FractureSusceptibilityNorm</code>, <code>CriticalStress</code>, and <code>CriticalStressValue</code>.</td></tr>
+                    <tr><td><code>self.results</code></td><td>The pandas DataFrame returned by <code>core/calculator.py</code>'s <code>run_calculation()</code>, containing one row per fracture segment or fracture plane with columns including <code>StrikeDeg</code>, <code>DipDeg</code>, <code>SigmaN</code>, <code>EffectiveSigmaN</code>, <code>Tau</code>, <code>FailureTau</code>, <code>CoulombMargin</code>, <code>EnvelopeDistance</code>, <code>SlipTendency</code>, <code>SlipTendencyNorm</code>, <code>DilationTendency</code>, <code>FractureSusceptibility</code>, <code>FractureSusceptibilityNorm</code>, <code>CriticalStress</code>, <code>CriticalStressValue</code>, <code>CriticalFactor</code>, <code>CriticalState</code>, and <code>CriticalStateValue</code>.</td></tr>
                     <tr><td><code>self.current_stress</code></td><td>A dictionary snapshot of the sidebar's stress inputs at the time "Calculate" was last pressed, holding <code>sigma1</code>, <code>sigma2</code>, <code>sigma3</code>, <code>pore_pressure</code>, <code>cohesion</code>, <code>friction</code>, and (when the General 3D orientation mode is active) <code>sigma1_trend</code>/<code>sigma1_plunge</code>/<code>sigma3_trend</code>.</td></tr>
                 </table>
                 <p>
@@ -191,10 +191,10 @@
                 <h3 id="4.1">4.1 Information Tab &mdash; Colour Points By</h3>
                 <table>
                     <tr><th>Control</th><th>Type</th><th>Default</th><th>Effect</th></tr>
-                    <tr><td>Slip tendency</td><td>Checkbox (exclusive)</td><td>Unchecked</td><td>Colours poles and the background tendency field by <code>SlipTendencyNorm</code> (normalized) or <code>SlipTendency</code> (raw), depending on the sidebar's normalization toggle.</td></tr>
+                    <tr><td>Slip tendency</td><td>Checkbox (exclusive)</td><td>Unchecked</td><td>Colours poles and the background tendency field by <code>SlipTendencyNorm</code> (normalized) or <code>SlipTendency</code> (raw), depending on the "Normalize color scale" checkbox in the Settings Tab's own Display Options (<a href="#4.5">Section 4.5</a>).</td></tr>
                     <tr><td>Dilation tendency</td><td>Checkbox (exclusive)</td><td>Unchecked</td><td>Colours by <code>DilationTendency</code>, always on a fixed 0&ndash;1 scale.</td></tr>
                     <tr><td>Fracture susceptibility</td><td>Checkbox (exclusive)</td><td>Unchecked</td><td>Colours by <code>FractureSusceptibility</code> (MPa).</td></tr>
-                    <tr><td>Critical stress</td><td>Checkbox (exclusive)</td><td>Unchecked</td><td>Colours by the binary <code>CriticalStressValue</code> using a fixed two-colour stable/critical palette, matching the Rose and Map tabs.</td></tr>
+                    <tr><td>Critical fractures</td><td>Checkbox (exclusive)</td><td>Unchecked</td><td>Colours by <code>CriticalStateValue</code>, a four-tier classification (Stable / Near Critical / Critical / Unstable) matching the same bands used by the Rose and Map tabs and by <code>core.calculator.critical_factor_and_state()</code> &mdash; see <a href="#5.3">Section 5.3</a>. The colour bar uses a proper colormap/norm with the four state names as tick labels, not a plain two-colour palette.</td></tr>
                     <tr><td>Colour scale dropdown</td><td>Custom colour-swatch dropdown</td><td>Plasma</td><td>Selects the Matplotlib colormap (or the bundled MATLAB-style Parula) applied when any of the four metrics above is active. Ignored when no metric is checked ("no metric" / classic mode, see <a href="#6.4">Section 6.4</a>).</td></tr>
                 </table>
                 <p>
@@ -243,6 +243,7 @@
                     <tr><td>Custom title</td><td>Text entry</td><td>(blank &rarr; auto)</td><td>Overrides the automatic title "Mohr Circle and Coulomb Failure Envelope" (with the active metric name appended when applicable)</td></tr>
                     <tr><td>Mohr envelope without Pore Pressure</td><td>Checkbox</td><td>Checked</td><td>Toggles the dry-envelope overlay described in <a href="#6.6">Section 6.6</a> (dashed circles/line using &sigma;&#8345; instead of &sigma;&#8345;&prime;)</td></tr>
                     <tr><td>Envelope line in front of Mohr Circle</td><td>Checkbox</td><td>Off (On after Reset Defaults)</td><td>Controls the Matplotlib z-order of the failure-envelope line relative to the shear-stress field / circles, so the line can be forced to always render on top</td></tr>
+                    <tr><td>Normalize color scale (<code>mohr_normalized_var</code>)</td><td>Checkbox</td><td>Checked</td><td>When a metric-based colouring mode is active, switches between the normalized (<code>SlipTendencyNorm</code>, per-dataset min&ndash;max scaled to [0, 1]) and raw (<code>SlipTendency</code>) values used for the colour mapping. Toggling it triggers a <code>preserve_view</code> redraw of both the Mohr Tab and, if present, the Stereonet Tab, so the two stay in sync.</td></tr>
                 </table>
 
                 <h3 id="4.6">4.6 Settings Tab &mdash; Plot Elements</h3>
@@ -340,6 +341,20 @@ center = &frac12;(&sigma;i + &sigma;j)          radius = &frac12;(&sigma;i &minu
                     observed across the whole dataset, i.e. <code>EnvelopeDistance</code> &le; 0.05 &times;
                     max(&tau;). This is a relative, dataset-dependent threshold rather than a fixed MPa tolerance,
                     so its meaning should be re-checked whenever the stress magnitudes change substantially.
+                </p>
+                <p>
+                    A separate, four-tier classification is also computed for every segment via
+                    <code>core.calculator.critical_factor_and_state()</code>: <code>CriticalFactor</code> is the
+                    friction coefficient required to resist the resolved shear stress,
+                    (&tau; &minus; C0) / (&sigma;n&prime;), and <code>threshold_ratio</code> expresses that demand
+                    as a fraction of the entered friction coefficient &mu;. The resulting <code>CriticalState</code>
+                    / <code>CriticalStateValue</code> bands this ratio into Stable (0&ndash;50%), Near Critical
+                    (50&ndash;75%), Critical (75&ndash;100%), or Unstable (&gt;100%). Unlike the binary
+                    <code>CriticalStress</code> flag above, this is not tied to the specific &tau; &ge; C0 +
+                    &mu;&middot;&sigma;n&prime; envelope test; it instead measures how close each fracture's
+                    friction demand is to the failure threshold, and is the classification driving the Mohr Tab's
+                    "Critical fractures" colour metric (<a href="#4.1">Section 4.1</a>) as well as the equivalent
+                    metric in the Rose and Map tabs.
                 </p>
 
                 <h3 id="5.4">5.4 Tendency and Susceptibility Metrics</h3>
@@ -450,13 +465,13 @@ n1 = sin&phi;&middot;cos&theta;,  n2 = sin&phi;&middot;sin&theta;,  n3 = cos&phi
                 <p>
                     When a metric checkbox is active, the workflow is: (1) build the continuous background field as
                     in <a href="#5.5">Section 5.5</a> and render it with <code>tricontourf</code> at 28 levels using the selected
-                    colormap and a <code>Normalize</code> (or, for the binary critical-stress metric, a two-colour
-                    <code>BoundaryNorm</code>/<code>ListedColormap</code> identical to the scheme used elsewhere in
-                    the app); (2) scatter every loaded fracture's (&sigma;n&prime;, &tau;) point on top using the
+                    colormap and a <code>Normalize</code> (or, for the Critical fractures metric, the four-tier
+                    colormap/norm returned by <code>attribute_colormap_and_norm()</code>, matching the discrete
+                    Stable/Near Critical/Critical/Unstable bands described in <a href="#5.3">Section 5.3</a>); (2) scatter every loaded fracture's (&sigma;n&prime;, &tau;) point on top using the
                     user-configured pole shape, size, colour, and edge styling; (3) attach a horizontal colour bar
                     sized and positioned per the Layout &amp; Sizing settings (<a href="#4.7">Section 4.7</a>), labelled with the
-                    metric's descriptive name and, for the critical-stress metric, custom tick labels "Stable" /
-                    "Critical" instead of numeric ticks.
+                    metric's descriptive name and, for the Critical fractures metric, custom tick labels "Stable" /
+                    "Near Critical" / "Critical" / "Unstable" instead of numeric ticks.
                 </p>
 
                 <div class="code-window">
@@ -486,7 +501,7 @@ def _mohr_field(sigma1, sigma2, sigma3, pore_pressure, cohesion, friction, value
         values = (tau >= cohesion + friction * (sigma_n - pore_pressure)).astype(float)
     return sigma_n.ravel() - pore_pressure, tau.ravel(), values.ravel()</code></pre>
                 </div>
-                <p class="ph-caption" style="text-align:left; margin: -1rem 0 1.5rem 0;">The <code>_mohr_field()</code> helper, evaluating slip tendency, dilation tendency, fracture susceptibility, or critical stress over the full polar/azimuthal mesh of possible plane orientations.</p>
+                <p class="ph-caption" style="text-align:left; margin: -1rem 0 1.5rem 0;">The <code>_mohr_field()</code> helper, evaluating slip tendency, dilation tendency, fracture susceptibility, or critical fracture state over the full polar/azimuthal mesh of possible plane orientations.</p>
 
                 <h3 id="6.6">6.6 Dry-Envelope Overlay</h3>
                 <p>
@@ -496,6 +511,15 @@ def _mohr_field(sigma1, sigma2, sigma3, pore_pressure, cohesion, friction, value
                     pressure both omitted) is added. This lets the analyst directly compare how much pore-pressure
                     reduction shifts the failure envelope and the data cloud relative to the theoretical dry
                     (undrained-free) case, without needing to re-run the calculation with P_f = 0.
+                </p>
+                <p>
+                    <code>_draw_mohr_dry_overlay()</code> respects the caller's <code>preserve_view</code> flag when
+                    expanding the x-axis limits to fit the dry envelope line: the expansion is skipped entirely when
+                    <code>preserve_view</code> is true. Previously this expansion ran unconditionally, so any
+                    cosmetic-only redraw with the dry overlay enabled would silently reset the user's pan/zoom
+                    viewport back out to fit the full envelope. It is now applied only on non-<code>preserve_view</code>
+                    redraws, consistent with the axis-limit handling in the rest of <code>_draw_mohr</code>
+                    (<a href="#workflow">Section 7</a>).
                 </p>
 
                 <h3 id="6.7">6.7 Symbols Index Construction</h3>
@@ -701,7 +725,7 @@ def _mohr_field(sigma1, sigma2, sigma3, pore_pressure, cohesion, friction, value
                 <h3>Example 12.1 &mdash; Identifying Critically Stressed Fractures for Reservoir Stimulation</h3>
                 <ol class="step-list">
                     <li>Load an SVG trace map or Excel orientation table of fractures via the workspace header, then enter the site's principal stresses, pore pressure, cohesion, and friction coefficient in the sidebar and press Calculate.</li>
-                    <li>Open the Mohr Tab and check the "Critical stress" colour-metric checkbox to shade the diagram by the binary stable/critical field.</li>
+                    <li>Open the Mohr Tab and check the "Critical fractures" colour-metric checkbox to shade the diagram by the four-tier Stable/Near Critical/Critical/Unstable field.</li>
                     <li>Inspect the Closest to Envelope table to identify the specific fracture IDs already at or nearest to failure.</li>
                     <li>Click one of the listed critical fractures to inspect its resolved &sigma;n&prime;, &tau;, T&#8347;, and &Delta;&tau; in the metric tiles, then use "Show in Map" to see its spatial location.</li>
                     <li>Re-run the calculation with a higher assumed pore pressure (e.g. simulating fluid injection) to observe how many additional fractures cross into the critical population, using the dry-envelope overlay to compare against the undrained case.</li>

@@ -102,7 +102,7 @@
                 <h3 id="1.1">1.1 Data Flow</h3>
                 <ol class="step-list">
                     <li><code>core.svg_loader.read_svg_segments()</code> or <code>core.excel_loader.read_excel_segments()</code> parse the source file into a list of <code>Segment</code> objects.</li>
-                    <li><code>core.calculator.run_calculation()</code> resolves the stress tensor onto each segment, producing columns such as <code>StrikeDeg</code>, <code>DipDeg</code>, <code>SigmaN</code>, <code>Tau</code>, <code>SlipTendency</code>, <code>SlipTendencyNorm</code>, <code>DilationTendency</code>, <code>FractureSusceptibility</code>, <code>FractureSusceptibilityNorm</code>, <code>CriticalStress</code>, <code>CriticalStressValue</code>, <code>X1/Y1/X2/Y2</code>, <code>RawX1…RawY2</code>, <code>Lat</code>, <code>Lon</code>, <code>EventLabel</code>, <code>PlaneName</code>, <code>BeachballURL</code>, and related fields.</li>
+                    <li><code>core.calculator.run_calculation()</code> resolves the stress tensor onto each segment, producing columns such as <code>StrikeDeg</code>, <code>DipDeg</code>, <code>SigmaN</code>, <code>Tau</code>, <code>SlipTendency</code>, <code>SlipTendencyNorm</code>, <code>DilationTendency</code>, <code>FractureSusceptibility</code>, <code>FractureSusceptibilityNorm</code>, <code>CriticalStress</code>, <code>CriticalStressValue</code>, <code>CriticalFactor</code>, <code>CriticalState</code>, <code>CriticalStateValue</code>, <code>X1/Y1/X2/Y2</code>, <code>RawX1…RawY2</code>, <code>Lat</code>, <code>Lon</code>, <code>EventLabel</code>, <code>PlaneName</code>, <code>BeachballURL</code>, and related fields.</li>
                     <li><code>dynamic_app.py</code> stores this table as <code>self.results</code> and calls <code>refresh_plots()</code>, which in turn calls <code>MapTab._draw_map()</code>.</li>
                     <li><code>MapTab._draw_map()</code> dispatches to one of four internal drawing routines depending on the data source and the geometry actually present, and renders the result onto a Matplotlib Figure embedded in the CustomTkinter window via <code>FigureCanvasTkAgg</code>.</li>
                     <li>User interaction with the Map Tab (segment selection, pan/zoom, appearance changes) feeds back into shared application state (<code>selected_segment_id</code>, view limits) that the Mohr, Stereonet, and Table tabs also read, enabling synchronized cross-tab highlighting.</li>
@@ -190,7 +190,7 @@
                     <li><strong>Cartesian / SVG mode:</strong> <code>X1, Y1, X2, Y2</code> (scaled, real-world units) and <code>RawX1, RawY1, RawX2, RawY2</code> (unscaled SVG pixel coordinates, used only when the profile has not yet been calibrated — see <a href="#5.3">Section 5.3</a>).</li>
                     <li><strong>Orientation-wheel mode:</strong> <code>StrikeDeg</code>, <code>DipDeg</code>, <code>ID</code>.</li>
                     <li><strong>Geographic mode:</strong> <code>Lat</code>, <code>Lon</code>, <code>PlaneName</code>, <code>EventLabel</code>, <code>Region</code>, <code>BeachballURL</code>.</li>
-                    <li><strong>All modes:</strong> <code>ID</code> (for selection), plus whichever attribute column is selected for colouring (<code>SlipTendency</code>/<code>SlipTendencyNorm</code>, <code>DilationTendency</code>, <code>FractureSusceptibility</code>/<code>FractureSusceptibilityNorm</code>, or <code>CriticalStressValue</code>).</li>
+                    <li><strong>All modes:</strong> <code>ID</code> (for selection), plus whichever attribute column is selected for colouring (<code>SlipTendency</code>/<code>SlipTendencyNorm</code>, <code>DilationTendency</code>, <code>FractureSusceptibility</code>/<code>FractureSusceptibilityNorm</code>, or <code>CriticalStateValue</code>).</li>
                 </ul>
 
                 <h3 id="3.2">3.2 Coordinate Calibration Prerequisite</h3>
@@ -237,6 +237,9 @@
                     <tr><td>Grid line width</td><td>Text entry</td><td>0.6</td><td>Line width (points) of gridlines; alpha is fixed internally at 0.6.</td></tr>
                     <tr><td>Boundary Color</td><td>Colour swatch</td><td>#1F2933</td><td>Colour applied to all four Axes spines (the plot border).</td></tr>
                     <tr><td>Boundary width</td><td>Text entry</td><td>1.0</td><td>Line width (points) of the plot border spines.</td></tr>
+                    <tr><td>Show scale (<code>map_show_scale_var</code>)</td><td>Checkbox</td><td>Off</td><td>Toggles visibility of the data-accurate scale bar drawn in the map's lower-right corner by default (or wherever it has since been dragged to; see <a href="#10.1">Section 10.1</a>).</td></tr>
+                    <tr><td>Scale Color (<code>map_scale_color_var</code>)</td><td>Colour swatch</td><td>#1F2933</td><td>Colour applied to the scale bar and its label text.</td></tr>
+                    <tr><td>Scale style (<code>map_scale_style_var</code>)</td><td>Dropdown</td><td>Solid bar</td><td>Rendering style of the scale bar: <strong>Solid bar</strong>, <strong>Segmented bar</strong> (alternating filled/unfilled segments), or <strong>Ticked line</strong> (a plain line with end and midpoint ticks).</td></tr>
                     <tr><td>Contour Line Color (<code>map_contour_line_color_var</code>)</td><td>Colour swatch</td><td>#000000</td><td>Stroke colour applied to contour line overlays, both in "Contour (Lines Only)" mode and for the optional line overlay drawn on top of "Contour (Filled)" surfaces.</td></tr>
                     <tr><td>Contour Line Width (<code>map_contour_line_width_var</code>)</td><td>Text entry</td><td>0.5</td><td>Line width (points) of contour lines, clamped to a minimum of 0.1.</td></tr>
                 </table>
@@ -245,7 +248,7 @@
                 <table>
                     <tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Position</td><td>Dropdown</td><td>Bottom</td><td>Bottom / Top / Left / Right / None. Determines where the colour bar is docked and how the main Axes is resized to make room for it (see <a href="#8.4">Section 8.4</a> for exact geometry).</td></tr>
-                    <tr><td>Length (e.g., 1.0 for 100%)</td><td>Text entry</td><td>1.0</td><td>Fractional length of the colour bar relative to the corresponding figure dimension, clamped to [0.1, 1.0].</td></tr>
+                    <tr><td>Length (e.g., 0.8 for 80%)</td><td>Text entry</td><td>1.0</td><td>Fractional length of the colour bar relative to the corresponding figure dimension, clamped to [0.1, 1.0].</td></tr>
                     <tr><td>Force 0 to 1 scale (<code>map_normalize_01_var</code>)</td><td>Checkbox</td><td>Off</td><td>When enabled, forces the colour scale normalization to a strict [0.0, 1.0] range regardless of the attribute column's actual data range, overriding the empirical min/max behaviour described in <a href="#5.2">Section 5.2</a>. Useful for visually comparing surfaces or maps across different datasets on a common scale.</td></tr>
                 </table>
 
@@ -285,7 +288,7 @@
                     <tr><td>Slip tendency</td><td>SlipTendencyNorm</td><td>SlipTendency</td><td>Tₛ = τ / σₙ</td></tr>
                     <tr><td>Dilation tendency</td><td>— (always shown raw)</td><td>DilationTendency</td><td>T_d = (σ₁ − σₙ) / (σ₁ − σ₃)</td></tr>
                     <tr><td>Fracture susceptibility</td><td>FractureSusceptibilityNorm</td><td>FractureSusceptibility</td><td>S_f = σₙ − P_f − (τ − C₀) / μ</td></tr>
-                    <tr><td>Critical fractures</td><td>CriticalStressValue (binary)</td><td>—</td><td>1 if τ ≥ μ(σₙ − P_f) + C₀, else 0</td></tr>
+                    <tr><td>Critical fractures</td><td>CriticalStateValue (four-tier)</td><td>—</td><td>0 = Stable, 1 = Near Critical, 2 = Critical, 3 = Unstable, banded from threshold_ratio = [(τ − C₀) / (σₙ − P_f)] / μ at 50%/75%/100%</td></tr>
                 </table>
 
                 <h4 id="5.1">5.1.1 Definition of Terms</h4>
@@ -299,6 +302,7 @@
                     <li><strong>Tₛ (Slip Tendency)</strong> — the ratio of resolved shear to normal stress; a plane slips when Tₛ approaches or exceeds μ.</li>
                     <li><strong>T_d (Dilation Tendency)</strong> — the propensity of a fracture to open (dilate) under the current stress state, normalized between the two principal stress extremes.</li>
                     <li><strong>S_f (Fracture Susceptibility)</strong> — a Mohr-Coulomb failure-margin proxy combining effective normal stress and cohesion-corrected shear stress; lower (more negative) values indicate closer proximity to shear failure.</li>
+                    <li><strong>threshold_ratio (Critical Fractures)</strong> — the friction coefficient required to resist the resolved shear stress, expressed as a fraction of the entered friction coefficient μ; see <code>core.calculator.critical_factor_and_state()</code>.</li>
                 </ul>
 
                 <h4 id="5.1">5.1.2 Normalization</h4>
@@ -309,8 +313,9 @@
                     <code>SlipTendencyNorm</code> values fall in a stable, comparable [0, ~1] range regardless of
                     which fractures happen to be present in the loaded dataset. <code>FractureSusceptibilityNorm</code>
                     is instead a simple min–max rescaling across the loaded fracture population:
-                    (S_f − S_f,min) / (S_f,max − S_f,min). Dilation Tendency and Critical Fractures are
-                    dimensionless/binary by construction and are never further normalized.
+                    (S_f − S_f,min) / (S_f,max − S_f,min). Dilation Tendency is dimensionless by construction and
+                    is never further normalized; Critical Fractures is likewise never rescaled, since its four
+                    tiers are already fixed integer codes (0–3) rather than a continuous quantity.
                 </p>
 
                 <h3 id="5.2">5.2 Colour Normalization for Rendering</h3>
@@ -321,9 +326,9 @@
                     colormap domain:
                 </p>
                 <ul>
-                    <li>Columns ending in "Norm", plus <code>CriticalStressValue</code> and <code>DilationTendency</code>, use a fixed <code>Normalize(vmin=0, vmax=1)</code>.</li>
+                    <li>Columns ending in "Norm", plus <code>DilationTendency</code>, use a fixed <code>Normalize(vmin=0, vmax=1)</code>.</li>
                     <li>All other (raw, unnormalized) columns use the empirical minimum and maximum of the finite values present in the current dataset. If the data is degenerate (min ≈ max), a symmetric padding of 5% of the magnitude (or 1.0 if the value is exactly zero) is applied so the colour scale remains well-defined.</li>
-                    <li><code>CriticalStressValue</code> is treated specially: rather than a continuous colormap, a two-colour <code>ListedColormap(["muted", "failure"])</code> is combined with a <code>BoundaryNorm([-0.5, 0.5, 1.5], N)</code> so that the binary 0/1 values are rendered as two crisp, discrete colours ("Stable" and "Critical") rather than a misleading continuous gradient. The colour bar in this mode is relabelled with the ticks "Stable" and "Critical" instead of numeric values.</li>
+                    <li><code>CriticalStateValue</code> is treated specially: rather than a continuous colormap, a discrete four-colour colormap/norm is used so that the integer codes 0–3 (Stable, Near Critical, Critical, Unstable) are rendered as crisp, discrete bands rather than a misleading continuous gradient. The colour bar in this mode is relabelled with the ticks "Stable", "Near Critical", "Critical", and "Unstable" instead of numeric values. (The older binary <code>CriticalStressValue</code> column still exists in the results table for backward compatibility, but the Critical Fractures display mode no longer uses it.)</li>
                 </ul>
 
                 <h3 id="5.3">5.3 Cartesian Coordinate Scaling</h3>
@@ -579,14 +584,17 @@
                     renders a visible, non-degenerate gradient.
                 </p>
 
-                <h3 id="8.2">8.2 Binary Classification Display</h3>
+                <h3 id="8.2">8.2 Critical-Fracture Classification Display</h3>
                 <p>
-                    The Critical Fractures mode is a two-class statistical summary rather than a continuous field:
-                    each segment is classified as "Critical" (τ at or above the Mohr-Coulomb failure threshold) or
-                    "Stable" (below it). The Map Tab renders this classification with a fixed two-colour palette and
-                    boundary-normalized colour mapping (<a href="#5.2">Section 5.2</a>) so that the discrete nature
-                    of the result is never misrepresented as a continuous gradient — a common source of
-                    misinterpretation in geomechanical figures.
+                    The Critical Fractures mode is a four-class statistical summary rather than a continuous field:
+                    each segment's <code>threshold_ratio</code> — the friction demand required to resist its
+                    resolved shear stress, expressed as a fraction of the entered friction coefficient μ — is
+                    banded into Stable (0–50%), Near Critical (50–75%), Critical (75–100%), or Unstable (&gt;100%),
+                    via <code>core.calculator.critical_factor_and_state()</code>. The Map Tab renders this
+                    classification with a discrete four-colour palette and boundary-normalized colour mapping
+                    (<a href="#5.2">Section 5.2</a>) so that the discrete nature of the result is never
+                    misrepresented as a continuous gradient — a common source of misinterpretation in geomechanical
+                    figures.
                 </p>
 
                 <h3 id="8.3">8.3 Event De-duplication (Geographic Mode)</h3>
@@ -614,9 +622,9 @@
                 </table>
                 <p><em>(Note: The exact fractional coordinates shown above reflect the Cartesian/SVG rendering mode. The Orientation Wheel and Geographic rendering modes utilize slightly adjusted docking rectangles to safely accommodate their unique radial and geographic axis labels.)</em></p>
                 <p>
-                    For binary Critical Fractures colouring, the colour bar's tick marks are overridden to display
-                    the text labels "Stable" and "Critical" at positions 0 and 1 respectively, in place of numeric
-                    tick values.
+                    For Critical Fractures colouring, the colour bar's tick marks are overridden to display the
+                    text labels "Stable", "Near Critical", "Critical", and "Unstable" at positions 0–3, in place of
+                    numeric tick values.
                 </p>
 
                 <!-- ================================================= -->
@@ -706,6 +714,17 @@
                     the Map Tab's canvas also has ordinary pan/zoom bindings on the same mouse buttons that must be
                     suppressed while editing is active.
                 </p>
+                <p>
+                    When the scale bar (<a href="#4.2">Section 4.2</a>) is visible, the same edit mode also lets the
+                    user click and drag the scale bar itself (<code>_map_scale_bar</code>) to any position within the
+                    map Axes, independently of the Axes-repositioning behaviour described above. On press, if the
+                    cursor is inside the scale bar's current window extent, the handler begins tracking a scale-bar
+                    drag instead of an Axes drag; on motion, the pixel displacement is converted to Axes-fraction
+                    coordinates and applied to the bar via <code>set_bbox_to_anchor</code>, clamped to keep the bar
+                    within the plot (x in [0.05, 1.0], y in [0.0, 1.0]); on release, the new position
+                    (<code>_map_scale_position</code>) is retained so the bar reappears in the same spot after a
+                    redraw, until Reset Map Defaults restores it to the default lower-right corner.
+                </p>
 
                 <h3 id="10.2">10.2 Calibrated Background Photograph Auto-Detection</h3>
                 <p>
@@ -777,7 +796,7 @@
                 <ol class="step-list">
                     <li>Load a Global-CMT-style Excel file with Lat, Lon, FP1 Strike/Dip/Slip (and optionally FP2) columns.</li>
                     <li>The Map Tab automatically renders a geographic scatter map; enter a candidate regional stress tensor and click Calculate.</li>
-                    <li>Set Map Display to "Critical fractures" to immediately identify which historical earthquakes are kinematically consistent with reactivation under the candidate stress field ("Critical", shown in the failure colour) versus which are not ("Stable", shown in the muted colour).</li>
+                    <li>Set Map Display to "Critical fractures" to immediately identify which historical earthquakes are kinematically consistent with reactivation under the candidate stress field, ranked into four bands — Stable, Near Critical, Critical, and Unstable — rather than a simple yes/no split.</li>
                     <li>Click an event marker to open its beachball diagram inset and inspect the Rake Misfit reported in the Mohr/Table tabs, which quantifies how well the entered stress tensor explains that earthquake's observed slip direction.</li>
                 </ol>
 
@@ -814,10 +833,14 @@
 
                 <h4 id="13.4">13.4 Critical Fracture Maps</h4>
                 <p>
-                    The binary Critical/Stable classification provides an unambiguous, decision-oriented summary
-                    suitable for risk communication to non-specialist stakeholders: it answers the direct question
-                    "is this structure currently at or beyond the failure threshold under the assumed stress state?"
-                    without requiring interpretation of a continuous colour gradient.
+                    The four-tier Stable / Near Critical / Critical / Unstable classification provides a
+                    decision-oriented summary suitable for risk communication to non-specialist stakeholders: it
+                    answers the question "how close is this structure to the failure threshold under the assumed
+                    stress state?" with graded urgency, rather than collapsing that answer to a single yes/no split.
+                    Near Critical structures in particular are useful for flagging fractures that are not yet at
+                    failure but would cross into the Critical or Unstable bands under a modest change in pore
+                    pressure or stress orientation, without requiring interpretation of a continuous colour
+                    gradient.
                 </p>
 
                 <h4 id="13.5">13.5 Orientation-Wheel Interpretation</h4>

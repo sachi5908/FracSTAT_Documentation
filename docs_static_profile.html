@@ -272,6 +272,14 @@
                     <tr><td>Status label</td><td>Read-only text</td><td>Reports the current stage of interactive picking ("Step 1 of 2…", "Step 2 of 2…", or a confirmation once both points are set).</td></tr>
                     <tr><td>Update Graphs</td><td>Button</td><td>Forces an unconditional redraw of the map and output plot using the current settings; primarily a convenience action, since virtually every other control already triggers a redraw automatically.</td></tr>
                 </table>
+                <div class="note-box">
+                    <strong>Note:</strong> the four coordinate fields are automatically rescaled whenever the
+                    workspace's overall map display unit changes (e.g. metres → centimetres). The internal
+                    <code>_graphs_convert_units(factor)</code> method multiplies the current X1, Y1, X2, and Y2
+                    values by the appropriate conversion factor and rewrites each StringVar, so the reference line
+                    remains anchored to the same physical location on the map after a unit change rather than
+                    silently keeping its old numeric value in the new unit.
+                </div>
 
                 <h3 id="4.4">4.4 Settings Tab — Display and Appearance</h3>
                 <table>
@@ -288,10 +296,16 @@
                     <tr><td>Scan line colour</td><td>Colour picker</td><td>Colour of the reference line drawn on the map (default magenta, #DB2777).</td></tr>
                     <tr><td>Trace colour</td><td>Colour picker</td><td>Colour of the fracture-trace network drawn on the map (default blue, #2563EB).</td></tr>
                     <tr><td>Show grid lines</td><td>Checkbox</td><td>Toggles grid visibility on both subplots.</td></tr>
+                    <tr><td>Enable custom dimensions</td><td>Checkbox</td><td><code>graph_use_custom_size_var</code>, default off. When checked, enables the four Plot Dimensions entry fields below and applies them on the next redraw; when unchecked, the fields are disabled (greyed out) and both subplots instead use Matplotlib's normal automatic subplot layout.</td></tr>
+                    <tr><td>Map (W x H)</td><td>Numeric entries (px)</td><td>Explicit pixel width and height for the map subplot (<code>graph_map_w_var</code> / <code>graph_map_h_var</code>), applied only while "Enable custom dimensions" is checked. Together with the Graph dimensions below, these directly set each subplot's Matplotlib <code>set_position()</code> rectangle (computed from the figure's pixel size), giving pixel‑exact control over subplot size that the default automatic layout cannot offer.</td></tr>
+                    <tr><td>Graph (W x H)</td><td>Numeric entries (px)</td><td>Explicit pixel width and height for the output-plot subplot (<code>graph_plot_w_var</code> / <code>graph_plot_h_var</code>), applied only while "Enable custom dimensions" is checked.</td></tr>
+                    <tr><td>Show scale</td><td>Checkbox</td><td><code>graph_show_scale_var</code>, default off. Toggles a data‑accurate scale bar in the lower‑right corner of the map subplot — see <a href="#9.4">Section 9.4</a>.</td></tr>
+                    <tr><td>Scale colour</td><td>Colour picker</td><td><code>graph_color_scale</code>, default #1F2933. Colour used to draw the scale bar (and its label/ticks).</td></tr>
+                    <tr><td>Scale style</td><td>Dropdown</td><td><code>graph_scale_style_var</code>, default "Solid bar". Chooses how the scale bar is rendered — Solid bar (single filled block), Segmented bar (alternating filled/unfilled quarters), or Ticked line (a plain line with end ticks and no fill).</td></tr>
                     <tr><td>Show real photo behind map</td><td>Checkbox</td><td>Enables a calibrated background raster image beneath the fracture traces on the map subplot (see <a href="#10.2">Section 10.2</a>).</td></tr>
                     <tr><td>Change Image…</td><td>Button</td><td>Opens a file-selection dialog to choose or replace the background photograph.</td></tr>
                     <tr><td>Image opacity (0–1)</td><td>Numeric entry</td><td>Alpha blending value applied to the background photograph.</td></tr>
-                    <tr><td>Reset Defaults</td><td>Button</td><td>Restores every appearance/colour setting in this tab (title, legend positions, widths, and all six colours) to its factory default; background-image settings are not affected.</td></tr>
+                    <tr><td>Reset Defaults</td><td>Button</td><td>Restores every setting in this tab — title, legend positions, widths, all seven colours, the scale-bar toggle/style, the background-image toggle/path/opacity, and the custom plot-dimensions toggle/values — to its factory default via a full reinitialisation of the tab's settings (<code>_init_graph_settings()</code>), then rebuilds the Settings tab UI and redraws.</td></tr>
                 </table>
                 <div class="tip-box">
                     <strong>Tip:</strong> all numeric colour and width fields fail safely — an invalid entry (non-numeric text, or a malformed hex colour) is silently replaced by the previously valid default rather than raising an error, so a mistyped value can never crash the redraw.
@@ -512,14 +526,18 @@ P20 = N_end / (2πr²)</div>
                 <p>
                     The "Select end points" workflow is implemented as a small state machine attached to
                     mouse-click events on the map canvas. Activating the button sets an internal picking flag and
-                    clears any previously buffered click, changes the map cursor to a crosshair, and updates the
-                    status label to request the first click. The first accepted click stores its scene coordinates,
-                    draws a temporary marker and label directly onto the map axis, and updates the status label to
-                    request the second click. The second accepted click completes the pair: both points are
-                    written into the four coordinate StringVars, picking mode is deactivated, the cursor is
-                    restored, and a full redraw is triggered automatically. Clicks that land outside the map
-                    subplot (<code>event.inaxes</code> mismatch) or that occur while picking mode is inactive are
-                    ignored.
+                    clears any previously buffered click, sets the map canvas widget's cursor to
+                    <code>"crosshair"</code> (via <code>configure(cursor="crosshair")</code>) so the user has a
+                    clear visual indicator that picking mode is live, and updates the status label to request the
+                    first click. The first accepted click stores its scene coordinates and draws a temporary,
+                    unfilled <code>"X"</code>‑shaped scatter marker (in the same cyan‑blue, #0891B2, used for the
+                    finalized Point 1 marker — see <a href="#9.1">Section 9.1</a>) plus an adjacent "Point 1" text
+                    label directly onto the map axis, then updates the status label to request the second click.
+                    The second accepted click completes the pair: both points are written into the four coordinate
+                    StringVars, picking mode is deactivated, the cursor is restored, and a full redraw is triggered
+                    automatically — which replaces the temporary "X" marker with the permanent, colour‑coded square
+                    endpoint markers described in Section 9.1. Clicks that land outside the map subplot
+                    (<code>event.inaxes</code> mismatch) or that occur while picking mode is inactive are ignored.
                 </p>
 
                 <!-- ================================================= -->
@@ -582,7 +600,8 @@ P20 = N_end / (2πr²)</div>
                     confirm the spatial extent each sample window covers relative to the fracture network. Axis
                     limits are padded by five percent of the data range on each side (with a minimum one-unit pad)
                     so traces are never clipped at the figure edge, and the aspect ratio is fixed to "equal" so
-                    that geometric distances and angles are not visually distorted.
+                    that geometric distances and angles are not visually distorted. An optional scale bar can also
+                    be drawn in the lower-right corner of this subplot — see <a href="#9.4">Section 9.4</a>.
                 </p>
 
                 <h3 id="9.2">9.2 Output Plot (Right Subplot)</h3>
@@ -628,6 +647,24 @@ P20 = N_end / (2πr²)</div>
                     <span class="ph-caption"><strong>Figure 9.2</strong> — Output cross-section plot showing Segment length along, Segment angle along, and P21 intensity plotted together against distance along the reference line.</span>
                 </figure>
 
+                <h3 id="9.4">9.4 Scale Bar (<code>_add_graphs_scale_bar</code>)</h3>
+                <p>
+                    When "Show scale" is enabled, <code>_add_graphs_scale_bar()</code> adds a data‑accurate
+                    <code>mpl_toolkits.axes_grid1.anchored_artists.AnchoredSizeBar</code> anchored to the
+                    lower‑right corner of the map subplot (<code>loc="lower right"</code>). The bar's physical
+                    length is chosen by a "nice number" heuristic — the largest value of the form
+                    <em>1, 2, or 5 × 10ⁿ</em> that does not exceed 22% of the map's current X‑axis span — so the
+                    labelled length is always a round, easily read figure rather than an arbitrary fraction of the
+                    map width. If the project's display unit is metres and the computed length is 1000 or
+                    greater, the label is shown in kilometres (e.g. "2 km") instead of an unwieldy metre value; for
+                    any other unit, or a length under 1000&nbsp;m, the label uses the display unit unchanged. The
+                    three "Scale style" options are all drawn from the same underlying bar: <em>Solid bar</em>
+                    leaves the default filled rectangle as‑is; <em>Segmented bar</em> hides that rectangle and
+                    rebuilds it as four alternating filled/unfilled quarter‑segments in the chosen scale colour
+                    and the Plot background colour; <em>Ticked line</em> suppresses the vertical bar height
+                    entirely, leaving only the horizontal line and its end ticks.
+                </p>
+
                 <!-- ================================================= -->
                 <h2 id="advanced">10. Advanced and Interactive Features</h2>
 
@@ -635,11 +672,14 @@ P20 = N_end / (2πr²)</div>
                 <p>
                     Rather than requiring manual coordinate entry, the user may click the "Select end points"
                     button and then click twice directly on the fracture map to define the reference line
-                    visually. The first click is rendered immediately as a labelled marker ("Point 1") so the user
-                    receives instant visual confirmation; the second click completes the line, writes both
-                    coordinate pairs into the numeric entry fields (so they remain editable afterward), and
-                    triggers a full recalculation. This workflow is particularly useful for aligning the reference
-                    line with a specific geological feature visible on a loaded background photograph (see <a href="#10.2">Section 10.2</a>), such as a fault trace or bedding contact, without needing to first read off its
+                    visually. The first click is rendered immediately as a temporary "X"-shaped marker labelled
+                    "Point 1" (see <a href="#6.6">Section 6.6</a>) so the user receives instant visual
+                    confirmation; the second click completes the line, writes both coordinate pairs into the
+                    numeric entry fields (so they remain editable afterward), and triggers a full recalculation
+                    that redraws both endpoints as the permanent square markers described in <a href="#9.1">Section
+                    9.1</a>. This workflow is particularly useful for aligning the reference line with a specific
+                    geological feature visible on a loaded background photograph (see <a href="#10.2">Section
+                    10.2</a>), such as a fault trace or bedding contact, without needing to first read off its
                     coordinates.
                 </p>
 
