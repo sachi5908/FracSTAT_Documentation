@@ -103,7 +103,7 @@
                 <!-- ================================================= -->
                 <h2 id="controls">3. Content Structure and Typography</h2>
                 <p>
-                    The tab uses Tkinter text-widget tags to give the reference sheet a typographic hierarchy
+                    The tab uses the <code>ui_common.qtk</code> text-widget tag API to give the reference sheet a typographic hierarchy
                     without resorting to a rich-text or HTML rendering engine. Four fonts and five tags are defined
                     once at build time and then applied selectively as each line is inserted.
                 </p>
@@ -211,6 +211,25 @@ c₃ = n · σ̂₃   (horizontal component, perpendicular to σ₁)</div>
                     axes rather than being tied to the horizontal‑σ₁/σ₃, vertical‑σ₂ assumption; this variant is
                     <code>stress_on_plane_3d_general()</code>.
                 </p>
+                <div class="note-box">
+                    <strong>Which principal stress is vertical is an explicit parameter, not a hidden assumption.</strong>
+                    <code>stress_on_plane_3d()</code> and the helper that builds the axes,
+                    <code>andersonian_principal_axes()</code>, both take a <code>vertical_axis</code> argument
+                    selecting the Andersonian regime (Anderson 1951, <em>The Dynamics of Faulting</em>, 2nd ed.):
+                    <code>"sigma1"</code> for normal faulting (S<sub>v</sub> = σ₁), <code>"sigma2"</code> for
+                    strike-slip (S<sub>v</sub> = σ₂), <code>"sigma3"</code> for reverse/thrust
+                    (S<sub>v</sub> = σ₃). The default is <code>"sigma2"</code>, which is exactly what the Dynamic
+                    Analyzer's <em>Andersonian Model (Simplified)</em> mode documents and what the c₂ = n_z
+                    identification above relies on — so in that mode σ₂ is the vertical axis and the remaining
+                    horizontal axis lies 90° clockwise from the σ₁ azimuth. The parameter exists because the
+                    <strong>Uncertainty Analyzer resolves stress on the opposite default convention</strong>
+                    (S<sub>v</sub> = σ₃; see its <code>_remap_for_regime</code> helper, which permutes the
+                    calculator's σ₁/σ₂/σ₃ <em>inputs</em> per regime). The two subsystems therefore answer different
+                    questions unless the same regime is selected in both, and slip tendency computed under the wrong
+                    regime can differ by more than a factor of two. For any regime other than strike-slip, either
+                    pass <code>vertical_axis</code> explicitly or supply a fully orthogonal frame and use
+                    <code>stress_on_plane_3d_general()</code>.
+                </div>
 
                 <h3 id="4.5">4.5 Tendency Metrics</h3>
                 <p>
@@ -235,6 +254,17 @@ c₃ = n · σ̂₃   (horizontal component, perpendicular to σ₁)</div>
                     effective-stress Coulomb failure envelope.
                 </p>
                 <p>
+                    S<sub>f</sub> is reported directly in the working stress unit, not on a 0–1 scale, and has a
+                    physical reading: it is the <strong>additional pore-pressure increase the plane can sustain
+                    before the effective-stress Coulomb envelope is reached</strong> (Mildren, Hillis &amp; Kaldi
+                    2002; Streit &amp; Hillis 2004). Written as S<sub>f</sub> = σₙ′ − (τ − C₀)/μ with
+                    σₙ′ = σₙ − Pᶠ, that reading is explicit: a large positive value means a large pressure margin,
+                    S<sub>f</sub> = 0 means the plane is already critically stressed, and a negative value means it
+                    sits beyond the envelope. Because the quantity <em>is</em> a pore-pressure increment, the
+                    pore-pressure term is always subtracted in S<sub>f</sub> — unlike T<sub>s</sub> and
+                    T<sub>d</sub>, which are reported on total σₙ.
+                </p>
+                <p>
                     <code>core/calculator.py</code> actually computes a second susceptibility value alongside
                     S<sub>f</sub>: <code>FractureSusceptibilityLegacy</code>, matching the original (pre
                     pore-pressure-correction) reference-script formula S<sub>f,legacy</sub> = σₙ − τ/μ. The two
@@ -242,6 +272,42 @@ c₃ = n · σ̂₃   (horizontal component, perpendicular to σ₁)</div>
                     app's own colour-by and Mohr-field options; the legacy value is carried through for
                     cross-checking against older reference output and appears as its own column in the Table tab.
                 </p>
+                <p>
+                    Two further columns are derived once the whole segment table exists, because the colour scales in
+                    the Map, Rose, Mohr and Stereonet tabs need a bounded 0–1 quantity:
+                </p>
+                <div class="formula-block">
+Ts,norm = Ts / Ts,max        with  Ts,max = (σ₁ − σ₃) / ( 2·√(σ₁·σ₃) )
+Sf,norm = 1 − ( Sf − min Sf ) / ( max Sf − min Sf )</div>
+                <div class="note-box">
+                    <strong>T<sub>s,max</sub> is theoretical, not the largest loaded value.</strong> The reference
+                    MATLAB script obtains T<sub>s,max</sub> by scanning τ/σₙ over a dense grid of <em>every</em>
+                    possible fracture orientation, not over the fractures actually loaded from file. For a diagonal
+                    principal-stress tensor that maximum has the closed form shown above — the tangent from the
+                    origin to the outer σ₁–σ₃ Mohr circle — and depends on σ₁ and σ₃ alone: not on σ₂, not on the
+                    principal-axis orientation, and not on which poles were digitised.
+                    <code>_theoretical_max_slip_tendency(σ₁, σ₃)</code> returns that value, so
+                    <code>SlipTendencyNorm</code> reproduces the reference T<sub>s</sub> to numerical precision.
+                    Normalising by <code>df["SlipTendency"].max()</code> instead — the maximum among the loaded
+                    fractures — only agrees by coincidence, when the loaded set happens to contain a plane at or near
+                    the optimal orientation; otherwise every normalised value is inflated by the ratio of the two
+                    maxima. Where σ₃ ≤ 0 (tensile or effective-stress states whose Mohr circle reaches the origin)
+                    the radicand is floored proportionately to the stress magnitude, at 10⁻⁶·max(σ₁², 1), rather than
+                    at an absolute constant, so T<sub>s,max</sub> stays finite without collapsing every normalised
+                    value toward zero.
+                </div>
+                <div class="note-box">
+                    <strong>S<sub>f,norm</sub> is deliberately inverted.</strong> Because a <em>smaller</em>
+                    S<sub>f</sub> means a <em>smaller</em> remaining pressure margin, i.e. a plane closer to failure,
+                    the min–max rescaling is subtracted from 1 so that the most susceptible planes (lowest
+                    S<sub>f</sub>) map to 1.0 — the "hot" end of every colour ramp — and the most stable planes map to
+                    0.0. Without the inversion the Map, Rose, Mohr and Stereonet colour scales render stable planes as
+                    critical and critical planes as stable. If every segment shares the same S<sub>f</sub> (range
+                    below 10⁻¹²), the column is set to 0.0 rather than dividing by zero. Note that this rescaling is
+                    <em>dataset-relative</em>: unlike T<sub>s,norm</sub>, S<sub>f,norm</sub> = 1.0 does not mean
+                    failure, only "the least stable plane in this file", so it should not be compared between
+                    datasets.
+                </div>
 
                 <!-- ================================================= -->
                 <h2 id="algorithms">5. Implementation: How the Text Is Built</h2>
@@ -253,7 +319,7 @@ c₃ = n · σ̂₃   (horizontal component, perpendicular to σ₁)</div>
                 <ol class="step-list">
                     <li>Grid-configure the tab's single row and column to expand, and place one <code>CTkTextbox</code> with 20&nbsp;px internal padding so the text reads as a padded card rather than touching the tab's edges.</li>
                     <li>Construct the four named <code>CTkFont</code> objects (title, header, body, math) plus the smaller subscript font, all in the Roboto family for prose and Consolas for formulas.</li>
-                    <li>Register five tags on the textbox's underlying Tkinter <code>Text</code> widget (<code>text._textbox</code>), each carrying its own font, spacing, indentation, and (for <code>title</code>) centre justification.</li>
+                    <li>Register five tags on the textbox's underlying <code>Text</code> adapter (<code>text._textbox</code>), each carrying its own font, spacing, indentation, and (for <code>title</code>) centre justification.</li>
                     <li>Insert the page title, then each section heading and its body/formula content in sequence, using the appropriate tag or tag-tuple for every inserted run of text.</li>
                     <li>For the three subscripted tendency-metric symbols, insert the base letter, the subscript character, and the remainder of the line as three separate calls so the subscript renders at reduced size and lowered baseline.</li>
                     <li>Call <code>text.configure(state="disabled")</code> as the final step, permanently locking the widget against further editing while leaving it fully scrollable and selectable for copying.</li>
@@ -298,6 +364,22 @@ text.configure(state="disabled")</code></pre>
                     state is kinematically consistent with the recorded earthquake, while a high misfit suggests the
                     entered principal stress orientation and/or ratio should be reconsidered.
                 </p>
+                <div class="note-box">
+                    <strong>Rake sign convention:</strong> rake is interpreted in the standard Aki &amp; Richards
+                    (1980) convention used by the GlobalCMT catalogue — measured within the fault plane from the
+                    strike direction, positive towards the <em>up-dip</em> direction, so that
+                    <code>rake&nbsp;=&nbsp;0°</code> is left-lateral, <code>+90°</code> is pure thrust,
+                    <code>180°</code> (or <code>-180°</code>) is right-lateral, and <code>-90°</code> is pure normal
+                    faulting. The slip vector is therefore built as
+                    <code>u&nbsp;=&nbsp;cos(rake)·ŝ&nbsp;+&nbsp;sin(rake)·û</code>, where <code>ŝ</code> is the unit
+                    strike vector and <code>û</code> the unit up-dip vector. Because FracSTAT enters principal
+                    stresses as <em>compression-positive</em> magnitudes, the Cauchy traction built from them is
+                    negated before the shear component is extracted, so that the resolved shear vector points in the
+                    sense the hanging wall is driven to move. <strong>Predicted Rake</strong> is reported in the same
+                    Aki &amp; Richards convention as the input, which means rake values taken directly from a
+                    GlobalCMT-style catalogue can be compared with it without any sign or reference-direction
+                    conversion.
+                </div>
                 <div class="note-box">
                     <strong>Backward compatibility:</strong> older two-column focal-mechanism files containing only
                     ID, Strike, and Dip continue to load and function exactly as before; the loader auto-detects

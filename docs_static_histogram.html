@@ -247,12 +247,22 @@
                 <h4>Segment Angles Mode</h4>
                 <table>
                     <tr><th>Field</th><th>Description</th><th>Units</th></tr>
-                    <tr><td>Max</td><td>Maximum strike angle (0–180°).</td><td>degrees</td></tr>
-                    <tr><td>Min</td><td>Minimum strike angle (0–180°).</td><td>degrees</td></tr>
+                    <tr><td>Max</td><td><strong>End</strong> of the shortest arc that contains every observed strike, traversed in the direction of increasing angle. This is the circular range endpoint, not <code>max()</code> — see <a href="#5.6">Section 5.6</a>.</td><td>degrees</td></tr>
+                    <tr><td>Min</td><td><strong>Start</strong> of that same shortest containing arc. Because the arc may wrap through 0°, Min can be numerically <em>larger</em> than Max; that is the correct reading of a wrapping quantity and not a fault.</td><td>degrees</td></tr>
                     <tr><td>CircMean</td><td>180°‑periodic circular axial mean of strike angles, computed by double‑angle vector summation.</td><td>degrees</td></tr>
                     <tr><td>CircStdDev</td><td>Circular standard deviation of the strike distribution.</td><td>degrees</td></tr>
                     <tr><td>Dominant</td><td>Orientation of the modal bin (highest frequency).</td><td>degrees</td></tr>
                 </table>
+                <div class="note-box">
+                    <p>
+                        <strong>Min and Max in this mode are arc endpoints, not order statistics.</strong> The Min
+                        and Max vertical reference lines on the plot mark the same two values, so on a set clustered
+                        across 000° the pair of lines brackets the cluster instead of standing at the two edges of
+                        the axis. The bin grid, by contrast, is still laid out over
+                        <code>min(θ)</code>…<code>max(θ)</code> of the folded values, because that is a display span
+                        over the plotted 0–180° domain rather than a statement about angular spread.
+                    </p>
+                </div>
 
                 <h4>Cross Plot Mode</h4>
                 <table>
@@ -355,11 +365,21 @@ dy = y2 − y1;              dy → −dy  if "Reverse Y" is enabled (default: e
                 </div>
 
                 <h3 id="4.2">4.2 Histogram Binning</h3>
-                <p>Given the filtered, positive sample {L₁, ..., Lₙ} and a user‑selected bin count nBins, the module constructs equal‑width bins spanning the sample range:</p>
+                <p>Given the filtered, positive sample {L₁, ..., Lₙ} and a user‑selected bin count nBins, the module constructs equal‑width bins centred on a grid that starts at the sample minimum and ends at the sample maximum:</p>
                 <div class="formula-block">
 step = (Lmax − Lmin) / nBins
-bin centres: ck = Lmin + k·step,   k = 0, 1, ..., nBins − 1
+bin centres: ck = Lmin + k·step,   k = 0, 1, ..., nBins
 bin edges:   ek = ck − step/2  (plus one trailing edge at the final centre + step/2)
+total span:  Lmin − step/2  to  Lmax + step/2
+                </div>
+                <div class="note-box">
+                    <p>
+                        <strong>The requested bin count is a step count, not a bar count.</strong> Because the centre
+                        grid includes both endpoints, nBins produces <strong>nBins + 1</strong> bars, and the plotted
+                        span overhangs the data by half a step at each end. Entering 20 bins therefore yields 21
+                        bars. This matters when reproducing a figure in another package or comparing bar heights
+                        against an externally computed histogram of the same data.
+                    </p>
                 </div>
                 <p>
                     Bin counts Ck are then obtained with a standard histogram accumulation (<code>numpy.histogram</code>)
@@ -367,6 +387,17 @@ bin edges:   ek = ck − step/2  (plus one trailing edge at the final centre + s
                     module falls back to a single bin of unit width centred on that value, avoiding a division by
                     zero in the step calculation.
                 </p>
+                <div class="note-box">
+                    <p>
+                        <strong>In Segment angles mode the bin grid and the reported extremes come from different
+                        quantities.</strong> Lmin and Lmax above are the plain <code>min()</code>/<code>max()</code>
+                        of the folded angles and continue to set the bin grid, because that is a display span over
+                        the plotted 0–180° domain. The Min and Max <em>values</em> on the Statistics card and the two
+                        reference lines instead come from the circular range (<a href="#5.6">Section 5.6</a>). The two
+                        are intentionally different: one is where to draw the axis, the other is what the angular
+                        spread actually is.
+                    </p>
+                </div>
                 <p>Two vertical axes are always displayed together: the left axis shows the raw count Ck, and the right (twin) axis shows the same information rescaled to percentage of the total sample:</p>
                 <div class="formula-block">
 Percentage axis limit = ( max(Ck) / n ) × 100 × 1.05
@@ -386,6 +417,15 @@ Percentage axis limit = ( max(Ck) / n ) × 100 × 1.05
                     <pre><code class="language-python">n = lengths.size
 nBins = self._length_bins()
 lmin, lmax = lengths.min(), lengths.max()
+
+if mode == "Segment angles":
+    # Reported/marked extremes come from the circular range, because
+    # min() and max() of a mod-180 quantity describe the coordinate cut
+    # rather than the fractures.  lmin/lmax still set the bin grid,
+    # which is a display span over the plotted 0-180 domain.
+    extreme_min, extreme_max = self._axial_arc_extremes(lengths)
+else:
+    extreme_min, extreme_max = float(lmin), float(lmax)
 
 if lmin == lmax:
     bin_edges = [lmin - 0.5, lmax + 0.5]
@@ -437,6 +477,27 @@ R² = corr(x, y)²   (squared Pearson correlation coefficient)
                     summation, together with the dominant bin orientation (Dominant), directly on the Statistics
                     card. For length‑weighted axial mean strike, consult the Rose Plot tab, which implements the
                     same circular‑statistics formula weighted by segment length.
+                </p>
+                <p>
+                    Wrapping also invalidates the ordinary extremes. On a mod‑180° coordinate, <code>min()</code>
+                    and <code>max()</code> are decided by where the coordinate happens to have been cut, not by the
+                    data: a population clustered on 000° has members just under 180° and just over 0°, so the
+                    arithmetic pair reports "Min 0.1°, Max 179.9°" — an apparent spread of the entire domain — for
+                    fractures whose real angular spread may be two degrees. The well‑defined replacement is the
+                    <strong>circular range</strong>, the shortest arc containing every observation:
+                </p>
+                <div class="formula-block">
+gaps        = differences between successive sorted angles, plus the wrap gap (θ₁ + 180°) − θ_n
+widest gap  = the largest empty sector between neighbouring observations
+circular range = 180° − widest gap          (the complement of that empty sector)
+(Min, Max)  = (angle just after the widest gap, angle just before it)</div>
+                <p>
+                    following Fisher (1993, §2.3.3) and Mardia &amp; Jupp (2000, §2.3.2). The returned pair traverses
+                    the arc in the direction of increasing angle and may wrap through the origin, exactly as the
+                    orientations do; the algorithm is given in <a href="#5.6">Section 5.6</a>. Note that neither the
+                    plain extremes nor the circular range is a robust statistic — a single stray outlier still
+                    controls the arc — so the circular range describes the sample's angular support, not the
+                    concentration of the population, for which CircStdDev is the appropriate measure.
                 </p>
 
                 <!-- ================================================= -->
@@ -501,13 +562,13 @@ X'i = (Xi − x_min) × scale_x,   Y'i = (Yi − y_min) × scale_y
 
                 <h3 id="canvas-rebuild-algorithm">5.4 Canvas Rebuild Algorithm (Custom Plot Sizing)</h3>
                 <p>
-                    Because Matplotlib's <code>FigureCanvasTkAgg</code> does not support changing a live canvas's
+                    Because the embedded <code>FigureCanvasTkAgg</code> does not support changing a live canvas's
                     backing pixel dimensions in place without artefacts, the "Plot Area Size" controls operate
                     through a full tear‑down‑and‑rebuild sequence, implemented in
                     <code>_len_rebuild_canvas(w_in, h_in, dpi)</code>:
                 </p>
                 <ol class="step-list">
-                    <li>Destroy the existing Tk canvas widget.</li>
+                    <li>Destroy the existing Qt canvas widget.</li>
                     <li>Close the existing Matplotlib Figure object via <code>matplotlib.pyplot.close()</code> to release its internal renderer resources and avoid a slow memory leak across repeated resizes.</li>
                     <li>Construct a new Figure at the requested size in inches (converted from the requested pixel dimensions at the fixed 100 dpi used throughout FracSTAT) with <code>constrained_layout=True</code>, and a new single Axes.</li>
                     <li>Construct a new <code>FigureCanvasTkAgg</code> bound to the new Figure, re‑attach the button‑release event handler used for legend‑position persistence, and grid it into the existing plot card.</li>
@@ -532,12 +593,56 @@ X'i = (Xi − x_min) × scale_x,   Y'i = (Yi − y_min) × scale_y
                     position takes over.
                 </p>
 
+                <h3 id="5.6">5.6 Circular Range of Axial Angles (<code>_axial_arc_extremes</code>)</h3>
+                <p>
+                    The static helper <code>_axial_arc_extremes(angles_deg, period=180.0)</code> returns the
+                    endpoints of the shortest arc containing every axial angle, and supplies the Min and Max values
+                    of Segment angles mode (<a href="#3.6">Section 3.6</a>) and the two vertical reference lines.
+                </p>
+                <ol class="step-list">
+                    <li>Fold to the period and sort: discard non‑finite values, reduce the rest modulo 180°, sort ascending.</li>
+                    <li>Return <code>(0.0, 0.0)</code> for an empty sample and <code>(θ, θ)</code> for a single observation.</li>
+                    <li>Compute the gaps between successive sorted angles, and separately the wrap gap <code>(θ₁ + 180°) − θ_n</code> that spans the cut at the origin.</li>
+                    <li>Find the widest of the successive gaps.</li>
+                    <li>If the wrap gap is at least as wide as that widest interior gap, the sample already occupies one unbroken run inside the domain and the plain extremes are the arc endpoints — return <code>(θ₁, θ_n)</code>.</li>
+                    <li>Otherwise the widest empty sector lies inside the domain, so the containing arc is its complement and wraps through the origin — return <code>(θ_{k+1}, θ_k)</code>, the angle immediately after the gap as the start and the angle immediately before it as the end.</li>
+                </ol>
+                <div class="code-window">
+                    <div class="code-header">
+                        <span class="code-lang">python</span>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">angles = np.sort(angles[np.isfinite(angles)] % period)
+if angles.size == 0:
+    return 0.0, 0.0
+if angles.size == 1:
+    return float(angles[0]), float(angles[0])
+
+gaps     = np.diff(angles)
+wrap_gap = (angles[0] + period) - angles[-1]
+widest   = int(np.argmax(gaps))
+
+if wrap_gap &gt;= gaps[widest]:
+    # The widest empty sector already straddles the cut, so the sample
+    # occupies one unbroken run and the plain extremes are correct.
+    return float(angles[0]), float(angles[-1])
+return float(angles[widest + 1]), float(angles[widest])</code></pre>
+                </div>
+                <p>
+                    The tie condition <code>wrap_gap &gt;= gaps[widest]</code> uses <code>&gt;=</code> deliberately: when
+                    the two candidate sectors are equally wide the arc is ambiguous, and preferring the non‑wrapping
+                    answer keeps the reported pair in ascending order for the common case of a sample that does not
+                    actually straddle the cut. The step is applied only in Segment angles mode; length modes take
+                    <code>float(min)</code> and <code>float(max)</code> unchanged, since length does not wrap.
+                </p>
+
                 <!-- ================================================= -->
                 <h2 id="statistics">6. Statistical Methods</h2>
                 <table>
                     <tr><th>Statistic</th><th>Formula</th><th>Interpretation</th></tr>
                     <tr><td>n</td><td>count of filtered, positive observations</td><td>Effective sample size available for interpretation; small n (roughly below 30) warrants caution when generalising the distribution shape.</td></tr>
-                    <tr><td>Minimum / Maximum</td><td>min(x), max(x)</td><td>Bounds of the observed range; in fracture studies the minimum is frequently a mapping‑resolution artefact (the shortest resolvable trace) rather than a true geological minimum.</td></tr>
+                    <tr><td>Minimum / Maximum (lengths)</td><td>min(x), max(x)</td><td>Bounds of the observed range; in fracture studies the minimum is frequently a mapping‑resolution artefact (the shortest resolvable trace) rather than a true geological minimum.</td></tr>
+                    <tr><td>Min / Max (angles)</td><td>endpoints of the shortest containing arc (<a href="#5.6">Section 5.6</a>)</td><td>Angular support of the sample, wrap‑aware. Not order statistics: the pair may run "backwards" (Min &gt; Max) when the arc crosses 0°, and the difference Max − Min must be taken modulo 180° to recover the circular range.</td></tr>
                     <tr><td>Mean</td><td>(1/n) Σ xi</td><td>Central tendency; for heavy‑tailed (power‑law‑like) fracture length distributions the mean can be strongly influenced by a small number of very long traces and may not represent a "typical" fracture — the CDF tab's median and quantile statistics are often more robust.</td></tr>
                     <tr><td>Total Length / Sum</td><td>Σ xi</td><td>Aggregate fracture length in the sample area; directly relevant to fracture‑intensity metrics such as P21 computed elsewhere in FracSTAT (Intensity &amp; Density tab).</td></tr>
                     <tr><td>Censored count</td><td>count of excluded boundary‑touching observations</td><td>Quantifies the magnitude of the truncation‑bias correction; a large censored fraction relative to n signals that the mapped area may be too small relative to the characteristic fracture length for unbiased length statistics.</td></tr>
@@ -576,7 +681,7 @@ X'i = (Xi − x_min) × scale_x,   Y'i = (Yi − y_min) × scale_y
                     <li><strong>Bars</strong> — one bar per bin, centred on the bin midpoint, width equal to the bin step, coloured and outlined per the Element Styling card.</li>
                     <li><strong>Left y‑axis (Frequency)</strong> — absolute bin counts, labelled and coloured per the Text &amp; Axis Styling card, with an integer‑only tick locator so fractional count ticks never appear.</li>
                     <li><strong>Right y‑axis (Frequency, %)</strong> — the same bar heights rescaled to percentage of n, sharing the x‑axis via a twin axis.</li>
-                    <li><strong>Minimum/Maximum reference lines</strong> — full‑height vertical lines marking the sample extremes, each with its own colour and width and included in the legend.</li>
+                    <li><strong>Minimum/Maximum reference lines</strong> — full‑height vertical lines marking the sample extremes, each with its own colour and width and included in the legend. In Segment angles mode they mark the endpoints of the shortest containing arc instead (<a href="#5.6">Section 5.6</a>), so they can appear inside the cluster rather than at the edges of the axis.</li>
                     <li><strong>Title</strong> — automatically composed from the selected mode and sample size, e.g. "Segment lengths, n=1,204", with censored‑count annotation appended when applicable; replaced verbatim by the Custom Title field when non‑blank.</li>
                     <li><strong>Z‑order correction</strong> — because Matplotlib's twin axis by default stacks the new (right) axis above the original, the tab explicitly reassigns z‑order and patch visibility so the left axis (and therefore its legend) remains clickable and visible in front of the right‑axis background.</li>
                 </ul>
@@ -684,11 +789,16 @@ X'i = (Xi − x_min) × scale_x,   Y'i = (Yi − y_min) × scale_y
                     polar/equal‑area) view of the strike‑angle distribution, folded to the 0–180° axial convention.
                     Multiple distinct peaks (modes) in this histogram are typically diagnostic of multiple structural
                     fracture sets formed under different regional or local stress orientations, or of a single set
-                    overprinted by a later, differently oriented set. Because a linear histogram does not correct for
-                    the fact that angular data "wraps around" at 0°/180°, a population whose true dominant
-                    orientation happens to straddle the 0°/180° boundary can appear artificially bimodal in this
-                    view; the Rose Plot tab's polar representation is the more reliable tool for such near‑boundary
-                    orientation populations.
+                    overprinted by a later, differently oriented set. The reported summary statistics are wrap‑aware:
+                    CircMean and CircStdDev use 180°‑periodic double‑angle summation, and Min/Max are the endpoints
+                    of the shortest containing arc (<a href="#4.4">Section 4.4</a>). The <em>bars</em>, however, are
+                    not — the bin grid is a linear partition of the folded 0–180° domain, so a population whose true
+                    dominant orientation straddles the 0°/180° boundary is split between the first and last bins and
+                    can appear artificially bimodal in this view even though CircMean correctly reports a single
+                    mode. Where the histogram and CircMean disagree in that way, the wrap is the explanation and
+                    CircMean is the statistic to trust; the Rose Plot tab's polar representation shows the same
+                    population without the artificial split, and is the more reliable view for near‑boundary
+                    orientation sets.
                 </p>
 
                 <h4 id="9.4">9.4 Length–Aperture and Length–Attribute Cross Plots</h4>
@@ -708,7 +818,9 @@ X'i = (Xi − x_min) × scale_x,   Y'i = (Yi − y_min) × scale_y
                 <table>
                     <tr><th>Limitation</th><th>Description</th></tr>
                     <tr><td>Edge‑censoring is a simple heuristic</td><td>It is a boundary‑proximity test based on the dataset's own bounding box; it cannot detect truncation against an irregular (non‑rectangular) mapped‑area boundary, nor truncation caused by cloud cover, image saturation, or other non‑geometric data‑quality limitations.</td></tr>
-                    <tr><td>No circular‑statistics correction</td><td>Segment‑angle statistics are computed on the linear (folded) 0–180° domain; near‑boundary orientation populations should be cross‑checked against the Rose Plot tab.</td></tr>
+                    <tr><td>Binning is linear, not circular</td><td>Segment‑angle <em>summary statistics</em> are wrap‑aware (circular axial mean and standard deviation, and a circular‑range Min/Max), but the histogram bins themselves are a linear partition of the folded 0–180° domain. A set straddling 0°/180° is therefore split across the two end bins and may read as bimodal; cross‑check against CircMean and the Rose Plot tab.</td></tr>
+                    <tr><td>Circular range is not robust</td><td>The shortest containing arc is fixed by the two observations bounding the widest empty sector, so one stray strike widens it as much as a genuinely dispersed population would. It measures angular support, not concentration — use CircStdDev for the latter.</td></tr>
+                    <tr><td>Angle bin grid spans the observed values, not the full domain</td><td>Bin edges run from <code>min(θ)</code> to <code>max(θ)</code> of the folded sample rather than a fixed 0–180° axis, so the horizontal extent of the bars differs between datasets and the bar positions of two histograms are not directly comparable without setting axis bounds manually.</td></tr>
                 </table>
 
                 <!-- ================================================= -->
@@ -717,7 +829,7 @@ X'i = (Xi − x_min) × scale_x,   Y'i = (Yi − y_min) × scale_y
                 <p>
                     The attribute‑resolution logic explicitly strips a stray "Â" character sequence and collapses
                     whitespace before matching labels, guarding against the case where the degree symbol (°) has
-                    been mis‑decoded through a legacy Windows/Tk text encoding path. It also recognises both
+                    been mis‑decoded through a legacy Windows text encoding path. It also recognises both
                     singular and pluralised historical label variants (e.g. "Trace Angle" vs "Trace Angles"), so
                     previously saved project sessions or exported CSVs that used an older label convention continue
                     to resolve correctly.

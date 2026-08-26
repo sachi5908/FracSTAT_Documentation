@@ -157,6 +157,19 @@
 
                 <p>Ultimately, FracSTAT serves as an integrated analytical platform intended to bridge the gap between conventional fracture characterization and modern quantitative structural analysis. It delivers a transparent, extensible framework to investigate all facets of a fracture network within one unified environment.</p>
                 
+                <h3>User Interface Technology</h3>
+                <p>FracSTAT's desktop interface is built on <strong>PySide6</strong> (Qt for Python). Plots are native Matplotlib figures embedded through Matplotlib's <code>backend_qtagg</code> Qt canvas.</p>
+                <div class="note-box">
+                    <strong>Note for readers of the module pages:</strong> the widget classes named throughout this
+                    documentation — <code>CTkFrame</code>, <code>CTkTabview</code>, <code>CTkScrollableFrame</code>,
+                    <code>FigureCanvasTkAgg</code>, <code>StringVar</code>, <code>ttk.Treeview</code>, and the
+                    <code>after()</code> scheduling calls — are provided by FracSTAT's own
+                    <code>ui_common.qtk</code> layer. This layer keeps a familiar Tk-style API surface while
+                    implementing every widget on top of PySide6 (for example, <code>ttk.Treeview</code> is a
+                    <code>QTreeWidget</code> subclass and <code>after()</code> is driven by <code>QTimer</code>).
+                    These names therefore describe Qt widgets, not CustomTkinter or Tkinter ones.
+                </div>
+
                 <!-- Spacer for scrolling -->
                 <div style="height: 100px;"></div>
 

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Uncertainty Monte Carlo Tab | FracSTAT Docs</title>
@@ -36,31 +37,31 @@
             <div class="docs-content-inner">
                 <h1>Uncertainty Monte Carlo Tab</h1>
                 <p>
-                    Implemented in <code>uncertainty_analyzer\tabs\uncertainty_montecarlo_tab.py</code>&nbsp;and rendered through the shared
+                    Implemented in <code>uncertainty_montecarlo_tab.py</code> and rendered through the shared
                     <code>uncertainty_sampling_tab.py</code> workspace builder, the <strong>Monte Carlo
                     Simulation</strong> tab is the primary probabilistic fault-stability analysis environment
                     within the FracSTAT Uncertainty Analyzer. It lets a structural geologist, geomechanical
                     engineer, or reservoir engineer propagate measurement and interpretation uncertainty in
                     stress magnitudes, rock-strength parameters, pore pressure, and fault orientation through a
-                    deterministic Mohr–Coulomb fault-stability calculation, producing a fully probabilistic
+                    deterministic Mohr&ndash;Coulomb fault-stability calculation, producing a fully probabilistic
                     characterization of slip tendency, dilation tendency, fracture susceptibility, and Coulomb
                     failure potential for one or many faults simultaneously.
                 </p>
                 <p>
-                    Unlike a conventional deterministic geomechanical assessment — which assigns a single
-                    value to each input parameter and returns a single stability verdict — the Monte Carlo
+                    Unlike a conventional deterministic geomechanical assessment &mdash; which assigns a single
+                    value to each input parameter and returns a single stability verdict &mdash; the Monte Carlo
                     tab treats every geomechanical input as a random variable governed by a user-selected
-                    probability distribution. Thousands of independent realizations of the fault–stress
+                    probability distribution. Thousands of independent realizations of the fault&ndash;stress
                     system are drawn, each realization is passed through the same physical stability equations
                     used elsewhere in FracSTAT, and the resulting population of outcomes is summarized
-                    statistically — yielding defensible, quantifiable answers to questions such as "what is
+                    statistically &mdash; yielding defensible, quantifiable answers to questions such as "what is
                     the probability that this fault will fail under current reservoir conditions?" rather than a
                     single pass/fail label that hides the underlying uncertainty.
                 </p>
                 <p>
-                    Because <code>uncertainty_montecarlo_tab.py</code> itself is a thin dispatcher — it sets
+                    Because <code>uncertainty_montecarlo_tab.py</code> itself is a thin dispatcher &mdash; it sets
                     <code>sampling_method="mc"</code> and immediately delegates construction of the entire tabbed
-                    workspace to <code>UncertaintySamplingTab.build()</code> — this guide documents the
+                    workspace to <code>UncertaintySamplingTab.build()</code> &mdash; this guide documents the
                     complete Monte Carlo workflow as experienced by the user, including the six analysis
                     sub-modules that appear as nested tabs beneath "Monte Carlo Simulation": Geomechanics,
                     Statistics, Sensitivity, Visualization, Spatial Probability Map, and Validation &amp; Export.
@@ -110,7 +111,7 @@
                 <ul>
                     <li>Structural geologists and geomechanical analysts performing fault-reactivation and induced-seismicity risk screening.</li>
                     <li>Reservoir engineers evaluating injection- or depletion-induced pore-pressure changes on pre-existing faults.</li>
-                    <li>Geohazard and CO₂-storage risk assessors requiring probabilistic, auditable slip- and dilation-tendency estimates.</li>
+                    <li>Geohazard and CO&#8322;-storage risk assessors requiring probabilistic, auditable slip- and dilation-tendency estimates.</li>
                     <li>Software QA engineers and technical reviewers validating the scientific correctness of FracSTAT outputs.</li>
                 </ul>
 
@@ -118,7 +119,7 @@
                 <p>
                     Throughout this guide, variable names shown in the mathematical background sections
                     correspond directly to the internal computational quantities used by the module (e.g.
-                    σ1, σ2, σ3 for the major, intermediate, and minor principal stresses). GUI
+                    &sigma;1, &sigma;2, &sigma;3 for the major, intermediate, and minor principal stresses). GUI
                     labels are reproduced exactly as they appear on screen and are set in bold. Equation numbers
                     are provided for cross-referencing between the Mathematical Background (Section 6) and the
                     Algorithms (Section 7).
@@ -143,36 +144,36 @@
                     <code>UncertaintySamplingTab.build()</code> routine, differing only in the string passed for
                     <code>sampling_method</code> (<code>"mc"</code> or <code>"lhs"</code>), which is later
                     resolved by the sampling engine into a specific pseudo-random-number generation strategy (see
-                    <a href="#7.1">Section 7.1</a>). Every other element of the workspace — the
+                    <a href="#7.1">Section 7.1</a>). Every other element of the workspace &mdash; the
                     input-loading logic in <code>uncertainty_app.py</code>, the fault-preparation and
                     column-alias resolution in <code>sampling_engine.py</code>, the physical stability equations
-                    in <code>uncertainty_calculator.py</code>, and the six analysis sub-tabs — is shared
+                    in <code>uncertainty_calculator.py</code>, and the six analysis sub-tabs &mdash; is shared
                     code, so a Monte Carlo run and an LHS run for the same input data and settings are directly
                     comparable and, at sufficiently large sample sizes, should converge to the same statistical
                     answer.
                 </p>
 
                 <figure class="figure-block">
-                    <div class="figure-img-wrap img-loaded" style="position: relative;">
+                    <div class="figure-img-wrap">
                         <img src="put_your_img_here.png" alt="FracSTAT workspace architecture diagram showing the Uncertainty Analyzer alongside the Static and Dynamic Analyzer workspaces" loading="lazy">
                         <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
                         </button>
                     </div>
-                    <span class="ph-caption"><strong>Figure 2.1</strong> — FracSTAT workspace architecture: the Uncertainty Analyzer alongside the Static and Dynamic Analyzer workspaces, with the Monte Carlo and LHS tabs both feeding the shared sampling engine and six analysis sub-modules.</span>
+                    <span class="ph-caption"><strong>Figure 2.1</strong> &mdash; FracSTAT workspace architecture: the Uncertainty Analyzer alongside the Static and Dynamic Analyzer workspaces, with the Monte Carlo and LHS tabs both feeding the shared sampling engine and six analysis sub-modules.</span>
                 </figure>
 
                 <h3 id="2.1">2.1 Relationship to Other FracSTAT Modules</h3>
                 <table>
-                    <tbody><tr><th>Module</th><th>Relationship to Monte Carlo Tab</th></tr>
+                    <tr><th>Module</th><th>Relationship to Monte Carlo Tab</th></tr>
                     <tr><td><code>uncertainty_app.py</code></td><td>Hosts the workspace shell, header controls, Excel/CSV loading pipeline, autosave, and font/typography propagation used by the Monte Carlo tab.</td></tr>
                     <tr><td><code>uncertainty_sampling_tab.py</code></td><td>Builds the shared tab layout (Geomechanics, Statistics, Sensitivity, Visualization, Spatial Probability Map, Validation &amp; Export) and orchestrates the run/cancel/threading logic invoked when the user clicks Run Monte Carlo Simulation.</td></tr>
                     <tr><td><code>sampling_engine.py</code></td><td>Implements <code>generate_samples()</code>, the core routine that draws Monte Carlo variates and evaluates fault stability for every realization and every selected fault.</td></tr>
                     <tr><td><code>distributions.py</code></td><td>Provides the probability-distribution registry (Normal, Truncated Normal, Lognormal, Gamma, Beta, Uniform) used to transform unit-uniform coordinates into physical parameter values.</td></tr>
-                    <tr><td><code>uncertainty_calculator.py</code></td><td>Implements the deterministic Mohr–Coulomb fault-stability physics (<code>calculate_fault_stability</code>) applied identically to every Monte Carlo realization.</td></tr>
+                    <tr><td><code>uncertainty_calculator.py</code></td><td>Implements the deterministic Mohr&ndash;Coulomb fault-stability physics (<code>calculate_fault_stability</code>) applied identically to every Monte Carlo realization.</td></tr>
                     <tr><td><code>validation.py</code> / <code>validation_module.py</code></td><td>Provide convergence diagnostics, analytical benchmark checks, reproducibility metadata, and CSV/Excel export of the Monte Carlo result set.</td></tr>
                     <tr><td>Static/Dynamic Analyzer</td><td>Independent workspaces; the Uncertainty Analyzer deliberately does not share its loaded input file or results with them (see <code>_ws_on_switch</code> in <code>uncertainty_app.py</code>).</td></tr>
-                </tbody></table>
+                </table>
 
                 <!-- ================================================= -->
                 <h2 id="interface-overview">3. Interface Overview</h2>
@@ -193,35 +194,35 @@
                     is currently active:
                 </p>
                 <table>
-                    <tbody><tr><th>Control</th><th>Type</th><th>Function</th></tr>
-                    <tr><td>SAMPLES</td><td>Numeric entry</td><td>Number of Monte Carlo realizations to draw per fault (default 1000; validated to the range 10–100,000).</td></tr>
+                    <tr><th>Control</th><th>Type</th><th>Function</th></tr>
+                    <tr><td>SAMPLES</td><td>Numeric entry</td><td>Number of Monte Carlo realizations to draw per fault (default 1000; validated to the range 10&ndash;100,000).</td></tr>
                     <tr><td>SEED</td><td>Numeric entry</td><td>Integer seed for the pseudo-random number generator, guaranteeing bit-for-bit reproducible realizations (default 42).</td></tr>
                     <tr><td>FAULT</td><td>Scrollable dropdown</td><td>Selects "All Faults" (population-level analysis) or an individual loaded fault by ID for a single-fault deep dive.</td></tr>
                     <tr><td>Run Monte Carlo Simulation</td><td>Button</td><td>Validates all inputs, launches the sampling worker thread, and displays the full-screen progress overlay.</td></tr>
                     <tr><td>Sampling-method badge</td><td>Static label</td><td>Displays "Monte Carlo Simulation" to confirm which sampler produced the currently displayed results.</td></tr>
                     <tr><td>Input-source badge</td><td>Static label bound to <code>loaded_source_var</code></td><td>Displays the file name (and worksheet, if applicable) of the currently loaded fault data set.</td></tr>
                     <tr><td>Cancel (floating)</td><td>Button, appears only during a run</td><td>Signals the background worker thread to stop at its next safe checkpoint via a <code>threading.Event</code>.</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3 id="3.2">3.2 The Six Analysis Sub-Tabs</h3>
                 <table>
-                    <tbody><tr><th>Sub-tab</th><th>Primary Purpose</th></tr>
+                    <tr><th>Sub-tab</th><th>Primary Purpose</th></tr>
                     <tr><td>Geomechanics</td><td>Defines every probabilistic input (stresses, strength, pore pressure, orientation), the stress regime, and displays Mohr-circle/scatter diagrams of the sampled stress state.</td></tr>
                     <tr><td>Statistics</td><td>Descriptive statistics (mean, SD, median, mode, percentiles, confidence interval) and histogram / input-response plots for any single metric or input.</td></tr>
                     <tr><td>Sensitivity</td><td>Global sensitivity analysis (Standardized Regression Coefficients and Partial Rank Correlation Coefficients) presented as a tornado diagram.</td></tr>
                     <tr><td>Visualization</td><td>A publication-oriented plotting library with single-plot, four-panel dashboard, and five predefined multi-panel scientific layouts.</td></tr>
                     <tr><td>Spatial Probability Map</td><td>Projects per-fault probability-of-failure and uncertainty-width metrics onto real-world fault coordinates loaded from a separate coordinate file.</td></tr>
                     <tr><td>Validation &amp; Export</td><td>Displays convergence, analytical-benchmark, and reference-solution validation status, previews the full realization table, and exports results to CSV or Excel.</td></tr>
-                </tbody></table>
+                </table>
 
                 <figure class="figure-block">
-                    <div class="figure-img-wrap" style="position: relative;">
+                    <div class="figure-img-wrap">
                         <img src="put_your_img_here.png" alt="Annotated screenshot of the Monte Carlo Simulation tab showing the shared controls bar and the six analysis sub-tab headers" loading="lazy">
                         <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
                         </button>
                     </div>
-                    <span class="ph-caption"><strong>Figure 3.1</strong> — Monte Carlo workspace layout: annotated screenshot showing the shared controls bar, the six analysis sub-tab headers, and the Geomechanics sidebar/plot split layout.</span>
+                    <span class="ph-caption"><strong>Figure 3.1</strong> &mdash; Monte Carlo workspace layout: annotated screenshot showing the shared controls bar, the six analysis sub-tab headers, and the Geomechanics sidebar/plot split layout.</span>
                 </figure>
 
                 <!-- ================================================= -->
@@ -229,27 +230,27 @@
                 <p>
                     The Monte Carlo tab consumes tabular fault data loaded through the workspace header's Load
                     Excel control, handled by <code>_load_excel_file</code> / <code>_read_uncertainty_input_file</code>
-                    in <code>uncertainty_app.py</code>. Loading occurs on a background thread so the Tk event
+                    in <code>uncertainty_app.py</code>. Loading occurs on a background thread so the Qt event
                     loop remains responsive, with a full-screen loading overlay shown while the file is parsed.
                 </p>
 
                 <h3 id="4.1">4.1 Supported File Types</h3>
                 <ul>
-                    <li><strong>.csv</strong> — read directly with <code>pandas.read_csv</code>.</li>
-                    <li><strong>.xlsx / .xls</strong> — opened with <code>pandas.ExcelFile</code>; if the workbook contains more than one worksheet, a modal Select Worksheet dialog is presented (single-sheet workbooks load automatically with no prompt).</li>
+                    <li><strong>.csv</strong> &mdash; read directly with <code>pandas.read_csv</code>.</li>
+                    <li><strong>.xlsx / .xls</strong> &mdash; opened with <code>pandas.ExcelFile</code>; if the workbook contains more than one worksheet, a modal Select Worksheet dialog is presented (single-sheet workbooks load automatically with no prompt).</li>
                 </ul>
 
                 <h3 id="4.2">4.2 Column Alias Resolution</h3>
                 <p>
                     Column names in real-world spreadsheets are inconsistent ("Sigma 1" vs. "Sigma1" vs.
-                    "σ_1"). The module normalizes every header by lower-casing it, replacing
+                    "&sigma;_1"). The module normalizes every header by lower-casing it, replacing
                     non-alphanumeric characters with spaces, and collapsing repeated whitespace
                     (<code>_normalise_name</code>), then matches the normalized header against a registry of
                     accepted aliases (<code>_COLUMN_ALIASES</code>) for each logical field. This makes column
                     matching case-insensitive and tolerant of spacing/punctuation differences.
                 </p>
                 <table>
-                    <tbody><tr><th>Logical Field</th><th>Accepted Header Aliases (case/spacing-insensitive)</th></tr>
+                    <tr><th>Logical Field</th><th>Accepted Header Aliases (case/spacing-insensitive)</th></tr>
                     <tr><td>fault_id</td><td>ID No, ID, Frac_ID, Fault_ID, Fracture_ID, Fault Name, Fault_Name</td></tr>
                     <tr><td>strike</td><td>Strike</td></tr>
                     <tr><td>dip</td><td>Dip</td></tr>
@@ -258,21 +259,21 @@
                     <tr><td>cohesion</td><td>Cohesion, C0, C, Cohesive Strength</td></tr>
                     <tr><td>pore_pressure</td><td>Pore Pressure, Pore_Pressure, Pf</td></tr>
                     <tr><td>shmax</td><td>SH max, SHmax, S Haz, Shaz, Maximum Horizontal Stress Azimuth</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3 id="4.3">4.3 Validation Rules Applied at Load Time (<code>prepare_faults</code>)</h3>
                 <ul>
                     <li>Strike and Dip columns are mandatory; their absence raises an explicit error identifying which column is missing.</li>
                     <li>Strike and Dip are coerced to numeric with <code>pandas.to_numeric(errors="coerce")</code>; any resulting NaN triggers a validation failure listing that Strike/Dip must be finite for every row.</li>
-                    <li>Strike must satisfy 0&nbsp;≤&nbsp;Strike&nbsp;&lt;&nbsp;360°; Dip must satisfy 0°&nbsp;≤&nbsp;Dip&nbsp;≤&nbsp;90°.</li>
+                    <li>Strike must satisfy 0&nbsp;&le;&nbsp;Strike&nbsp;&lt;&nbsp;360&deg;; Dip must satisfy 0&deg;&nbsp;&le;&nbsp;Dip&nbsp;&le;&nbsp;90&deg;.</li>
                     <li>If a Fault ID column is present, IDs are cast to string, whitespace-trimmed, and checked for blank or duplicate values; either condition raises an error before any sampling can begin.</li>
-                    <li>If a Fault ID column is absent, sequential integer identifiers (1, 2, 3, …) are assigned automatically.</li>
+                    <li>If a Fault ID column is absent, sequential integer identifiers (1, 2, 3, &hellip;) are assigned automatically.</li>
                     <li>Optional columns (sigma1, sigma2, sigma3, friction, cohesion, pore_pressure, shmax) are coerced numeric where present; when absent for a given fault, the corresponding sidebar mean value in the Geomechanics tab is used instead.</li>
                 </ul>
                 <div class="note-box">
                     <strong>Note:</strong> when no file has been loaded at all, <code>prepare_faults(None)</code>
-                    returns a single synthetic "Representative plane" fault (Strike&nbsp;=&nbsp;45°,
-                    Dip&nbsp;=&nbsp;60°), which lets a user explore the tool's mechanics using only the global
+                    returns a single synthetic "Representative plane" fault (Strike&nbsp;=&nbsp;45&deg;,
+                    Dip&nbsp;=&nbsp;60&deg;), which lets a user explore the tool's mechanics using only the global
                     mean/SD values entered in the Geomechanics sidebar before any real fault population is
                     available.
                 </div>
@@ -303,49 +304,49 @@
                 <p>
                     A single dropdown selects which principal stress is assumed vertical (S<sub>v</sub>),
                     following the Andersonian classification of faulting regimes. This selection does not alter
-                    the sampled σ1&nbsp;&gt;&nbsp;σ2&nbsp;&gt;&nbsp;σ3 ordering used for
+                    the sampled &sigma;1&nbsp;&gt;&nbsp;&sigma;2&nbsp;&gt;&nbsp;&sigma;3 ordering used for
                     display and statistics; it only controls how those three sampled stresses are remapped onto
                     the fault-normal stress calculation performed by <code>calculate_fault_stability</code> (see
                     <a href="#6.4">Section 6.4</a> and <a href="#7.4">Section 7.4</a>).
                 </p>
                 <table>
-                    <tbody><tr><th>UI Label</th><th>Regime</th><th>Vertical Stress Assignment</th></tr>
-                    <tr><td>Normal Faulting (S<sub>v</sub> = S1)</td><td><code>normal</code></td><td>σ1 (largest) is vertical; internally remapped so S<sub>v</sub> occupies the σ3 slot fed to the stability calculator.</td></tr>
-                    <tr><td>Strike-Slip (S<sub>v</sub> = S2)</td><td><code>strike_slip</code></td><td>σ2 (intermediate) is vertical; remapped into the σ3 slot.</td></tr>
-                    <tr><td>Reverse/Thrust (S<sub>v</sub> = S3)</td><td><code>reverse</code></td><td>σ3 (smallest) is vertical; this is the calculator's native convention and requires no remap (default).</td></tr>
-                </tbody></table>
+                    <tr><th>UI Label</th><th>Regime</th><th>Vertical Stress Assignment</th></tr>
+                    <tr><td>Normal Faulting (S<sub>v</sub> = S1)</td><td><code>normal</code></td><td>&sigma;1 (largest) is vertical; internally remapped so S<sub>v</sub> occupies the &sigma;3 slot fed to the stability calculator.</td></tr>
+                    <tr><td>Strike-Slip (S<sub>v</sub> = S2)</td><td><code>strike_slip</code></td><td>&sigma;2 (intermediate) is vertical; remapped into the &sigma;3 slot.</td></tr>
+                    <tr><td>Reverse/Thrust (S<sub>v</sub> = S3)</td><td><code>reverse</code></td><td>&sigma;3 (smallest) is vertical; this is the calculator's native convention and requires no remap (default).</td></tr>
+                </table>
 
                 <h3 id="5.2">5.2 Principal Stress Inputs (Card 1)</h3>
                 <p>
                     Sigma 1, Sigma 2, and Sigma 3 (MPa) are each configured with an independent Mean, Standard
                     Deviation (STDV), and Distribution Type. Because the sampler represents the stress tensor as
-                    an ordered base stress (σ3) plus two non-negative gaps (σ2−σ3 and
-                    σ1−σ2; see <a href="#7.2">Section 7.2</a>), the engine enforces two
+                    an ordered base stress (&sigma;3) plus two non-negative gaps (&sigma;2&minus;&sigma;3 and
+                    &sigma;1&minus;&sigma;2; see <a href="#7.2">Section 7.2</a>), the engine enforces two
                     structural constraints at run time:
                 </p>
                 <ul>
                     <li><strong>Mean ordering:</strong> Sigma 1 (mean) &gt; Sigma 2 (mean) &gt; Sigma 3 (mean) &gt; 0.</li>
-                    <li><strong>Standard-deviation ordering:</strong> SD(Sigma 1) ≥ SD(Sigma 2) ≥ SD(Sigma 3), required for the gap-variance decomposition to remain non-negative.</li>
+                    <li><strong>Standard-deviation ordering:</strong> SD(Sigma 1) &ge; SD(Sigma 2) &ge; SD(Sigma 3), required for the gap-variance decomposition to remain non-negative.</li>
                 </ul>
                 <p>
                     Available distribution choices for the principal stresses are Normal, Truncated Normal,
-                    Gaussian (alias of Normal), Log Normal, and Gamma — all positive-support laws
+                    Gaussian (alias of Normal), Log Normal, and Gamma &mdash; all positive-support laws
                     appropriate for physical stress magnitudes. An Auto STDV control lets the user set all three
-                    principal-stress standard deviations simultaneously as a chosen percentage (1–50%) of
+                    principal-stress standard deviations simultaneously as a chosen percentage (1&ndash;50%) of
                     their respective means.
                 </p>
 
                 <h3 id="5.3">5.3 Rock Strength and Fluid Pressure Inputs (Card 2)</h3>
                 <table>
-                    <tbody><tr><th>Parameter</th><th>Symbol</th><th>Default Mean</th><th>Default SD</th><th>Unit</th><th>Distribution Choices</th></tr>
-                    <tr><td>Friction coefficient</td><td>μ</td><td>0.60</td><td>0.05</td><td>dimensionless</td><td>Normal, Truncated Normal, Gaussian, Log Normal, Gamma, Beta</td></tr>
+                    <tr><th>Parameter</th><th>Symbol</th><th>Default Mean</th><th>Default SD</th><th>Unit</th><th>Distribution Choices</th></tr>
+                    <tr><td>Friction coefficient</td><td>&mu;</td><td>0.60</td><td>0.05</td><td>dimensionless</td><td>Normal, Truncated Normal, Gaussian, Log Normal, Gamma, Beta</td></tr>
                     <tr><td>Cohesion</td><td>C0</td><td>10.0</td><td>2.0</td><td>MPa</td><td>Normal, Truncated Normal, Gaussian, Log Normal, Gamma</td></tr>
                     <tr><td>Pore pressure</td><td>Pp</td><td>10.0</td><td>2.0</td><td>MPa</td><td>Normal, Truncated Normal, Gaussian, Log Normal, Gamma</td></tr>
-                </tbody></table>
+                </table>
                 <p>
                     Friction is unique in offering a Beta distribution because its physical support,
-                    [0,&nbsp;1], has two finite bounds — exactly the case for which the Beta law is well
-                    suited. Cohesion and pore pressure are bounded only below (≥&nbsp;0&nbsp;MPa), which the
+                    [0,&nbsp;1], has two finite bounds &mdash; exactly the case for which the Beta law is well
+                    suited. Cohesion and pore pressure are bounded only below (&ge;&nbsp;0&nbsp;MPa), which the
                     Gamma and Truncated Normal laws respect naturally. An Auto STDV control identical in
                     behavior to Card 1 is provided for this group.
                 </p>
@@ -358,14 +359,14 @@
                     Fisher 3D orientation-sampling models.
                 </p>
                 <table>
-                    <tbody><tr><th>Field</th><th>Role</th><th>Notes</th></tr>
+                    <tr><th>Field</th><th>Role</th><th>Notes</th></tr>
                     <tr><td>Strike (deg)</td><td>Fault-plane strike azimuth</td><td>Left blank automatically in All Faults mode; each fault supplies its own strike from the loaded data.</td></tr>
                     <tr><td>Dip (deg)</td><td>Fault-plane dip</td><td>Same All Faults behavior as Strike.</td></tr>
                     <tr><td>SHmax Azimuth (deg)</td><td>Maximum horizontal stress direction</td><td>Always uses its own independent Von Mises k, even under the Fisher 3D option.</td></tr>
                     <tr><td>k (Strike row)</td><td>Von Mises / Fisher concentration</td><td>Under Fisher 3D, this single k also governs the coupled Dip sampling; the Dip k field is disabled and greyed out in that mode.</td></tr>
                     <tr><td>k (Dip row)</td><td>Von Mises concentration for Dip</td><td>Only active when the orientation distribution is Von Mises (independent strike/dip).</td></tr>
                     <tr><td>k (SHmax row)</td><td>Von Mises concentration for SHmax</td><td>Always independent of the strike/dip coupling choice.</td></tr>
-                </tbody></table>
+                </table>
                 <p>
                     Higher k values produce a tighter (lower-variance) angular distribution; k&nbsp;=&nbsp;0
                     degenerates to a uniform distribution over all directions (a fully unconstrained
@@ -379,7 +380,7 @@
                 <h3 id="5.5">5.5 Effective Stress Toggle</h3>
                 <p>
                     The <strong>Use effective principal stresses</strong> switch controls whether pore pressure
-                    is subtracted from the normal stress (and from σ1, σ3 in the dilation-tendency
+                    is subtracted from the normal stress (and from &sigma;1, &sigma;3 in the dilation-tendency
                     formula) before computing every stability metric. Toggling this switch after a run has
                     completed does not require re-sampling: it recomputes Ts, Sf, Fs, Td, and the failure flag
                     for the already-sampled realizations in place (see <a href="#8.4">Section 8.4</a>), and
@@ -394,15 +395,15 @@
                     relevant sub-module sections below.
                 </p>
                 <table>
-                    <tbody><tr><th>Control Category</th><th>Representative Settings</th><th>Effect</th></tr>
+                    <tr><th>Control Category</th><th>Representative Settings</th><th>Effect</th></tr>
                     <tr><td>Backgrounds &amp; Frame</td><td>Figure background, Plot background, Boundary color/width</td><td>Sets Matplotlib facecolor and spine styling for publication-quality export.</td></tr>
                     <tr><td>Grid Controls</td><td>Show grid, Grid color/width/style/alpha</td><td>Toggles and styles the axis grid.</td></tr>
-                    <tr><td>Colour Scale</td><td>Colormap dropdown, Normalize (0–1), Colorbar location</td><td>Selects the Matplotlib/seaborn-style colormap used for any scalar-mapped scatter/contour plot and whether its scale is normalized to [0,1] or auto-ranged to the data.</td></tr>
+                    <tr><td>Colour Scale</td><td>Colormap dropdown, Normalize (0&ndash;1), Colorbar location</td><td>Selects the Matplotlib/seaborn-style colormap used for any scalar-mapped scatter/contour plot and whether its scale is normalized to [0,1] or auto-ranged to the data.</td></tr>
                     <tr><td>Element Styling</td><td>Point type/size/alpha/edge, Histogram bins/alpha/hatch, Line widths/styles</td><td>Cosmetic styling of markers, histograms, and reference lines.</td></tr>
                     <tr><td>Legend Settings</td><td>Legend location, Legend frame, Show legend</td><td>Controls legend placement and visibility.</td></tr>
                     <tr><td>Layout</td><td>Square plot, Plot size (px) width/height</td><td>Forces a 1:1 aspect ratio and/or sets an explicit pixel size for the embedded Matplotlib canvas via <code>apply_plot_pixel_size</code>.</td></tr>
                     <tr><td>Reset to Defaults</td><td>Button</td><td>Restores every appearance setting in that sub-module to its factory default in one action.</td></tr>
-                </tbody></table>
+                </table>
 
                 <!-- ================================================= -->
                 <h2 id="maths">6. Mathematical Background</h2>
@@ -416,87 +417,145 @@
 
                 <h3 id="6.1">6.1 Notation</h3>
                 <table>
-                    <tbody><tr><th>Symbol</th><th>Meaning</th><th>Unit</th></tr>
-                    <tr><td>σ1, σ2, σ3</td><td>Major, intermediate, and minor total principal stresses (σ1 &gt; σ2 &gt; σ3)</td><td>MPa</td></tr>
+                    <tr><th>Symbol</th><th>Meaning</th><th>Unit</th></tr>
+                    <tr><td>&sigma;1, &sigma;2, &sigma;3</td><td>Major, intermediate, and minor total principal stresses (&sigma;1 &gt; &sigma;2 &gt; &sigma;3)</td><td>MPa</td></tr>
                     <tr><td>Pp</td><td>Pore fluid pressure</td><td>MPa</td></tr>
-                    <tr><td>μ</td><td>Coefficient of internal friction</td><td>dimensionless</td></tr>
+                    <tr><td>&mu;</td><td>Coefficient of internal friction</td><td>dimensionless</td></tr>
                     <tr><td>C0</td><td>Cohesive strength</td><td>MPa</td></tr>
                     <tr><td>SHmax</td><td>Azimuth of the maximum horizontal stress</td><td>degrees</td></tr>
                     <tr><td>Strike, Dip</td><td>Fault-plane orientation (right-hand rule strike; dip angle)</td><td>degrees</td></tr>
-                    <tr><td>σn</td><td>Normal stress resolved on the fault plane (total)</td><td>MPa</td></tr>
-                    <tr><td>σ'n</td><td>Effective normal stress = σn − Pp</td><td>MPa</td></tr>
-                    <tr><td>τ</td><td>Shear stress resolved on the fault plane</td><td>MPa</td></tr>
+                    <tr><td>&sigma;n</td><td>Normal stress resolved on the fault plane (total)</td><td>MPa</td></tr>
+                    <tr><td>&sigma;'n</td><td>Effective normal stress = &sigma;n &minus; Pp</td><td>MPa</td></tr>
+                    <tr><td>&tau;</td><td>Shear stress resolved on the fault plane</td><td>MPa</td></tr>
                     <tr><td>Ts</td><td>Slip tendency</td><td>dimensionless</td></tr>
                     <tr><td>Td</td><td>Dilation tendency</td><td>dimensionless</td></tr>
-                    <tr><td>Sf</td><td>Fracture susceptibility (frictional stability margin)</td><td>MPa</td></tr>
+                    <tr><td>Sf</td><td>Fracture susceptibility &mdash; the sustainable pore-pressure increase before failure (always evaluated on &sigma;'n)</td><td>MPa</td></tr>
                     <tr><td>Fs (Fsi)</td><td>Coulomb Failure Index</td><td>dimensionless</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3 id="6.2">6.2 Fault-Normal Vector and Resolved Stress</h3>
                 <p>
-                    The unit vector normal to the fault plane is constructed from its strike and dip using the
-                    standard structural-geology right-hand-rule convention:
+                    The unit vector normal to the fault plane &mdash; its <em>pole</em> &mdash; is constructed from
+                    strike and dip in the standard structural-geology right-hand-rule convention, in an
+                    (East, North, Up) frame. Under the right-hand rule the dip direction is strike&nbsp;+&nbsp;90&deg;,
+                    so the downward pole trends strike&nbsp;&minus;&nbsp;90&deg; and plunges 90&deg;&nbsp;&minus;&nbsp;dip:
                 </p>
-                <div class="formula-block">n = ( −sin(dip)·sin(strike), sin(dip)·cos(strike), −cos(dip) )     (Eq. 6.1)</div>
+                <div class="formula-block">n = ( &minus;sin(dip)&middot;cos(strike), sin(dip)&middot;sin(strike), &minus;cos(dip) )     (Eq. 6.1)</div>
+                <div class="note-box">
+                    <p>
+                        <strong>Sines and cosines are not interchangeable here, even though &sigma;n and &tau; do not
+                        notice.</strong> The reflected form
+                        (&minus;sin&nbsp;dip&middot;sin&nbsp;strike, sin&nbsp;dip&middot;cos&nbsp;strike, &minus;cos&nbsp;dip)
+                        describes a <em>left</em>-hand-rule plane whose pole trends &minus;strike, i.e. a different
+                        fault from the one the user entered. It nevertheless reproduces identical &sigma;n, &tau;, and
+                        Ts (agreement measured at 2.3&times;10&#8315;&sup1;&#8309;) because only <em>squared</em>
+                        direction cosines enter those quantities and one principal axis is vertical. Any
+                        <em>signed</em> use of the vector &mdash; plotting the pole on a stereonet, deriving a slip
+                        direction, computing a rake &mdash; is wrong under the reflected form. Equation 6.1 is written
+                        in the conventional form so the geometry agrees with
+                        <code>core/models.fault_basis_vectors</code> and the Static Analyzer's stereonet tab.
+                    </p>
+                </div>
                 <p>
-                    Because the calculator's internal (rotated_x, rotated_y) coordinate frame is aligned with
-                    SHmax rather than geographic north, the normal vector is rotated about the vertical axis by
-                    the sampled SHmax azimuth before the stress tensor is resolved:
+                    Because the calculator's internal (rotated_x, rotated_y) frame is aligned with the horizontal
+                    principal axes rather than geographic north, the pole is projected onto them: e1 points along
+                    the sampled SHmax azimuth and e2 lies 90&deg; clockwise from it. A unit vector at azimuth A is
+                    (sin&nbsp;A, cos&nbsp;A) in (East, North), so these are genuine dot products:
                 </p>
                 <div class="formula-block">
-rotated_x = cos(SHmax)·nx + sin(SHmax)·ny
-rotated_y = −sin(SHmax)·nx + cos(SHmax)·ny     (Eq. 6.2)</div>
+rotated_x = nx&middot;sin(SHmax) + ny&middot;cos(SHmax)
+rotated_y = nx&middot;cos(SHmax) &minus; ny&middot;sin(SHmax)     (Eq. 6.2)</div>
+                <p>
+                    Swapping the sine and cosine in Equation 6.2 projects onto azimuth
+                    90&deg;&nbsp;&minus;&nbsp;SHmax instead of SHmax; as with Equation 6.1 that error is invisible in
+                    &sigma;n and &tau; only because the components are squared before use.
+                </p>
                 <p>
                     With the three sampled principal stresses assumed to act along the rotated_x, rotated_y, and
                     vertical (z) axes respectively (reverse/thrust convention; see <a href="#6.4">Section 6.4</a>
                     for the regime remap), the normal and total resolved (traction) stresses are:
                 </p>
                 <div class="formula-block">
-σn = σ1·rotated_x² + σ2·rotated_y² + σ3·nz²     (Eq. 6.3)
+&sigma;n = &sigma;1&middot;rotated_x&sup2; + &sigma;2&middot;rotated_y&sup2; + &sigma;3&middot;nz&sup2;     (Eq. 6.3)
 
-|T|² = σ1²·rotated_x² + σ2²·rotated_y² + σ3²·nz²     (Eq. 6.4)
+|T|&sup2; = &sigma;1&sup2;&middot;rotated_x&sup2; + &sigma;2&sup2;&middot;rotated_y&sup2; + &sigma;3&sup2;&middot;nz&sup2;     (Eq. 6.4)
 
-τ = √ max(|T|² − σn², 0)     (Eq. 6.5)</div>
+&tau; = &radic; max(|T|&sup2; &minus; &sigma;n&sup2;, 0)     (Eq. 6.5)</div>
                 <p>
-                    The max(·, 0) clamp in Equation 6.5 is a numerical safeguard against a negative
+                    The max(&middot;, 0) clamp in Equation 6.5 is a numerical safeguard against a negative
                     radicand arising from floating-point rounding when the traction magnitude is very close to
                     the normal-stress magnitude (i.e. near-zero shear).
                 </p>
 
                 <h3 id="6.3">6.3 Effective Stress and the Stress Basis Toggle</h3>
                 <p>Effective normal stress follows Terzaghi's principle:</p>
-                <div class="formula-block">σ'n = σn − Pp     (Eq. 6.6)</div>
+                <div class="formula-block">&sigma;'n = &sigma;n &minus; Pp     (Eq. 6.6)</div>
                 <p>
                     The module maintains both bases simultaneously for every realization; the Use effective
-                    principal stresses switch (<a href="#5.5">Section 5.5</a>) selects which of σn or
-                    σ'n, and which of the raw or pore-pressure-adjusted σ1/σ3, feed into the
-                    Ts, Td, Sf, and Fs formulas below. When effective stress is disabled, pore pressure is
-                    excluded entirely from these four metrics (a conservative total-stress assessment); when
+                    principal stresses switch (<a href="#5.5">Section 5.5</a>) selects which of &sigma;n or
+                    &sigma;'n, and which of the raw or pore-pressure-adjusted &sigma;1/&sigma;3, feed into the
+                    Ts, Td, and Fs formulas below. When effective stress is disabled, pore pressure is
+                    excluded entirely from those three metrics (a conservative total-stress assessment); when
                     enabled, it is subtracted throughout (an effective-stress assessment appropriate for
                     injection/depletion-induced fault-reactivation studies).
                 </p>
+                <div class="note-box">
+                    <p>
+                        <strong>Sf is exempt from this switch.</strong> Fracture susceptibility is
+                        <em>defined</em> as a pore-pressure margin (<a href="#6.7">Section 6.7</a>), so it is
+                        always evaluated on effective normal stress regardless of the toggle. Ts, Td, and Fs honour
+                        the switch because total-stress forms of those are legitimate reporting choices; Sf has no
+                        total-stress form. Letting Sf follow the switch made the default (total-stress) mode drop Pp
+                        from Sf entirely, reporting the margin of a dry fault whatever pore pressure the user
+                        entered &mdash; and it left Sf statistically independent of pore pressure (measured
+                        correlation &minus;0.005168, standardized regression coefficient &minus;0.0005), so pore
+                        pressure appeared to have no influence on fault stability at all.
+                    </p>
+                </div>
 
                 <h3 id="6.4">6.4 Stress-Regime Remap</h3>
                 <p>
-                    The stability calculator's fixed internal convention places the vertical stress in the
-                    σ3 (normal_z) slot. Because the sampler always returns σ1&nbsp;&gt;&nbsp;σ2&nbsp;&gt;&nbsp;σ3
-                    for display purposes, the module remaps which sampled value is fed into that slot according
-                    to the user-selected stress regime, without altering the display ordering:
+                    <code>calculate_fault_stability</code> hard-codes a single convention &mdash;
+                    &sigma;1&nbsp;&rarr;&nbsp;rotated_x, &sigma;2&nbsp;&rarr;&nbsp;rotated_y,
+                    &sigma;3&nbsp;&rarr;&nbsp;normal_z &mdash; which is a reverse/thrust state with
+                    &sigma;1&nbsp;=&nbsp;SHmax and &sigma;3&nbsp;=&nbsp;S<sub>v</sub>. It does not infer or select a
+                    stress regime on its own. Whichever principal stress is vertical must therefore occupy the
+                    &sigma;3 slot for the physics to be right, so <code>_remap_for_regime()</code> permutes the
+                    columns handed to the calculation according to the user-selected regime. The sampled ensemble
+                    itself keeps &sigma;1&nbsp;&gt;&nbsp;&sigma;2&nbsp;&gt;&nbsp;&sigma;3 throughout for display,
+                    statistics, and export; only the calculator's input is permuted:
                 </p>
                 <table>
-                    <tbody><tr><th>Regime</th><th>Calculator sigma1 slot</th><th>Calculator sigma2 slot</th><th>Calculator sigma3 slot</th></tr>
-                    <tr><td>Normal Faulting (S<sub>v</sub> = S1)</td><td>sampled σ2</td><td>sampled σ3</td><td>sampled σ1 (= S<sub>v</sub>)</td></tr>
-                    <tr><td>Strike-Slip (S<sub>v</sub> = S2)</td><td>sampled σ1</td><td>sampled σ3</td><td>sampled σ2 (= S<sub>v</sub>)</td></tr>
-                    <tr><td>Reverse/Thrust (S<sub>v</sub> = S3)</td><td>sampled σ1</td><td>sampled σ2</td><td>sampled σ3 (= S<sub>v</sub>, no remap needed)</td></tr>
-                </tbody></table>
+                    <tr><th>Regime</th><th>Calculator sigma1 slot</th><th>Calculator sigma2 slot</th><th>Calculator sigma3 slot</th></tr>
+                    <tr><td>Normal Faulting (S<sub>v</sub> = S1)</td><td>sampled &sigma;2</td><td>sampled &sigma;3</td><td>sampled &sigma;1 (= S<sub>v</sub>)</td></tr>
+                    <tr><td>Strike-Slip (S<sub>v</sub> = S2)</td><td>sampled &sigma;1</td><td>sampled &sigma;3</td><td>sampled &sigma;2 (= S<sub>v</sub>)</td></tr>
+                    <tr><td>Reverse/Thrust (S<sub>v</sub> = S3)</td><td>sampled &sigma;1</td><td>sampled &sigma;2</td><td>sampled &sigma;3 (= S<sub>v</sub>, no remap needed)</td></tr>
+                </table>
+                <p>
+                    An unrecognized regime string falls back to <code>"reverse"</code>, the no-op case. The active
+                    regime is recorded on the result table as the <code>stress_regime</code> attribute so that
+                    exports and reproducibility metadata (<a href="#9.6">Section 9.6</a>) state which permutation
+                    produced the numbers.
+                </p>
+                <div class="note-box">
+                    <p>
+                        <strong>Consequence for downstream metrics.</strong> Inside the calculator, the labels
+                        &sigma;1 and &sigma;3 no longer mean "global maximum" and "global minimum" once a remap has
+                        been applied &mdash; they mean "the value in that slot". Only the reverse/thrust case
+                        preserves both identities. Any metric that is defined against the overall stress ellipsoid
+                        rather than against a slot must therefore be computed outside the calculator from the
+                        unpermuted columns; dilation tendency is exactly such a metric
+                        (<a href="#6.6">Section 6.6</a>).
+                    </p>
+                </div>
 
                 <h3 id="6.5">6.5 Slip Tendency (Ts)</h3>
                 <p>
                     Slip tendency (Morris, Ferrill &amp; Henderson, 1996) is the ratio of resolved shear stress
                     to resolved normal stress on the fault plane, evaluated on the selected stress basis
-                    (σn or σ'n):
+                    (&sigma;n or &sigma;'n):
                 </p>
-                <div class="formula-block">Ts = τ / σn(basis)     (Eq. 6.7)</div>
+                <div class="formula-block">Ts = &tau; / &sigma;n(basis)     (Eq. 6.7)</div>
                 <p>
                     Ts is undefined (reported as missing) when the basis normal stress is not strictly positive.
                     Higher Ts indicates a fault plane oriented closer to the frictional failure envelope for the
@@ -505,43 +564,82 @@ rotated_y = −sin(SHmax)·nx + cos(SHmax)·ny     (Eq. 6.2)</div>
                 </p>
 
                 <h3 id="6.6">6.6 Dilation Tendency (Td)</h3>
-                <div class="formula-block">Td = (σ1(basis) − σn(basis)) / (σ1(basis) − σ3(basis))     (Eq. 6.8)</div>
+                <div class="formula-block">Td = (&sigma;1(basis) &minus; &sigma;n(basis)) / (&sigma;1(basis) &minus; &sigma;3(basis))     (Eq. 6.8)</div>
                 <p>
                     Td quantifies the propensity of a fault or fracture to open (dilate) under the current stress
                     field, independent of frictional sliding. It is bounded in [0,&nbsp;1] for physically
                     consistent stress states: Td&nbsp;=&nbsp;1 corresponds to a plane oriented for maximum
                     dilation potential (the least favorably clamped orientation), while Td&nbsp;=&nbsp;0
                     corresponds to a plane subjected to the maximum principal stress directly across it. Dilation
-                    tendency is calculated in <code>sampling_engine.py</code> using the true global maximum and
-                    minimum principal stresses (σ1 and σ3 as sampled, i.e. before the regime remap of
-                    <a href="#6.4">Section 6.4</a>), since it is defined against the overall stress ellipsoid,
-                    not against whichever slot a given regime happens to place S<sub>v</sub> in.
+                    tendency is calculated in <code>sampling_engine.py</code>, overwriting the calculator's own
+                    column, using the true global maximum and minimum principal stresses (&sigma;1 and &sigma;3 as
+                    sampled, i.e. before the regime remap of <a href="#6.4">Section 6.4</a>), since it is defined
+                    against the overall stress ellipsoid and not against whichever slot a given regime happens to
+                    place S<sub>v</sub> in. The selected stress basis still applies: in effective-stress mode Pp is
+                    subtracted from &sigma;1, &sigma;3, and &sigma;n alike &mdash; from every term, so the ratio is
+                    consistent &mdash; and in total-stress mode from none of them.
                 </p>
 
                 <h3 id="6.7">6.7 Fracture Susceptibility (Sf)</h3>
-                <div class="formula-block">Sf = σn(basis) − (τ − C0) / μ     (Eq. 6.9)</div>
+                <div class="formula-block">Sf = &sigma;'n &minus; (&tau; &minus; C0) / &mu;  =  (&sigma;n &minus; Pp) &minus; (&tau; &minus; C0) / &mu;     (Eq. 6.9)</div>
                 <p>
-                    Sf expresses, in stress units (MPa), the margin between the current normal stress and the
-                    normal stress at which the Mohr–Coulomb failure criterion τ&nbsp;=&nbsp;C0&nbsp;+&nbsp;μ·σn(basis)
-                    would be satisfied for the same shear stress and friction/cohesion values. Sf&nbsp;≤&nbsp;0
-                    indicates the realization has crossed the failure envelope (see <a href="#6.9">Section
-                    6.9</a>); Sf therefore doubles as both a continuous risk metric and the basis for the binary
-                    failure classification.
+                    Sf is the <strong>pore-pressure increase, in MPa, that the fault can sustain before it reaches
+                    the Mohr&ndash;Coulomb failure envelope</strong> &tau;&nbsp;=&nbsp;C0&nbsp;+&nbsp;&mu;&middot;&sigma;'n
+                    at unchanged shear stress (Mildren, Hillis &amp; Kaldi, 2002; Streit &amp; Hillis, 2004). That
+                    definition is what makes it a decision-grade number for injection screening: it answers "how much
+                    more pressure?" directly, in the units the operator controls.
+                </p>
+                <div class="note-box">
+                    <p>
+                        <strong>Sf is always an effective-stress quantity.</strong> It uses &sigma;'n irrespective of
+                        the effective-stress toggle (<a href="#6.3">Section 6.3</a>), because a pore-pressure margin
+                        is only meaningful under Terzaghi's effective-stress principle (Terzaghi, 1943; Hubbert &amp;
+                        Rubey, 1959) in the first place. There is no total-stress form of fracture susceptibility to
+                        select. The value therefore responds to the sampled pore pressure in both modes, which is
+                        also what makes Pp appear in the sensitivity ranking (<a href="#9.3">Section 9.3</a>) at its
+                        true influence.
+                    </p>
+                </div>
+                <p>
+                    Sf&nbsp;&le;&nbsp;0 indicates the realization is already at or past the envelope &mdash; no
+                    further pressure can be sustained (see <a href="#6.9">Section 6.9</a>) &mdash; so Sf doubles as a
+                    continuous risk metric and as the basis for the binary failure classification. It is undefined
+                    (reported as missing) when &sigma;'n&nbsp;&le;&nbsp;0 or &mu;&nbsp;&le;&nbsp;0, since the
+                    division by &mu; and the effective-stress premise both fail there.
                 </p>
 
                 <h3 id="6.8">6.8 Coulomb Failure Index (Fs / Fsi)</h3>
-                <div class="formula-block">Fs = τ / (C0 + μ·σn(basis))     (Eq. 6.10)</div>
+                <div class="formula-block">Fs = &tau; / (C0 + &mu;&middot;&sigma;n(basis))     (Eq. 6.10)</div>
                 <p>
                     Fs (displayed on plots using the scientific symbol Fsi to avoid confusion with the general
                     variable "Fs") is a normalized failure-potential ratio: Fs&nbsp;=&nbsp;1 marks the
-                    Mohr–Coulomb failure envelope exactly, Fs&nbsp;&lt;&nbsp;1 denotes a stable stress
+                    Mohr&ndash;Coulomb failure envelope exactly, Fs&nbsp;&lt;&nbsp;1 denotes a stable stress
                     state, and Fs&nbsp;&gt;&nbsp;1 denotes a stress state that has exceeded frictional-cohesive
                     strength on that plane. Fs is undefined when the basis normal stress or the failure-envelope
                     denominator is not strictly positive.
                 </p>
 
                 <h3 id="6.9">6.9 Binary Failure Flag</h3>
-                <div class="formula-block">failure = TRUE if and only if Sf ≤ 0     (Eq. 6.11)</div>
+                <div class="formula-block">
+failure = TRUE   if Sf is finite and Sf &le; 0
+        = FALSE  if Sf is finite and Sf &gt; 0
+        = missing (pd.NA)  if Sf could not be evaluated     (Eq. 6.11)</div>
+                <p>
+                    The column is a pandas nullable <code>boolean</code>, not a plain NumPy bool, and the three-way
+                    outcome is deliberate.
+                </p>
+                <div class="note-box">
+                    <p>
+                        <strong>An undefined realization is not a stable realization.</strong> Because
+                        <code>np.nan &le; 0</code> evaluates to <code>False</code>, writing the flag as a plain
+                        comparison silently reclassifies every row whose Sf could not be computed
+                        (&sigma;'n&nbsp;&le;&nbsp;0, or &mu;&nbsp;&le;&nbsp;0) as "did not fail". Those rows then
+                        enter the Probability of Failure denominator as successes, biasing the reported probability
+                        <em>downwards</em> &mdash; the unsafe direction for a risk metric. Keeping them as
+                        <code>pd.NA</code> means the probability is computed over evaluable realizations only, and the
+                        count of non-evaluable rows stays visible instead of being absorbed into the "safe" tally.
+                    </p>
+                </div>
                 <p>
                     This nullable boolean column underlies the Probability of Failure statistic reported
                     throughout the Geomechanics, Statistics, and Validation &amp; Export sub-tabs (<a href="#statistics">Section 9</a>).
@@ -550,27 +648,37 @@ rotated_y = −sin(SHmax)·nx + cos(SHmax)·ny     (Eq. 6.2)</div>
                 <h3 id="6.10">6.10 Analytical Reference Cases</h3>
                 <p>
                     Two closed-form sanity checks are embedded permanently in the validation pipeline
-                    (<code>validation.analytical_benchmarks</code>) and are re-evaluated on every run:
+                    (<code>validation.analytical_benchmarks</code>) and are re-evaluated on every run. Both use
+                    &sigma;1&nbsp;=&nbsp;60, &sigma;2&nbsp;=&nbsp;40, &sigma;3&nbsp;=&nbsp;25&nbsp;MPa with
+                    Pp&nbsp;=&nbsp;10&nbsp;MPa, &mu;&nbsp;=&nbsp;0.6, and C0&nbsp;=&nbsp;0:
                 </p>
-                <ul>
-                    <li>
-                        <strong>Sigma-3 principal plane</strong> (strike&nbsp;=&nbsp;0°, dip&nbsp;=&nbsp;0°):
-                        the fault normal is exactly parallel to σ3, so the analytically expected normal
-                        stress equals σ3 (25&nbsp;MPa in the reference case) and the expected shear stress
-                        is exactly zero.
-                    </li>
-                    <li>
-                        <strong>Sigma-1 principal plane</strong> (strike&nbsp;=&nbsp;90°, dip&nbsp;=&nbsp;90°):
-                        the fault normal is exactly parallel to σ1, so the expected normal stress equals
-                        σ1 (60&nbsp;MPa) with zero shear.
-                    </li>
-                </ul>
+                <table>
+                    <tr><th>Case</th><th>Strike / Dip</th><th>Expected &sigma;n</th><th>Expected &tau;</th><th>Expected Td</th><th>Expected Sf</th></tr>
+                    <tr><td>Sigma-3 principal plane (pole &#8741; &sigma;3)</td><td>0&deg; / 0&deg;</td><td>25 MPa (= &sigma;3)</td><td>0</td><td>1.0</td><td>15 MPa</td></tr>
+                    <tr><td>Sigma-1 principal plane (pole &#8741; &sigma;1)</td><td>90&deg; / 90&deg;</td><td>60 MPa (= &sigma;1)</td><td>0</td><td>0.0</td><td>50 MPa</td></tr>
+                </table>
                 <p>
-                    Both cases additionally check the analytically expected dilation tendency (1.0 and 0.0
-                    respectively) and fracture susceptibility, with a numerical tolerance of 1×10⁻¹⁰.
-                    This is a unit-test-grade verification, embedded in the production workflow, that the
-                    vectorized fault-normal geometry and stress-resolution code (<a href="#6.2">Section 6.2</a>)
-                    has not been silently broken by a code change.
+                    With zero shear and zero cohesion, Equation 6.9 collapses to
+                    Sf&nbsp;=&nbsp;&sigma;n&nbsp;&minus;&nbsp;Pp, giving 25&nbsp;&minus;&nbsp;10&nbsp;=&nbsp;15 and
+                    60&nbsp;&minus;&nbsp;10&nbsp;=&nbsp;50&nbsp;MPa &mdash; the plane can take 15 (respectively 50)
+                    MPa of additional pore pressure before it reaches the envelope.
+                </p>
+                <div class="note-box">
+                    <p>
+                        <strong>The expected Sf values must include the pore-pressure term.</strong> When they were
+                        written as 25 and 60&nbsp;MPa &mdash; &sigma;n with Pp dropped &mdash; the benchmark
+                        <em>agreed</em> with the pre-correction calculator and reported "passed" while Sf was in fact
+                        independent of the pore pressure the user entered. A benchmark that encodes the same mistake
+                        as the code it checks is worse than no benchmark, because it converts a silent error into a
+                        green tick. These two numbers are consequently the sharpest available regression test on the
+                        Sf definition of <a href="#6.7">Section 6.7</a>.
+                    </p>
+                </div>
+                <p>
+                    All four checked quantities (&sigma;n, &tau;, Td, Sf) are compared with an absolute tolerance of
+                    1&times;10&#8315;&sup1;&#8304;. This is a unit-test-grade verification, embedded in the production
+                    workflow, that the vectorized fault-normal geometry and stress-resolution code
+                    (<a href="#6.2">Section 6.2</a>) has not been silently broken by a code change.
                 </p>
 
                 <!-- ================================================= -->
@@ -586,13 +694,13 @@ rotated_y = −sin(SHmax)·nx + cos(SHmax)·ny     (Eq. 6.2)</div>
                 <p>
                     The function <code>_standard_samples()</code> is the single point where the two sampling
                     methods diverge. For Monte Carlo, it uses NumPy's modern Generator API seeded from the
-                    user's integer seed (<code>numpy.random.default_rng(seed)</code>) to draw an (N&nbsp;×&nbsp;D)
+                    user's integer seed (<code>numpy.random.default_rng(seed)</code>) to draw an (N&nbsp;&times;&nbsp;D)
                     array of independent standard-normal variates, where N is the requested sample count and D
                     is the number of stochastic dimensions (7 stress/strength/orientation inputs from
                     <code>INPUTS</code> plus 2 fault-orientation inputs from <code>ORIENTATION_INPUTS</code>
                     = 9 total dimensions per realization).
                 </p>
-                <div class="formula-block">Z ~ N(0, I_D),  Z ∈ R^(N×D)     (Eq. 7.1, Monte Carlo)</div>
+                <div class="formula-block">Z ~ N(0, I_D),  Z &isin; R^(N&times;D)     (Eq. 7.1, Monte Carlo)</div>
                 <p>
                     For comparison, Latin Hypercube Sampling instead draws a D-dimensional Latin Hypercube design
                     over the unit cube via <code>scipy.stats.qmc.LatinHypercube(seed=seed)</code>, clips the
@@ -600,7 +708,7 @@ rotated_y = −sin(SHmax)·nx + cos(SHmax)·ny     (Eq. 6.2)</div>
                     inverse-CDF transform), and maps them to standard-normal space with the inverse normal CDF
                     (<code>scipy.stats.norm.ppf</code>). Monte Carlo sampling therefore explores the input space
                     with independent pseudo-random draws, while LHS enforces stratified, evenly spaced coverage
-                    along each marginal dimension — typically converging with fewer realizations, at the
+                    along each marginal dimension &mdash; typically converging with fewer realizations, at the
                     cost of slightly more complex generation. Because the Monte Carlo tab always resolves to
                     <code>kind="mc"</code>, every subsequent transformation in this section operates on the
                     independent standard-normal array Z.
@@ -608,29 +716,29 @@ rotated_y = −sin(SHmax)·nx + cos(SHmax)·ny     (Eq. 6.2)</div>
 
                 <h3 id="7.2">7.2 Ordered Principal-Stress Sampling via Positive Gaps</h3>
                 <p>
-                    Sampling σ1, σ2, σ3 as three independent random variables cannot, by
-                    construction, guarantee σ1&nbsp;&gt;&nbsp;σ2&nbsp;&gt;&nbsp;σ3 on every
-                    realization. The engine instead samples the smallest stress (σ3) directly and
-                    represents the other two as σ3 plus two independently distributed, strictly
+                    Sampling &sigma;1, &sigma;2, &sigma;3 as three independent random variables cannot, by
+                    construction, guarantee &sigma;1&nbsp;&gt;&nbsp;&sigma;2&nbsp;&gt;&nbsp;&sigma;3 on every
+                    realization. The engine instead samples the smallest stress (&sigma;3) directly and
+                    represents the other two as &sigma;3 plus two independently distributed, strictly
                     non-negative gaps:
                 </p>
                 <div class="formula-block">
-σ3 ~ Distribution_3(mean3, sd3), support [0, ∞)
-gap23 ~ Distribution_2(mean2 − mean3, sd2′), support [0, ∞)
-gap12 ~ Distribution_1(mean1 − mean2, sd1′), support [0, ∞)
-σ2 = σ3 + gap23,   σ1 = σ3 + gap23 + gap12     (Eq. 7.2)</div>
+&sigma;3 ~ Distribution_3(mean3, sd3), support [0, &infin;)
+gap23 ~ Distribution_2(mean2 &minus; mean3, sd2&prime;), support [0, &infin;)
+gap12 ~ Distribution_1(mean1 &minus; mean2, sd1&prime;), support [0, &infin;)
+&sigma;2 = &sigma;3 + gap23,   &sigma;1 = &sigma;3 + gap23 + gap12     (Eq. 7.2)</div>
                 <p>
                     where the gap standard deviations are derived by variance subtraction so that the marginal
                     variance of each reconstructed principal stress still matches the user-specified SD:
                 </p>
                 <div class="formula-block">
-sd2′ = √ max(sd2² − sd3², 0)
-sd1′ = √ max(sd1² − sd2², 0)     (Eq. 7.3)</div>
+sd2&prime; = &radic; max(sd2&sup2; &minus; sd3&sup2;, 0)
+sd1&prime; = &radic; max(sd1&sup2; &minus; sd2&sup2;, 0)     (Eq. 7.3)</div>
                 <p>
-                    This construction is exactly why the engine requires SD(σ1)&nbsp;≥&nbsp;SD(σ2)&nbsp;≥&nbsp;SD(σ3)
+                    This construction is exactly why the engine requires SD(&sigma;1)&nbsp;&ge;&nbsp;SD(&sigma;2)&nbsp;&ge;&nbsp;SD(&sigma;3)
                     at run time (<a href="#5.2">Section 5.2</a>): if the ordering were violated, the radicand in
                     Equation 7.3 would go negative and silently clamp to zero, producing an incorrect (deflated)
-                    gap variance. Each of the three quantities (σ3, gap23, gap12) is drawn using its own
+                    gap variance. Each of the three quantities (&sigma;3, gap23, gap12) is drawn using its own
                     selected distribution family (<a href="#7.3">Section 7.3</a>) applied to its own dedicated
                     column of the standard-normal array Z (columns 2, 1, and 0 respectively, converted to a
                     uniform coordinate via the standard-normal CDF before being handed to the distribution
@@ -640,20 +748,20 @@ sd1′ = √ max(sd1² − sd2², 0)     (Eq. 7.3)</div>
                 <h3 id="7.3">7.3 Distribution Registry and the Inverse-CDF (Quantile) Method</h3>
                 <p>
                     Every scalar stochastic input (other than orientation) is transformed from a unit-uniform
-                    coordinate u&nbsp;=&nbsp;Φ(z) via the appropriate quantile function of the chosen
+                    coordinate u&nbsp;=&nbsp;&Phi;(z) via the appropriate quantile function of the chosen
                     distribution (<code>distributions.sample_scalar</code>). All distributions except Uniform
                     are moment-parameterized (mean, standard deviation) so that a user need not learn each law's
                     native shape/scale parameters.
                 </p>
                 <table>
-                    <tbody><tr><th>Distribution</th><th>Support</th><th>Sampling Formula</th><th>Typical Use</th></tr>
-                    <tr><td>Normal / Gaussian</td><td>(−∞, ∞), or the equivalent Truncated Normal when a finite physical bound applies</td><td>x = Φ⁻¹(u; mean, sd) [or truncated variant]</td><td>General-purpose symmetric uncertainty</td></tr>
-                    <tr><td>Truncated Normal</td><td>[lower, upper]</td><td>x = TruncNorm.ppf(u; a, b, mean, sd) with a,b the standardized bounds</td><td>Physically bounded parameters (friction, cohesion, pore pressure, stresses)</td></tr>
-                    <tr><td>Lognormal</td><td>(0, ∞)</td><td>x = Lognorm.ppf(u; σ, scale) with σ² = ln(1+(sd/mean)²), scale = exp(ln(mean) − σ²/2)</td><td>Strictly positive, right-skewed parameters</td></tr>
-                    <tr><td>Gamma</td><td>(0, ∞)</td><td>x = Gamma.ppf(u; shape=(mean/sd)², scale=sd²/mean)</td><td>Positive parameters with flexible skew</td></tr>
-                    <tr><td>Beta</td><td>[lower, upper] (finite both sides)</td><td>x = lower + (upper−lower)·Beta.ppf(u; α,β), α,β from moment matching</td><td>Friction coefficient (natural [0,1] bound)</td></tr>
-                    <tr><td>Uniform</td><td>[minimum, maximum] or [mean−√3·sd, mean+√3·sd]</td><td>x = minimum + u·(maximum − minimum)</td><td>Conservative bracketed uncertainty with no preferred value</td></tr>
-                </tbody></table>
+                    <tr><th>Distribution</th><th>Support</th><th>Sampling Formula</th><th>Typical Use</th></tr>
+                    <tr><td>Normal / Gaussian</td><td>(&minus;&infin;, &infin;), or the equivalent Truncated Normal when a finite physical bound applies</td><td>x = &Phi;&#8315;&sup1;(u; mean, sd) [or truncated variant]</td><td>General-purpose symmetric uncertainty</td></tr>
+                    <tr><td>Truncated Normal</td><td>[lower, upper]</td><td>x = TruncNorm.ppf(u; a, b, loc=&mu;, scale=&sigma;) where (&mu;, &sigma;) is the <em>parent</em> normal solved so that the truncated law's moments equal the requested mean and sd (<a href="#7.4">Section 7.4</a>), and a = (lower&minus;&mu;)/&sigma;, b = (upper&minus;&mu;)/&sigma;</td><td>Physically bounded parameters (friction, cohesion, pore pressure, stresses)</td></tr>
+                    <tr><td>Lognormal</td><td>(0, &infin;)</td><td>x = Lognorm.ppf(u; &sigma;, scale) with &sigma;&sup2; = ln(1+(sd/mean)&sup2;), scale = exp(ln(mean) &minus; &sigma;&sup2;/2)</td><td>Strictly positive, right-skewed parameters</td></tr>
+                    <tr><td>Gamma</td><td>(0, &infin;)</td><td>x = Gamma.ppf(u; shape=(mean/sd)&sup2;, scale=sd&sup2;/mean)</td><td>Positive parameters with flexible skew</td></tr>
+                    <tr><td>Beta</td><td>[lower, upper] (finite both sides)</td><td>x = lower + (upper&minus;lower)&middot;Beta.ppf(u; &alpha;,&beta;), &alpha;,&beta; from moment matching</td><td>Friction coefficient (natural [0,1] bound)</td></tr>
+                    <tr><td>Uniform</td><td>[minimum, maximum] or [mean&minus;&radic;3&middot;sd, mean+&radic;3&middot;sd]</td><td>x = minimum + u&middot;(maximum &minus; minimum)</td><td>Conservative bracketed uncertainty with no preferred value</td></tr>
+                </table>
                 <p>
                     A defensive post-sampling check (in <code>sample_scalar</code>) verifies that no drawn value
                     for a bounded quantity falls outside its declared physical range; a violation raises an
@@ -661,13 +769,13 @@ sd1′ = √ max(sd1² − sd2², 0)     (Eq. 7.3)</div>
                     stability calculation.
                 </p>
 
-                <h3 id="7.4">7.4 Automatic Truncation of Normal/Gaussian Selections</h3>
+                <h3 id="7.4">7.4 Automatic Truncation of Normal/Gaussian Selections, and the Parent-Parameter Solve</h3>
                 <p>
                     A subtle but important behavior: whenever the user selects Normal or Gaussian for an input
-                    that carries a finite physical bound (friction&nbsp;∈&nbsp;[0,1]; cohesion, pore
-                    pressure, and all three principal stresses&nbsp;≥&nbsp;0), the sampler transparently
-                    substitutes the mathematically equivalent Truncated Normal distribution with the same mean
-                    and standard deviation, rather than allowing probability mass to fall outside the physical
+                    that carries a finite physical bound (friction&nbsp;&isin;&nbsp;[0,1]; cohesion, pore
+                    pressure, and all three principal stresses&nbsp;&ge;&nbsp;0), the sampler transparently
+                    substitutes a Truncated Normal distribution <em>whose moments are the requested mean and
+                    standard deviation</em>, rather than allowing probability mass to fall outside the physical
                     range. This substitution is recorded in the results' metadata
                     (<code>results.attrs["effective_distributions"]</code>, surfaced via
                     <code>distributions.effective_distribution_name</code>) and is reported explicitly to the
@@ -675,13 +783,56 @@ sd1′ = √ max(sd1² − sd2², 0)     (Eq. 7.3)</div>
                     "Normal" label the user selected in the UI never silently misrepresents what was actually
                     sampled.
                 </p>
+                <p>
+                    Delivering the requested <em>moments</em> requires a solve, because SciPy's
+                    <code>truncnorm</code> takes <code>loc</code>/<code>scale</code> as the <strong>parent</strong>
+                    normal's &mu; and &sigma;, and the truncated law's mean and standard deviation are not &mu; and
+                    &sigma; whenever a bound is within reach (Johnson, Kotz &amp; Balakrishnan, 1994, Vol. 1,
+                    sec. 13.10):
+                </p>
+                <div class="formula-block">&alpha; = (lower &minus; &mu;)/&sigma;,    &beta; = (upper &minus; &mu;)/&sigma;,    Z = &Phi;(&beta;) &minus; &Phi;(&alpha;)
+
+E[X]   = &mu; + &sigma; &middot; ( &phi;(&alpha;) &minus; &phi;(&beta;) ) / Z
+
+Var[X] = &sigma;² &middot; [ 1 + ( &alpha;&middot;&phi;(&alpha;) &minus; &beta;&middot;&phi;(&beta;) ) / Z &minus; ( ( &phi;(&alpha;) &minus; &phi;(&beta;) ) / Z )² ]     (Eq. 7.3b)</div>
+                <p>
+                    <code>_truncated_normal_parent()</code> therefore inverts Equation 7.3b as two nested
+                    one-dimensional root finds: E[X] is monotone in &mu;, so for any trial &sigma; the parent mean
+                    that reproduces the requested mean is found by a bracketed <code>brentq</code> solve; the
+                    realised standard deviation is then monotone in &sigma; once &mu; is chosen that way, so an outer
+                    <code>brentq</code> solve fixes &sigma;. Both roots are verified against Equation 7.3b before
+                    being used (to 1e&#8315;&#8313; on the inner solve and 1e&#8315;&#8311; relative on the final pair),
+                    because an unverified root on a flat residual is exactly how a non-solution gets mistaken for
+                    one.
+                </p>
+                <div class="note-box">
+                    <p>
+                        <strong>The measured error this removes.</strong> Passing the requested moments straight
+                        through as <code>loc</code>/<code>scale</code> sampled a different distribution from the one
+                        specified. A cohesion entered as mean&nbsp;2.0&nbsp;MPa, sd&nbsp;3.0&nbsp;MPa with a lower
+                        bound of 0 was actually drawn with mean&nbsp;<strong>3.2821</strong>, sd&nbsp;2.1891 &mdash;
+                        the mean <strong>64% above</strong> the value the user typed. The bias grows as the mean
+                        approaches a bound relative to the spread, so the most bounded inputs (cohesion and pore
+                        pressure near zero, friction near 0 or 1) were the worst affected.
+                    </p>
+                </div>
+                <p>
+                    <strong>Not every (mean, sd) pair is attainable on a bounded support.</strong> On
+                    [0,&nbsp;&infin;) the ratio sd/mean has a supremum of 1 (the exponential limit); on a finite
+                    [l,&nbsp;u] the standard deviation cannot exceed (u&nbsp;&minus;&nbsp;l)/&radic;12 (the uniform
+                    limit); and both ceilings tighten as the mean approaches a bound. A request outside those limits
+                    raises a <code>ValueError</code> that names the largest standard deviation the support can carry
+                    and suggests a Lognormal, Gamma, or Uniform law instead &mdash; rather than quietly returning
+                    parameters whose moments differ from the ones asked for. The mean is also required to lie
+                    strictly inside the bounds.
+                </p>
 
                 <h3 id="7.5">7.5 Orientation Sampling: Von Mises and Fisher 3D Models</h3>
                 <p>
                     SHmax azimuth is always sampled with a circular Von Mises distribution about its mean using
                     its own concentration k_shmax:
                 </p>
-                <div class="formula-block">SHmax = [ VonMises.ppf(u; k_shmax, loc=mean_SHmax) in radians ] × (180/π), reduced modulo 360°     (Eq. 7.4)</div>
+                <div class="formula-block">SHmax = [ VonMises.ppf(u; k_shmax, loc=mean_SHmax) in radians ] &times; (180/&pi;), reduced modulo 360&deg;     (Eq. 7.4)</div>
                 <p>
                     For fault-plane orientation (Strike, Dip), two mutually exclusive models are available,
                     selected by the Orientation Distribution dropdown:
@@ -690,26 +841,26 @@ sd1′ = √ max(sd1² − sd2², 0)     (Eq. 7.3)</div>
                 <h4 id="7.5.1">7.5.1 Von Mises (independent strike and dip)</h4>
                 <ul>
                     <li>Strike is sampled circularly with the Von Mises law (Equation 7.4 form) using k_strike about the fault's own mean strike.</li>
-                    <li>Dip is sampled with a Truncated Normal law bounded to [0°, 90°], whose standard deviation is approximated from k_dip via the small-angle Von Mises variance relation σ≈(180/π)/√k (with a diffuse 90° spread used when k_dip&nbsp;=&nbsp;0).</li>
+                    <li>Dip is sampled with a Truncated Normal law bounded to [0&deg;, 90&deg;], whose standard deviation is approximated from k_dip via the small-angle Von Mises variance relation &sigma;&asymp;(180/&pi;)/&radic;k (with a diffuse 90&deg; spread used when k_dip&nbsp;=&nbsp;0).</li>
                 </ul>
 
                 <h4 id="7.5.2">7.5.2 Fisher 3D (coupled strike and dip)</h4>
                 <p>
-                    The Fisher 3D model recognizes that strike and dip are not physically independent —
-                    they jointly describe a single plane's pole vector — and instead samples a 3-D Fisher
+                    The Fisher 3D model recognizes that strike and dip are not physically independent &mdash;
+                    they jointly describe a single plane's pole vector &mdash; and instead samples a 3-D Fisher
                     distribution of unit vectors clustered about the mean pole direction, using the shared
-                    Strike-row k as the Fisher concentration κ:
+                    Strike-row k as the Fisher concentration &kappa;:
                 </p>
                 <div class="formula-block">
-cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
-φ = 2π·u2     (Eq. 7.5)</div>
+cos(&theta;) = 1 + ln[ u1 + (1&minus;u1)&middot;e&#8315;&sup2;&#7488; ] / &kappa;   (or 1&minus;2u1 when &kappa; = 0)
+&phi; = 2&pi;&middot;u2     (Eq. 7.5)</div>
                 <p>
-                    The polar angle θ and azimuthal angle φ are used to rotate about the mean pole
+                    The polar angle &theta; and azimuthal angle &phi; are used to rotate about the mean pole
                     direction within a local (east, north) tangent frame constructed by Gram-Schmidt
                     orthogonalization against a reference axis. Because a geological plane is axial (a pole and
                     its antipode describe the same plane), any sampled pole with a positive vertical component is
                     reflected to the lower hemisphere (<code>poles[poles[:, 2] &gt; 0] *= -1.0</code>) before
-                    back-converting to a strike/dip pair. Horizontal planes (dip&nbsp;≈&nbsp;0) retain the
+                    back-converting to a strike/dip pair. Horizontal planes (dip&nbsp;&asymp;&nbsp;0) retain the
                     fault's original mean strike convention, since strike is geometrically undefined for a
                     perfectly horizontal surface.
                 </p>
@@ -728,8 +879,8 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                     (<a href="#4.3">Section 4.3</a>). For each fault it draws a fresh D-dimensional
                     standard-normal block via <code>_standard_samples</code>, transforms it into physical
                     stress/strength/orientation values via <code>_sample_inputs</code> (Sections
-                    7.2–7.5), applies the selected stress-regime remap (<a href="#6.4">Section 6.4</a>),
-                    evaluates the deterministic stability physics (Sections 6.2–6.9) via
+                    7.2&ndash;7.5), applies the selected stress-regime remap (<a href="#6.4">Section 6.4</a>),
+                    evaluates the deterministic stability physics (Sections 6.2&ndash;6.9) via
                     <code>calculate_fault_stability</code>, and appends <code>fault_id</code> and a zero-based
                     realization index column before concatenating every fault's realization block into one
                     combined DataFrame. Cancellation is checked between faults (and once before/after the
@@ -746,13 +897,13 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                 </p>
 
                 <figure class="figure-block">
-                    <div class="figure-img-wrap img-loaded" style="position: relative;">
+                    <div class="figure-img-wrap">
                         <img src="put_your_img_here.png" alt="Monte Carlo sampling pipeline flowchart from mean/SD/distribution settings through the stress-regime remap to the tagged realization table" loading="lazy">
                         <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
                         </button>
                     </div>
-                    <span class="ph-caption"><strong>Figure 7.1</strong> — Monte Carlo sampling pipeline: from user-entered mean/SD/distribution settings, through standard-normal draw, distribution transform, stress-regime remap, and stability calculation, to the final tagged realization table.</span>
+                    <span class="ph-caption"><strong>Figure 7.1</strong> &mdash; Monte Carlo sampling pipeline: from user-entered mean/SD/distribution settings, through standard-normal draw, distribution transform, stress-regime remap, and stability calculation, to the final tagged realization table.</span>
                 </figure>
 
                 <!-- ================================================= -->
@@ -783,7 +934,7 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                     Once validation succeeds, the workspace switches the active module tab to the button that
                     was clicked, disables every shared and per-module simulation control (SAMPLES, SEED, FAULT
                     selector, and the Run button itself) to prevent concurrent runs, and shows a full-screen
-                    determinate progress overlay (Running uncertainty simulation…). A daemon
+                    determinate progress overlay (Running uncertainty simulation&hellip;). A daemon
                     <code>threading.Thread</code> is then started running the private <code>_worker()</code>
                     function, which:
                 </p>
@@ -791,7 +942,7 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                     <li>Calls <code>generate_samples()</code> (<a href="#algorithms">Section 7</a>), passing a <code>cancel_event</code> and a <code>progress_callback</code> that reports completed sampling stages (1 preparation stage + 2 stages per fault: sampling and stability calculation).</li>
                     <li>If the cancel event is set immediately after sampling completes, raises <code>SimulationCancelled</code> without proceeding to validation, avoiding wasted computation on discarded results.</li>
                     <li>Calls <code>build_validation_report()</code> (<a href="#9.4">Section 9.4</a>), passing a second <code>progress_callback</code> whose reported range is offset to continue smoothly from where sampling left off, so the single progress bar advances continuously through both phases.</li>
-                    <li>Marshals the completed results and validation report back onto the main Tk thread via <code>app.after(0, _on_success, ...)</code>, since Tkinter widgets may only be touched from the main thread.</li>
+                    <li>Marshals the completed results and validation report back onto the main Qt thread via <code>app.after(0, _on_success, ...)</code>, since Qt widgets may only be touched from the main thread.</li>
                 </ol>
                 <p>
                     A floating, always-on-top Cancel window is displayed alongside the full-screen loader (which
@@ -802,7 +953,7 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
 
                 <h3 id="8.3">8.3 Success, Error, and Cancellation Handlers</h3>
                 <table>
-                    <tbody><tr><th>Handler</th><th>Trigger</th><th>Behavior</th></tr>
+                    <tr><th>Handler</th><th>Trigger</th><th>Behavior</th></tr>
                     <tr>
                         <td><code>_on_success</code></td>
                         <td>Sampling and validation both complete without cancellation</td>
@@ -818,7 +969,7 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                         <td><code>SimulationCancelled</code> raised after the user pressed Cancel</td>
                         <td>Restores controls to normal state after a brief settling delay and sets the status bar to confirm that any previously loaded results remain unchanged.</td>
                     </tr>
-                </tbody></table>
+                </table>
 
                 <h3 id="8.4">8.4 Post-Run Recalculation: The Effective-Stress Toggle Path</h3>
                 <p>
@@ -827,10 +978,10 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                     flag directly on every cached realization DataFrame (both the currently displayed one and
                     every other fault's cached result) using the already-sampled
                     sigma1/sigma2/sigma3/pore_pressure/shear_stress/friction/cohesion columns, following exactly
-                    Equations 6.6–6.11 on the newly selected basis. It then refreshes the convergence table
+                    Equations 6.6&ndash;6.11 on the newly selected basis. It then refreshes the convergence table
                     and its summary for the active result, updates the reproducibility metadata's
                     <code>analysis_options.use_effective_ts</code> flag, redraws the active plot, marks the
-                    workspace dirty, and autosaves — all without discarding or resampling the underlying
+                    workspace dirty, and autosaves &mdash; all without discarding or resampling the underlying
                     stochastic draws. This design choice keeps the (potentially expensive) sampling step
                     decoupled from a purely presentational recalculation.
                 </p>
@@ -841,7 +992,7 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                     completing a run all trigger a private, silent autosave (via
                     <code>core.project_state.save_state</code> / <code>collect_uncertainty_state</code>) that
                     persists the current uncertainty session independently of the Static and Dynamic Analyzer
-                    workspaces — by design, the Uncertainty Analyzer's input and results are never written
+                    workspaces &mdash; by design, the Uncertainty Analyzer's input and results are never written
                     into the shared Static/Dynamic handoff cache, keeping the three workspaces' data fully
                     isolated from one another.
                 </p>
@@ -851,7 +1002,7 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                 <p>
                     This section describes every statistical computation available across the Statistics,
                     Sensitivity, and Validation &amp; Export sub-tabs, all of which operate on the realization
-                    population produced by the Monte Carlo run described in Sections 6–8.
+                    population produced by the Monte Carlo run described in Sections 6&ndash;8.
                 </p>
 
                 <h3 id="9.1">9.1 Descriptive Statistics (Statistics Sub-Tab)</h3>
@@ -860,17 +1011,60 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                     module computes and displays, in a compact grid of eight cards:
                 </p>
                 <table>
-                    <tbody><tr><th>Statistic</th><th>Formula / Definition</th></tr>
+                    <tr><th>Statistic</th><th>Formula / Definition</th></tr>
                     <tr><td>Mean</td><td>Arithmetic mean of the finite realization values</td></tr>
                     <tr><td>SD (Std Dev)</td><td>Sample standard deviation, ddof&nbsp;=&nbsp;1 (Bessel's correction)</td></tr>
                     <tr><td>Median</td><td>50th percentile</td></tr>
                     <tr><td>Mode</td><td>Most frequently occurring value after rounding to 3 decimal places</td></tr>
                     <tr><td>P10, P50, P90</td><td>10th, 50th (duplicate of Median), and 90th percentiles</td></tr>
-                    <tr><td>95% CI of mean</td><td>mean ± 1.96 × SEM, where SEM = SD / √N (large-sample Normal approximation to the sampling distribution of the mean)</td></tr>
-                </tbody></table>
+                    <tr><td>95% CI of mean</td><td>mean &plusmn; 1.96 &times; SEM, where SEM = SD / &radic;N (large-sample Normal approximation to the sampling distribution of the mean)</td></tr>
+                </table>
+                <p>
+                    <strong>Two of the sampled inputs wrap, and are summarised on the circle.</strong> Fault
+                    strike is <em>axial</em> (period 180&deg;: 179&deg; and 1&deg; are 2&deg; apart, not 178&deg;)
+                    and the SHmax azimuth is <em>directional</em> (period 360&deg;). Neither has a meaningful
+                    arithmetic mean or standard deviation, so <code>_input_location_and_spread()</code> routes both
+                    through <code>_circular_mean_and_sd()</code>, which maps the angles onto the full circle,
+                    reduces them to their mean resultant vector, and maps the result back (Mardia &amp; Jupp, 2000,
+                    sec. 2.2.1, 2.3.2, 2.3.4; Fisher, 1993, sec. 2.3.1):
+                </p>
+                <div class="formula-block">&phi;      = &theta; &middot; 2&pi; / period            (period = 180&deg; for strike, 360&deg; for SHmax)
+
+C      = mean( cos &phi; ),   S = mean( sin &phi; ),   R = &radic;(C² + S²)
+
+mean   = atan2(S, C) &middot; (period / 360&deg;)        reduced modulo the period
+s.d.   = &radic;( &minus;2 &middot; ln R ) &middot; (period / 360&deg;)</div>
+                <p>
+                    The 180&deg; period for strike is the standard doubling transform for axial data. Dip is a
+                    plunge confined to 0&ndash;90&deg; and does not wrap, so it &mdash; like the stresses, friction,
+                    cohesion, and pore pressure &mdash; keeps the ordinary linear summary.
+                </p>
+                <div class="note-box">
+                    <p>
+                        <strong>What a linear mean of a wrapping angle reports.</strong> A population straddling the
+                        coordinate cut contributes as many values just below 180&deg; as just above 0&deg;, so their
+                        arithmetic mean lands near the middle of the range &mdash; the orientation
+                        <em>perpendicular</em> to the true one. Measured on a von Mises sample centred on a true
+                        strike of 0.04&deg;, the arithmetic mean read <strong>89.89&deg;</strong>; an SHmax azimuth
+                        concentrated on 359.98&deg; read <strong>180.28&deg;</strong>. The same number was printed
+                        in the callout box beside the plot, so the figure and its annotation agreed with each other
+                        while both disagreed with the sample.
+                    </p>
+                </div>
+                <p>
+                    The same rule governs the <strong>P10/Mean/P90 overlay</strong> drawn on input histograms
+                    (<a href="#10.4">Section 10.4</a>). For a wrapping input the location line is the circular mean
+                    and the P10/P90 pair is taken on the <em>angular residual</em> about it,
+                    <code>(&theta; &minus; mean + period/2) mod period &minus; period/2</code>, because an ordinary
+                    quantile of a wrapping variable is fixed by where the coordinate happens to have been cut rather
+                    than by the data: on a strike sample clustered near 0&deg; the raw P10&ndash;P90 band covered
+                    almost the entire 0&ndash;180&deg; range while the samples themselves sat within a few degrees of
+                    the ends. When the resulting interval straddles the wrap point, the two arcs it genuinely
+                    occupies are shaded separately instead of one band running the wrong way round the circle.
+                </p>
                 <p>
                     Four plot types are available: <strong>Metric Histogram</strong> (with a mean reference line
-                    and a shaded P10–P90 band), <strong>Sampled Input Distribution</strong> (histogram of
+                    and a shaded P10&ndash;P90 band), <strong>Sampled Input Distribution</strong> (histogram of
                     any single stochastic input, annotated with its mean/SD or, for orientation inputs, its
                     mean/k), <strong>Input-Response Plot</strong> (a dual-axis scatter of the chosen output
                     metric against a chosen input, overlaid on that input's histogram on a secondary y-axis,
@@ -882,7 +1076,7 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                     The response trend line, computed in <code>_plot_response_trend</code>, supports three
                     fitting methods: <strong>Binned mean</strong> (the input range is divided into
                     histogram-matched bins and the mean response is plotted at each bin's mean input value
-                    — a non-parametric, assumption-free summary), <strong>Linear regression</strong> (a
+                    &mdash; a non-parametric, assumption-free summary), <strong>Linear regression</strong> (a
                     first-degree least-squares polynomial fit), and <strong>Quadratic regression</strong> (a
                     second-degree least-squares polynomial fit for capturing curvature in the input-response
                     relationship).
@@ -893,7 +1087,7 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                     <code>per_fault_statistics()</code> (<code>statistics.py</code>) groups the realization table
                     by <code>fault_id</code> and computes, for each fault, the mean, median, standard deviation,
                     and the P05/P10/P50/P90/P95 percentiles of the selected metric, joined with a Probability of
-                    Failure column equal to the fraction of that fault's realizations with Sf&nbsp;≤&nbsp;0.
+                    Failure column equal to the fraction of that fault's realizations with Sf&nbsp;&le;&nbsp;0.
                     This per-fault breakdown underlies the Fault Uncertainty Envelope and Fault Behaviour
                     Classification plots in the Visualization sub-tab and the Spatial Probability Map's per-fault
                     aggregation (<a href="#10.5">Section 10.5</a>).
@@ -901,13 +1095,38 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
 
                 <h3 id="9.3">9.3 Global Sensitivity Analysis (Sensitivity Sub-Tab)</h3>
                 <p>
-                    The Sensitivity sub-tab quantifies how strongly each of the nine stochastic inputs (σ1,
-                    σ2, σ3, pore pressure, friction, cohesion, SHmax, strike, dip) influences a
-                    chosen output metric (Ts, Td, Sf, or Fs), using two complementary regression-based measures
-                    computed over the full realization set (or, when multiple faults are present, over the
-                    per-realization mean across all faults, so the sensitivity ranking reflects
-                    population-level rather than single-fault behavior).
+                    The Sensitivity sub-tab quantifies how strongly each of the nine stochastic inputs (&sigma;1,
+                    &sigma;2, &sigma;3, pore pressure, friction, cohesion, SHmax, strike, dip) influences a
+                    chosen output metric (Ts, Td, Sf, or Fs), using two complementary regression-based measures.
+                    Before either is computed, two preparation steps apply.
                 </p>
+                <p>
+                    <strong>Strike is folded to its axial domain.</strong> Strike is a 0&ndash;180&deg; axial
+                    quantity, so <code>_clean_xy()</code> applies <code>strike mod 180</code>; left unfolded, the
+                    artificial discontinuity at 180&deg;/360&deg; corrupts both SRC and PRCC by making two nearly
+                    identical orientations numerically far apart.
+                </p>
+                <p>
+                    <strong>Multi-fault runs are collapsed to one row per realization.</strong> Every fault in a
+                    realization is evaluated on the <em>same</em> sampled stress state, so the nine input columns
+                    repeat identically within a realization and only the target varies across that realization's
+                    faults. <code>aggregate_paired_faults()</code> therefore groups by <code>realization</code> and
+                    takes the mean of the inputs and the target whenever more than one <code>fault_id</code> is
+                    present.
+                </p>
+                <div class="note-box">
+                    <p>
+                        <strong>Why aggregation is not merely cosmetic.</strong> Fitting the regression to the
+                        un-aggregated rows replicates each input vector n_faults times and folds purely
+                        within-realization scatter &mdash; variation that no input can explain, since the inputs are
+                        constant across it &mdash; into a model whose unit of observation is really the realization.
+                        That inflates the apparent sample size and deflates R², the standard clustered-data caution
+                        (Efron &amp; Tibshirani, 1993, ch. 8; Field &amp; Welsh, 2007). The sidebar accordingly
+                        reports the count as paired samples (realizations), not rows, and the same aggregation is
+                        used by every SRC display in the application so that one definition of the design matrix is
+                        shared rather than each view rebuilding its own.
+                    </p>
+                </div>
 
                 <h4 id="9.3.1">9.3.1 Standardized Regression Coefficients (SRC)</h4>
                 <p>
@@ -916,14 +1135,46 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                     zero contribution rather than a division-by-zero). An ordinary least-squares multiple
                     regression is then fit via NumPy's <code>numpy.linalg.lstsq</code>:
                 </p>
-                <div class="formula-block">y_std = β1·x1_std + β2·x2_std + ... + β9·x9_std + ε     (Eq. 9.1)</div>
+                <div class="formula-block">y_std = &beta;1&middot;x1_std + &beta;2&middot;x2_std + ... + &beta;9&middot;x9_std + &epsilon;     (Eq. 9.1)</div>
                 <p>
-                    Each fitted coefficient β<sub>i</sub> is the Standardized Regression Coefficient for
+                    Each fitted coefficient &beta;<sub>i</sub> is the Standardized Regression Coefficient for
                     input i: it measures the expected change in the output, in standard-deviation units, per
                     one-standard-deviation change in that input, holding the (linear, additive) effect of the
-                    other inputs fixed. SRC assumes an approximately linear input-output relationship and is
-                    most reliable when the true response surface is not strongly nonlinear.
+                    other inputs fixed. A run with no variation in the <em>target</em> raises an error rather than
+                    returning meaningless coefficients.
                 </p>
+                <p>
+                    Squared SRCs partition the output variance &mdash; that is, they satisfy
+                    &Sigma;SRC²&nbsp;=&nbsp;R² and may be read as variance shares &mdash; <strong>only</strong> when
+                    the inputs are mutually uncorrelated and the response is linear in them (Iman &amp; Helton,
+                    1988; Saltelli et&nbsp;al., 2008, ch. 1; Marino et&nbsp;al., 2008, sec. 2). Neither condition is
+                    guaranteed here: the ordered-gap sampler (<a href="#7.2">Section 7.2</a>) can draw &sigma;1,
+                    &sigma;2, and &sigma;3 with strong mutual correlation. The module therefore computes and displays
+                    three diagnostics alongside the coefficients:
+                </p>
+                <table>
+                    <tr><th>Diagnostic</th><th>Definition</th><th>What it tells you</th></tr>
+                    <tr><td>Model R²</td><td>1 &minus; SS_residual / SS_total of the standardized fit</td><td>How much of the output variance the linear model explains at all</td></tr>
+                    <tr><td>&Sigma;SRC²</td><td>Sum of the squared coefficients</td><td>Should equal R² if the variance-share reading is valid; any gap measures how far it is not</td></tr>
+                    <tr><td>Largest |r| between inputs</td><td>Maximum absolute pairwise correlation among inputs that actually vary</td><td>Whether the uncorrelated-inputs precondition holds</td></tr>
+                </table>
+                <p>
+                    The sidebar note prints all three on every run, and adds a warning when
+                    |r|&nbsp;&gt;&nbsp;0.1 <em>and</em> |&Sigma;SRC²&nbsp;&minus;&nbsp;R²|&nbsp;&gt;&nbsp;0.05 (read
+                    the SRCs as conditional regression weights and rank with PRCC instead), and a second warning when
+                    R²&nbsp;&lt;&nbsp;0.6 (the response is not well described by a linear model).
+                </p>
+                <div class="note-box">
+                    <p>
+                        <strong>The measured failure this guards against.</strong> On a correlated-stress run the
+                        pairwise input correlations reached 0.7977, 0.6027, and 0.7529, and &Sigma;SRC² reached
+                        1.6294 against an R² of 0.9513 &mdash; the squared coefficients summed to 171% of the
+                        variance they were being read as dividing up. With none of the three numbers displayed, that
+                        tornado diagram was indistinguishable on screen from a valid variance decomposition. The
+                        diagnostics do not change the coefficients; they tell you which of the two readings the
+                        coefficients support.
+                    </p>
+                </div>
 
                 <h4 id="9.3.2">9.3.2 Partial Rank Correlation Coefficients (PRCC)</h4>
                 <p>
@@ -932,7 +1183,7 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                     ranked target input and, separately, against the ranked output; the residuals of both
                     regressions are then correlated:
                 </p>
-                <div class="formula-block">PRCC_i = corr( x_i_rank − x̂_i_rank , y_rank − ŷ_rank )     (Eq. 9.2)</div>
+                <div class="formula-block">PRCC_i = corr( x_i_rank &minus; x&#770;_i_rank , y_rank &minus; y&#770;_rank )     (Eq. 9.2)</div>
                 <p>
                     PRCC measures the monotonic association between one input and the output after removing the
                     linear influence of every other input on both quantities, making it more robust than SRC to
@@ -955,24 +1206,103 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                     <code>convergence_table()</code> (<code>validation.py</code>) evaluates the running Ts mean,
                     Ts P50, Ts P90, Sf mean, and probability-of-failure at a geometrically spaced sequence of
                     nested sample-size checkpoints (between roughly 32 samples and the full requested sample
-                    count, in up to 6 steps), and records the increment between successive checkpoints for each
-                    metric. <code>convergence_summary()</code> then declares the run <strong>Passed</strong> only
-                    if every continuous metric's final increment is ≤&nbsp;2% of its own final value and the
-                    probability-of-failure's final increment is ≤&nbsp;1 percentage point; otherwise it is
-                    reported <strong>Not yet converged</strong>, signaling that a larger sample size may be
-                    warranted for that particular fault/settings combination.
+                    count, in up to 6 steps), records the increment between successive checkpoints for each
+                    metric, and &mdash; crucially &mdash; attaches to every checkpoint a
+                    <code>&lt;metric&gt;_sem</code> column holding the Monte&nbsp;Carlo standard error of that
+                    estimate at that sample size.
                 </p>
+
+                <h4 id="9.4.1">9.4.1 Why an increment is not an error bound</h4>
+                <p>
+                    A single small increment between two neighbouring sample sizes does not bound the remaining
+                    error. The nested levels form a geometric ladder, so consecutive levels differ by a factor of
+                    only about 1.5&ndash;2 <em>and</em> their estimates are computed from largely the same rows; two
+                    such estimates routinely agree to well inside 2% while both are still far from the limit.
+                    Measured on heavy-tailed synthetic ensembles (Pareto Ts, normal Sf, 40 independent runs per
+                    size), a final-increment-only rule reported "passed" for 10 of 40 runs at 512 realizations, and
+                    8 of those 10 were still more than 2% away from a 400&nbsp;000-realization reference. In
+                    individual runs the true remaining error reached 1.9&times; the increment the rule was
+                    inspecting &mdash; the increment underestimated the very error it was standing in for.
+                </p>
+
+                <h4 id="9.4.2">9.4.2 The two conditions</h4>
+                <p>
+                    A convergence claim is a statement about the estimator's <em>precision</em>, so
+                    <code>convergence_summary()</code> requires <strong>both</strong> of the following to hold for
+                    every one of the five metrics:
+                </p>
+                <table>
+                    <tr><th>Condition</th><th>Test</th><th>Rationale</th></tr>
+                    <tr><td><strong>Precision</strong></td><td>The Monte&nbsp;Carlo half-width 1.96&nbsp;&times;&nbsp;SEM at the largest level is within tolerance</td><td>Bounds how far the estimate still is from its limit (Helton &amp; Davis, 2003; Saltelli et&nbsp;al., 2008, ch. 2)</td></tr>
+                    <tr><td><strong>Stability</strong></td><td>The last <em>two</em> successive increments are both within tolerance</td><td>A single lucky step cannot certify a run; successive-refinement testing (Roache, 1998, ch. 5)</td></tr>
+                </table>
+                <div class="formula-block">
+passed = for every metric:  1.96·SEM / scale &le; limit   AND   max(last 2 increments) / scale &le; limit
+
+where  limit = 2%  (relative) for Ts_mean, Ts_p50, Ts_p90, Sf_mean
+       limit = 1 percentage point (absolute) for probability_of_failure
+       scale = max(|final value|, 1e-12)  for the continuous metrics, 1.0 for P(failure)</div>
+                <p>
+                    Continuous metrics use a relative tolerance; probability of failure is already a probability and
+                    uses an absolute one. A non-finite or degenerate SEM fails the precision test rather than
+                    silently satisfying it, and fewer than two checkpoint levels fails outright with an explanatory
+                    reason. Failure is reported as <strong>Not yet converged</strong>, signalling that a larger
+                    sample size is warranted for that fault/settings combination; the summary also returns the
+                    per-metric pass/fail flags, the relative increments, and the half-widths, so it is visible
+                    <em>which</em> metric and <em>which</em> condition held the run back.
+                </p>
+
+                <h4 id="9.4.3">9.4.3 The SEM comes from a cluster bootstrap over realizations</h4>
+                <p>
+                    Every fault in a run is evaluated on the <em>same</em> sampled realization of the stress state,
+                    so rows that share a <code>realization</code> index are correlated, and an ordinary row-wise
+                    bootstrap would understate the sampling error. <code>_cluster_bootstrap_standard_errors()</code>
+                    therefore resamples <strong>whole realizations</strong> &mdash; the clusters &mdash; with
+                    replacement, recomputes the five statistics on each resampled pool, and takes the standard
+                    deviation across resamples (Efron &amp; Tibshirani, 1993, ch. 8; Field &amp; Welsh, 2007). The
+                    realizations themselves are independent draws, which is precisely what the resampling requires.
+                </p>
+                <div class="note-box">
+                    <p>
+                        <strong>Details that affect the numbers.</strong> The bootstrap uses 200 resamples, dropping
+                        to 60 once a level exceeds 20&nbsp;000 rows, and a fixed internal seed so the diagnostic is
+                        reproducible across runs of the same ensemble. A level containing fewer than two distinct
+                        realizations returns NaN standard errors &mdash; which, per the rule above, fails the
+                        precision test rather than passing it by default. In a single-fault run each realization is
+                        one row and the cluster bootstrap reduces to the ordinary bootstrap, so the correction costs
+                        nothing there; the difference appears in All Faults mode, where it is the difference between
+                        an honest and an optimistic standard error.
+                    </p>
+                </div>
 
                 <h3 id="9.5">9.5 Analytical Benchmarks and Reference Comparison</h3>
                 <p>
                     In addition to the two closed-form geometric benchmark cases described in
                     <a href="#6.10">Section 6.10</a>, a three-case <code>reference_comparison()</code>
-                    independently re-implements the scalar (non-vectorized) version of the stability equations in
-                    pure Python/math and compares it point-by-point against the vectorized NumPy implementation
-                    used for the actual Monte Carlo ensemble, on both the total- and effective-stress bases. Any
-                    discrepancy above 1×10⁻¹⁰ would flag a numerical-implementation
-                    divergence between the two code paths; in normal operation this check always passes and
-                    exists as a continuous regression safeguard rather than a user-facing diagnostic.
+                    independently re-implements the stability equations by an entirely different route and compares
+                    them point-by-point against the vectorized NumPy implementation used for the actual Monte Carlo
+                    ensemble, on both the total- and effective-stress bases. The reference path assembles the full
+                    Cauchy stress tensor by rotation,
+                </p>
+                <div class="formula-block">
+&sigma; = R &middot; diag(&sigma;1, &sigma;2, &sigma;3) &middot; R&#7488;      with R = [e1 e2 e3] in (East, North, Up)
+t = &sigma; &middot; n            (traction vector on the plane)
+&sigma;n = n &middot; t            &tau; = ‖ t &minus; &sigma;n&middot;n ‖</div>
+                <p>
+                    rather than reusing the direction-cosine expressions of <a href="#6.2">Section 6.2</a>. That
+                    independence is the point: the squared-direction-cosine shortcut is exactly what concealed the
+                    pole-convention error described in Section&nbsp;6.2, so a reference built from the same shortcut
+                    could not have caught it, whereas a tensor-and-traction reference exercises the signed vector.
+                    The reference also evaluates Sf on effective normal stress unconditionally, matching the shipped
+                    definition (<a href="#6.7">Section 6.7</a>); when it instead followed the effective-stress
+                    toggle, <code>reference_comparison(use_effective_ts=False)</code> disagreed with the calculator
+                    by the pore pressure itself &mdash; a maximum absolute error of 12.0&nbsp;MPa and
+                    <code>"passed": False</code> on every run.
+                </p>
+                <p>
+                    Any discrepancy above 1&times;10&#8315;&sup1;&#8304; flags a numerical divergence between the two
+                    code paths; in normal operation this check always passes and exists as a continuous regression
+                    safeguard rather than a user-facing diagnostic.
                 </p>
 
                 <h3 id="9.6">9.6 Reproducibility Metadata</h3>
@@ -1004,8 +1334,8 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                 <p>
                     Draws the classical Mohr circle construction for every sampled realization (subsampled to a
                     configurable maximum, default 900 circles, for rendering performance) as a translucent
-                    ensemble, overlaid with three bold mean circles (σ1−σ3, σ1−σ2,
-                    σ2−σ3) and the Coulomb failure envelope τ&nbsp;=&nbsp;C0&nbsp;+&nbsp;μ·σn.
+                    ensemble, overlaid with three bold mean circles (&sigma;1&minus;&sigma;3, &sigma;1&minus;&sigma;2,
+                    &sigma;2&minus;&sigma;3) and the Coulomb failure envelope &tau;&nbsp;=&nbsp;C0&nbsp;+&nbsp;&mu;&middot;&sigma;n.
                     When Use effective principal stresses is on, every circle is shifted left by its own
                     realization's pore pressure (so the plot title reads "Mohr diagram for effective stress and
                     pore-pressure variations"); an Include total-stress circles option can overlay the unshifted
@@ -1015,42 +1345,42 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
 
                 <h4 id="10.1.2">10.1.2 Total-Stress Mohr Circles</h4>
                 <p>
-                    A simplified variant that always plots on the total-stress σn axis regardless of the
+                    A simplified variant that always plots on the total-stress &sigma;n axis regardless of the
                     effective-stress toggle, useful for a stress-state overview independent of the current
                     pore-pressure basis selection.
                 </p>
 
                 <h4 id="10.1.3">10.1.3 Stress Scatter</h4>
                 <p>
-                    A conventional σn (or σ'n) vs. τ scatter of every realization, colored by a
+                    A conventional &sigma;n (or &sigma;'n) vs. &tau; scatter of every realization, colored by a
                     selectable metric (Slip tendency, Dilation tendency, or Fracture susceptibility), with
                     optional Mohr circles (drawn at the ensemble mean principal stresses), a Coulomb failure
                     envelope overlay, and an optional Highlight failed points marker style/color for realizations
-                    with Sf&nbsp;≤&nbsp;0.
+                    with Sf&nbsp;&le;&nbsp;0.
                 </p>
                 <p>
-                    A persistent sidebar summary displays the ensemble mean of six tiles — Normal Stress
+                    A persistent sidebar summary displays the ensemble mean of six tiles &mdash; Normal Stress
                     (or Effective Normal Stress, matching the active basis), Shear Stress, Slip Tendency,
-                    Dilation Tendency, Fracture Susceptibility, and Coulomb Failure Index — alongside the
+                    Dilation Tendency, Fracture Susceptibility, and Coulomb Failure Index &mdash; alongside the
                     realized Probability of Failure, recalculated live whenever the fault selection or the
                     effective-stress toggle changes.
                 </p>
 
                 <figure class="figure-block">
-                    <div class="figure-img-wrap img-loaded" style="position: relative;">
+                    <div class="figure-img-wrap">
                         <img src="put_your_img_here.png" alt="Example Mohr uncertainty diagram showing a translucent ensemble of sampled Mohr circles, mean circles, and the Coulomb failure envelope" loading="lazy">
                         <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
                         </button>
                     </div>
-                    <span class="ph-caption"><strong>Figure 10.1</strong> — Example Mohr uncertainty diagram: translucent ensemble of sampled Mohr circles, three bold mean circles, and the Coulomb failure envelope.</span>
+                    <span class="ph-caption"><strong>Figure 10.1</strong> &mdash; Example Mohr uncertainty diagram: translucent ensemble of sampled Mohr circles, three bold mean circles, and the Coulomb failure envelope.</span>
                 </figure>
 
                 <h3 id="10.2">10.2 Statistics Sub-Tab Plots</h3>
                 <p>
                     Described in <a href="#9.1">Section 9.1</a>; the four plot types (Metric Histogram, Sampled
                     Input Distribution, Input-Response Plot, Probabilistic Response (Single)) share a common
-                    styling card offering histogram bin count, marker/point styling, mean-line and P10–P90
+                    styling card offering histogram bin count, marker/point styling, mean-line and P10&ndash;P90
                     range-fill styling, response-trend method/marker/color, and independent Y1/Y2 axis-limit
                     entry fields for the dual-axis plot types.
                 </p>
@@ -1068,7 +1398,7 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                     individual Analytical Plot types plus six overall Visualization Layout modes.
                 </p>
                 <table>
-                    <tbody><tr><th>Analytical Plot Type</th><th>Description</th></tr>
+                    <tr><th>Analytical Plot Type</th><th>Description</th></tr>
                     <tr><td>Histogram</td><td>Frequency or density histogram of the selected response metric, with optional theoretical Normal PDF overlay for goodness-of-fit inspection.</td></tr>
                     <tr><td>KDE</td><td>Gaussian kernel density estimate of the response metric via pandas' built-in KDE plotting.</td></tr>
                     <tr><td>CDF</td><td>Empirical cumulative distribution function of the response metric.</td></tr>
@@ -1081,46 +1411,50 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                     <tr><td>Orientation Stereonet</td><td>Equal-area lower-hemisphere pole-point projection of every sampled fault-plane orientation, visualizing the combined strike/dip uncertainty cloud.</td></tr>
                     <tr><td>Probabilistic Response (Single)</td><td>One predefined input's histogram with the chosen metric's response trend on a twin axis.</td></tr>
                     <tr><td>Sensitivity Tornado</td><td>Standalone tornado plot using the <code>standardized_response_sensitivity</code> SRC-style ranking, colored by magnitude.</td></tr>
-                    <tr><td>Fault Uncertainty Envelope</td><td>P10–P90 shaded band and P50 line (or, for a single fault, an error-bar point) across faults for the selected metric, with a physically meaningful threshold reference line (Ts: 0.60; Td: 0.40; Sf: 0.0; Fs: 1.00).</td></tr>
-                    <tr><td>Fault Behaviour Classification</td><td>Scatter of per-fault median Coulomb Failure Index, color/marker-coded into "Moderately Stable" (Fs P50 &lt; 0.80) and "Critically Stressed" (Fs P50 ≥ 0.80) classes.</td></tr>
-                </tbody></table>
+                    <tr><td>Fault Uncertainty Envelope</td><td>P10&ndash;P90 shaded band and P50 line (or, for a single fault, an error-bar point) across faults for the selected metric, with a physically meaningful threshold reference line (Ts: 0.60; Td: 0.40; Sf: 0.0; Fs: 1.00).</td></tr>
+                    <tr><td>Fault Behaviour Classification</td><td>Scatter of per-fault median Coulomb Failure Index, color/marker-coded into "Moderately Stable" (Fs P50 &lt; 0.80) and "Critically Stressed" (Fs P50 &ge; 0.80) classes.</td></tr>
+                </table>
                 <table>
-                    <tbody><tr><th>Visualization Layout Mode</th><th>Description</th></tr>
+                    <tr><th>Visualization Layout Mode</th><th>Description</th></tr>
                     <tr><td>Single Analytical Plot</td><td>Displays exactly one of the fourteen plot types above, full-size.</td></tr>
-                    <tr><td>Four-Panel Analysis Dashboard</td><td>A 2×2 grid in which each of the four panels independently selects any of the fourteen plot types, sharing the current response metric and input parameter.</td></tr>
-                    <tr><td>Input Parameter Distributions</td><td>A fixed 2×4 grid showing all eight sampled physical inputs' distributions simultaneously.</td></tr>
-                    <tr><td>Response Metric Distributions</td><td>A fixed 2×4 grid: histogram (top row) and CDF (bottom row) for each of the four response metrics.</td></tr>
-                    <tr><td>Probabilistic Response Analysis</td><td>A fixed 3×3 grid: eight input-vs-response panels (one per stochastic input) plus a ninth sensitivity-tornado panel for the selected metric.</td></tr>
-                    <tr><td>Fault-Level Uncertainty Envelopes</td><td>A fixed 2×3 grid of Ts/Td/Sf/Fs envelopes plus the Fault Behaviour Classification scatter, each with independently stored Y-axis limits.</td></tr>
-                </tbody></table>
+                    <tr><td>Four-Panel Analysis Dashboard</td><td>A 2&times;2 grid in which each of the four panels independently selects any of the fourteen plot types, sharing the current response metric and input parameter.</td></tr>
+                    <tr><td>Input Parameter Distributions</td><td>A fixed 2&times;4 grid showing all eight sampled physical inputs' distributions simultaneously.</td></tr>
+                    <tr><td>Response Metric Distributions</td><td>A fixed 2&times;4 grid: histogram (top row) and CDF (bottom row) for each of the four response metrics.</td></tr>
+                    <tr><td>Probabilistic Response Analysis</td><td>A fixed 3&times;3 grid: eight input-vs-response panels (one per stochastic input) plus a ninth sensitivity-tornado panel for the selected metric.</td></tr>
+                    <tr><td>Fault-Level Uncertainty Envelopes</td><td>A fixed 2&times;3 grid of Ts/Td/Sf/Fs envelopes plus the Fault Behaviour Classification scatter, each with independently stored Y-axis limits.</td></tr>
+                </table>
                 <p>
-                    Two statistical overlay checkboxes — Overlay KDE Curve and Overlay P10/Mean/P90
-                    — apply uniformly across every eligible plot type and layout mode, adding a smoothed
-                    density curve and/or a shaded interquantile band with mean-line annotation. A Full-Screen
-                    viewer (opened via the monitor icon) reproduces the entire toolbar in a dedicated
-                    always-on-top window with its own compact selector row, letting a user present or inspect a
-                    plot at full display resolution while retaining every interactive control.
+                    Two statistical overlay checkboxes &mdash; Overlay KDE Curve and Overlay P10/Mean/P90
+                    &mdash; apply uniformly across every eligible plot type and layout mode, adding a smoothed
+                    density curve and/or a shaded interquantile band with mean-line annotation. On the two
+                    wrapping inputs (strike, period 180&deg;; SHmax azimuth, period 360&deg;) the band and mean line
+                    are computed on the circle rather than on the line, and a band that straddles the wrap point is
+                    drawn as the two arcs it actually occupies &mdash; see
+                    <a href="#9.1">Section 9.1</a> for the formulae and the measured error the linear version
+                    produced. A Full-Screen viewer (opened via the monitor icon) reproduces the entire toolbar in a
+                    dedicated always-on-top window with its own compact selector row, letting a user present or
+                    inspect a plot at full display resolution while retaining every interactive control.
                 </p>
 
                 <h3 id="10.5">10.5 Spatial Probability Map Sub-Tab</h3>
                 <p>
                     This sub-tab is unique among the six in requiring a second, independently loaded data
                     source: a coordinate file (Excel/CSV) mapping each <code>fault_id</code> to either a single
-                    X/Y point or an X1/Y1–X2/Y2 trace segment, matched against the Monte Carlo results by
+                    X/Y point or an X1/Y1&ndash;X2/Y2 trace segment, matched against the Monte Carlo results by
                     ID. Column-alias detection accepts numerous header variants (Easting/Northing, bracketed
                     unit suffixes such as "X&nbsp;[km]", etc.) and automatically infers the coordinate unit from
                     the header text when possible.
                 </p>
                 <p>
                     Once coordinates are loaded, the module aggregates the realization population per
-                    <code>fault_id</code> into Fsi (mean Coulomb Failure Index), P10, P50, P90, and P(Fsi&nbsp;≥&nbsp;1)
+                    <code>fault_id</code> into Fsi (mean Coulomb Failure Index), P10, P50, P90, and P(Fsi&nbsp;&ge;&nbsp;1)
                     (the fraction of realizations exceeding the failure threshold), computes an
-                    Uncertainty_Width&nbsp;=&nbsp;P90&nbsp;−&nbsp;P10 metric, and offers three views:
+                    Uncertainty_Width&nbsp;=&nbsp;P90&nbsp;&minus;&nbsp;P10 metric, and offers three views:
                 </p>
                 <ul>
-                    <li><strong>Map Plot</strong> — a georeferenced scatter (point mode) or line-collection (trace mode) map colored by the selected metric, with a coordinate-unit conversion pipeline (km/m/cm/mm), optional fault-ID text labels, and a positionable colorbar.</li>
-                    <li><strong>Data Table</strong> — a scrollable tabular preview of the merged coordinate/probability data (capped at 500 rows for UI responsiveness), exportable to Excel or CSV independently of the main Validation &amp; Export sub-tab.</li>
-                    <li><strong>Fracture Uncertainty Map</strong> — a horizontal bar chart ranking every fault by Uncertainty_Width, auto-sized (up to 60 inches tall) so that large fault populations remain legible without overlapping labels, with an optional numeric value annotation on each bar.</li>
+                    <li><strong>Map Plot</strong> &mdash; a georeferenced scatter (point mode) or line-collection (trace mode) map colored by the selected metric, with a coordinate-unit conversion pipeline (km/m/cm/mm), optional fault-ID text labels, and a positionable colorbar.</li>
+                    <li><strong>Data Table</strong> &mdash; a scrollable tabular preview of the merged coordinate/probability data (capped at 500 rows for UI responsiveness), exportable to Excel or CSV independently of the main Validation &amp; Export sub-tab.</li>
+                    <li><strong>Fracture Uncertainty Map</strong> &mdash; a horizontal bar chart ranking every fault by Uncertainty_Width, auto-sized (up to 60 inches tall) so that large fault populations remain legible without overlapping labels, with an optional numeric value annotation on each bar.</li>
                 </ul>
                 <div class="note-box">
                     <strong>Note:</strong> the coordinate file's ID column must match the Fault ID values used in
@@ -1129,13 +1463,13 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                 </div>
 
                 <figure class="figure-block">
-                    <div class="figure-img-wrap img-loaded" style="position: relative;">
+                    <div class="figure-img-wrap">
                         <img src="put_your_img_here.png" alt="Example spatial probability map showing fault traces coloured by probability of failure alongside a fracture uncertainty ranking chart" loading="lazy">
                         <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
                         </button>
                     </div>
-                    <span class="ph-caption"><strong>Figure 10.2</strong> — Spatial Probability Map example: fault traces colored by P(Fsi ≥ 1), alongside the paired Fracture Uncertainty Map ranking faults by P90−P10 spread.</span>
+                    <span class="ph-caption"><strong>Figure 10.2</strong> &mdash; Spatial Probability Map example: fault traces colored by P(Fsi &ge; 1), alongside the paired Fracture Uncertainty Map ranking faults by P90&minus;P10 spread.</span>
                 </figure>
 
                 <!-- ================================================= -->
@@ -1156,7 +1490,7 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                 <p>
                     Every sub-tab's Plot Appearance card exposes a Plot size (px) width/height control pair with
                     an Apply Plot Size button (<code>plot_size.apply_plot_pixel_size</code>). This resizes the
-                    embedded Tk canvas widget directly (clamped to the range 240–4096 px per dimension),
+                    embedded Qt canvas widget directly (clamped to the range 240&ndash;4096 px per dimension),
                     letting a user produce a figure at an exact pixel footprint suitable for a specific
                     publication template or presentation slide, independent of the surrounding window size.
                 </p>
@@ -1164,9 +1498,9 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                 <h3 id="11.3">11.3 Custom Typography and Font Propagation</h3>
                 <p>
                     The shared workspace header's font family, size, weight, italic, and color controls (in
-                    <code>uncertainty_app.py</code>) are applied not only to the surrounding Tk UI but are
-                    actively re-applied to every Matplotlib artist — titles, axis labels, tick labels,
-                    legend text, and colorbar labels — across every registered figure in every sub-tab
+                    <code>uncertainty_app.py</code>) are applied not only to the surrounding Qt UI but are
+                    actively re-applied to every Matplotlib artist &mdash; titles, axis labels, tick labels,
+                    legend text, and colorbar labels &mdash; across every registered figure in every sub-tab
                     (<code>_apply_uncertainty_figure_fonts</code>), ensuring visual consistency between the
                     on-screen application chrome and the exported plot images.
                 </p>
@@ -1184,14 +1518,14 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                     Described further in <a href="#12.1">Section 12.1</a>; from the user's perspective, this
                     surfaces as near-instantaneous switching between the All Faults view and any individual
                     fault once at least one run has completed, along with a status-bar message ("Restored
-                    previously simulated results for …") confirming that cached data, not a fresh
+                    previously simulated results for &hellip;") confirming that cached data, not a fresh
                     simulation, is being displayed.
                 </p>
 
                 <h3 id="11.6">11.6 Session Save/Restore and Cross-Module Isolation</h3>
                 <p>
-                    The complete Monte Carlo session — loaded input file, every sidebar setting, and
-                    (implicitly, via autosave) the most recent results — is persisted per-project and
+                    The complete Monte Carlo session &mdash; loaded input file, every sidebar setting, and
+                    (implicitly, via autosave) the most recent results &mdash; is persisted per-project and
                     reloaded automatically when the project is reopened, independent of whatever Static or
                     Dynamic Analyzer state exists for the same project (<a href="#8.5">Section 8.5</a>).
                 </p>
@@ -1206,7 +1540,7 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                     individual fault that has no direct cache entry but an All Faults run has already been
                     completed, <code>_cached_fault_results_from_all_fault_run()</code> slices that population by
                     <code>fault_id</code>, recomputes only the lightweight convergence table and metadata for
-                    that subset, and caches the result — avoiding an entirely new (and computationally
+                    that subset, and caches the result &mdash; avoiding an entirely new (and computationally
                     redundant) simulation. Loading a new input file or changing the sampling settings invalidates
                     this cache, since a newly loaded source may reuse an existing Fault ID label that would
                     otherwise return stale results.
@@ -1226,8 +1560,8 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                     Because many appearance controls (color swatches, sliders, dropdowns) can fire several rapid
                     variable-write events in a single user interaction (e.g. a color picker emitting intermediate
                     values while being dragged, or Reset to Defaults setting ~30 variables at once), every
-                    sub-tab coalesces these bursts into a single scheduled redraw roughly 60–80
-                    milliseconds after the last change, using Tk's <code>after()</code>/<code>after_cancel()</code>
+                    sub-tab coalesces these bursts into a single scheduled redraw roughly 60&ndash;80
+                    milliseconds after the last change, using the <code>after()</code>/<code>after_cancel()</code>
                     scheduling primitives. This eliminates visible flicker and avoids redundant full
                     <code>figure.clear()</code>-and-rebuild cycles.
                 </p>
@@ -1237,9 +1571,9 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                     File loading (<a href="#data-input">Section 4</a>), coordinate loading for the Spatial
                     Probability Map (<a href="#10.5">Section 10.5</a>), and the Monte Carlo
                     sampling/validation pipeline itself (<a href="#8.2">Section 8.2</a>) all execute on
-                    background daemon threads, with results marshaled back to the Tk main thread via
+                    background daemon threads, with results marshaled back to the Qt main thread via
                     <code>widget.after(0, callback)</code>. This keeps the application's event loop responsive
-                    — including allowing the Cancel control to be clicked — throughout potentially
+                    &mdash; including allowing the Cancel control to be clicked &mdash; throughout potentially
                     long-running operations.
                 </p>
 
@@ -1247,8 +1581,8 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                 <p>
                     <code>calculate_fault_stability()</code> operates on entire NumPy arrays of realizations at
                     once (rather than looping in Python per realization), so the per-realization cost of
-                    Equations 6.1–6.11 is amortized across the whole ensemble via compiled array operations
-                    — essential for keeping sample sizes up to 100,000 responsive.
+                    Equations 6.1&ndash;6.11 is amortized across the whole ensemble via compiled array operations
+                    &mdash; essential for keeping sample sizes up to 100,000 responsive.
                 </p>
 
                 <h3 id="12.6">12.6 Bounded Mohr-Circle Rendering</h3>
@@ -1256,7 +1590,7 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                     The Geomechanics sub-tab's Mohr uncertainty diagrams cap the number of individually rendered
                     circles (Max. displayed circles, default 900) by selecting evenly spaced representative
                     realizations from the full ensemble via a linear index subsample, rather than rendering one
-                    Matplotlib LineCollection segment per realization — preventing the plot from becoming
+                    Matplotlib LineCollection segment per realization &mdash; preventing the plot from becoming
                     sluggish or visually saturated at large sample sizes while preserving a representative visual
                     impression of the full distribution.
                 </p>
@@ -1265,18 +1599,18 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                 <p>
                     The Fracture Uncertainty Map (<a href="#10.5">Section 10.5</a>) dynamically grows its figure
                     height (up to 60 inches) in proportion to the number of faults, embedded inside a scrollable
-                    Tk frame, only recalculating this size when the fault count itself changes (not on every
-                    cosmetic appearance edit) — avoiding both label overlap for large fault populations and
+                    Qt frame, only recalculating this size when the fault count itself changes (not on every
+                    cosmetic appearance edit) &mdash; avoiding both label overlap for large fault populations and
                     unnecessary canvas reconfiguration during routine styling adjustments.
                 </p>
 
                 <!-- ================================================= -->
                 <h2 id="examples">13. Practical Examples</h2>
 
-                <h3 id="13.1">13.1 Example 1 — Single Representative Fault Screening</h3>
+                <h3 id="13.1">13.1 Example 1 &mdash; Single Representative Fault Screening</h3>
                 <p>
                     Scenario: A geomechanical analyst has measurement uncertainty on a single, poorly constrained
-                    fault plane (Strike 45° ± 5°, Dip 60° ± 5°) and wants a rapid
+                    fault plane (Strike 45&deg; &plusmn; 5&deg;, Dip 60&deg; &plusmn; 5&deg;) and wants a rapid
                     screening estimate of reactivation risk under current reservoir stress conditions, without
                     loading a spreadsheet.
                 </p>
@@ -1288,41 +1622,41 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                     <li>Open Sensitivity to identify which input (e.g. pore pressure or friction) contributes most to the spread in Fsi, focusing further data-acquisition effort on that parameter.</li>
                 </ol>
 
-                <h3 id="13.2">13.2 Example 2 — Population-Level Injection Risk Screening</h3>
+                <h3 id="13.2">13.2 Example 2 &mdash; Population-Level Injection Risk Screening</h3>
                 <p>
-                    Scenario: A CO₂-injection or produced-water-disposal operator has a spreadsheet of 40
+                    Scenario: A CO&#8322;-injection or produced-water-disposal operator has a spreadsheet of 40
                     mapped faults (with Strike, Dip, and per-fault Sigma columns) and needs to rank faults by
                     injection-induced reactivation risk under an anticipated pore-pressure increase.
                 </p>
                 <ol class="step-list">
                     <li>Load the fault spreadsheet via the workspace header's Load Excel control; confirm the Analysis columns selected dialog correctly matched every expected column.</li>
                     <li>In Geomechanics, set FAULT to All Faults, enable Use effective principal stresses, and set the Pore Pressure mean to the anticipated post-injection value (with an SD reflecting monitoring/interpretation uncertainty).</li>
-                    <li>Run the simulation with a moderate sample size (e.g. 2000 per fault) suitable for 40 faults × 2000 = 80,000 total realizations.</li>
-                    <li>In Visualization, select the Fault-Level Uncertainty Envelopes layout to view all faults' Ts/Td/Sf/Fs P10–P90 envelopes and the Fault Behaviour Classification scatter simultaneously.</li>
-                    <li>Load the corresponding coordinate file in Spatial Probability Map and select P(Fsi ≥ 1) as the Display Variable to produce a map directly identifying the highest-risk fault locations for stakeholder communication.</li>
-                    <li>Export the full validated result set (<a href="#9.6">Section 9.6</a>) via Validation &amp; Export → Export Excel for the permanent project record.</li>
+                    <li>Run the simulation with a moderate sample size (e.g. 2000 per fault) suitable for 40 faults &times; 2000 = 80,000 total realizations.</li>
+                    <li>In Visualization, select the Fault-Level Uncertainty Envelopes layout to view all faults' Ts/Td/Sf/Fs P10&ndash;P90 envelopes and the Fault Behaviour Classification scatter simultaneously.</li>
+                    <li>Load the corresponding coordinate file in Spatial Probability Map and select P(Fsi &ge; 1) as the Display Variable to produce a map directly identifying the highest-risk fault locations for stakeholder communication.</li>
+                    <li>Export the full validated result set (<a href="#9.6">Section 9.6</a>) via Validation &amp; Export &rarr; Export Excel for the permanent project record.</li>
                 </ol>
 
-                <h3 id="13.3">13.3 Example 3 — Comparing Von Mises and Fisher 3D Orientation Models</h3>
+                <h3 id="13.3">13.3 Example 3 &mdash; Comparing Von Mises and Fisher 3D Orientation Models</h3>
                 <p>
                     Scenario: An analyst wants to test whether treating strike and dip uncertainty as coupled
                     (Fisher 3D) rather than independent (Von Mises) materially changes the predicted probability
                     of failure for a critically oriented fault.
                 </p>
                 <ol class="step-list">
-                    <li>Run the simulation once with Orientation Distribution set to Von Mises and a fixed seed, recording the resulting Probability of Failure and Ts P10–P90 range from the Statistics sub-tab.</li>
+                    <li>Run the simulation once with Orientation Distribution set to Von Mises and a fixed seed, recording the resulting Probability of Failure and Ts P10&ndash;P90 range from the Statistics sub-tab.</li>
                     <li>Switch Orientation Distribution to Fisher 3D (leaving every other setting, including the seed, unchanged) and re-run.</li>
                     <li>Compare the two Ts histograms side by side (Statistics sub-tab) and the two Orientation Stereonet plots (Visualization sub-tab) to visualize how the coupled Fisher model reshapes the sampled orientation cloud relative to the independent Von Mises model.</li>
                 </ol>
 
                 <figure class="figure-block">
-                    <div class="figure-img-wrap img-loaded" style="position: relative;">
+                    <div class="figure-img-wrap">
                         <img src="put_your_img_here.png" alt="Side-by-side Ts histograms and stereonets comparing Von Mises and Fisher 3D orientation sampling" loading="lazy">
                         <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
                         </button>
                     </div>
-                    <span class="ph-caption"><strong>Figure 13.1</strong> — Worked example result comparison: side-by-side Ts histograms and stereonets illustrating the practical difference between Von Mises and Fisher 3D orientation sampling for the same fault and stress inputs.</span>
+                    <span class="ph-caption"><strong>Figure 13.1</strong> &mdash; Worked example result comparison: side-by-side Ts histograms and stereonets illustrating the practical difference between Von Mises and Fisher 3D orientation sampling for the same fault and stress inputs.</span>
                 </figure>
 
                 <!-- ================================================= -->
@@ -1332,7 +1666,7 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                 <p>
                     A realization's Ts should be compared against an appropriate frictional threshold;
                     Byerlee's Law suggests typical crustal rock friction coefficients cluster near
-                    μ&nbsp;≈&nbsp;0.6–0.85, so Ts values approaching or exceeding roughly 0.6 in
+                    &mu;&nbsp;&asymp;&nbsp;0.6&ndash;0.85, so Ts values approaching or exceeding roughly 0.6 in
                     the sampled population indicate that a meaningful fraction of plausible stress/strength
                     combinations places the fault near or past frictional failure. The Monte Carlo population
                     view is essential here: a deterministic mean-case Ts below the threshold can still coexist
@@ -1343,7 +1677,7 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                 <h3 id="14.2">14.2 Reading Dilation Tendency (Td)</h3>
                 <p>
                     High Td (approaching 1) identifies fault or fracture orientations most favorably aligned for
-                    hydraulic opening (dilation) under the current stress field — geologically significant
+                    hydraulic opening (dilation) under the current stress field &mdash; geologically significant
                     for identifying preferential fluid-flow pathways, potential conduits for fault-controlled
                     mineralization, or, in an injection context, faults most susceptible to opening-mode
                     reactivation rather than pure frictional slip.
@@ -1351,7 +1685,7 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
 
                 <h3 id="14.3">14.3 Reading Fracture Susceptibility (Sf) and the Coulomb Failure Index (Fsi)</h3>
                 <p>
-                    Sf provides a physically interpretable stress margin in MPa — the amount by which
+                    Sf provides a physically interpretable stress margin in MPa &mdash; the amount by which
                     normal stress would need to change (holding shear stress, friction, and cohesion fixed) to
                     bring the fault exactly onto the failure envelope. Fsi, being dimensionless and normalized so
                     that 1.0 always marks the failure envelope regardless of the specific friction/cohesion
@@ -1398,26 +1732,26 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
 
                 <h3 id="15.1">15.1 Software Dependencies</h3>
                 <table>
-                    <tbody><tr><th>Library</th><th>Role in the Monte Carlo Tab</th></tr>
+                    <tr><th>Library</th><th>Role in the Monte Carlo Tab</th></tr>
                     <tr><td>NumPy</td><td>Random number generation (Generator API), vectorized array arithmetic for stability calculations and distribution transforms.</td></tr>
                     <tr><td>SciPy (<code>scipy.stats</code>)</td><td>Probability-distribution quantile functions (norm, truncnorm, lognorm, beta, gamma, vonmises) and the Latin Hypercube QMC engine (used by the sibling LHS tab).</td></tr>
                     <tr><td>pandas</td><td>Tabular fault data ingestion, DataFrame-based realization storage, groupby-based per-fault statistics, and CSV/Excel export.</td></tr>
                     <tr><td>Matplotlib</td><td>All embedded plotting (Figure/FigureCanvasTkAgg), including Mohr circles, scatter plots, tornado charts, contour maps, and the stereonet projection.</td></tr>
-                    <tr><td>CustomTkinter (ctk)</td><td>The entire GUI control layer — tabs, entries, dropdowns, sliders, checkboxes, and scrollable frames.</td></tr>
+                    <tr><td>PySide6 via <code>ui_common.qtk</code> (ctk)</td><td>The entire GUI control layer &mdash; tabs, entries, dropdowns, sliders, checkboxes, and scrollable frames.</td></tr>
                     <tr><td>openpyxl (via <code>pandas.ExcelWriter</code>)</td><td>Multi-sheet Excel export in the Validation &amp; Export sub-tab.</td></tr>
-                </tbody></table>
+                </table>
 
                 <h3 id="15.2">15.2 Numerical Stability Safeguards</h3>
                 <ul>
                     <li>The shear-stress radicand in Equation 6.5 is clamped to a minimum of zero to prevent NaN results from floating-point rounding near zero shear.</li>
-                    <li>Every distribution transform in <code>sample_scalar()</code> clips its unit-uniform input to the open interval (1×10⁻¹², 1−1×10⁻¹²) before applying an inverse-CDF, preventing infinite quantile values at the extremes.</li>
+                    <li>Every distribution transform in <code>sample_scalar()</code> clips its unit-uniform input to the open interval (1&times;10&#8315;&sup1;&sup2;, 1&minus;1&times;10&#8315;&sup1;&sup2;) before applying an inverse-CDF, preventing infinite quantile values at the extremes.</li>
                     <li>Denominators in Ts, Td, Sf, and Fs are guarded with explicit validity masks (e.g. <code>calculation_normal &gt; 0</code>, <code>friction_valid</code>, <code>dilation_valid</code>) so that an invalid realization yields a reported missing value rather than a divide-by-zero exception or a silently wrong number.</li>
                     <li>The principal-stress gap-variance construction (Equation 7.3) clamps its radicand to zero rather than allowing a negative variance under a (validated-against) inverted SD ordering.</li>
                 </ul>
 
                 <h3 id="15.3">15.3 Threading Model Summary</h3>
                 <p>
-                    All Tkinter widget mutations occur exclusively on the main thread; every background thread
+                    All Qt widget mutations occur exclusively on the main thread; every background thread
                     (file loading, simulation, coordinate loading) communicates results back via
                     <code>widget.after(0, callback)</code>, and every long-running loop checks a shared
                     <code>threading.Event</code> for cooperative cancellation at well-defined checkpoints rather
@@ -1428,7 +1762,7 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                 <p>
                     The canonical realization table produced by <code>generate_samples()</code> is a single
                     pandas DataFrame with one row per (fault, realization) pair, carrying columns for every
-                    sampled input (sigma1–sigma3, friction, cohesion, pore_pressure, shmax, strike, dip),
+                    sampled input (sigma1&ndash;sigma3, friction, cohesion, pore_pressure, shmax, strike, dip),
                     the derived stability outputs (normal_stress, effective_normal_stress, shear_stress, Ts, Td,
                     Sf, Fs, failure), and identifying columns (fault_id, realization). Provenance and
                     configuration are attached as DataFrame <code>.attrs</code> metadata (stress_regime,
@@ -1441,38 +1775,54 @@ cos(θ) = 1 + ln[ u1 + (1−u1)·e⁻²ᵀ ] / κ   (or 1−2u1 when κ = 0)
                 <!-- ================================================= -->
                 <h2 id="limitations">16. Limitations</h2>
                 <table>
-                    <tbody><tr><th>Limitation</th><th>Description</th></tr>
+                    <tr><th>Limitation</th><th>Description</th></tr>
                     <tr><td>Idealized fault geometry</td><td>The underlying stability physics assumes planar, non-intersecting fault surfaces with spatially uniform stress and strength properties per realization; fault-zone heterogeneity, curvature, and stress perturbation near fault tips are not modeled.</td></tr>
-                    <tr><td>Independent inputs</td><td>Inputs other than fault orientation are assumed statistically independent of one another; correlated uncertainty between, for example, cohesion and friction (common in some laboratory-derived strength envelopes) is not natively supported and would require an external pre-transformation of the input distributions.</td></tr>
-                    <tr><td>Linear failure criterion</td><td>The Mohr–Coulomb failure criterion is linear in normal stress; non-linear (e.g. Hoek–Brown or Barton–Bandis) failure envelopes are not implemented.</td></tr>
-                    <tr><td>First-order sensitivity measures</td><td>Sensitivity coefficients (SRC, PRCC) are regression-based, global, first-order measures; they do not capture higher-order interaction effects between inputs, and SRC specifically assumes an approximately linear input-output relationship.</td></tr>
-                    <tr><td>Convergence is a heuristic</td><td>The 2% / 1-percentage-point convergence criterion (<a href="#9.4">Section 9.4</a>) is a practical heuristic, not a formal statistical stopping rule; a run reported as "Passed" does not guarantee that every downstream statistic (e.g. an extreme tail percentile) has fully converged.</td></tr>
+                    <tr><td>Independent inputs</td><td>Inputs other than fault orientation and the ordered principal stresses are assumed statistically independent of one another; correlated uncertainty between, for example, cohesion and friction (common in some laboratory-derived strength envelopes) is not natively supported and would require an external pre-transformation of the input distributions. Note that the ordered-gap sampler (<a href="#7.2">Section 7.2</a>) does induce correlation among &sigma;1, &sigma;2, and &sigma;3, which is why the SRC diagnostics of <a href="#9.3.1">Section 9.3.1</a> are reported.</td></tr>
+                    <tr><td>Linear failure criterion</td><td>The Mohr&ndash;Coulomb failure criterion is linear in normal stress; non-linear (e.g. Hoek&ndash;Brown or Barton&ndash;Bandis) failure envelopes are not implemented.</td></tr>
+                    <tr><td>First-order sensitivity measures</td><td>Sensitivity coefficients (SRC, PRCC) are regression-based, global, first-order measures; they do not capture higher-order interaction effects between inputs. Squared SRCs are a variance decomposition only when the inputs are uncorrelated and the response is linear, so the reported R², &Sigma;SRC², and largest input |r| must be read alongside the tornado diagram; where they disagree, rank with PRCC.</td></tr>
+                    <tr><td>Convergence is a heuristic</td><td>The two-condition convergence criterion of <a href="#9.4">Section 9.4</a> (precision: 1.96&nbsp;&times;&nbsp;SEM within 2% / 1 percentage point; stability: two successive increments within tolerance) is a practical stopping rule applied to five named metrics only. A run reported as "Passed" does not guarantee that every downstream statistic &mdash; an extreme tail percentile, a per-fault probability &mdash; has converged to the same accuracy.</td></tr>
+                    <tr><td>Fracture susceptibility is always effective-stress</td><td>Sf is a sustainable pore-pressure increase and is therefore computed on &sigma;'n&nbsp;=&nbsp;&sigma;n&nbsp;&minus;&nbsp;Pp regardless of the effective-stress toggle (<a href="#6.7">Section 6.7</a>). There is no total-stress form of Sf, so the toggle changes Ts, Td, and Fs but deliberately leaves Sf and the failure flag derived from it untouched. It is undefined (NaN) when &sigma;'n&nbsp;&le;&nbsp;0 or &mu;&nbsp;&le;&nbsp;0.</td></tr>
+                    <tr><td>Regime handling is a permutation of inputs</td><td>The stress calculator hard-codes one geometric assignment (&sigma;1 along SHmax, &sigma;3 vertical). Regimes are realised by permuting which sampled magnitude enters each slot (<a href="#6.4">Section 6.4</a>), not by re-deriving the geometry, and an unrecognised regime string silently falls back to reverse/thrust. Inside the calculator the argument names denote slots, not global maximum and minimum.</td></tr>
+                    <tr><td>Cluster bootstrap resample count</td><td>Standard errors come from 200 bootstrap resamples of whole realizations, reduced to 60 above 20,000 rows for runtime (<a href="#9.4.3">Section 9.4.3</a>); the SEM is itself a Monte&nbsp;Carlo estimate with its own sampling noise, and it is returned as NaN when a checkpoint contains fewer than two realizations.</td></tr>
+                    <tr><td>Wrapping inputs summarised on the circle only where implemented</td><td>Strike (period 180&deg;) and the SHmax azimuth (period 360&deg;) receive circular means, dispersions, and overlay bands (<a href="#9.1">Section 9.1</a>), and strike is folded modulo 180&deg; before sensitivity fitting. Other circular diagnostics &mdash; a formal concentration test, a Rayleigh or Watson uniformity statistic on the sampled orientations &mdash; are not computed.</td></tr>
                     <tr><td>Exact-ID coordinate matching</td><td>The Spatial Probability Map requires exact string-matched Fault IDs between the Monte Carlo input spreadsheet and the separately loaded coordinate file; no fuzzy or coordinate-based automatic matching is performed.</td></tr>
-                    <tr><td>Sample-size cap</td><td>Maximum sample size is capped at 100,000 realizations per fault by UI validation; very large multi-fault populations (many faults × large sample counts) are bounded primarily by available system memory and interactive redraw performance rather than by an explicit software limit.</td></tr>
+                    <tr><td>Sample-size cap</td><td>Maximum sample size is capped at 100,000 realizations per fault by UI validation; very large multi-fault populations (many faults &times; large sample counts) are bounded primarily by available system memory and interactive redraw performance rather than by an explicit software limit.</td></tr>
                     <tr><td>Single-parameter Fisher coupling</td><td>The Fisher 3D orientation model couples strike and dip using a single shared concentration parameter (from the Strike row); it does not support independently specified strike and dip concentrations within the coupled model.</td></tr>
-                </tbody></table>
+                    <tr><td>Not every moment pair is attainable on a bounded support</td><td>A truncated normal on [l,&nbsp;u] cannot have a standard deviation above (u&nbsp;&minus;&nbsp;l)/&radic;12, and on [0,&nbsp;&infin;) cannot have sd/mean&nbsp;&ge;&nbsp;1; both ceilings tighten as the mean approaches a bound. Such requests raise rather than silently sampling different moments (<a href="#7.4">Section 7.4</a>), so a wide spread on a tightly bounded input must be expressed with a Lognormal, Gamma, or Uniform law instead.</td></tr>
+                </table>
 
                 <!-- ================================================= -->
                 <h2 id="references">17. References</h2>
-                <p>Morris, A., Ferrill, D. A., &amp; Henderson, D. B. (1996). Slip-tendency analysis and fault reactivation. <em>Geology</em>, 24(3), 275–278.</p>
-                <p>Ferrill, D. A., Winterle, J., Wittmeyer, G., Sims, D., Colton, S., Armstrong, A., &amp; Morris, A. P. (1999). Stressed rock strains groundwater at Yucca Mountain, Nevada. <em>GSA Today</em>, 9(5), 1–8. (Dilation tendency formulation.)</p>
-                <p>Jaeger, J. C., Cook, N. G. W., &amp; Zimmerman, R. W. (2007). <em>Fundamentals of Rock Mechanics</em> (4th ed.). Blackwell Publishing. (Mohr–Coulomb failure theory, effective stress.)</p>
+                <p>Morris, A., Ferrill, D. A., &amp; Henderson, D. B. (1996). Slip-tendency analysis and fault reactivation. <em>Geology</em>, 24(3), 275&ndash;278.</p>
+                <p>Ferrill, D. A., Winterle, J., Wittmeyer, G., Sims, D., Colton, S., Armstrong, A., &amp; Morris, A. P. (1999). Stressed rock strains groundwater at Yucca Mountain, Nevada. <em>GSA Today</em>, 9(5), 1&ndash;8. (Dilation tendency formulation.)</p>
+                <p>Jaeger, J. C., Cook, N. G. W., &amp; Zimmerman, R. W. (2007). <em>Fundamentals of Rock Mechanics</em> (4th ed.). Blackwell Publishing. (Mohr&ndash;Coulomb failure theory, effective stress.)</p>
                 <p>Terzaghi, K. (1943). <em>Theoretical Soil Mechanics</em>. John Wiley &amp; Sons. (Effective-stress principle.)</p>
-                <p>Byerlee, J. (1978). Friction of rocks. <em>Pure and Applied Geophysics</em>, 116, 615–626. (Empirical friction-coefficient ranges.)</p>
-                <p>Fisher, R. A. (1953). Dispersion on a sphere. <em>Proceedings of the Royal Society A</em>, 217(1130), 295–305. (Fisher distribution for orientation data.)</p>
-                <p>Mardia, K. V., &amp; Jupp, P. E. (2000). <em>Directional Statistics</em>. John Wiley &amp; Sons. (Von Mises and spherical/Fisher distribution theory.)</p>
-                <p>Iman, R. L., &amp; Conover, W. J. (1982). A distribution-free approach to inducing rank correlation among input variables. <em>Communications in Statistics — Simulation and Computation</em>, 11(3), 311–334. (Partial Rank Correlation Coefficient methodology.)</p>
-                <p>McKay, M. D., Beckman, R. J., &amp; Conover, W. J. (1979). A comparison of three methods for selecting values of input variables in the analysis of output from a computer code. <em>Technometrics</em>, 21(2), 239–245. (Latin Hypercube Sampling, referenced for comparison with Monte Carlo.)</p>
-                <p>Saltelli, A., Ratto, M., Andres, T., Campolongo, F., Cariboni, J., Gatelli, D., Saisana, M., &amp; Tarantola, S. (2008). <em>Global Sensitivity Analysis: The Primer</em>. John Wiley &amp; Sons. (SRC/PRCC sensitivity-analysis framework.)</p>
-                <p>Virtanen, P. et al. (2020). SciPy 1.0: Fundamental algorithms for scientific computing in Python. <em>Nature Methods</em>, 17, 261–272.</p>
-                <p>Harris, C. R. et al. (2020). Array programming with NumPy. <em>Nature</em>, 585, 357–362.</p>
-                <p>Hunter, J. D. (2007). Matplotlib: A 2D graphics environment. <em>Computing in Science &amp; Engineering</em>, 9(3), 90–95.</p>
+                <p>Hubbert, M. K., &amp; Rubey, W. W. (1959). Role of fluid pressure in mechanics of overthrust faulting. <em>Geological Society of America Bulletin</em>, 70(2), 115&ndash;166. (Pore-pressure control on fault reactivation.)</p>
+                <p>Mildren, S. D., Hillis, R. R., &amp; Kaldi, J. (2002). Calibrating predictions of fault seal reactivation in the Timor Sea. <em>APPEA Journal</em>, 42(1), 187&ndash;202. (Fracture susceptibility Sf as the sustainable pore-pressure increase.)</p>
+                <p>Streit, J. E., &amp; Hillis, R. R. (2004). Estimating fault stability and sustainable fluid pressures for underground storage of CO<sub>2</sub> in porous rock. <em>Energy</em>, 29(9&ndash;10), 1445&ndash;1456. (Sustainable-pressure formulation on effective normal stress.)</p>
+                <p>Byerlee, J. (1978). Friction of rocks. <em>Pure and Applied Geophysics</em>, 116, 615&ndash;626. (Empirical friction-coefficient ranges.)</p>
+                <p>Johnson, N. L., Kotz, S., &amp; Balakrishnan, N. (1994). <em>Continuous Univariate Distributions</em>, Vol. 1 (2nd ed.). John Wiley &amp; Sons. (Sec. 13.10: moments of the truncated normal distribution.)</p>
+                <p>Fisher, R. A. (1953). Dispersion on a sphere. <em>Proceedings of the Royal Society A</em>, 217(1130), 295&ndash;305. (Fisher distribution for orientation data.)</p>
+                <p>Mardia, K. V., &amp; Jupp, P. E. (2000). <em>Directional Statistics</em>. John Wiley &amp; Sons. (Von Mises and spherical/Fisher distribution theory; circular mean and dispersion, sec. 2.2.1 and 2.3.4; the doubling transform for axial data, sec. 2.3.2.)</p>
+                <p>Fisher, N. I. (1993). <em>Statistical Analysis of Circular Data</em>. Cambridge University Press. (Circular mean and circular standard deviation, sec. 2.3.1.)</p>
+                <p>Iman, R. L., &amp; Conover, W. J. (1982). A distribution-free approach to inducing rank correlation among input variables. <em>Communications in Statistics &mdash; Simulation and Computation</em>, 11(3), 311&ndash;334. (Partial Rank Correlation Coefficient methodology.)</p>
+                <p>Iman, R. L., &amp; Helton, J. C. (1988). An investigation of uncertainty and sensitivity analysis techniques for computer models. <em>Risk Analysis</em>, 8(1), 71&ndash;90. (Conditions under which squared SRCs partition output variance.)</p>
+                <p>Marino, S., Hogue, I. B., Ray, C. J., &amp; Kirschner, D. E. (2008). A methodology for performing global uncertainty and sensitivity analysis in systems biology. <em>Journal of Theoretical Biology</em>, 254(1), 178&ndash;196. (Sec. 2: R² reporting alongside SRC, and PRCC for non-linear monotonic responses.)</p>
+                <p>Efron, B., &amp; Tibshirani, R. J. (1993). <em>An Introduction to the Bootstrap</em>. Chapman &amp; Hall. (Ch. 8: bootstrapping clustered and non-iid data.)</p>
+                <p>Field, C. A., &amp; Welsh, A. H. (2007). Bootstrapping clustered data. <em>Journal of the Royal Statistical Society: Series B</em>, 69(3), 369&ndash;390. (Resampling whole clusters rather than individual observations.)</p>
+                <p>Helton, J. C., &amp; Davis, F. J. (2003). Latin hypercube sampling and the propagation of uncertainty in analyses of complex systems. <em>Reliability Engineering &amp; System Safety</em>, 81(1), 23&ndash;69. (Monte Carlo standard error as the precision measure for a sampling-based analysis.)</p>
+                <p>Roache, P. J. (1998). <em>Verification and Validation in Computational Science and Engineering</em>. Hermosa Publishers. (Ch. 5: successive-refinement stability as a convergence test.)</p>
+                <p>McKay, M. D., Beckman, R. J., &amp; Conover, W. J. (1979). A comparison of three methods for selecting values of input variables in the analysis of output from a computer code. <em>Technometrics</em>, 21(2), 239&ndash;245. (Latin Hypercube Sampling, referenced for comparison with Monte Carlo.)</p>
+                <p>Saltelli, A., Ratto, M., Andres, T., Campolongo, F., Cariboni, J., Gatelli, D., Saisana, M., &amp; Tarantola, S. (2008). <em>Global Sensitivity Analysis: The Primer</em>. John Wiley &amp; Sons. (SRC/PRCC sensitivity-analysis framework, ch. 1; sampling-error estimation, ch. 2.)</p>
+                <p>Virtanen, P. et al. (2020). SciPy 1.0: Fundamental algorithms for scientific computing in Python. <em>Nature Methods</em>, 17, 261&ndash;272.</p>
+                <p>Harris, C. R. et al. (2020). Array programming with NumPy. <em>Nature</em>, 585, 357&ndash;362.</p>
+                <p>Hunter, J. D. (2007). Matplotlib: A 2D graphics environment. <em>Computing in Science &amp; Engineering</em>, 9(3), 90&ndash;95.</p>
 
                 <!-- Pagination Navigation -->
-                <div class="pagination-nav"><a href="docs_dynamic_method.html" class="nav-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>Previous: Dynamic Method Tab</a><a href="docs_uncertainty_lhs.html" class="nav-btn">Next: Uncertainty LHS Tab<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></a></div>
+                <div class="pagination-nav"></div>
             </div>
         </main>
     </div>
     <script src="script.js"></script>
-
-</body></html>
+</body>
+</html>

@@ -310,9 +310,9 @@ nU = −cos(colat)</div>
                 </p>
                 <table>
                     <tr><th>Metric</th><th>Formula</th><th>Normalisation</th></tr>
-                    <tr><td>Slip tendency (normalised)</td><td>Ts = τ / max(σn, 10⁻¹²)</td><td>Divided by the maximum Ts found on the grid so the field spans 0–1.</td></tr>
+                    <tr><td>Slip tendency (normalised)</td><td>Ts = τ / max(σn, 10⁻¹²)</td><td>Divided by the closed-form theoretical maximum Ts,max = (σ1 − σ3) / (2·√(σ1·σ3)), <em>not</em> by the largest value on the grid, so the field matches the per-fracture <code>SlipTendencyNorm</code> column exactly (<a href="#section-7-1">Section 7.1</a>).</td></tr>
                     <tr><td>Dilation tendency</td><td>Td = (σ1 − σn) / (σ1 − σ3)</td><td>Already dimensionless, 0–1 by construction.</td></tr>
-                    <tr><td>Fracture susceptibility</td><td>Sf = σn − Pf − (τ − C0)/μ</td><td>Displayed in stress units (e.g. MPa); colour range set from data min/max.</td></tr>
+                    <tr><td>Fracture susceptibility</td><td>Sf = σn − Pf − (τ − C0)/μ</td><td>Raw form displayed in stress units (e.g. MPa). The normalised form is rescaled against the <em>loaded</em> fractures' Sf minimum and maximum and then inverted, 1 − (Sf − min)/(max − min), so the least stable orientations map to 1.0, matching the inversion in <code>calculator.py</code>; the field is set to 0 everywhere if that range collapses below 10⁻¹².</td></tr>
                     <tr><td>Critical fractures</td><td>threshold_ratio = [(τ − C₀) / (σn − Pf)] / μ, banded to 0=Stable, 1=Near Critical, 2=Critical, 3=Unstable at the 50%/75%/100% thresholds</td><td>Discrete four-colour scale (Stable / Near Critical / Critical / Unstable).</td></tr>
                 </table>
                 <p>
@@ -333,7 +333,14 @@ nU = −cos(colat)</div>
 σ2_axis = (0, 0, 1)
 σ3_axis = (cosα, −sinα, 0)</div>
                 <p>
-                    where α is the σ1 azimuth in radians. In General 3-D mode, the fully general routine
+                    where α is the σ1 azimuth in radians. This is the strike-slip Andersonian regime
+                    (S<sub>v</sub> = σ2) — the only one the simplified mode builds, and now named explicitly as the
+                    default <code>vertical_axis="sigma2"</code> of <code>andersonian_principal_axes()</code>, which
+                    also accepts <code>"sigma1"</code> (normal faulting, S<sub>v</sub> = σ1) and <code>"sigma3"</code>
+                    (reverse/thrust, S<sub>v</sub> = σ3). Note that the Uncertainty Analyzer's default is the
+                    opposite convention, S<sub>v</sub> = σ3, so a stereonet built here and a slip-tendency
+                    distribution built there are not directly comparable unless the same regime is chosen in both.
+                    In General 3-D mode, the fully general routine
                     <code>principal_stress_axes_fracstat(σ1_trend, σ1_plunge, σ3_trend)</code> is used: σ1 is
                     built directly from its own trend/plunge; σ3's plunge is solved so that σ3 is exactly
                     orthogonal to σ1 (using the supplied σ3 trend as a starting horizontal direction and
@@ -351,9 +358,38 @@ nU = −cos(colat)</div>
                     Stereonet Tab shares the same slip-tendency, dilation-tendency, and fracture-susceptibility
                     metrics computed for the nodal plane; the underlying calculator additionally resolves the
                     shear traction along the observed slip vector and reports a Rake Misfit, but this
-                    Wallace–Bott diagnostic is displayed in the Pole Inspector and Table tab rather than as a
-                    separate stereonet colour metric.
+                    Wallace–Bott diagnostic is displayed in the Pole Inspector text panel (shared with the Map and
+                    Mohr tabs) rather than as a stereonet colour metric or a Table-tab column: the inspector prints
+                    the signed resolved shear along the slip vector, the predicted rake, and the misfit, labelling
+                    the latter "consistent" at ≤ 30° and "inconsistent" above it.
                 </p>
+                <div class="note-box">
+                    <strong>Sign conventions in the rake diagnostic.</strong> Both quantities are built from the
+                    fault-plane basis returned by <code>fault_basis_vectors(strike, dip)</code> in an
+                    (East, North, Up) frame: the unit strike vector ŝ = (sin strike, cos strike, 0), the
+                    <em>down</em>-dip vector d̂ = (sin·cos, cos·cos, −sin) taken along the dip direction
+                    strike + 90°, and the upward pole n. Because the traction is assembled from
+                    compression-positive stress magnitudes, the physical (tension-positive) shear traction acting on
+                    the hanging wall is the <em>negative</em> of the in-plane traction component,
+                    and the observed slip direction follows the Aki &amp; Richards (1980, §4.2) rake convention
+                    (0° left-lateral, +90° reverse/up-dip, 180° right-lateral, −90° normal/down-dip):
+                </div>
+                <div class="formula-block">
+shear_traction = −( T − σn·n )
+slip_vector    = cos(rake)·ŝ − sin(rake)·d̂        (equivalently cos(rake)·ŝ + sin(rake)·û, û = up-dip)
+τ_rake         = shear_traction · slip_vector      (signed driving stress along the observed slip)
+predicted_rake = atan2( −(shear_traction · d̂), shear_traction · ŝ )
+Rake Misfit    = | (predicted_rake − rake + 180°) mod 360° − 180° |</div>
+                <div class="note-box">
+                    The two minus signs are not cosmetic. τ_rake is a <em>signed</em> quantity — positive when the
+                    resolved shear drives slip in the observed direction, negative when the stress field would drive
+                    the opposite sense — so getting the traction sign wrong inverts the geological interpretation of
+                    every focal mechanism while leaving the unsigned τ and T<sub>s</sub> untouched. Likewise the
+                    minus sign on the dip component of <code>predicted_rake</code> converts a down-dip component into
+                    the up-dip-positive Aki &amp; Richards sense, so that observed and predicted rakes are compared in
+                    the same convention; and the modulo-360 wrap folds the difference into 0–180°, so a misfit is
+                    never reported as, say, 350° when the true angular separation is 10°.
+                </div>
 
                 <div class="code-window">
                     <div class="code-header">
@@ -373,15 +409,30 @@ sigma_n = s1*c0**2 + s2*c1**2 + s3*c2**2
 traction_sq = s1**2*c0**2 + s2**2*c1**2 + s3**2*c2**2
 tau = np.sqrt(np.maximum(traction_sq - sigma_n**2, 0.0))
 
-if column == "SlipTendencyNorm":
-    field_values = tau / np.maximum(sigma_n, 1e-12)
-    field_values /= field_values.max()
+if column.startswith("SlipTendency"):
+    raw = tau / np.maximum(sigma_n, 1e-12)
+    if column == "SlipTendencyNorm":
+        # Closed-form theoretical maximum, NOT raw.max() over the grid.
+        denom = 2.0 * np.sqrt(max(s1 * s3, 1e-12))
+        tsmax = max((s1 - s3) / denom, 1e-12)
+        field_values = raw / tsmax
+    else:
+        field_values = raw
 elif column == "DilationTendency":
     field_values = (s1 - sigma_n) / max(s1 - s3, 1e-12)
-elif column == "FractureSusceptibility":
-    field_values = sigma_n - stress["pore_pressure"] - (tau - stress["cohesion"]) / max(stress["friction"], 1e-12)
+elif column.startswith("FractureSusceptibility"):
+    raw_values = sigma_n - stress["pore_pressure"] - (tau - stress["cohesion"]) / max(stress["friction"], 1e-12)
+    if column == "FractureSusceptibilityNorm" and not self.results.empty:
+        sf_min = float(self.results["FractureSusceptibility"].min())
+        sf_max = float(self.results["FractureSusceptibility"].max())
+        sf_range = sf_max - sf_min
+        # Inverted: a SMALLER Sf is MORE susceptible, so it maps to 1.0.
+        field_values = (np.zeros_like(raw_values) if abs(sf_range) < 1e-12
+                        else 1.0 - (raw_values - sf_min) / sf_range)
+    else:
+        field_values = raw_values
 else:
-    field_values = (tau >= stress["cohesion"] + stress["friction"]*(sigma_n - stress["pore_pressure"])).astype(float)
+    field_values = (tau &gt;= stress["cohesion"] + stress["friction"]*(sigma_n - stress["pore_pressure"])).astype(float)
 
 radius = np.sqrt(2) * np.sin(colatitude / 2)
 field_x, field_y = (radius*np.sin(trend)).ravel(), (radius*np.cos(trend)).ravel()</code></pre>
@@ -607,14 +658,31 @@ field_x, field_y = (radius*np.sin(trend)).ravel(), (radius*np.cos(trend)).ravel(
 
                 <h3 id="section-7-1">7.1 Theoretical Maximum Normalisation</h3>
                 <p>
-                    The normalised slip-tendency field (Ts) divides every grid value of τ/σn by the single
-                    largest value found anywhere on the 64×128 analytic grid, i.e. the theoretical maximum
-                    tau/sigmaN over every possible orientation for that stress tensor. This is the same
-                    closed-form-equivalent normalisation constant used by the calculator module's
-                    <code>_theoretical_max_slip_tendency()</code> for the <code>SlipTendencyNorm</code> column,
-                    ensuring the stereonet field and the per-fracture Table/Map colouring are numerically
-                    consistent with one another.
+                    The normalised slip-tendency field divides every grid value of τ/σn by a closed-form constant
+                    rather than by the largest value that happens to appear on the 64×128 grid:
                 </p>
+                <div class="formula-block">
+Ts,max = (σ1 − σ3) / ( 2·√(σ1·σ3) )        the tangent from the origin to the outer σ1–σ3 Mohr circle</div>
+                <p>
+                    This is the exact theoretical maximum of τ/σn over <em>every</em> possible plane orientation for a
+                    diagonal principal-stress tensor, and it depends on σ1 and σ3 alone — not on σ2, not on the
+                    principal-axis orientation, and not on the discretisation of the grid. It is the same constant the
+                    calculator module's <code>_theoretical_max_slip_tendency()</code> uses for the per-fracture
+                    <code>SlipTendencyNorm</code> column, so the stereonet field and the Table/Map/Mohr colouring are
+                    numerically consistent by construction rather than only approximately. Taking the grid maximum
+                    instead would make the normalisation depend on the mesh: the grid stops short of the poles
+                    (colatitude runs 0.01 to π/2 − 0.01 rad) and samples azimuth in 128 steps, so it need not contain
+                    the optimally oriented plane.
+                </p>
+                <div class="note-box">
+                    <strong>One residual difference between field and column.</strong> Both use the formula above,
+                    but they guard the radicand differently where σ1·σ3 ≤ 0 — i.e. in tensile or effective-stress
+                    states whose Mohr circle reaches the origin. The stereonet field clamps it at an absolute 10⁻¹²,
+                    whereas <code>_theoretical_max_slip_tendency()</code> clamps it proportionately to the stress
+                    magnitude, at 10⁻⁶·max(σ1², 1). For ordinary compressive states with σ3 &gt; 0 the two agree
+                    exactly; only in the degenerate σ3 ≤ 0 case can the field and the per-fracture column be scaled
+                    differently, and in that regime neither normalised value should be read quantitatively.
+                </div>
 
                 <!-- ================================================= -->
                 <h2 id="visualization">8. Visualization Components</h2>
@@ -726,7 +794,7 @@ field_x, field_y = (radius*np.sin(trend)).ravel(), (radius*np.cos(trend)).ravel(
                 <p>
                     All redraws finish with <code>self.stereo_canvas.draw_idle()</code> rather than a blocking
                     <code>draw()</code>, deferring the actual GPU/CPU rendering work to the next idle slot in
-                    Tkinter's event loop so rapid successive setting changes (e.g. typing in a numeric field) do
+                    Qt's event loop so rapid successive setting changes (e.g. typing in a numeric field) do
                     not each force an immediate, separate render pass.
                 </p>
 
@@ -841,14 +909,16 @@ field_x, field_y = (radius*np.sin(trend)).ravel(), (radius*np.cos(trend)).ravel(
                     <tr><td>Visual clutter for dense datasets</td><td>Great-circle plane traces ("Show All Planes") can become visually cluttered for datasets with many hundreds of fractures; the fixed low alpha (0.25) mitigates but does not eliminate this.</td></tr>
                     <tr><td>Non-linear angular compression</td><td>The equal-area projection, while area-preserving, still compresses angular relationships non-linearly toward the primitive circle; visual judgements of "cluster tightness" should be corroborated with the quantitative statistics available on the Rose tab.</td></tr>
                     <tr><td>Dip clamping</td><td>Dip values are clipped to 0–90°; any input data implying an overturned or otherwise out-of-range dip will be silently clamped rather than rejected.</td></tr>
-                    <tr><td>No rake-misfit colour metric</td><td>Kinematic (Wallace–Bott) rake-misfit diagnostics for focal-mechanism data are available in the Table tab but are not exposed as a Stereonet colour-by metric.</td></tr>
+                    <tr><td>No rake-misfit colour metric</td><td>Kinematic (Wallace–Bott) rake-misfit diagnostics for focal-mechanism data appear only in the pole-inspector text panel (τ along slip, predicted rake, misfit); they are not exposed as a Stereonet colour-by metric, and the Table tab's 16 columns do not include them either.</td></tr>
                 </table>
 
                 <!-- ================================================= -->
                 <h2 id="references">15. References</h2>
+                <p>Aki, K., &amp; Richards, P. G. (1980). <em>Quantitative Seismology: Theory and Methods</em> (Vol. 1), §4.2. W. H. Freeman.</p>
                 <p>Allmendinger, R. W., Cardozo, N., &amp; Fisher, D. M. (2012). <em>Structural Geology Algorithms: Vectors and Tensors</em>. Cambridge University Press.</p>
                 <p>Anderson, E. M. (1951). <em>The Dynamics of Faulting and Dyke Formation with Applications to Britain</em> (2nd ed.). Oliver and Boyd.</p>
                 <p>Barton, C. A., Zoback, M. D., &amp; Moos, D. (1995). Fluid flow along potentially active faults in crystalline rock. <em>Geology</em>, 23(8), 683–686.</p>
+                <p>Bott, M. H. P. (1959). The mechanics of oblique slip faulting. <em>Geological Magazine</em>, 96(2), 109–117.</p>
                 <p>Morris, A., Ferrill, D. A., &amp; Henderson, D. B. (1996). Slip-tendency analysis and fault reactivation. <em>Geology</em>, 24(3), 275–278.</p>
                 <p>Wallace, R. E. (1951). Geometry of shearing stress and relation to faulting. <em>The Journal of Geology</em>, 59(2), 118–130.</p>
                 <p>Zoback, M. D. (2007). <em>Reservoir Geomechanics</em>. Cambridge University Press.</p>

@@ -544,7 +544,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                     <li>Configure the colour bar via <code>_setup_static_stereo_colorbar</code> (<a href="#7.4">Section 7.4</a>).</li>
                     <li>Set the plot title (custom or auto‑generated, embedding the live fracture count n).</li>
                     <li>Call <code>_static_stereonet_update_stats</code> to refresh the Statistics card.</li>
-                    <li>Request a canvas redraw via <code>draw_idle()</code>, which defers the actual paint operation to Tkinter's next idle cycle for smoother responsiveness under rapid successive control changes.</li>
+                    <li>Request a canvas redraw via <code>draw_idle()</code>, which defers the actual paint operation to Qt's next idle cycle for smoother responsiveness under rapid successive control changes.</li>
                 </ol>
                 <p>
                     The module additionally exposes a public <code>refresh_static_stereonet()</code> hook, called by
@@ -595,7 +595,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                 <h3 id="7.1">7.1 Figure and Canvas Architecture</h3>
                 <p>
                     The stereonet is rendered on a single Matplotlib Figure (default size 9&times;7 inches at
-                    100&nbsp;dpi) embedded in the CustomTkinter plot card via <code>FigureCanvasTkAgg</code>. A
+                    100&nbsp;dpi) embedded in the Qt plot card via <code>FigureCanvasTkAgg</code>. A
                     secondary Axes, added into the same Figure at a fixed rectangle via <code>add_axes</code>, hosts
                     the colour bar and is toggled visible/invisible depending on plot mode and user preference,
                     avoiding the overhead of destroying and rebuilding Axes objects on every redraw.
@@ -816,7 +816,7 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                 <p>
                     The module calls the Matplotlib canvas's <code>draw_idle()</code> method rather than the
                     blocking <code>draw()</code> at the end of every redraw. <code>draw_idle()</code> schedules the
-                    actual paint operation on Tkinter's event‑loop idle queue instead of forcing it synchronously,
+                    actual paint operation on Qt's event‑loop idle queue instead of forcing it synchronously,
                     which allows several rapid, successive control changes (for example, quickly typing into a
                     numeric entry field or dragging a colour picker) to coalesce into fewer physical repaints,
                     improving perceived UI responsiveness without any explicit debounce logic in this module.

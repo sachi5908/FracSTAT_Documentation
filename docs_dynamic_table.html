@@ -90,7 +90,7 @@
                 <h2 id="position">1. Position within the FracSTAT Architecture</h2>
                 <p>
                     FracSTAT is organised around a Launcher/Home screen (<code>launcher.py</code>) that hosts two
-                    principal analytical workspaces embedded as CustomTkinter frames: the Static Analyzer (geometric
+                    principal analytical workspaces embedded as Qt frames: the Static Analyzer (geometric
                     fracture-network characterisation) and the Dynamic Analyzer (stress-based slip-tendency
                     analysis, implemented in <code>dynamic_app.py</code> as the <code>SlipTendencyApp</code> class).
                     A third, Uncertainty Analyzer module is present as an under-construction placeholder. The Table
@@ -137,7 +137,7 @@
                     Scale, Switch Mode, Back) and to the right of the collapsible sidebar (Profile &amp; Units,
                     Stress &amp; Orientation, Display, Actions, Results summary, Selected Segment panel — all shared
                     with the other tabs). The tab's own layout consists of three stacked regions arranged on a
-                    two-column, three-row Tk grid:
+                    two-column, three-row grid:
                 </p>
                 <ul>
                     <li><strong>Row 0 — Toolbar:</strong> a transparent frame containing the section label "Segment
@@ -273,7 +273,7 @@
                     <tr><td>12</td><td>Td</td><td>Td</td><td>0.000 (3 dp)</td><td>dimensionless, 0–1</td><td>Dilation tendency, DilationTendency.</td></tr>
                     <tr><td>13</td><td>Sf</td><td>S_f (Pf-corr.)</td><td>0.00 (2 dp)</td><td>MPa</td><td>Fracture susceptibility including pore-pressure and cohesion correction, FractureSusceptibility.</td></tr>
                     <tr><td>14</td><td>SfLegacy</td><td>S_f (legacy)</td><td>0.00 (2 dp) or "—"</td><td>MPa</td><td>Original (pre-correction) MATLAB-formula fracture susceptibility, FractureSusceptibilityLegacy; shown as an em-dash if absent.</td></tr>
-                    <tr><td>15</td><td>Factor</td><td>Critical factor</td><td>0.000 (3 dp)</td><td>dimensionless</td><td>The friction coefficient required to resist the resolved shear stress, (τ − C₀) / (σₙ − Pf), CriticalFactor. Compare against the sidebar's entered friction coefficient μ to gauge how close a plane is to failure.</td></tr>
+                    <tr><td>15</td><td>Factor</td><td>Critical factor</td><td>0.000 (3 dp)</td><td>dimensionless</td><td>The friction coefficient required to resist the resolved shear stress, max(τ − C₀, 0) / (σₙ − Pf), CriticalFactor. Compare against the sidebar's entered friction coefficient μ to gauge how close a plane is to failure; see <a href="#6.6">Section 6.6</a> for the zero/negative effective-stress cases.</td></tr>
                     <tr><td>16</td><td>State</td><td>State</td><td>text</td><td>—</td><td>The four-tier critical-fracture classification, CriticalState: "Stable" (Factor/μ &lt; 50%), "Near Critical" (50–75%), "Critical" (75–100%), or "Unstable" (&gt;100%); see <a href="#6.6">Section 6.6</a>.</td></tr>
                 </table>
 
@@ -406,10 +406,24 @@ SfLegacy (original)           =  σₙ − τ / μ
                 <p>The Mohr–Coulomb failure criterion used throughout FracSTAT is:</p>
                 <div class="formula-block">τ ≥ μ·(σₙ − Pf) + C₀   ⇒   plane is critically stressed</div>
                 <p>
-                    The CSF column reports "Yes" when this inequality holds for the row's resolved (σₙ, τ) pair,
-                    and "No" otherwise. This is exactly the boolean condition drawn as the shaded Coulomb failure
-                    envelope on the Mohr tab and reflected in the map/rose colour scale when "Critical fractures" is
-                    the selected attribute.
+                    This criterion is evaluated for every row during calculation and stored in the results DataFrame
+                    as the boolean <code>CriticalStress</code> flag (with <code>CriticalStressValue</code>,
+                    <code>CoulombMargin</code> and <code>EnvelopeDistance</code> alongside it), but it is not one of
+                    the Table Tab's 16 visible columns: what the table surfaces is the finer-grained
+                    <strong>Critical factor</strong> and <strong>State</strong> pair derived from the same numbers.
+                    The flag itself is exactly the boolean condition drawn as the Coulomb failure envelope on the
+                    Mohr tab and reflected in the map/rose colour scale when "Critical fractures" is the selected
+                    attribute.
+                </p>
+                <p>
+                    <code>Critical factor</code> is the friction coefficient the plane would need in order to resist
+                    its resolved shear, max(τ − C₀, 0) / (σₙ − Pf), and <code>State</code> bands the ratio of that
+                    demand to the entered μ at 50% / 75% / 100%. Two degenerate cases are handled explicitly rather
+                    than producing a division error: if the effective normal stress σₙ − Pf is zero or negative the
+                    factor is 0 when there is no driving shear and +∞ otherwise (so a tensile plane carrying shear
+                    reports as Unstable), and if μ itself is zero the ratio is +∞ whenever the factor is positive.
+                    Because the driving shear is floored at zero, a plane whose resolved τ lies below its cohesion
+                    reports a factor of exactly 0 rather than a negative value.
                 </p>
 
                 <!-- ================================================= -->
@@ -417,7 +431,7 @@ SfLegacy (original)           =  σₙ − τ / μ
 
                 <h3 id="7.1">7.1 Tab Construction — <code>_build_table_tab()</code></h3>
                 <p>
-                    Executed once, during <code>SlipTendencyApp._build_layout()</code>, after the tab's Tk container
+                    Executed once, during <code>SlipTendencyApp._build_layout()</code>, after the tab's Qt container
                     frame has been created by the CTkTabview. The method performs, in order:
                 </p>
                 <ol class="step-list">
@@ -434,9 +448,9 @@ SfLegacy (original)           =  σₙ − τ / μ
                     headings dictionary and a fixed 90 px, centre-anchored column width.</li>
                     <li><strong>Scrollbar wiring</strong> — a <code>ttk.Scrollbar</code> is created with
                     <code>command=self.table.yview</code> and the Treeview's <code>yscrollcommand</code> is bound
-                    back to the scrollbar, establishing the standard bidirectional Tk scroll contract.</li>
+                    back to the scrollbar, establishing the standard bidirectional Tk-style scroll contract.</li>
                     <li><strong>Event binding</strong> — the Treeview's <code>&lt;&lt;TreeviewSelect&gt;&gt;</code>
-                    virtual event (fired by Tk whenever the widget's selection changes, whether by mouse or
+                    virtual event (fired by the Treeview whenever the widget's selection changes, whether by mouse or
                     keyboard) is bound to <code>on_table_select</code>.</li>
                 </ol>
                 <p>
@@ -488,11 +502,14 @@ SfLegacy (original)           =  σₙ − τ / μ
 
                 <h3 id="7.3">7.3 Theming — <code>configure_table_style()</code></h3>
                 <p>
-                    ttk widgets (unlike CustomTkinter widgets) do not automatically follow FracSTAT's light/dark
+                    The Treeview (unlike the regular <code>CTk*</code> controls) does not automatically follow
+                    FracSTAT's light/dark
                     colour tokens, so this method explicitly configures a <code>ttk.Style</code> object every time
-                    it is called. It first forces the "clam" ttk theme (chosen because it is the most reliably
-                    cross-platform themeable base theme for customising Treeview colours; the default platform
-                    themes on Windows/macOS often ignore background-colour overrides). It then branches on
+                    it is called. Under the PySide6 backend, <code>ttk.Style</code> is the
+                    <code>ui_common.qtk.ttk</code> compatibility shim: the options configured here are translated
+                    into Qt stylesheet (QSS) rules and applied to the underlying <code>QTreeWidget</code>. The
+                    <code>theme_use("clam")</code> call is retained for API compatibility and has no visual effect
+                    on the Qt backend. The method then branches on
                     <code>self.appearance_var.get()</code>:
                 </p>
                 <table>
@@ -544,7 +561,7 @@ SfLegacy (original)           =  σₙ − τ / μ
                     rows of the results DataFrame (see <a href="#performance">Section 10</a> for the rationale). For each row, the displayed
                     values are formatted (see <a href="#columns">Section 5</a>'s Format column) and inserted with
                     <code>self.table.insert("", "end", iid=str(int(row.ID)), values=(...))</code>. Using the
-                    segment's own ID as the Tk item identifier is what allows <code>on_table_select()</code> to
+                    segment's own ID as the Treeview item identifier is what allows <code>on_table_select()</code> to
                     recover the numeric ID directly from the widget's selection state without a separate lookup
                     table.</li>
                     <li><strong>Selection restoration:</strong> if <code>self.selected_segment_id is not None</code>
@@ -553,7 +570,7 @@ SfLegacy (original)           =  σₙ − τ / μ
                     <code>self.table.see(selected_iid)</code>. This re-applies the previously active selection
                     (which was necessarily cleared by step 1's blanket delete) and scrolls the view so the selected
                     row is visible, giving the appearance of a persistent highlight across recalculations even
-                    though the underlying Tk items were fully destroyed and rebuilt.</li>
+                    though the underlying Qt items were fully destroyed and rebuilt.</li>
                 </ol>
 
                 <figure class="figure-block">
@@ -635,7 +652,7 @@ SfLegacy (original)           =  σₙ − τ / μ
                 <!-- ================================================= -->
                 <h2 id="performance">10. Performance Optimisation</h2>
                 <p>
-                    The Table Tab includes two deliberate performance safeguards, both aimed at keeping the Tk main
+                    The Table Tab includes two deliberate performance safeguards, both aimed at keeping the Qt main
                     loop responsive when <code>self.results</code> contains a very large number of segments (dense
                     SVG trace networks with fine curve-tessellation settings can readily produce several thousand
                     to tens of thousands of rows):
@@ -644,7 +661,7 @@ SfLegacy (original)           =  σₙ − τ / μ
                     <li><strong>Row cap</strong> — <code>refresh_table()</code> iterates only
                     <code>self.results.head(1000)</code>, i.e. at most the first one thousand rows in DataFrame
                     order, regardless of the true row count. <code>ttk.Treeview</code> inserts are individually
-                    expensive Tk operations, and inserting tens of thousands of rows synchronously on the main GUI
+                    expensive Qt operations, and inserting tens of thousands of rows synchronously on the main GUI
                     thread would visibly freeze the interface for a period proportional to row count. Capping at
                     1000 keeps the insertion loop's wall-clock cost small and bounded irrespective of dataset size.
                     This cap affects only the Table Tab's on-screen display and selection restoration; it has no
@@ -652,7 +669,7 @@ SfLegacy (original)           =  σₙ − τ / μ
                     operate on the full, uncapped <code>self.results</code> DataFrame.</li>
                     <li><strong>Full-clear-and-rebuild rather than incremental diffing</strong> — every refresh
                     deletes all existing rows before reinserting, rather than attempting to compute a minimal diff
-                    against the previous state. This trades a theoretically larger amount of Tk work per refresh
+                    against the previous state. This trades a theoretically larger amount of Qt work per refresh
                     for substantially simpler, more robust code with no risk of stale rows, orphaned iids, or
                     column-value drift; given the 1000-row cap, the practical cost of full deletion-and-reinsertion
                     is small.</li>
@@ -790,7 +807,7 @@ SfLegacy (original)           =  σₙ − τ / μ
                 <h2 id="implementation">14. Implementation Notes</h2>
                 <ul>
                     <li><strong>Mixin architecture</strong> — <code>TableTab</code> is a bare Python mixin class
-                    (it does not inherit from <code>ctk.CTkFrame</code> or any Tk widget); its methods assume the
+                    (it does not inherit from <code>ctk.CTkFrame</code> or any Qt widget); its methods assume the
                     presence of <code>self.tabs</code>, <code>self.results</code>,
                     <code>self.selected_segment_id</code>, <code>self.appearance_var</code>,
                     <code>self.unit_label()</code>, and <code>self.select_segment()</code>, all of which are
@@ -798,12 +815,13 @@ SfLegacy (original)           =  σₙ − τ / μ
                     multiple-inheritance MRO (<code>SlipTendencyApp(WorkspaceHeaderMixin, MapTab, RoseTab, MohrTab,
                     TableTab, MethodTab, StereonetTab, ctk.CTkFrame)</code>).</li>
                     <li><strong>Widget technology</strong> — the Table Tab is the only tab in the Dynamic Analyzer
-                    that uses the standard <code>tkinter.ttk.Treeview</code>/<code>Scrollbar</code> widgets rather
-                    than CustomTkinter equivalents (CustomTkinter has no built-in multi-column tabular widget); this
-                    is why it requires its own explicit ttk.Style theming rather than relying on CustomTkinter's
-                    automatic light/dark colour tuples.</li>
+                    that uses the <code>ui_common.qtk.ttk.Treeview</code>/<code>Scrollbar</code> widgets rather
+                    than the regular <code>CTk*</code> controls (there is no built-in multi-column tabular
+                    <code>CTk*</code> widget); the Treeview is a <code>QTreeWidget</code> subclass, which
+                    is why it requires its own explicit <code>ttk.Style</code> theming rather than relying on the
+                    automatic light/dark colour tuples the other qtk widgets accept.</li>
                     <li><strong>Item identifiers (iids)</strong> — using <code>str(int(row.ID))</code> as the
-                    Treeview iid, rather than Tk's default auto-incrementing internal iid, is what allows O(1)
+                    Treeview iid, rather than an auto-generated internal iid, is what allows O(1)
                     mapping between a clicked row and its underlying segment ID, and what allows selection
                     restoration (<a href="#7.4">Section 7.4</a>, step 6) to work by simple string containment testing ("in
                     self.table.get_children()") without maintaining a separate lookup dictionary.</li>
@@ -816,7 +834,7 @@ SfLegacy (original)           =  σₙ − τ / μ
                     does not resort the Treeview in the current implementation; the table always reflects
                     <code>self.results</code>' native row order (segment ID order).</li>
                     <li><strong>Thread safety</strong> — <code>refresh_table()</code> and
-                    <code>on_table_select()</code> are both expected to run exclusively on the Tk main thread,
+                    <code>on_table_select()</code> are both expected to run exclusively on the Qt main thread,
                     consistent with the rest of the Dynamic Analyzer; no locking or thread-marshalling is
                     implemented because no other thread ever mutates <code>self.results</code> or
                     <code>self.selected_segment_id</code> concurrently with the Table Tab's own execution.</li>

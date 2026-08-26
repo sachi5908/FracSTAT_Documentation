@@ -217,7 +217,7 @@
                     <tr><th>Control</th><th>Type</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Resamples (n)</td><td>Numeric entry</td><td>10</td><td>Number of bootstrap resamples drawn (with replacement) for both the parameter confidence interval and the goodness‑of‑fit p‑value. Higher values tighten the interval at proportionally higher computation cost.</td></tr>
                     <tr><td>Level</td><td>Dropdown</td><td>95%</td><td>Confidence level (90 / 95 / 99 %) used to compute the percentile bootstrap interval.</td></tr>
-                    <tr><td>Show Parametric CI Envelope</td><td>Checkbox</td><td>Off</td><td>Overlays a shaded envelope on the CDF/CCDF curve spanning every combination of the bootstrap parameter confidence bounds (a conservative visual band, not itself a formal CI on the curve).</td></tr>
+                    <tr><td>Show Parametric CI Envelope</td><td>Checkbox</td><td>Off</td><td>Overlays a shaded envelope on the CDF/CCDF curve spanning every combination of the bootstrap parameter confidence bounds (a conservative visual band, not itself a formal CI on the curve). Each bound curve is re‑conditioned at x_min by the same <code>(F(x) − F(x_min)) / (1 − F(x_min))</code> identity used for the central fit (<a href="#4.9">Section 4.9</a>), so the envelope closes to zero width at the cutoff rather than fanning out from it.</td></tr>
                     <tr><td>Calculate</td><td>Button</td><td>—</td><td>Runs the bootstrap procedure for every model currently selected for plotting and caches the result.</td></tr>
                     <tr><td>Clear</td><td>Button</td><td>—</td><td>Disables bootstrapping and removes cached bootstrap results from the current redraw (the model fit itself is retained).</td></tr>
                 </table>
@@ -249,7 +249,7 @@
                     <tr><th>Control</th><th>Type</th><th>Effect</th></tr>
                     <tr><td>X min / X max / Y min / Y max</td><td>Numeric entries (blank = auto)</td><td>Overrides matplotlib's automatic axis limits on the corresponding axis. Only applied when both a lower and upper value are supplied and the lower value is smaller than the upper.</td></tr>
                     <tr><td>Reset Bounds to Auto</td><td>Button</td><td>Clears all four manual bound fields.</td></tr>
-                    <tr><td>Plot Area Size — Width / Height (px)</td><td>Numeric entries</td><td>Rebuilds the matplotlib Figure and its Tkinter canvas at an explicit pixel size (default 700 × 850, a portrait‑leaning box matching the conventional aspect of published CDF/CCDF figures).</td></tr>
+                    <tr><td>Plot Area Size — Width / Height (px)</td><td>Numeric entries</td><td>Rebuilds the matplotlib Figure and its Qt canvas at an explicit pixel size (default 700 × 850, a portrait‑leaning box matching the conventional aspect of published CDF/CCDF figures).</td></tr>
                     <tr><td>Reset Size to Auto</td><td>Button</td><td>Resets the Width/Height entry fields to 700 × 850 px. Note: the canvas rebuild triggered by this button currently reconstructs the figure at 1000 × 1000 px rather than the 700 × 850 px shown in the fields — a known discrepancy between the displayed defaults and the rebuilt canvas size.</td></tr>
                 </table>
 
@@ -308,36 +308,75 @@ F̂(x)  = P(L ≤ x) = 1 − r(x)/n                  (Cumulative CDF)
                 <h3 id="4.3">4.3 Power‑law Model</h3>
                 <div class="formula-block">
 p(x)    = ((α − 1) / x_min) · (x / x_min)^(−α)     for x ≥ x_min
-P(L > x) = (x / x_min)^(−α + 1)</div>
+P(L > x | L ≥ x_min) = (x / x_min)^(−α + 1)</div>
                 <p>
                     α is the scaling exponent. The theoretically interesting and frequently reported range for
                     natural fracture networks is roughly 1.5 &lt; α &lt; 3.5.
                 </p>
+                <div class="note-box">
+                    <p>
+                        <strong>Every survival function in this section is conditional on x ≥ x_min.</strong> Each
+                        model is fitted to the tail above x_min only, so the distribution being estimated — and the
+                        curve actually drawn — is the conditional one,
+                    </p>
+                    <div class="formula-block">P(L &gt; x | L ≥ x_min)  =  [ S(x) − 0 ] / S(x_min)  =  S(x) / S(x_min)</div>
+                    <p>
+                        equivalently <code>(F(x) − F(x_min)) / (1 − F(x_min))</code> for the CDF, which is what
+                        <code>powerlaw</code>'s <code>cdf()</code> methods return (Clauset, Shalizi &amp; Newman,
+                        2009, §3.1). A correctly conditioned model has F(x_min) = 0 by construction. Printing the
+                        <em>unconditional</em> S(x) as the fitted equation misstates the annotation by the factor
+                        1/S(x_min) — measured on synthetic tails, that error reached 62% for the exponential, 98.5%
+                        for the log‑normal, and roughly 100% for the stretched exponential. The power‑law form above
+                        happens to be already conditional as written, since (x/x_min)^(−α+1) equals 1 at x = x_min;
+                        the other four need their normalising denominator shown explicitly, and do so below.
+                    </p>
+                </div>
 
                 <h3 id="4.4">4.4 Exponential Model</h3>
-                <div class="formula-block">P(L > x) = e^(−λ(x − x_min))</div>
-                <p>λ (units of inverse length) is the decay rate; its reciprocal 1/λ is the characteristic length scale of the population.</p>
+                <div class="formula-block">P(L > x | L ≥ x_min) = e^(−λ(x − x_min))</div>
+                <p>λ (units of inverse length) is the decay rate; its reciprocal 1/λ is the characteristic length scale of the population. The x_min shift in the exponent is the conditioning: the unconditional e^(−λx) differs from it by the constant factor e^(−λ·x_min).</p>
 
                 <h3 id="4.5">4.5 Log‑normal Model</h3>
-                <div class="formula-block">P(L > x) = ½ · erfc[ (ln x − μ) / (σ√2) ]</div>
-                <p>μ and σ are the mean and standard deviation of ln(L). The log‑normal model is common where fracture length reflects the multiplicative combination of several independent growth processes.</p>
+                <div class="formula-block">P(L > x | L ≥ x_min) = erfc[ (ln x − μ) / (σ√2) ] / erfc[ (ln x_min − μ) / (σ√2) ]</div>
+                <p>μ and σ are the mean and standard deviation of ln(L). The log‑normal model is common where fracture length reflects the multiplicative combination of several independent growth processes. The ½ that appears in the textbook unconditional survival function is a special case of the denominator here: erfc[(ln x_min − μ)/(σ√2)] is the tail mass above x_min, and it equals 1 (giving the familiar ½ after the standard factor) only in the limit x_min → 0. Dividing by it is what normalises the plotted curve to 1 at x_min.</p>
 
                 <h3 id="4.6">4.6 Weibull (Stretched‑Exponential) Model</h3>
-                <div class="formula-block">P(L > x) = e^(−(λx)^β)</div>
-                <p>β is the shape parameter (β = 1 recovers the exponential model) and λ is a scale parameter. FracSTAT labels this Weibull in the user interface because that is the more familiar name in geoscience and reliability contexts.</p>
+                <div class="formula-block">P(L > x | L ≥ x_min) = e^(−[ (λx)^β − (λx_min)^β ])</div>
+                <p>β is the shape parameter (β = 1 recovers the exponential model) and λ is a scale parameter. FracSTAT labels this Weibull in the user interface because that is the more familiar name in geoscience and reliability contexts. The subtracted (λ·x_min)^β term is the conditioning supplied by <code>powerlaw</code>'s conditional CDF and is not negligible at realistic x_min.</p>
 
                 <h3 id="4.7">4.7 Truncated Power‑law Model</h3>
-                <div class="formula-block">P(L &gt; x) = C · x^(−α+1) · e^(−λx)     for x ≥ x_min</div>
+                <p>The density is a power law with an exponential cutoff, and its survival function is obtained by integrating that density from x to infinity — which yields an <strong>upper incomplete gamma function</strong>, not the density's own shape:</p>
+                <div class="formula-block">
+p(x)                  ∝ x^(−α) · e^(−λx)                         for x ≥ x_min
+P(L &gt; x | L ≥ x_min)  = Γ(1 − α, λx) / Γ(1 − α, λ·x_min)</div>
                 <p>
-                    This model superimposes an exponential cutoff on a power‑law scaling regime and is frequently
+                    where Γ(s, z) is the upper incomplete gamma function (Aban, Meerschaert &amp; Panorska, 2006,
+                    <em>JASA</em> 101(473), §2; Clauset, Shalizi &amp; Newman, 2009, table 2.3). This model
+                    superimposes an exponential cutoff on a power‑law scaling regime and is frequently
                     invoked when a genuinely scale‑invariant fracturing process is bounded by a finite physical
-                    control, such as mechanical layer thickness. The <code>powerlaw</code> library internally stores
-                    the scaling exponent as <code>α_raw</code> (where <code>α_raw = α − 1.0</code> relative to the
-                    conventional notation). FracSTAT displays the conventional α on the plot annotation by adding
-                    1.0 to the library's internal value, so the annotated equation reads
-                    <code>P(L &gt; x) = C·x^(−α+1)·e^(−λx)</code> with the conventional exponent. The module supports
+                    control, such as mechanical layer thickness.
+                </p>
+                <div class="note-box">
+                    <p>
+                        <strong>α is used exactly as the library reports it.</strong> In <code>powerlaw</code> 2.0.0,
+                        <code>Truncated_Power_Law._pdf_base_function</code> is
+                        <code>x**(-self.alpha) * exp(-self.Lambda * x)</code> (<code>distributions.py</code>), so
+                        <code>fit.truncated_power_law.alpha</code> is already the conventional pdf exponent α of
+                        Clauset et al. table 2.3. No ±1 conversion is applied or needed. Adding 1 "to convert" reports
+                        every truncated‑power‑law exponent a full unit too steep: on synthetic tails drawn with
+                        α = 2.500 / 3.000 / 1.800 the library recovers 2.542 / 2.977 / 1.822, and the +1 version would
+                        print 3.542 / 3.977 / 2.822. Since α ≈ 2 is the boundary between a finite and an infinite
+                        mean, a whole‑unit shift changes the geological reading of the result, not just its
+                        decimals.
+                    </p>
+                </div>
+                <p>
+                    The module supports
                     fixing either α or λ by the user, in which case the free parameter is re‑optimised by direct
-                    maximisation of the truncated‑power‑law log‑likelihood subject to the fixed value.
+                    maximisation of the truncated‑power‑law log‑likelihood subject to the fixed value. In that
+                    override mode the plotted curve and the recomputed KS statistic both use the normalised
+                    conditional survival ∫ₓ<sup>∞</sup> t^(−α) e^(−λt) dt ⁄ ∫<sub>x_min</sub><sup>∞</sup> t^(−α) e^(−λt) dt,
+                    evaluated by quadrature with the same α convention.
                 </p>
 
                 <h3 id="4.8">4.8 Maximum Likelihood Estimation and x_min Selection</h3>
@@ -358,6 +397,22 @@ P(L > x) = (x / x_min)^(−α + 1)</div>
                     multiplicative anchor factor so that it passes exactly through the empirical curve's value at
                     x_min. This anchoring preserves the shape and relative comparison of the tail fit while making
                     the visual overlay directly comparable to the empirical curve across the full displayed range.
+                </p>
+                <p>
+                    Anchoring is a display transform only — it moves the conditional curve of
+                    <a href="#4.3">Section 4.3</a> onto the empirical scale; it does not make an unconditional
+                    formula correct. The two are separate steps and must not be conflated. The model curve fed to
+                    the anchor is always evaluated as
+                </p>
+                <div class="formula-block">F_cond(x) = ( F(x) − F(x_min) ) / ( 1 − F(x_min) )</div>
+                <p>
+                    so that F_cond(x_min) = 0 and the survival is 1 at the cutoff <em>before</em> the anchor factor
+                    is applied. This is also the identity used by the bootstrap confidence‑band routine, which
+                    conditions each resampled model with the same expression rather than reusing the parent fit's
+                    scaling. A model that arrives at the anchor with F(x_min) ≠ 0 has not been conditioned and will
+                    show a visible offset at the left edge of the fitted range — that discrepancy is the diagnostic
+                    for the error, and it is why the equations in Sections 4.4–4.7 carry their x_min terms
+                    explicitly.
                 </p>
 
                 <!-- ================================================= -->
@@ -730,6 +785,13 @@ band = [ F̂(x) − ε,  F̂(x) + ε ]  clipped to [0, 1]</div>
                     KS statistic, log‑likelihood, AIC, and BIC are all recomputed consistently for the
                     constrained model.
                 </p>
+                <p>
+                    The α entered in the <strong>Fix α =</strong> field is the conventional pdf exponent of
+                    <a href="#4.7">Section 4.7</a> — the exponent of x in p(x) ∝ x^(−α) e^(−λx) — which is also
+                    exactly what the library stores and what the annotation reports. There is no offset between the
+                    value typed in, the value optimised, and the value displayed, so a value taken from a published
+                    truncated‑power‑law fit can be entered directly.
+                </p>
 
                 <h3 id="11.3">11.3 Interactive x_min Picking</h3>
                 <p>
@@ -762,7 +824,7 @@ band = [ F̂(x) − ε,  F̂(x) + ε ]  clipped to [0, 1]</div>
                     <tr><td><code>SciPy</code></td><td>One‑sample KS testing, descriptive statistics (skewness/kurtosis), numerical optimisation for the Truncated Power‑law manual override, numerical integration of the constrained density, and the complementary error function used in the log‑normal survival function.</td></tr>
                     <tr><td><code>NumPy</code></td><td>All array‑based numerical computation, percentile‑based bootstrap interval construction, and random resampling.</td></tr>
                     <tr><td><code>Matplotlib</code></td><td>All plotting, including log/linear axis transforms, the residuals subplot, the draggable legend and equation annotation, and PNG export.</td></tr>
-                    <tr><td><code>CustomTkinter</code></td><td>Every sidebar control, the Model Comparison dialog, and the scrollable Statistics Summary panel.</td></tr>
+                    <tr><td><code>PySide6</code> (via <code>ui_common.qtk</code>)</td><td>Every sidebar control, the Model Comparison dialog, and the scrollable Statistics Summary panel.</td></tr>
                 </table>
 
                 <!-- ================================================= -->
@@ -773,6 +835,7 @@ band = [ F̂(x) − ε,  F̂(x) + ε ]  clipped to [0, 1]</div>
                     <tr><td>Default bootstrap resample count</td><td>The default of 10 resamples gives unstable confidence intervals and GOF p‑values, chosen for responsiveness during exploratory analysis. This should be increased substantially (200–1000) before any value is quoted in a final report.</td></tr>
                     <tr><td>Censoring not auto‑detected</td><td>Censoring caused by finite outcrop, map, or image extent is not automatically detected or corrected. Users working with edge‑truncated data should consult the Histogram tab's edge‑censoring option before drawing scaling conclusions.</td></tr>
                     <tr><td>Digitisation artefacts</td><td>The module assumes the supplied length column already reflects the desired physical population. It does not itself distinguish artefacts of digitisation (e.g. an SVG curve tessellated into many short straight segments) from genuinely short natural fractures; the Curve Step setting on the Fracture Map sidebar controls this trade‑off upstream.</td></tr>
+                    <tr><td>Displayed equation is the conditional tail law</td><td>Every fitted equation annotation reports the survival function <em>conditional</em> on L ≥ x_min (<a href="#4.3">Section 4.3</a>), because that is the distribution estimated from the tail sample and the curve that is drawn. It must not be read as the unconditional law of the whole fracture population; converting between the two requires the tail fraction, which the module does not estimate.</td></tr>
                     <tr><td>Main‑thread bootstrapping</td><td>All fitting and bootstrap computation runs on the main UI thread rather than a background worker thread, since matplotlib's TkAgg backend is not safe to drive concurrently from a worker thread. Very large bootstrap runs will therefore block interaction with the rest of the application until they complete.</td></tr>
                 </table>
 
@@ -785,6 +848,7 @@ band = [ F̂(x) − ε,  F̂(x) + ε ]  clipped to [0, 1]</div>
                 <p>Schwarz, G. (1978). Estimating the dimension of a model. <em>Annals of Statistics</em>, 6(2), 461–464.</p>
                 <p>Dvoretzky, A., Kiefer, J., &amp; Wolfowitz, J. (1956). Asymptotic minimax character of the sample distribution function. <em>Annals of Mathematical Statistics</em>, 27(3), 642–669.</p>
                 <p>Alstott, J., Bullmore, E., &amp; Plenz, D. (2014). powerlaw: A Python package for analysis of heavy‑tailed distributions. <em>PLoS ONE</em>, 9(1), e85777.</p>
+                <p>Aban, I. B., Meerschaert, M. M., &amp; Panorska, A. K. (2006). Parameter Estimation for the Truncated Pareto Distribution. <em>Journal of the American Statistical Association</em>, 101(473), 270–277.</p>
                 <p>Efron, B., &amp; Tibshirani, R. J. (1993). <em>An Introduction to the Bootstrap</em>. Chapman &amp; Hall/CRC.</p>
 
                 <!-- Pagination Navigation -->

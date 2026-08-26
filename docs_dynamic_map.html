@@ -104,7 +104,7 @@
                     <li><code>core.svg_loader.read_svg_segments()</code> or <code>core.excel_loader.read_excel_segments()</code> parse the source file into a list of <code>Segment</code> objects.</li>
                     <li><code>core.calculator.run_calculation()</code> resolves the stress tensor onto each segment, producing columns such as <code>StrikeDeg</code>, <code>DipDeg</code>, <code>SigmaN</code>, <code>Tau</code>, <code>SlipTendency</code>, <code>SlipTendencyNorm</code>, <code>DilationTendency</code>, <code>FractureSusceptibility</code>, <code>FractureSusceptibilityNorm</code>, <code>CriticalStress</code>, <code>CriticalStressValue</code>, <code>CriticalFactor</code>, <code>CriticalState</code>, <code>CriticalStateValue</code>, <code>X1/Y1/X2/Y2</code>, <code>RawX1…RawY2</code>, <code>Lat</code>, <code>Lon</code>, <code>EventLabel</code>, <code>PlaneName</code>, <code>BeachballURL</code>, and related fields.</li>
                     <li><code>dynamic_app.py</code> stores this table as <code>self.results</code> and calls <code>refresh_plots()</code>, which in turn calls <code>MapTab._draw_map()</code>.</li>
-                    <li><code>MapTab._draw_map()</code> dispatches to one of four internal drawing routines depending on the data source and the geometry actually present, and renders the result onto a Matplotlib Figure embedded in the CustomTkinter window via <code>FigureCanvasTkAgg</code>.</li>
+                    <li><code>MapTab._draw_map()</code> dispatches to one of four internal drawing routines depending on the data source and the geometry actually present, and renders the result onto a Matplotlib Figure embedded in the Qt window via <code>FigureCanvasTkAgg</code>.</li>
                     <li>User interaction with the Map Tab (segment selection, pan/zoom, appearance changes) feeds back into shared application state (<code>selected_segment_id</code>, view limits) that the Mohr, Stereonet, and Table tabs also read, enabling synchronized cross-tab highlighting.</li>
                 </ol>
 
@@ -310,10 +310,16 @@
                     When "Color by normalized Tₛ" is enabled, Slip Tendency is divided by a theoretical maximum
                     Tₛ,max computed analytically from σ₁ and σ₃ alone (independent of the sampled fracture set — see
                     <code>core.calculator._theoretical_max_slip_tendency</code>), guaranteeing that
-                    <code>SlipTendencyNorm</code> values fall in a stable, comparable [0, ~1] range regardless of
                     which fractures happen to be present in the loaded dataset. <code>FractureSusceptibilityNorm</code>
-                    is instead a simple min–max rescaling across the loaded fracture population:
-                    (S_f − S_f,min) / (S_f,max − S_f,min). Dilation Tendency is dimensionless by construction and
+                    is instead a min–max rescaling across the loaded fracture population, <em>inverted</em>:
+                    1 − (S_f − S_f,min) / (S_f,max − S_f,min). The inversion matters for reading the map — because a
+                    lower S_f means a smaller remaining pore-pressure margin, the least stable fractures are the ones
+                    that map to 1.0 and therefore render at the "hot" end of the colormap; without it the colour
+                    scale would run backwards. It also means S_f,norm is dataset-relative: 1.0 marks the least stable
+                    fracture in the current file, not a fracture at failure, so normalized susceptibility maps should
+                    not be compared between datasets (unlike <code>SlipTendencyNorm</code>, whose denominator is
+                    theoretical). Where every fracture shares one S_f value the column collapses to 0.0 rather than
+                    dividing by a zero range. Dilation Tendency is dimensionless by construction and
                     is never further normalized; Critical Fractures is likewise never rescaled, since its four
                     tiers are already fixed integer codes (0–3) rather than a continuous quantity.
                 </p>
@@ -496,7 +502,7 @@
                 <ol class="step-list">
                     <li><strong>Sample-point extraction</strong> — each fracture segment contributes one (midpoint-only) or three (start, midpoint, end — see <a href="#6.6b">below</a>) spatial sample points, depending on the "Sample along segment length" setting, each tagged with the segment's value for the active colouring attribute.</li>
                     <li><strong>Cache lookup</strong> — a BLAKE2b hash is computed over the sample dataset, the selected value column, the spatial bounds, the chosen variogram model, and the grid resolution. If an identical hash is found in <code>self._map_krige_cache</code>, the previously computed grid is reused immediately and no recomputation occurs — this makes toggling between Map Style options or cosmetic settings instantaneous after the first interpolation.</li>
-                    <li><strong>Asynchronous computation</strong> — on a cache miss, <code>_show_map_kriging_loader()</code> displays a progress overlay on the plot canvas and the interpolation itself is dispatched to a background daemon thread, keeping the Tkinter main thread (and therefore the rest of the UI) responsive while the surface is computed.</li>
+                    <li><strong>Asynchronous computation</strong> — on a cache miss, <code>_show_map_kriging_loader()</code> displays a progress overlay on the plot canvas and the interpolation itself is dispatched to a background daemon thread, keeping the Qt main thread (and therefore the rest of the UI) responsive while the surface is computed.</li>
                     <li><strong>Interpolation fallback chain</strong> — the engine first attempts <code>OrdinaryKriging</code> from the PyKrige library using the selected variogram model. If PyKrige is not installed, or the kriging system is singular for the current sample configuration (raising a <code>LinAlgWarning</code>), the engine falls back to SciPy's <code>griddata</code>, itself attempted in order of decreasing interpolation quality: <code>cubic</code> → <code>linear</code> → <code>nearest</code>, so that a surface is always produced even for degenerate or sparse sample sets.</li>
                     <li><strong>Result caching and marshalling</strong> — once the background thread completes, the resulting grid is stored in <code>self._map_krige_cache</code> keyed by the hash computed in step 2, and the map is redrawn; the redraw call that triggered the original cache miss will, on completion, hit the now-populated cache.</li>
                 </ol>
@@ -741,11 +747,11 @@
                 <h3 id="10.3">10.3 Asynchronous Beachball Retrieval</h3>
                 <p>
                     Beachball diagram images are fetched over HTTP in a background <code>ThreadPoolExecutor</code>
-                    (four worker threads) rather than on the Tkinter main thread, so downloading a diagram from an
+                    (four worker threads) rather than on the Qt main thread, so downloading a diagram from an
                     external URL never freezes the user interface. Each URL is tracked in one of three sets —
                     cached (successfully loaded), pending (download in progress), or failed (download attempted and
                     unsuccessful) — and a completed download is marshalled back onto the main thread via the
-                    Tkinter <code>after()</code> scheduling mechanism, which then triggers a targeted redraw of the
+                    Qt <code>after()</code> scheduling mechanism, which then triggers a targeted redraw of the
                     map only if the just-loaded image belongs to the currently selected event.
                 </p>
 
@@ -763,12 +769,12 @@
                 <table>
                     <tr><th>Technique</th><th>Applied To</th><th>Benefit</th></tr>
                     <tr><td>Vectorized LineCollection / batched scatter</td><td>All fracture segments, orientation ticks, or focal-mechanism markers</td><td>A single collection object is added to the Axes per redraw instead of hundreds or thousands of individual <code>plot()</code> / <code>scatter()</code> calls, dramatically reducing Matplotlib artist-management overhead.</td></tr>
-                    <tr><td><code>draw_idle()</code> instead of <code>draw()</code></td><td>Every redraw path</td><td>Matplotlib defers the actual repaint to the next Tk event-loop idle slot and coalesces rapid successive redraw requests (e.g. during a drag), avoiding redundant repaints.</td></tr>
+                    <tr><td><code>draw_idle()</code> instead of <code>draw()</code></td><td>Every redraw path</td><td>Matplotlib defers the actual repaint to the next Qt event-loop idle slot and coalesces rapid successive redraw requests (e.g. during a drag), avoiding redundant repaints.</td></tr>
                     <tr><td>Background-image pixel cache</td><td><code>_load_bg_image_array</code> via <code>_bg_image_cache</code> tuple (path, array)</td><td>The photograph is decoded from disk only once per unique path; repeated redraws (pan, zoom, cosmetic changes) reuse the cached NumPy array.</td></tr>
                     <tr><td>Threaded network I/O</td><td>Beachball image downloads</td><td>HTTP fetches (up to 8-second timeout each) run off the UI thread in a 4-worker pool, keeping the interface responsive while multiple diagrams load concurrently.</td></tr>
                     <tr><td><code>preserve_view</code> flag</td><td>All redraw call sites</td><td>Avoids unnecessarily recomputing and resetting the home view / axis limits on every cosmetic change, preserving the user's current pan/zoom position and avoiding a jarring view reset.</td></tr>
                     <tr><td>BLAKE2b-keyed surface cache (<code>_map_krige_cache</code>)</td><td>Kriged/interpolated surfaces (Grid Heatmap, Contour styles)</td><td>Interpolation is only recomputed when the dataset, value column, spatial bounds, variogram model, or grid resolution actually change; toggling between Map Style options or unrelated cosmetic settings reuses the cached grid instantly.</td></tr>
-                    <tr><td>Background-thread kriging</td><td><code>_krige_map_surface()</code></td><td>The (potentially expensive) interpolation computation runs on a daemon thread rather than the Tkinter main thread, so the UI remains responsive and a progress overlay can be shown while a new surface is computed.</td></tr>
+                    <tr><td>Background-thread kriging</td><td><code>_krige_map_surface()</code></td><td>The (potentially expensive) interpolation computation runs on a daemon thread rather than the Qt main thread, so the UI remains responsive and a progress overlay can be shown while a new surface is computed.</td></tr>
                 </table>
 
                 <!-- ================================================= -->
@@ -797,7 +803,7 @@
                     <li>Load a Global-CMT-style Excel file with Lat, Lon, FP1 Strike/Dip/Slip (and optionally FP2) columns.</li>
                     <li>The Map Tab automatically renders a geographic scatter map; enter a candidate regional stress tensor and click Calculate.</li>
                     <li>Set Map Display to "Critical fractures" to immediately identify which historical earthquakes are kinematically consistent with reactivation under the candidate stress field, ranked into four bands — Stable, Near Critical, Critical, and Unstable — rather than a simple yes/no split.</li>
-                    <li>Click an event marker to open its beachball diagram inset and inspect the Rake Misfit reported in the Mohr/Table tabs, which quantifies how well the entered stress tensor explains that earthquake's observed slip direction.</li>
+                    <li>Click an event marker to open its beachball diagram inset and inspect the Rake Misfit reported in the pole-inspector text panel alongside the resolved shear along the slip vector and the predicted rake (the same panel is shared by the Map, Mohr and Stereonet tabs; the misfit is labelled "consistent" at ≤ 30°). It quantifies how well the entered stress tensor explains that earthquake's observed slip direction.</li>
                 </ol>
 
                 <!-- ================================================= -->
@@ -869,7 +875,7 @@
                 <table>
                     <tr><th>Attribute</th><th>Description</th></tr>
                     <tr><td><code>self.map_fig</code> / <code>self.map_ax</code> / <code>self.map_cbar_ax</code></td><td>The Matplotlib Figure and the two Axes objects (main plot and colour bar) that together constitute the Map Tab canvas.</td></tr>
-                    <tr><td><code>self.map_canvas</code></td><td>The <code>FigureCanvasTkAgg</code> widget embedding <code>map_fig</code> inside the CustomTkinter window.</td></tr>
+                    <tr><td><code>self.map_canvas</code></td><td>The <code>FigureCanvasTkAgg</code> widget embedding <code>map_fig</code> inside the Qt window.</td></tr>
                     <tr><td><code>self._map_home_limits</code></td><td>The tight (pre-aspect-correction) data bounding box computed on the last full redraw; used by Reset View and the zoom-percentage indicator.</td></tr>
                     <tr><td><code>self._map_geo_scatter</code> / <code>self._map_geo_ids</code></td><td>The scatter-plot artist and parallel array of segment IDs used for click-to-select picking in geographic mode.</td></tr>
                     <tr><td><code>self._beachball_cache</code> / <code>_pending</code> / <code>_failed</code></td><td>Three sets/dicts tracking the asynchronous download state of every beachball image URL encountered.</td></tr>

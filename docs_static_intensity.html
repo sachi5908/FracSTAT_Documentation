@@ -45,8 +45,12 @@
                     descriptors used throughout structural geology, reservoir characterization, and rock‑mass
                     engineering: <strong>P21</strong> (areal fracture intensity — cumulative trace length per unit
                     sampling area, units [length]/[length]² = [length]⁻¹) and <strong>P20</strong> (areal fracture
-                    density — number of fracture centers, approximated here by fracture endpoints, per unit
-                    sampling area, units [length]⁻²).
+                    density — number of fracture <em>traces</em> per unit sampling area, units [length]⁻²,
+                    in the P<sub>ij</sub> notation of Dershowitz &amp; Herda, 1992). P20 counts whole traces, never
+                    the straight segments a polyline trace happens to be digitised into: a single trace drawn with
+                    fifty vertices is one fracture, not fifty. Locally, the circular‑window estimator reaches the
+                    same quantity by counting <em>trace tips</em> inside the window, two tips per fully enclosed
+                    trace.
                 </p>
                 <p>
                     Unlike simple line‑scanline or box‑counting methods, the circular scanline technique is
@@ -160,12 +164,12 @@
                 <div class="note-box">
                     <strong>Canvas layout synchronisation:</strong> because this tab's plot card is hosted inside a
                     <code>CTkTabview</code> page, the canvas widget only receives its final, real‑world pixel
-                    dimensions from Tkinter after the page is actually shown — an initial draw performed while the
+                    dimensions from Qt after the page is actually shown — an initial draw performed while the
                     page is still hidden uses provisional (often zero‑sized) bounds, which would leave the
                     equal‑aspect plot clipped and the colour bar misaligned. To correct this, the tab binds both
                     <code>&lt;Configure&gt;</code> and <code>&lt;Map&gt;</code> events on the canvas widget to
                     <code>_schedule_p21_layout_sync()</code>, which debounces via <code>after_idle()</code> and
-                    calls <code>_sync_p21_layout()</code> once Tk settles. <code>_sync_p21_layout()</code> re‑runs
+                    calls <code>_sync_p21_layout()</code> once Qt settles. <code>_sync_p21_layout()</code> re‑runs
                     only the inexpensive layout portion — <code>fig.tight_layout()</code> followed by
                     <code>_align_colorbar_to_plot()</code> — rather than the full, potentially expensive redraw, so
                     the plot and colour bar snap into correct alignment the moment the tab becomes visible or is
@@ -220,7 +224,7 @@
                 <!-- ================================================= -->
                 <h2 id="controls">4. Settings and Controls</h2>
                 <p>
-                    This section documents every interactive control exposed in the sidebar, the CustomTkinter
+                    This section documents every interactive control exposed in the sidebar, the <code>ui_common.qtk</code>
                     variable that backs it, its default value, and its effect on the calculation or rendering
                     pipeline. All controls other than the two colour‑scale dropdowns trigger an immediate call to
                     <code>_draw_trace_intensity()</code> (directly, or via a bound <kbd>Return</kbd>/<kbd>FocusOut</kbd>
@@ -239,7 +243,7 @@
                     <tr><td>Number of scan circles</td><td>Text entry</td><td><code>num_circles_var</code></td><td>"12"</td><td>Target circle count along the shorter map dimension; the algorithm (<a  href="#sec-6-1">Section 6.1</a>) derives the full 2‑D grid layout, spacing, and radius from this single value.</td></tr>
                     <tr><td>Show fracture traces (Map)</td><td>Checkbox</td><td><code>show_map_var</code></td><td>True</td><td>Toggles the LineCollection overlay of the raw fracture segments on top of (or below) the intensity/density surface.</td></tr>
                     <tr><td>Traces above Grid / Grid above Traces</td><td>Radio button pair</td><td><code>layer_order_var</code></td><td>"traces_top"</td><td>Sets the Z‑order and, correspondingly, which layer receives the partial‑opacity blend from the slider below (see <a  href="#sec-4-1-1">Section 4.1.1</a>).</td></tr>
-                    <tr><td>Upper layer opacity</td><td>Slider (0.1–1.0)</td><td><code>top_opacity_var</code></td><td>0.8</td><td>Alpha applied to whichever layer (traces or grid) is currently on top per Layer stacking order; the lower layer remains fully opaque. Debounced via a 100&nbsp;ms Tk <code>after()</code> timer to avoid re‑triggering the (potentially expensive) kriging step on every pixel of slider drag.</td></tr>
+                    <tr><td>Upper layer opacity</td><td>Slider (0.1–1.0)</td><td><code>top_opacity_var</code></td><td>0.8</td><td>Alpha applied to whichever layer (traces or grid) is currently on top per Layer stacking order; the lower layer remains fully opaque. Debounced via a 100&nbsp;ms <code>after()</code> timer to avoid re‑triggering the (potentially expensive) kriging step on every pixel of slider drag.</td></tr>
                 </table>
 
                 <h4 id="sec-4-1-1">4.1.1 Layer Stacking and Opacity Logic</h4>
@@ -327,7 +331,7 @@
                     <tr><td>Grid Layout (X x Y)</td><td>The resolved scan‑circle grid dimensions, xNumCircle × yNumCircle, after the packing algorithm in <a  href="#sec-6-1">Section 6.1</a> has run.</td></tr>
                     <tr><td>Total Scan Circles</td><td>xNumCircle × yNumCircle, the total number of circular sampling windows used.</td></tr>
                     <tr><td>Global Intensity (P21)</td><td>The single scalar network‑wide intensity, total fracture length divided by mapped area, with a unit⁻¹ superscript matching the active display unit.</td></tr>
-                    <tr><td>Global Density (P20)</td><td>The single scalar network‑wide density, fracture‑segment count divided by mapped area, with a unit⁻² superscript.</td></tr>
+                    <tr><td>Global Density (P20)</td><td>The single scalar network‑wide density, <strong>trace count</strong> (<code>df["Trace"].nunique()</code>) divided by mapped area, with a unit⁻² superscript. It is deliberately not a segment count: reporting <code>len(lengths)</code> here would make the density scale with digitisation density, so a 40‑trace network drawn with ten segments per trace would read ten times too high.</td></tr>
                 </table>
 
                 <!-- ================================================= -->
@@ -346,10 +350,11 @@
                     <tr><th>Symbol</th><th>Description</th><th>Units</th></tr>
                     <tr><td>r</td><td>Radius of a circular scan window (<code>rCircle</code> in the implementation).</td><td>[length]</td></tr>
                     <tr><td>N</td><td>Number of discrete fracture‑segment/circle‑boundary intersection points found for one scan circle.</td><td>count</td></tr>
-                    <tr><td>M</td><td>Number of fracture segment endpoints ("tips") that fall strictly inside a scan circle.</td><td>count</td></tr>
+                    <tr><td>M</td><td>Number of fracture <strong>trace tips</strong> that fall strictly inside a scan circle. A tip is the first point of a trace's first segment or the last point of its last segment; interior polyline vertices are not tips and are excluded by <code>_trace_tip_masks()</code>.</td><td>count</td></tr>
                     <tr><td>I</td><td>Local (per‑circle) estimate of P21, fracture intensity.</td><td>[length]⁻¹</td></tr>
                     <tr><td>D</td><td>Local (per‑circle) estimate of P20, fracture density.</td><td>[length]⁻²</td></tr>
                     <tr><td>L_tot</td><td>Sum of all segment lengths in the mapped dataset (Σ Length_m).</td><td>[length]</td></tr>
+                    <tr><td>n_traces</td><td>Number of distinct traces in the mapped dataset, <code>df["Trace"].nunique()</code>. Not the segment count.</td><td>count</td></tr>
                     <tr><td>A_map</td><td>Bounding‑box area of the mapped dataset, (x_max−x_min)×(y_max−y_min).</td><td>[length]²</td></tr>
                 </table>
 
@@ -366,17 +371,32 @@
                 </p>
 
                 <h3 id="sec-5-3">5.3 Circle‑Based P20 (Density) Estimator</h3>
-                <p>The corresponding density estimator, based on counting fracture centers (approximated here by fracture‑segment endpoints falling inside the circle) is:</p>
+                <p>The companion density estimator counts fracture <strong>trace tips</strong> falling inside the circle:</p>
                 <div class="formula-block">D  =  M / (2π r²)</div>
                 <p>
-                    where M is the count of fracture‑segment endpoints (a proxy for fracture centers) falling
-                    inside the circle. This is coded directly as
-                    <code>M_circle / (2 * π * rCircle**2)</code>; note that the code's normalization constant of
-                    2πr² (rather than the naive πr²) reflects that each fracture segment endpoint lying inside the
-                    window is counted once per endpoint (two endpoints per whole segment), so the effective
-                    per‑fracture‑center density remains consistent with the conventional P20 definition when
-                    segments are not truncated at the circle boundary.
+                    where M is the number of trace tips inside the window (Mauldon, Dunne &amp; Rohrbaugh, 2001,
+                    §2). This is coded as <code>M_circle / (2 * π * rCircle**2)</code>. The normalisation constant is
+                    2πr², not the naive πr², because a trace contributes <em>two</em> tips: for a tip density of
+                    2d per unit area over a window of area πr², the expected count is E[M] = 2d·πr², so the
+                    unbiased estimate of the trace density d is M/(2πr²). Dividing the two estimators returns the
+                    Mauldon mean trace length,
                 </p>
+                <div class="formula-block">ℓ  =  I / D  =  [N / (4r)] / [M / (2π r²)]  =  π r N / (2 M)</div>
+                <p>
+                    which is exactly the mean‑length estimator published alongside them, so the constants are not
+                    free parameters that could be adjusted.
+                </p>
+                <div class="note-box">
+                    <p>
+                        <strong>Tips, not segment endpoints.</strong> M is accumulated with the per‑row boolean masks
+                        returned by <code>_trace_tip_masks(df)</code>, so only a trace's first (X1, Y1) and last
+                        (X2, Y2) can ever be counted. Summing both endpoints of every segment instead — as an
+                        unmasked count does — charges each interior polyline vertex twice, so a trace digitised into
+                        <em>n</em> segments supplies 2<em>n</em> "tips" instead of 2 and D measures how finely the
+                        map was drawn rather than how densely it is fractured. Tips are the physically meaningful
+                        quantity here because they are where fractures actually terminate.
+                    </p>
+                </div>
 
                 <h3 id="sec-5-4">5.4 Global (Network‑Wide) Statistics</h3>
                 <p>
@@ -387,11 +407,26 @@
                 </p>
                 <div class="formula-block">
 P21_global  =  L_tot / A_map
-P20_global  =  n_segments / A_map</div>
+P20_global  =  n_traces / A_map        where n_traces = df["Trace"].nunique()</div>
                 <p>
                     These are the classical, non‑circular definitions of areal intensity and density applied to the
                     entire bounding box of the dataset, and are what is displayed in the Global Results card.
                 </p>
+                <div class="note-box">
+                    <p>
+                        <strong>P20 is traces per unit area, not segments per unit area.</strong> In the
+                        P<sub>ij</sub> system of Dershowitz &amp; Herda (1992), the first index is the dimension of
+                        the sampling region and the second the dimension of the feature measured: P20 is
+                        zero‑dimensional features (whole fractures) counted over a two‑dimensional region. A
+                        polyline trace is one fracture however many vertices were clicked while digitising it, so
+                        the numerator must be the distinct‑trace count. Using the row count of the segment table
+                        instead makes P20_global proportional to discretisation: a network of 20 traces in
+                        10 000 m² is 0.002000 m⁻² whether each trace is stored as one segment or as fifty, whereas
+                        a segment count would report 0.002, 0.010, or 0.100 m⁻² for the same geology. Note also
+                        that P21_global is unaffected by this, because Σ Length_m telescopes over the vertices of a
+                        polyline and is already digitisation‑invariant.
+                    </p>
+                </div>
 
                 <h3 id="sec-5-5">5.5 Scan‑Circle Packing Geometry</h3>
                 <p>
@@ -467,10 +502,23 @@ t1,2 = (−b ∓ √Δ) / (2a)</div>
                 </p>
                 <p>
                     Per scan circle, the intersection count N (summed over all segments, over the segment axis)
-                    becomes <code>N_circle</code>, and the two boolean "endpoint inside circle" tests
+                    becomes <code>N_circle</code>. The two "endpoint inside circle" tests
                     d₁_sq&nbsp;&lt;&nbsp;r² and d₂_sq&nbsp;&lt;&nbsp;r² (squared distance from each of the
-                    segment's two endpoints to the circle centre, compared against r²) are summed to give
-                    <code>M_circle</code>, the endpoint‑inside‑circle count used by the density estimator.
+                    segment's two endpoints to the circle centre, compared against r²) are each
+                    <strong>AND‑ed with a trace‑tip mask</strong> before summing:
+                </p>
+                <div class="formula-block">
+tip1_mask, tip2_mask = _trace_tip_masks(df)
+m_arr = ((d1_sq &lt; r_sq) &amp; tip1_mask[:, None]).astype(int) \
+      + ((d2_sq &lt; r_sq) &amp; tip2_mask[:, None]).astype(int)</div>
+                <p>
+                    so that <code>M_circle</code> is a count of genuine trace tips, not of segment endpoints
+                    (<a  href="#sec-5-3">Section 5.3</a>). <code>_trace_tip_masks()</code> groups the rows by
+                    <code>Trace</code>, orders each group by <code>Segment</code>, and sets <code>tip1</code> True on
+                    the first row of the trace and <code>tip2</code> True on its last; every other endpoint is an
+                    interior polyline vertex and stays False. If the frame carries no <code>Trace</code> column the
+                    helper degrades gracefully by treating every row as its own trace (both masks all True), which
+                    reproduces the older segment‑endpoint behaviour only in the one case where it is correct.
                 </p>
                 <p>
                     Both <code>N_circle</code> and <code>M_circle</code> are reshaped from a flat (n_circles,)
@@ -481,9 +529,12 @@ t1,2 = (−b ∓ √Δ) / (2a)</div>
 
                 <h3 id="6.3">6.3 Step 3 — Global Statistics and Sidebar Update</h3>
                 <p>
-                    <code>total_length = Σ(Length_m)</code>, mapArea, global_P21, and global_P20 are computed per
+                    <code>total_length = Σ(Length_m)</code>, mapArea,
+                    <code>n_traces = int(df["Trace"].nunique())</code>, global_P21, and global_P20 are computed per
                     <a  href="#sec-5-4">5.4</a> and pushed into the four Global Results labels, alongside the resolved grid layout
-                    (xNumCircle × yNumCircle) and total scan‑circle count. The unit suffix (m, cm, mm, or km) is
+                    (xNumCircle × yNumCircle) and total scan‑circle count. When the frame has no <code>Trace</code>
+                    column, <code>n_traces</code> falls back to <code>len(lengths)</code>, i.e. one trace per row.
+                    The unit suffix (m, cm, mm, or km) is
                     read live from the shared <code>_static_map_unit_var</code> so the displayed units always track
                     the workspace's current display unit.
                 </p>
@@ -556,7 +607,7 @@ t1,2 = (−b ∓ √Δ) / (2a)</div>
                     (P21 vs P20), or the requested circle count invalidates the cache and forces recomputation.
                 </p>
                 <p>
-                    The opacity slider additionally uses a 100&nbsp;ms Tk <code>after()</code> debounce
+                    The opacity slider additionally uses a 100&nbsp;ms <code>after()</code> debounce
                     (<code>self._opacity_timer</code>) so that dragging the slider does not trigger a full
                     recomputation (including a potential kriging pass) on every intermediate pixel value emitted
                     during the drag; only the final settled value (100&nbsp;ms after the last movement) triggers
@@ -608,7 +659,7 @@ t1,2 = (−b ∓ √Δ) / (2a)</div>
                 <h3 id="7.4">7.4 Global vs. Local Statistics — Interpretation Guidance</h3>
                 <p>
                     The Global Results panel's P21/P20 values are computed directly from the full dataset (total
-                    length / total segment count divided by the bounding‑box area) and therefore represent the
+                    length, and total <em>trace</em> count, each divided by the bounding‑box area) and therefore represent the
                     exact areal intensity/density of the digitized network over its full extent — they are not
                     themselves circular‑scanline estimates and carry no orientation‑bias correction, but they also
                     carry no scan‑circle sampling error, since they use every available data point. The
@@ -694,7 +745,7 @@ t1,2 = (−b ∓ √Δ) / (2a)</div>
 
                 <h3 id="9.4">9.4 Zero‑Level Suppression on Contour Labels</h3>
                 <p>
-                    Because scan circles with no fracture length or fracture endpoints correctly evaluate to
+                    Because scan circles containing no fracture length and no trace tips correctly evaluate to
                     I&nbsp;=&nbsp;0 or D&nbsp;=&nbsp;0, an unfiltered contour pass would frequently draw and label a
                     "0.000" contour threading through every low‑intensity region of the map, adding visual noise
                     without informative content. The implementation filters this level out of the isoline/label
@@ -786,6 +837,7 @@ t1,2 = (−b ∓ √Δ) / (2a)</div>
                     <tr><td>Class and inheritance</td><td><code>TraceIntensityTab</code> is implemented as a mixin class, combined with several sibling mixins (StaticMapTab, StaticLengthsTab, StaticCDFTab, StaticAnglesTab, StaticStereonetTab, StaticFluidFlowTab, StaticGraphsTab, StaticResultsTab, WorkspaceHeaderMixin) into the single <code>StaticAnalyzerApp</code> class, following the shared‑mixin architecture used throughout the Static Analyzer.</td></tr>
                     <tr><td>Shared data source</td><td><code>self.results</code> / <code>self._static_results</code> is populated exclusively by the Fracture Map tab's geometry pipeline (<code>run_static_calculations()</code>, overridden at runtime to <code>_static_map_run_geometry()</code>); this tab performs no independent geometry computation of its own beyond the scan‑circle grid and intersection test.</td></tr>
                     <tr><td>Colormap resolution helper</td><td>The module‑level <code>_resolve_cmap()</code> function is duplicated (by design, for decoupling) from the equivalent helper in <code>static_map_tab.py</code>; both resolve a display colormap name to a matplotlib Colormap object, including the app's custom bundled Parula approximation via <code>SlipTendencyApp._parula_colormap()</code>.</td></tr>
+                    <tr><td>Trace‑tip helper</td><td>The module‑level <code>_trace_tip_masks(df)</code> returns two row‑aligned boolean arrays marking which of each segment's two endpoints is a genuine trace tip (first row's X1/Y1 and last row's X2/Y2 within each <code>Trace</code> group, ordered by <code>Segment</code>). It is the single point at which the density estimator is made independent of digitisation density; the equivalent trace‑level logic on the Connectivity tab lives in <code>core/branch_counter.py</code>'s <code>_trace_tip_lookup()</code>.</td></tr>
                     <tr><td>Palette source</td><td>Default background/border/grid colours are seeded once from <code>self.plot_palette()</code> (a method shared across the workspace) at widget‑construction time, but thereafter are fully independent, user‑editable StringVars specific to this tab.</td></tr>
                     <tr><td>Unit propagation</td><td>The display unit (m/cm/mm/km) is never stored locally; it is read on every draw from the shared <code>_static_map_unit_var</code> owned by the Fracture Map tab, ensuring the Intensity &amp; Density tab always reports statistics in the workspace's currently active unit even if the unit is changed after this tab was last drawn.</td></tr>
                     <tr><td>No independent SVG/Excel loading</td><td>This tab intentionally exposes no Load SVG / Load Excel controls; all data loading is centralized in the shared workspace header and the Fracture Map tab, per the application's overall data‑flow design.</td></tr>
@@ -795,7 +847,8 @@ t1,2 = (−b ∓ √Δ) / (2a)</div>
                 <h2 id="limitations">14. Limitations</h2>
                 <table>
                     <tr><th>Limitation</th><th>Description</th></tr>
-                    <tr><td>Endpoint‑based P20 proxy</td><td>The P20 estimator implemented here counts fracture‑segment endpoints falling inside each scan circle as a proxy for fracture centers; for very short segments relative to the circle radius, or for fracture traces that were digitised as multiple connected sub‑segments (rather than one segment per physical fracture), this can differ from a strict fracture‑center count and should be interpreted with care.</td></tr>
+                    <tr><td>Tip‑based P20 estimator</td><td>The local P20 estimator counts trace <em>tips</em> inside each scan circle rather than trace <em>centres</em>. This is the published circular‑window estimator (Mauldon, Dunne &amp; Rohrbaugh, 2001) and is digitisation‑invariant, since interior polyline vertices are masked out by <code>_trace_tip_masks()</code>. It remains a sampling estimator, however: a long trace crossing the window without terminating in it contributes no tips, so a single circle placed on a sparse, long‑trace network can read low while the global P20 does not. Compare the map against the Global Results value (<a  href="#7.4">Section 7.4</a>) before treating a local minimum as real.</td></tr>
+                    <tr><td>Bounding‑box sampling area</td><td>Both global statistics are normalised by the data's own bounding box, A_map = Δx × Δy, not by an independently chosen sampling window. Where the mapped domain is not rectangular, or where traces do not reach the box edges, A_map overstates the true sampled area and both P21_global and P20_global are correspondingly biased low. The Connectivity tab, by contrast, accepts an explicit sampling window for exactly this reason.</td></tr>
                     <tr><td>Fixed variogram model</td><td>The fixed linear‑variogram kriging model (<a  href="#sec-7-2">Section 7.2</a>) is not adaptively fit to each dataset's own spatial autocorrelation structure; it functions as a general‑purpose smoothing interpolator rather than a geostatistically optimal predictor for every possible fracture network.</td></tr>
                     <tr><td>Indirect grid resolution control</td><td>Grid resolution is controlled indirectly, via the Number of scan circles field, which sets circle count along the shorter map dimension only — very elongated (high aspect‑ratio) datasets may produce an uneven number of circles along the two axes.</td></tr>
                 </table>
@@ -804,6 +857,7 @@ t1,2 = (−b ∓ √Δ) / (2a)</div>
                 <h2 id="references">15. References</h2>
                 <p>Mauldon, M. (1998). Estimating mean fracture trace length and density from observations in convex windows. <em>Rock Mechanics and Rock Engineering</em>, 31(4), 201–216.</p>
                 <p>Mauldon, M., Dunne, W. M., &amp; Rohrbaugh, M. B. (2001). Circular scanlines and circular windows: new tools for characterizing the geometry of fracture traces. <em>Journal of Structural Geology</em>, 23(2–3), 247–258.</p>
+                <p>Dershowitz, W. S., &amp; Herda, H. H. (1992). Interpretation of fracture spacing and intensity. In <em>Proceedings of the 33rd U.S. Symposium on Rock Mechanics</em> (pp. 757–766). Balkema, Rotterdam. — source of the P<sub>ij</sub> notation; P20 is defined as the number of fractures per unit area.</p>
                 <p>Rohrbaugh, M. B., Dunne, W. M., &amp; Mauldon, M. (2002). Estimating fracture trace intensity, density, and mean length using circular scan lines and windows. <em>AAPG Bulletin</em>, 86(12), 2089–2104.</p>
                 <p>Terzaghi, R. D. (1965). Sources of error in joint surveys. <em>Géotechnique</em>, 15(3), 287–304.</p>
                 <p>Cressie, N. A. C. (1993). <em>Statistics for Spatial Data</em> (Revised Edition). John Wiley &amp; Sons.</p>

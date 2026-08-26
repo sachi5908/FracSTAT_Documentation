@@ -373,9 +373,13 @@
                     <span class="ph-caption"><strong>Figure 2.6</strong> — Scale Calibration interface showing the function of the different tabs used to scale the digitized traces.</span>
                 </figure>
                 <p>
-                    For SVG‑sourced data, raw digitizer coordinates (in pixel units) are linearly rescaled into the
-                    physical profile box defined by the <strong>Profile Width</strong> and <strong>Profile Length</strong>
-                    fields (see <a href="#5.2">Section 5.2</a>). For spatial Excel/CSV data, no rescaling
+                    For SVG‑sourced data, raw digitizer coordinates (in pixel units) are rescaled into real‑world
+                    units by a single isotropic factor, taken from the calibration's units‑per‑pixel value where one
+                    exists and otherwise from an aspect‑preserving fit inside the physical profile box defined by the
+                    <strong>Profile Width</strong> and <strong>Profile Length</strong>
+                    fields (see <a href="#5.2">Section 5.2</a>). Because the same factor is applied to both axes, the
+                    traces may not fill the profile box exactly; angles and relative lengths are preserved instead.
+                    For spatial Excel/CSV data, no rescaling
                     is performed — the coordinates are trusted to already be in real‑world units. The exact formulas
                     are given in <a href="#maths">Section 8</a>.
                 </p>
@@ -429,6 +433,14 @@
                     metres, centimetres, millimetres and kilometres — FracSTAT automatically converts the profile
                     width/length values for you when you change the unit, and keeps the Dynamic Analyzer workspace
                     in sync.
+                </p>
+                <p>
+                    These two fields set the box the geometry is fitted <em>into</em>, not the exact extent it is
+                    stretched <em>to</em>. Scaling is isotropic (<a href="#8.1">Section 8.1</a>), so only the more
+                    restrictive of the two limits binds and the traces may fall short of the other. If the mapped
+                    traces look smaller than the box you declared, that is aspect preservation doing its job — the
+                    alternative would silently shear every strike in the dataset. Where an exact units‑per‑pixel
+                    calibration exists, it takes precedence over these fields entirely.
                 </p>
 
                 <h3 id="5.3">5.3 Display Mode</h3>
@@ -539,19 +551,41 @@
 
                 <h3 id="8.1">8.1 Pixel‑to‑real‑world scaling (SVG data)</h3>
                 <p>
-                    For SVG‑sourced data, raw digitizer coordinates <em>(x, y)</em>, in SVG pixel units, are
-                    linearly rescaled into the physical profile box defined by the Profile Width (W) and Profile
-                    Length (L). If <em>(x<sub>min</sub>, x<sub>max</sub>)</em> and <em>(y<sub>min</sub>, y<sub>max</sub>)</em>
-                    are the bounding extents of every segment endpoint in pixel space, the scaling factors are:
+                    For SVG‑sourced data, raw digitizer coordinates <em>(x, y)</em>, in SVG pixel units, are rescaled
+                    into real‑world units by a <strong>single isotropic factor applied to both axes</strong>. The
+                    factor is chosen by a three‑way rule, in this order:
                 </p>
                 <div class="formula-block">
-sx = W / (x_max − x_min)
-sy = L / (y_max − y_min)
-                </div>
+if not calibrated:                       scale = 1.0
+elif units_per_px is known (&gt; 0):        scale = units_per_px
+else:                                    scale = min( W / (x_max − x_min), L / (y_max − y_min) )
+
+scale_x = scale_y = scale</div>
                 <p>Each endpoint is then transformed as:</p>
                 <div class="formula-block">
-x' = (x − x_min) · sx
-y' = (y − y_min) · sy
+x' = (x − x_min) · scale
+y' = (y − y_min) · scale</div>
+                <p>
+                    The preferred branch is the middle one: the calibration dialog measures how many real‑world units
+                    one source pixel represents (<code>units_per_px</code>, computed in <code>core/scale.py</code>),
+                    and using it directly is both isotropic and exact, with no dependence on how much of the frame
+                    the traced fractures happen to cover. The <code>min(…)</code> fallback fits the trace bounding
+                    box inside the declared W × L profile rectangle while preserving aspect; because the calibration
+                    dialog derives W and L from a single px‑per‑unit value, W/L already equals the source pixel
+                    aspect ratio, so this recovers the true units‑per‑pixel when the traces span the calibrated frame
+                    and never introduces shear when they do not.
+                </p>
+                <div class="note-box">
+                    <strong>Why not separate sx and sy?</strong> Independent factors
+                    sx&nbsp;=&nbsp;W/(x_max−x_min) and sy&nbsp;=&nbsp;L/(y_max−y_min) stretch the trace bounding box
+                    to fill the profile rectangle exactly. That is an anisotropic transform — a similarity only when
+                    sx&nbsp;=&nbsp;sy — so it does not preserve angles, and every orientation statistic downstream
+                    (strike, rose diagrams, stereonets, Terzaghi weighting) is computed on a sheared network.
+                    Orientation analysis requires a conformal map (Priest, 1993, <em>Discontinuity Analysis for Rock
+                    Engineering</em>, ch. 3). Measured on a synthetic set, the anisotropic form displaced strike by up
+                    to 25.3°, and the reported length of an identical‑length trace set varied by a factor of 2.5 with
+                    azimuth alone. Isotropic scaling can leave unused margin on one side of the profile rectangle;
+                    that empty space is the correct outcome, not a defect.
                 </div>
                 <p>
                     For spatial Excel/CSV data, no rescaling is performed — the coordinates are used at 1:1 physical
@@ -568,10 +602,18 @@ y' = (y − y_min) · sy
                     to the "Reverse Y" setting:
                 </p>
                 <div class="formula-block">
-Δx = x2' − x1'
+Δx = x2' − x1'          (negated when "Flip X" is active)
 Δy = −(y2' − y1')      (FracSTAT applies Reverse‑Y internally by default)
 
-image_strike = atan2(Δx, Δy)      (measured clockwise from the image's own vertical axis)
+image_strike = degrees( atan2(Δx, Δy) ) mod 360°</div>
+                <div class="note-box">
+                    <strong>Argument order matters.</strong> The x‑component is passed <em>first</em>:
+                    <code>atan2(Δx, Δy)</code> measures the angle clockwise from the +Y (image‑up) axis, which is the
+                    compass convention. The more familiar <code>atan2(Δy, Δx)</code> measures counter‑clockwise from
+                    +X, i.e. mathematical convention, and substituting it here reflects every azimuth about the 45°
+                    line. The <code>mod 360°</code> keeps the result a fully directed 0–360° strike rather than
+                    folding it to 0–180°, which downstream stress resolution and stereonet pole placement need once
+                    dip departs from vertical.
                 </div>
                 <p>This image‑referenced strike is then rotated into a north‑referenced strike using the Y‑axis azimuth from North (θₙ):</p>
                 <div class="formula-block">
@@ -628,6 +670,18 @@ y_rot = x' · sin(θ) + y' · cos(θ)
                     while one dominated by Y and X nodes is highly connected (numerous, well‑linked flow pathways).
                     This ratio is explored further, and plotted, on the Connectivity tab.
                 </p>
+                <div class="note-box">
+                    <strong>These counts will not match the Connectivity tab, and are not meant to.</strong> The tile
+                    above is a fast <em>segment‑level</em> indicator: it snaps every segment endpoint (plus the
+                    computed intersection points) to a 0.01‑unit grid and classifies each location by how many ends
+                    coincide there, which is why it has a C‑node class at all. Two consecutive segments of one
+                    polyline trace meet at a C‑node, so the count rises as a trace is digitised with more vertices.
+                    The Connectivity tab instead performs the Sanderson &amp; Nixon (2015) <em>trace‑level</em>
+                    classification: only a trace's first and last points are tips, interior vertices are not nodes,
+                    there is no C class, and two tips that merely touch stay I nodes because only two branches meet
+                    there. Use this tile as a quick look at the map; use the Connectivity tab for any reported
+                    topology.
+                </div>
 
                 <!-- ================================================= -->
                 <h2 id="reading-map">10. Reading the Map Geologically</h2>
@@ -688,6 +742,14 @@ y_rot = x' · sin(θ) + y' · cos(θ)
                     <tr>
                         <td>Resolution truncation</td>
                         <td>Very short fractures, below the digitizing pixel resolution, are systematically missed or over‑represented as noise.</td>
+                    </tr>
+                    <tr>
+                        <td>Profile box is a bound, not an extent</td>
+                        <td>Because scaling is isotropic (<a href="#8.1">Section 8.1</a>), uncalibrated data is fitted inside the Profile Width × Length box rather than stretched to fill it, and one axis will generally have unused margin. The absolute scale of uncalibrated SVG data is therefore only as good as those two numbers; a genuine units‑per‑pixel calibration is the only route to an absolutely correct scale.</td>
+                    </tr>
+                    <tr>
+                        <td>Map node tile is segment‑level</td>
+                        <td>The Nodes summary tile and the "Show segment nodes" overlay classify coincident <em>segment</em> ends on a 0.01‑unit snap grid and include a C (continuation) class, so their counts depend on how finely traces were digitised and will not equal the Connectivity tab's trace‑level I/Y/X census (<a href="#topology">Section 9</a>).</td>
                     </tr>
                 </table>
 

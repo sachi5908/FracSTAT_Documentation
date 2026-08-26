@@ -265,7 +265,7 @@
                 <h2 id="controls">4. Settings and Controls, Card by Card</h2>
                 <p>
                     This section documents every interactive control exposed in the settings panel, in the order
-                    in which it appears, together with its underlying Tkinter/CustomTkinter variable name, default
+                    in which it appears, together with its underlying <code>ui_common.qtk</code> variable name, default
                     value, valid range, and the precise effect on the redraw routine (<code>_draw_rose</code>).
                 </p>
 
@@ -335,7 +335,7 @@
                     <tr><td>Slip tendency</td><td>Yes (default)</td><td><code>SlipTendencyNorm</code></td><td>Normalized slip tendency Tₛ</td></tr>
                     <tr><td>Slip tendency</td><td>No</td><td><code>SlipTendency</code></td><td>Slip tendency Tₛ</td></tr>
                     <tr><td>Dilation tendency</td><td>n/a</td><td><code>DilationTendency</code></td><td>Dilation tendency Td</td></tr>
-                    <tr><td>Fracture susceptibility</td><td>Yes</td><td><code>FractureSusceptibilityNorm</code></td><td>Normalized fracture susceptibility</td></tr>
+                    <tr><td>Fracture susceptibility</td><td>Yes</td><td><code>FractureSusceptibilityNorm</code></td><td>Normalized fracture susceptibility (inverted &mdash; 1 = least stable; see <a href="#5.5">Section 5.5</a>)</td></tr>
                     <tr><td>Fracture susceptibility</td><td>No</td><td><code>FractureSusceptibility</code></td><td>Fracture susceptibility Sf, MPa</td></tr>
                     <tr><td>Critical fractures</td><td>n/a</td><td><code>CriticalStateValue</code></td><td>Critical fracture state: 0=Stable, 1=Near Critical, 2=Critical, 3=Unstable</td></tr>
                 </table>
@@ -427,7 +427,12 @@
                     Normalize instance. Columns whose name ends in "Norm", together with DilationTendency,
                     are fixed to the domain [0, 1]; all other continuous columns use the
                     finite data-driven minimum and maximum, with a small symmetric padding applied when the data
-                    range collapses to a single value (to avoid a degenerate colour scale). The
+                    range collapses to a single value (to avoid a degenerate colour scale). Note that
+                    <code>FractureSusceptibilityNorm</code> is <em>inverted</em> at source in
+                    <code>core/calculator.py</code> &mdash; 1 &minus; (S_f &minus; min) / (max &minus; min) &mdash;
+                    because a lower S_f means a smaller remaining pore-pressure margin; on this tab that means a
+                    petal at the top of the [0, 1] colour domain contains the <em>least</em> stable fractures, and
+                    the scale is relative to the loaded dataset rather than to a failure threshold. The
                     CriticalStateValue attribute instead uses a discrete four-colour colormap/norm banding its
                     integer codes 0&ndash;3 (Stable, Near Critical, Critical, Unstable), guaranteeing that each
                     state maps unambiguously to its own flat colour swatch rather than a continuous gradient, and
@@ -759,9 +764,9 @@ color_values = np.array(color_values)</code></pre>
                     <tr><th>Technique</th><th>Where applied</th><th>Benefit</th></tr>
                     <tr><td>Vectorised NumPy histogram</td><td><a href="#6.2">Section 6.2</a>/<a href="#6.4">6.4</a>, <code>np.histogram(weights=...)</code></td><td>O(n) weighted binning without an explicit Python loop over segments.</td></tr>
                     <tr><td>Single <code>ax.bar()</code> call for all petals</td><td><a href="#9.2">Section 9.2</a></td><td>Avoids per-bin matplotlib artist creation overhead; scales to the maximum supported 360 bins without perceptible lag.</td></tr>
-                    <tr><td><code>draw_idle()</code> rather than <code>draw()</code></td><td>End of <code>_draw_rose</code></td><td>Defers the actual canvas repaint to Tkinter's event loop, coalescing rapid successive setting changes (e.g., a slider or rapid typing) into fewer physical repaints.</td></tr>
+                    <tr><td><code>draw_idle()</code> rather than <code>draw()</code></td><td>End of <code>_draw_rose</code></td><td>Defers the actual canvas repaint to Qt's event loop, coalescing rapid successive setting changes (e.g., a slider or rapid typing) into fewer physical repaints.</td></tr>
                     <tr><td>Deterministic closed-form colour-bar layout</td><td><a href="#6.6">Section 6.6</a></td><td>Avoids the per-frame cost of matplotlib's automatic constrained/tight layout solvers.</td></tr>
-                    <tr><td>Idempotent variable initialisation</td><td><a href="#7.1">Section 7.1</a>, <code>hasattr</code> guards in <code>_rose_init_vars</code></td><td>Prevents redundant Tkinter variable churn if the tab-build path is ever invoked more than once.</td></tr>
+                    <tr><td>Idempotent variable initialisation</td><td><a href="#7.1">Section 7.1</a>, <code>hasattr</code> guards in <code>_rose_init_vars</code></td><td>Prevents redundant variable churn if the tab-build path is ever invoked more than once.</td></tr>
                     <tr><td>Shared colormap/normalisation resolution</td><td><a href="#10.1">Section 10.1</a></td><td>Colour-scale computation logic lives in one place (SlipTendencyApp) rather than being duplicated per tab, reducing both code size and the chance of visual inconsistency.</td></tr>
                 </table>
                 <p>
@@ -864,7 +869,7 @@ color_values = np.array(color_values)</code></pre>
 
                 <h3 id="14.2">14.2 Variable Naming Convention</h3>
                 <p>
-                    Every CustomTkinter variable owned by this tab is prefixed <code>rose_</code> (e.g.,
+                    Every <code>ui_common.qtk</code> variable owned by this tab is prefixed <code>rose_</code> (e.g.,
                     <code>rose_bins_var</code>, <code>rose_show_circles_var</code>) to avoid collisions with the
                     many other tabs' variables that coexist on the same <code>SlipTendencyApp</code> instance.
                 </p>
@@ -873,7 +878,7 @@ color_values = np.array(color_values)</code></pre>
                 <p>
                     All free-text numeric entries (bin count, petal gap, circle line width, σ1 line width,
                     colour-bar length, boundary width) are parsed with a try/except ValueError pattern that falls
-                    back to a hard-coded sane default rather than raising an exception into the Tkinter event loop,
+                    back to a hard-coded sane default rather than raising an exception into the Qt event loop,
                     ensuring the application never crashes from a malformed or empty text entry.
                 </p>
 
@@ -891,8 +896,8 @@ color_values = np.array(color_values)</code></pre>
                     <tr><th>Library</th><th>Role</th></tr>
                     <tr><td><code>numpy</code></td><td>Weighted histogram binning, angular array manipulation, trigonometric conversions.</td></tr>
                     <tr><td><code>matplotlib</code> (pyplot Figure/Axes API)</td><td>Polar plot rendering, colour mapping (ScalarMappable), colour-bar construction.</td></tr>
-                    <tr><td><code>matplotlib.backends.backend_tkagg</code></td><td>Embeds the Matplotlib Figure inside the CustomTkinter canvas widget (FigureCanvasTkAgg).</td></tr>
-                    <tr><td><code>customtkinter</code> (ctk)</td><td>All settings-panel widgets: frames, labels, entries, checkboxes, option menus, buttons.</td></tr>
+                    <tr><td><code>matplotlib.backends.backend_qtagg</code></td><td>Embeds the Matplotlib Figure inside the Qt canvas widget (<code>FigureCanvasTkAgg</code>, the <code>ui_common.qtk</code> shim over <code>FigureCanvasQTAgg</code>).</td></tr>
+                    <tr><td><code>ui_common.qtk</code> (ctk)</td><td>All settings-panel widgets: frames, labels, entries, checkboxes, option menus, buttons.</td></tr>
                     <tr><td><code>ui_common.ui_widgets</code></td><td>Supplies <code>_StaticColorButton</code>, the shared swatch/hex colour-picker widget.</td></tr>
                 </table>
 

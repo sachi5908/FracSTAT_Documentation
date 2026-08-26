@@ -631,7 +631,7 @@ strike_mean = ½ · atan2(S, C)  (mod 180°)</div>
                 <h3 id="10.3">10.3 Idle-Draw Scheduling</h3>
                 <p>
                     The canvas is repainted via <code>FigureCanvasTkAgg.draw_idle()</code> rather than the
-                    blocking <code>draw()</code>, deferring pixel-level rendering to the next Tkinter idle cycle.
+                    blocking <code>draw()</code>, deferring pixel-level rendering to the next Qt idle cycle.
                     This keeps rapid successive setting changes (e.g. dragging through bin-count values or
                     a fast sequence of colour-picker changes) from stalling the UI thread with redundant full
                     redraws.

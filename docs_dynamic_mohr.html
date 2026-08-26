@@ -361,9 +361,10 @@ center = &frac12;(&sigma;i + &sigma;j)          radius = &frac12;(&sigma;i &minu
                 <p>These are computed upstream in <code>core/calculator.py</code> and simply displayed here:</p>
                 <div class="formula-block">
 Slip Tendency:               Ts = &tau; / &sigma;n
-Normalized Ts:                Ts,norm = Ts / Ts,max
+Normalized Ts:                Ts,norm = Ts / Ts,max,   Ts,max = (&sigma;1 &minus; &sigma;3) / ( 2&middot;&radic;(&sigma;1&middot;&sigma;3) )
 Dilation Tendency:            Td = (&sigma;1 &minus; &sigma;n) / (&sigma;1 &minus; &sigma;3)
 Fracture Susceptibility:      Sf = &sigma;n &minus; Pf &minus; (&tau; &minus; C0)/&mu;
+Normalized Sf:                Sf,norm = 1 &minus; ( Sf &minus; min Sf ) / ( max Sf &minus; min Sf )
 Fracture Susceptibility (legacy):  Sf,legacy = &sigma;n &minus; &tau;/&mu;</div>
                 <p>
                     Ts,max is the theoretical maximum &tau;/&sigma;n achievable over every possible fracture
@@ -371,8 +372,16 @@ Fracture Susceptibility (legacy):  Sf,legacy = &sigma;n &minus; &tau;/&mu;</div>
                     &sigma;&#8323; only, equal to the tangent from the origin to the outer Mohr circle &mdash; not
                     the maximum among only the loaded fractures. Dilation tendency ranges 0 (least likely to
                     dilate/open) to 1 (most likely). Fracture susceptibility is expressed directly in MPa and is not
-                    bounded to [0, 1]; the Mohr Tab's colour mapping normalizes it per-dataset using its observed
-                    minimum and maximum when the "normalized" display option is active elsewhere in the workspace.
+                    bounded to [0, 1]; when the "normalized" display option is active, the Mohr Tab rescales it
+                    per-dataset from the loaded fractures' observed S<sub>f</sub> minimum and maximum and then
+                    <strong>inverts</strong> the result, S<sub>f,norm</sub> = 1 &minus; (S<sub>f</sub> &minus; min) /
+                    (max &minus; min), so that the lowest S<sub>f</sub> &mdash; the smallest remaining pore-pressure
+                    margin, i.e. the plane closest to failure &mdash; maps to 1.0 at the "hot" end of the colormap.
+                    Without that inversion the colour scale reads backwards, rendering stable planes as critical.
+                    Because the endpoints come from the loaded data rather than from theory, S<sub>f,norm</sub> = 1.0
+                    means "least stable plane in this file", not "at failure", and should not be compared across
+                    datasets; if every segment shares one S<sub>f</sub> value (range below 10&#8315;&#185;&sup2;) the
+                    field is set to 0 throughout instead of dividing by zero.
                 </p>
                 <p>
                     <code>calculator.py</code> actually computes <strong>two</strong> Sf values side by side, one
@@ -480,7 +489,7 @@ n1 = sin&phi;&middot;cos&theta;,  n2 = sin&phi;&middot;sin&theta;,  n3 = cos&phi
                         <button class="copy-btn">Copy</button>
                     </div>
                     <pre><code class="language-python">@staticmethod
-def _mohr_field(sigma1, sigma2, sigma3, pore_pressure, cohesion, friction, value_column):
+def _mohr_field(sigma1, sigma2, sigma3, pore_pressure, cohesion, friction, value_column, df=None):
     polar   = np.linspace(0.01, np.pi / 2 - 0.01, 58)
     azimuth = np.linspace(0.0, 2 * np.pi, 116, endpoint=False)
     polar, azimuth = np.meshgrid(polar, azimuth)
@@ -490,13 +499,30 @@ def _mohr_field(sigma1, sigma2, sigma3, pore_pressure, cohesion, friction, value
     sigma_n     = sigma1 * n1**2 + sigma2 * n2**2 + sigma3 * n3**2
     traction_sq = sigma1**2 * n1**2 + sigma2**2 * n2**2 + sigma3**2 * n3**2
     tau         = np.sqrt(np.maximum(traction_sq - sigma_n**2, 0.0))
-    if value_column == "SlipTendencyNorm":
-        raw    = tau / np.maximum(sigma_n, 1e-12)
-        values = raw / max(float(raw.max()), 1e-12)
+
+    if value_column.startswith("SlipTendency"):
+        raw = tau / np.maximum(sigma_n, 1e-12)
+        if value_column == "SlipTendencyNorm":
+            # Exact closed-form theoretical max, as in calculator.py --
+            # NOT raw.max() over this mesh.
+            denom = 2.0 * np.sqrt(max(sigma1 * sigma3, 1e-12))
+            tsmax = max((sigma1 - sigma3) / denom, 1e-12)
+            values = raw / tsmax
+        else:
+            values = raw
     elif value_column == "DilationTendency":
         values = (sigma1 - sigma_n) / max(sigma1 - sigma3, 1e-12)
-    elif value_column == "FractureSusceptibility":
-        values = sigma_n - pore_pressure - (tau - cohesion) / max(friction, 1e-12)
+    elif value_column.startswith("FractureSusceptibility"):
+        raw_values = sigma_n - pore_pressure - (tau - cohesion) / max(friction, 1e-12)
+        if value_column == "FractureSusceptibilityNorm" and df is not None and not df.empty:
+            # Inverted: a SMALLER Sf is MORE susceptible, so it maps to 1.0.
+            sf_min = float(df["FractureSusceptibility"].min())
+            sf_max = float(df["FractureSusceptibility"].max())
+            sf_range = sf_max - sf_min
+            values = (np.zeros_like(raw_values) if abs(sf_range) &lt; 1e-12
+                      else 1.0 - (raw_values - sf_min) / sf_range)
+        else:
+            values = raw_values
     else:
         values = (tau >= cohesion + friction * (sigma_n - pore_pressure)).astype(float)
     return sigma_n.ravel() - pore_pressure, tau.ravel(), values.ravel()</code></pre>
@@ -689,7 +715,7 @@ def _mohr_field(sigma1, sigma2, sigma3, pore_pressure, cohesion, friction, value
                     its parent panel and resizes smoothly with the application window. The first time the user
                     commits a value into the Plot Width or Plot Height fields (via Enter or focus-out), the tab
                     switches into a fixed-pixel-size mode: the Matplotlib Figure's internal resolution is set from
-                    the requested width/height in pixels divided by its DPI, and the underlying Tk widget is
+                    the requested width/height in pixels divided by its DPI, and the underlying Qt widget is
                     re-gridded without the sticky option so the grid geometry manager can no longer stretch it. This
                     avoids a documented race condition in which <code>sticky="nsew"</code> and an explicit
                     <code>widget.configure(width=..., height=...)</code> call would compete on every window resize,
@@ -713,7 +739,7 @@ def _mohr_field(sigma1, sigma2, sigma3, pore_pressure, cohesion, friction, value
                     <tr><th>Technique</th><th>Where Applied</th><th>Benefit</th></tr>
                     <tr><td>Cached Symbols-index arguments (<code>_mohr_index_last_args</code>)</td><td>Drag interaction for the Symbols box</td><td>Lets a mouse-drag redraw only the small legend box instead of the entire diagram on every motion event</td></tr>
                     <tr><td>Vectorized nearest-point search</td><td>Hover tooltip</td><td>Uses NumPy array operations across all points simultaneously instead of a Python-level loop, keeping hover responsive even for large datasets</td></tr>
-                    <tr><td>Auto vs. fixed canvas sizing with conditional sticky grid option</td><td><code>_mohr_apply_canvas_sizing()</code></td><td>Prevents a documented Tk/Matplotlib resize race condition that could otherwise cause visible frame corruption on window resize</td></tr>
+                    <tr><td>Auto vs. fixed canvas sizing with conditional sticky grid option</td><td><code>_mohr_apply_canvas_sizing()</code></td><td>Prevents a documented Matplotlib canvas resize race condition that could otherwise cause visible frame corruption on window resize</td></tr>
                     <tr><td>Separate pick-artist registries per scatter group</td><td>Classic mode click handling</td><td>Allows constant-time identification of which segment was clicked, regardless of which of the three stable/near/critical groups it belongs to</td></tr>
                     <tr><td>Numeric field parsing with fallback defaults</td><td>Every Settings-tab entry</td><td>Avoids exceptions (and therefore a broken redraw) if the user temporarily leaves a field blank or enters non-numeric text while editing</td></tr>
                     <tr><td>Bounded 58&times;116 polar grid</td><td>Continuous tendency field</td><td>Balances visual smoothness of the background contour against the cost of re-evaluating stress equations and re-triangulating on every redraw</td></tr>
@@ -780,7 +806,7 @@ def _mohr_field(sigma1, sigma2, sigma3, pore_pressure, cohesion, friction, value
                     <tr><td><code>plot_palette()</code></td><td>Supplies theme-aware default colours (text, muted, spine, failure, effective) that several Settings-tab defaults are seeded from when the workspace theme changes.</td></tr>
                 </table>
                 <p>
-                    All colour and dimension fields are backed by CustomTkinter StringVar/BooleanVar instances
+                    All colour and dimension fields are backed by <code>ui_common.qtk</code> StringVar/BooleanVar instances
                     lazily initialized in <code>_mohr_init_vars()</code>, which only creates a variable if it does
                     not already exist &mdash; this makes the initialization function safe to call repeatedly (e.g.
                     across a project session restore) without discarding values the user has already set.

@@ -118,7 +118,7 @@
                     <tr><td><code>self.results</code></td><td>Master per-segment geometry/attribute table (X1, Y1, X2, Y2, Length_m, StrikeDeg, Trace, Segment, ID …) shared by every Static Analyzer tab.</td></tr>
                     <tr><td><code>self._static_map_unit_var</code></td><td>Currently selected display unit (m, cm, mm, km); used to label every distance axis and statistic in this module.</td></tr>
                     <tr><td><code>self.graph_fig</code> / <code>self.graph_map_ax</code> / <code>self.graph_plot_ax</code></td><td>The Matplotlib Figure and its two subplots — the reference-line map (left) and the derived cross-section plot (right).</td></tr>
-                    <tr><td><code>self.graph_canvas</code></td><td>The Tkinter/Matplotlib canvas embedding the Figure and receiving mouse-click events for interactive endpoint selection.</td></tr>
+                    <tr><td><code>self.graph_canvas</code></td><td>The Qt/Matplotlib canvas embedding the Figure and receiving mouse-click events for interactive endpoint selection.</td></tr>
                 </table>
                 <p>
                     Because the module reads directly from <code>self.results</code>, any change made elsewhere in
@@ -251,7 +251,7 @@
                     <tr><td>Segment length</td><td>Checkbox</td><td>Plots the length of the individual intersected segment against along-line distance ("Segment length along").</td></tr>
                     <tr><td>Segment angle</td><td>Checkbox</td><td>Plots the north-referenced strike of the intersected segment against along-line distance ("Segment angle along").</td></tr>
                     <tr><td>Estimated intensity, P21</td><td>Checkbox</td><td>Enables the Mauldon circular-scanline P21 (fracture length per unit area) series, sampled at evenly spaced windows along the line.</td></tr>
-                    <tr><td>Estimated density, P20</td><td>Checkbox</td><td>Enables the companion P20 (fracture count per unit area) series from the same scan-window computation.</td></tr>
+                    <tr><td>Estimated density, P20</td><td>Checkbox</td><td>Enables the companion P20 (trace tips per unit area) series from the same scan-window computation.</td></tr>
                     <tr><td>Number of scan circles</td><td>Numeric entry</td><td>Sets the count of circular sampling windows distributed along the reference line for the P21/P20 calculation; internally clamped to the range 2–200 (default 12).</td></tr>
                 </table>
 
@@ -418,12 +418,31 @@ a = ‖B−A‖² ,  b = 2[(A−C)·(B−A)] ,  c = ‖A−C‖² − r²</div>
                     Intensity &amp; Density tabs elsewhere in FracSTAT), each scan circle of radius r accumulates
                     two counts: N_int, the total number of segment–circle boundary crossings (from <a href="#5.6">Section 5.6</a>,
                     counting a fully interior segment once and a partially interior segment once for its single
-                    boundary crossing), and N_end, the total number of segment endpoints that fall strictly inside
+                    boundary crossing), and m, the number of <strong>trace tips</strong> that fall strictly inside
                     the circle. The two derived statistics at that scan position are:
                 </p>
                 <div class="formula-block">
 P21 = N_int / (4r)
-P20 = N_end / (2πr²)</div>
+P20 = m / (2πr²)          m = trace tips inside the circle</div>
+                <p>
+                    A trace's two tips are the start of its first segment and the end of its last segment. Interior
+                    polyline vertices — the joins between consecutive segments of the same trace — are deliberately
+                    excluded, because they are an artefact of how finely the trace was digitised rather than real
+                    fracture terminations.
+                </p>
+                <div class="note-box">
+                    <strong>m counts trace tips, not segment endpoints.</strong>
+                    Mauldon, Dunne &amp; Rohrbaugh (2001) define the circular-window density estimator as
+                    P20 = m / (2πr²) with m the number of <em>trace</em> endpoints inside the window. Accumulating one
+                    count per segment endpoint instead (i.e. adding both endpoints of every segment that lie inside
+                    the circle) double-counts every interior vertex, so a single trace digitised into n segments
+                    contributes 2n endpoints rather than 2. P20 then scales with digitisation density instead of with
+                    fracture density: re-digitising the same map more finely would inflate the reported density
+                    without any change in the geology. FracSTAT therefore builds the tip list once per dataset
+                    (grouping by <code>Trace</code>, ordered by <code>Segment</code>) and tests only those points for
+                    containment. N_int, and hence P21, is unaffected — it is a boundary-crossing count, which is
+                    already invariant to how a trace is subdivided.
+                </div>
                 <p>
                     P21 has units of [length⁻¹] and estimates the total fracture-trace length per unit sampled area
                     (i.e., areal fracture intensity); P20 has units of [length⁻²] and estimates the number of
@@ -482,10 +501,17 @@ P20 = N_end / (2πr²)</div>
                     centres (<a href="#5.5">Section 5.5</a>), every fracture segment in the dataset is tested for endpoint containment
                     (a simple Euclidean-distance-to-centre comparison against the radius) and, where at least one
                     endpoint is outside the circle, for a full segment–circle boundary intersection via the
-                    quadratic of <a href="#5.6">Section 5.6</a>. Segments with both endpoints inside the circle are counted as
-                    endpoint-only contributions (no boundary crossing is possible for a fully interior segment).
+                    quadratic of <a href="#5.6">Section 5.6</a>. Segments with both endpoints inside the circle contribute no
+                    boundary crossing at all (none is possible for a fully interior segment) and are skipped.
                     This is an O(N × M) procedure, where M is the number of fracture segments in the dataset, and
                     is the dominant computational cost of the module for large fracture networks (see <a href="#performance">Section 11</a>).
+                </p>
+                <p>
+                    The P20 tip count is kept entirely separate from that segment loop. The trace-tip array is built
+                    once, before the sweep, by <code>_graphs_trace_tips()</code>; each scan circle then vectorises a
+                    single distance test over it with <code>np.hypot</code> / <code>np.count_nonzero</code>
+                    (<a href="#5.7">Section 5.7</a> explains why the tips, and not the segment endpoints, are the correct
+                    population).
                 </p>
                 <div class="code-window">
                     <div class="code-header">
@@ -493,19 +519,25 @@ P20 = N_end / (2πr²)</div>
                         <button class="copy-btn">Copy</button>
                     </div>
                     <pre><code class="language-python">def _graphs_intensity_density_along(self, df, line):
-    """Utilizes circular scan windows along the line to calculate P21 & P20."""
+    """Utilizes circular scan windows along the line to calculate P21 &amp; P20."""
     centres, radius, distances = self._graphs_scan_circles(line)
     segs = df[["X1", "Y1", "X2", "Y2"]].to_numpy(dtype=float)
+    # P20 counts TRACE TIPS, not segment endpoints (Mauldon, Dunne &amp;
+    # Rohrbaugh 2001, J. Struct. Geol. 23, 247-258: the circular estimator
+    # is P20 = m/(2*pi*r^2) with m the number of trace endpoints inside the
+    # window).  Summing int(inside1)+int(inside2) over every SEGMENT counts
+    # each interior polyline vertex twice, so a trace digitised into n
+    # segments contributed 2n endpoints instead of 2 and P20 scaled with
+    # digitisation density rather than with fracture density.
+    tips = self._graphs_trace_tips(df)
     intensity, density = [], []
 
     for cx, cy in centres:
         n_intersections = 0
-        n_endpoints = 0
 
         for x1, y1, x2, y2 in segs:
-            inside1 = math.hypot(x1 - cx, y1 - cy) < radius
-            inside2 = math.hypot(x2 - cx, y2 - cy) < radius
-            n_endpoints += int(inside1) + int(inside2)
+            inside1 = math.hypot(x1 - cx, y1 - cy) &lt; radius
+            inside2 = math.hypot(x2 - cx, y2 - cy) &lt; radius
 
             if inside1 and inside2:
                 continue
@@ -515,12 +547,39 @@ P20 = N_end / (2πr²)</div>
                 n_intersections += self._graphs_segment_circle_intersections(
                     (x1, y1, x2, y2), (cx, cy), radius)
 
+        if len(tips):
+            n_endpoints = int(np.count_nonzero(
+                np.hypot(tips[:, 0] - cx, tips[:, 1] - cy) &lt; radius
+            ))
+        else:
+            n_endpoints = 0
+
         intensity.append(n_intersections / max(4.0 * radius, 1e-12))
         density.append(n_endpoints / max(2.0 * math.pi * radius ** 2, 1e-12))
 
-    return distances, intensity, density</code></pre>
+    return distances, intensity, density
+
+
+@staticmethod
+def _graphs_trace_tips(df):
+    """
+    The two tips of every trace: start of its first segment and end of its
+    last.  Interior polyline vertices are deliberately excluded - they are
+    an artefact of digitisation, not fracture terminations.
+    """
+    if df is None or df.empty or "Trace" not in df.columns:
+        return np.empty((0, 2), dtype=float)
+    order = ["Trace", "Segment"] if "Segment" in df.columns else ["Trace"]
+    ordered = df.sort_values(order)
+    pts = []
+    for _trace_id, group in ordered.groupby("Trace", sort=False):
+        first = group.iloc[0]
+        last = group.iloc[-1]
+        pts.append((float(first["X1"]), float(first["Y1"])))
+        pts.append((float(last["X2"]), float(last["Y2"])))
+    return np.asarray(pts, dtype=float) if pts else np.empty((0, 2), dtype=float)</code></pre>
                 </div>
-                <p class="ph-caption" style="text-align:left; margin: -1rem 0 1.5rem 0;">Simplified excerpt of <code>_graphs_intensity_density_along()</code>, showing the per-circle endpoint-containment test and the fallback to the algebraic segment–circle intersection routine for partially interior segments.</p>
+                <p class="ph-caption" style="text-align:left; margin: -1rem 0 1.5rem 0;">Simplified excerpt of <code>_graphs_intensity_density_along()</code> and its tip helper, showing the per-circle segment–circle crossing count (with the fallback to the algebraic intersection routine for fully exterior segments) and the separate, vectorised trace-tip containment test that feeds P20.</p>
 
                 <h3 id="6.6">6.6 Interactive Endpoint Picking State Machine</h3>
                 <p>
@@ -575,7 +634,7 @@ P20 = N_end / (2πr²)</div>
                     <tr><td>Segment length along</td><td>Distance along line</td><td>Segment length (display unit)</td><td>Is local fracture length variable at fine spatial resolution along the transect?</td></tr>
                     <tr><td>Segment angle along</td><td>Distance along line</td><td>Strike (degrees)</td><td>Does fracture orientation rotate systematically along the transect (e.g. across a fold hinge)?</td></tr>
                     <tr><td>P21 intensity</td><td>Distance along line</td><td>Fracture length per unit area (unit⁻¹)</td><td>How does areal fracture intensity vary spatially, independent of network orientation bias?</td></tr>
-                    <tr><td>P20 density</td><td>Distance along line</td><td>Fracture count per unit area (unit⁻²)</td><td>How does the areal density of fracture terminations/nodes vary spatially?</td></tr>
+                    <tr><td>P20 density</td><td>Distance along line</td><td>Trace tips per unit area (unit⁻²)</td><td>How does the areal density of fracture terminations vary spatially?</td></tr>
                     <tr><td>Trace length from</td><td>Perpendicular distance from line</td><td>Trace length (display unit)</td><td>Are longer fractures preferentially located on one side of a chosen reference feature (e.g. a bedding plane or fault)?</td></tr>
                     <tr><td>Segment length from</td><td>Perpendicular distance from line</td><td>Segment length (display unit)</td><td>Is segment length asymmetric about the reference line?</td></tr>
                     <tr><td>Segment angle from</td><td>Perpendicular distance from line</td><td>Strike (degrees)</td><td>Does fracture orientation differ systematically on either side of the reference line?</td></tr>
@@ -808,9 +867,9 @@ P20 = N_end / (2πr²)</div>
                 <p>
                     The module is implemented as the <code>StaticGraphsTab</code> Python mixin class, combined
                     into <code>StaticAnalyzerApp</code> via multiple inheritance together with the other Static
-                    Analyzer tab mixins. All interactive controls are built with CustomTkinter widgets
+                    Analyzer tab mixins. All interactive controls are built with <code>ui_common.qtk</code> (PySide6) widgets
                     (<code>CTkCheckBox</code>, <code>CTkEntry</code>, <code>CTkOptionMenu</code>,
-                    <code>CTkButton</code>) bound directly to Tkinter-style Variable objects, so that reading a
+                    <code>CTkButton</code>) bound directly to Tk-style <code>Variable</code> objects, so that reading a
                     control's current value anywhere in the drawing routine is simply a matter of calling
                     <code>.get()</code> on the corresponding variable; every control that should trigger a redraw
                     is wired either to its variable-change command callback or to a bound
