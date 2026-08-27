@@ -132,81 +132,6 @@ HTML pages** — they are generated at runtime.
 and be invoked from `initDynamicBehaviors()` — an inline `<script>` inside a page body
 runs only on a hard load and silently stops working after an AJAX navigation.
 
-### Adding a documentation page
-
-1. Copy an existing page (for example `docs_static_rose.html`) as the structural template,
-   keeping the navbar, the empty `#docsSidebar` aside, and the
-   `.docs-content` / `.docs-content-inner` wrappers.
-2. Replace the `<title>` (convention: `Page Name | FracSTAT Docs`) and the page content.
-3. Register the page in `SIDEBAR_SECTIONS` **and** in `PAGE_ORDER` in `script.js`.
-4. Run `python _check_html.py` and confirm the new page reports `OK`.
-
----
-
-## Validating the HTML
-
-`_check_html.py` walks every `*.html` file in the working directory and reports:
-
-- tags that never close or close out of order (void and inline SVG elements are exempt)
-- duplicate `id` attributes
-- in-page `href="#..."` anchors that resolve to no `id` on that page
-- leftover `[cite: N]` LLM artifacts
-- unescaped bare `&` in prose (skipping `script`, `style`, `code`, `pre`, `textarea`, and comments, where a literal `&` is intended)
-
-```bash
-python _check_html.py
-```
-
-It exits `0` when the corpus is clean and `1` when any file has problems. Current status:
-**29 files checked, 0 with problems.** Run it before every commit that touches HTML.
-
----
-
-## Admin panel (`admin.html`)
-
-A self-contained, in-browser content editor for non-technical maintainers. It makes text
-blocks matching `EDITABLE_SELECTOR` (paragraphs, list items, headings, table cells,
-captions, note/tip boxes, code blocks, tutorial-card fields) editable in place, uploads
-replacement images to Cloudinary, commits changes straight back to the `main` branch via
-the GitHub Git Data API, and can export a full `.zip` backup of the site with JSZip.
-
-Access notes:
-
-- Sign-in is verified by a Google Apps Script endpoint, which returns a short-lived GitHub
-  token held only in `sessionStorage` for the tab's lifetime. No credentials or tokens are
-  stored in this repository.
-- Because the panel commits directly to `main` with no review step, treat it as a
-  privileged tool. Prefer a normal pull request for substantial rewrites, and use
-  `admin.html` for small copy fixes.
-- The page is intentionally excluded from `PAGE_ORDER` and `SIDEBAR_SECTIONS`, so it is
-  unreachable from site navigation.
-
----
-
-## Editing conventions
-
-- **Titles** — `Page Name | FracSTAT Docs` for docs pages.
-- **Anchors** — every `<h2>` that appears in the on-page `.toc-box` needs a matching `id`;
-  `_check_html.py` flags a dangling anchor.
-- **Escaping** — write `&amp;` in prose. A bare `&` is only acceptable inside
-  `code`/`pre`/`script`/`style`.
-- **Images** — host assets on Cloudinary and reference them by absolute URL, matching the
-  existing logo and favicon pattern; `put_your_img_here.png` is the local placeholder for
-  screenshots not yet captured.
-- **Comments** — `script.js` documents *why* non-obvious code exists (mobile scroll
-  restoration, the router's re-initialization requirement). Preserve that when editing.
-- **Accessibility** — decorative artwork carries `aria-hidden="true"`, the preloader uses
-  `role="status"` with `aria-live="polite"`, and toggle buttons update their
-  `aria-label`/`title`. Keep these attributes intact on new markup.
-
----
-
-## Deployment
-
-GitHub Pages serves the `main` branch root directly; pushing to `main` publishes the site.
-`index.html` is the landing page and `introduction.html` is the documentation entry point.
-No build or CI step is involved.
-
 ---
 
 ## Related repositories
@@ -221,21 +146,6 @@ The application requires Python 3.10 or newer and is built on PySide6, matplotli
 pandas, SciPy, PyKrige, powerlaw, OpenCV, Pillow, CairoSVG, svgpathtools, ReportLab,
 python-docx, and openpyxl. See `requirements.txt` in the application repository for the
 pinned floors and the versions each release was verified against.
-
----
-
-## Contributing
-
-Documentation corrections, clarifications, and new tutorial content are welcome.
-
-1. Fork the repository and create a branch.
-2. Make the edit, registering any new page in `script.js` as described above.
-3. Run `python _check_html.py` and confirm a clean report.
-4. Verify the page renders and navigates correctly under `python -m http.server`.
-5. Open a pull request describing the change.
-
-Report factual errors in the documentation or bugs in the site through the
-[issue tracker](https://github.com/sachi5908/FracSTAT_Documentation/issues).
 
 ---
 
