@@ -88,9 +88,6 @@ web server — or GitHub Pages — can serve the directory as-is.
 ├── admin.html                       # Browser-based content editor (auth-gated)
 ├── script.js                        # Site-wide behaviour + navigation source of truth
 ├── style.css                        # Site-wide styles
-├── put_your_img_here.png            # Screenshot placeholder
-├── _check_html.py                   # Dev-only structural validator
-├── _dois.txt                        # DOI list backing introduction.html's reference section
 ├── LICENSE                          # MIT
 └── README.md
 ```
