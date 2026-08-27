@@ -169,7 +169,8 @@
                     fully orthogonal 3D mode, as its own trend and plunge — see below). FracSTAT does not resolve
                     stress directly onto the fracture plane's strike direction; it resolves stress onto the plane's
                     pole, or outward normal, which is built from the corrected strike <em>and the fracture's
-                    dip</em> in an (East, North, Up) basis:
+                    dip</em> in an (East, North, Up) basis
+                    <a class="cite" href="#ref-ragan2009">(Ragan, 2009)</a>:
                 </p>
                 <div class="formula-block">n = ( sin(dip)·sin(strike_N + 90°), sin(dip)·cos(strike_N + 90°), cos(dip) )</div>
                 <p>
@@ -183,8 +184,10 @@
                 <h3 id="4.4">4.4 Resolved Stress</h3>
                 <p>
                     With the normal n defined above, FracSTAT projects each of the three principal stresses onto n
-                    and recombines them into the resolved normal and shear stress. In the default Andersonian mode
-                    (σ₁ and σ₃ horizontal, σ₂ vertical), the three direction cosines are:
+                    and recombines them into the resolved normal and shear stress
+                    <a class="cite" href="#ref-jaeger2007">(Jaeger et al., 2007)</a>. In the default Andersonian mode
+                    (σ₁ and σ₃ horizontal, σ₂ vertical) <a class="cite" href="#ref-anderson1951">(Anderson, 1951)</a>,
+                    the three direction cosines are:
                 </p>
                 <div class="formula-block">
 c₁ = n · σ̂₁   (horizontal component, along the σ₁ azimuth)
@@ -403,6 +406,66 @@ text.configure(state="disabled")</code></pre>
                     <tr><td>Mohr Tab</td><td>Plots total stress (σₙ, τ), effective stress shifted by pore pressure Pᶠ, individual segment points, and the Coulomb failure envelope τ = C₀ + μσₙ′ using exactly the resolved-stress formulas of <a href="#4.4">Section 4.4</a>; Mohr-diagram point numbers correspond directly to each segment's ID in the Table tab. The quantity Δτ = τ − [C₀ + μ(σₙ − Pᶠ)] is positive wherever a segment's Mohr point touches or crosses the failure envelope.</td></tr>
                     <tr><td>Table Tab</td><td>Tabulates the per-segment numeric results (strike_N, α, σₙ, τ, T<sub>s</sub>, T<sub>d</sub>, S<sub>f</sub>, CSF) produced by the same pipeline documented here.</td></tr>
                 </table>
+
+                <!-- ================================================= -->
+                <h2 id="references">8. References</h2>
+                <p>
+                    The formulas reproduced on the Method tab are standard results; the sources below are the ones a
+                    reader should be pointed to when a value taken from this tab is reported. Section 8.1 covers the
+                    stress transformation and the tendency metrics, Section 8.2 the geometric and kinematic
+                    conventions used to build the fracture-plane normal and to interpret rake.
+                </p>
+
+                <h3 id="8.1">8.1 Resolved Stress, Failure and Tendency Metrics</h3>
+                <ul class="ref-list">
+                    <li id="ref-ferrill2003">Ferrill, D. A., &amp; Morris, A. P. (2003). Dilational normal faults. <em>Journal of Structural Geology</em>, 25(2), 183&ndash;196. <a href="https://doi.org/10.1016/S0191-8141(02)00029-9" target="_blank" rel="noopener">https://doi.org/10.1016/S0191-8141(02)00029-9</a></li>
+                    <li id="ref-jaeger2007">Jaeger, J. C., Cook, N. G. W., &amp; Zimmerman, R. W. (2007). <em>Fundamentals of Rock Mechanics</em> (4th ed.). Blackwell Publishing, Oxford. ISBN 978-0-632-05759-7.</li>
+                    <li id="ref-mildren2002">Mildren, S. D., Hillis, R. R., &amp; Kaldi, J. (2002). Calibrating predictions of fault seal reactivation in the Timor Sea. <em>The APPEA Journal</em>, 42(1), 187&ndash;202. <a href="https://doi.org/10.1071/AJ01011" target="_blank" rel="noopener">https://doi.org/10.1071/AJ01011</a></li>
+                    <li id="ref-morris1996">Morris, A., Ferrill, D. A., &amp; Henderson, D. B. (1996). Slip-tendency analysis and fault reactivation. <em>Geology</em>, 24(3), 275&ndash;278. <a href="https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2" target="_blank" rel="noopener">https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2</a></li>
+                    <li id="ref-streit2004">Streit, J. E., &amp; Hillis, R. R. (2004). Estimating fault stability and sustainable fluid pressures for underground storage of CO&#8322; in porous rock. <em>Energy</em>, 29(9&ndash;10), 1445&ndash;1456. <a href="https://doi.org/10.1016/j.energy.2004.03.078" target="_blank" rel="noopener">https://doi.org/10.1016/j.energy.2004.03.078</a></li>
+                    <li id="ref-zoback2007">Zoback, M. D. (2007). <em>Reservoir Geomechanics</em>. Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511586477" target="_blank" rel="noopener">https://doi.org/10.1017/CBO9780511586477</a></li>
+                </ul>
+
+                <h3 id="8.2">8.2 Geometric and Kinematic Conventions</h3>
+                <ul class="ref-list">
+                    <li id="ref-aki1980">Aki, K., &amp; Richards, P. G. (1980). <em>Quantitative Seismology: Theory and Methods</em> (Vol. 1), &sect;4.2. W. H. Freeman, San Francisco.</li>
+                    <li id="ref-anderson1951">Anderson, E. M. (1951). <em>The Dynamics of Faulting and Dyke Formation with Applications to Britain</em> (2nd ed.). Oliver and Boyd, Edinburgh.</li>
+                    <li id="ref-bott1959">Bott, M. H. P. (1959). The mechanics of oblique slip faulting. <em>Geological Magazine</em>, 96(2), 109&ndash;117. <a href="https://doi.org/10.1017/S0016756800059987" target="_blank" rel="noopener">https://doi.org/10.1017/S0016756800059987</a></li>
+                    <li id="ref-ragan2009">Ragan, D. M. (2009). <em>Structural Geology: An Introduction to Geometrical Techniques</em> (4th ed.). Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511816109" target="_blank" rel="noopener">https://doi.org/10.1017/CBO9780511816109</a></li>
+                    <li id="ref-wallace1951">Wallace, R. E. (1951). Geometry of shearing stress and relation to faulting. <em>The Journal of Geology</em>, 59(2), 118&ndash;130. <a href="https://doi.org/10.1086/625831" target="_blank" rel="noopener">https://doi.org/10.1086/625831</a></li>
+                </ul>
+
+                <div class="cite-box">
+                    <p><strong>Methods statement for the Method tab.</strong> The Method tab produces no figure of its
+                    own, so what follows is the statement to use when any stress-resolution result obtained anywhere in
+                    the Dynamic Analyzer is reported &mdash; it records the conventions this tab documents:</p>
+                    <p>Fracture-plane poles were constructed from strike and dip in an (East, North, Up) basis
+                    <a class="cite" href="#ref-ragan2009">(Ragan, 2009)</a>, with strike corrected to true north by the
+                    stated image Y-axis azimuth. Normal and shear stress were resolved on each pole by full
+                    three-dimensional transformation of the principal-stress tensor
+                    <a class="cite" href="#ref-jaeger2007">(Jaeger et al., 2007)</a>, so both components depend on dip
+                    and on all three principal magnitudes. State which principal stress was taken as vertical: the
+                    Andersonian regime is an explicit parameter <a class="cite" href="#ref-anderson1951">(Anderson,
+                    1951)</a> and defaults to S<sub>v</sub> = &sigma;&#8322; (strike-slip) here, whereas the
+                    Uncertainty Analyzer defaults to S<sub>v</sub> = &sigma;&#8323;; slip tendency computed under the
+                    wrong regime can differ by more than a factor of two. Report &sigma;&#8321;, &sigma;&#8322;,
+                    &sigma;&#8323;, the &sigma;&#8321; azimuth, P<sub>f</sub>, C&#8320; and &mu; in the working stress
+                    unit. Tendency metrics follow the standard definitions: slip tendency T<sub>s</sub> = &tau;/&sigma;&#8345;
+                    <a class="cite" href="#ref-morris1996">(Morris et al., 1996)</a>, dilation tendency
+                    <a class="cite" href="#ref-ferrill2003">(Ferrill and Morris, 2003)</a>, and the fracture stability
+                    margin S<sub>f</sub>, read as the additional pore-pressure increase a plane can sustain before the
+                    effective-stress Coulomb envelope is reached
+                    <a class="cite" href="#ref-mildren2002">(Mildren et al., 2002;</a>
+                    <a class="cite" href="#ref-streit2004">Streit and Hillis, 2004)</a>. Note that T<sub>s,norm</sub>
+                    is normalised by the theoretical maximum (&sigma;&#8321; &minus; &sigma;&#8323;)/(2&radic;(&sigma;&#8321;&sigma;&#8323;))
+                    rather than by the loaded maximum, and that S<sub>f,norm</sub> is dataset-relative and inverted, so
+                    it must not be compared between datasets
+                    <a class="cite" href="#ref-zoback2007">(Zoback, 2007)</a>. In focal-mechanism mode, rake misfit is
+                    computed against the Wallace&ndash;Bott prediction that slip parallels the resolved shear stress
+                    <a class="cite" href="#ref-wallace1951">(Wallace, 1951;</a>
+                    <a class="cite" href="#ref-bott1959">Bott, 1959)</a>, with input and predicted rake both in the
+                    <a class="cite" href="#ref-aki1980">Aki and Richards (1980)</a> convention.</p>
+                </div>
 
                 <!-- Pagination Navigation -->
                 <div class="pagination-nav"></div>
