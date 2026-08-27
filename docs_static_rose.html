@@ -63,6 +63,7 @@
                         <li><a href="#performance">10. Performance Optimization</a></li>
                         <li><a href="#advanced">11. Advanced Features</a></li>
                         <li><a href="#limitations">12. Limitations</a></li>
+                        <li><a href="#references">13. References</a></li>
                     </ul>
                 </div>
 
@@ -223,7 +224,9 @@
                 <h3 id="4.1">4.1 Axial (Bidirectional) Orientation Data</h3>
                 <p>
                     Fracture strike is an axial quantity: a fracture trending 040° is geometrically identical to
-                    one trending 220°, since both describe the same line in the horizontal plane. The Rose Plot
+                    one trending 220°, since both describe the same line in the horizontal plane. Axial data of
+                    this kind are 180°-periodic and cannot be treated with ordinary linear statistics
+                    <a class="cite" href="#ref-mardia2000">(Mardia and Jupp, 2000)</a>. The Rose Plot
                     module respects this by folding every strike value into the half-open interval [0°, 180°) prior
                     to any statistical operation:
                 </p>
@@ -243,6 +246,10 @@ w_i = 1      (Weight petals by = "Count")</div>
                     where <em>L<sub>i</sub></em> is the segment's real-world length (<code>Length_m</code>). When
                     length weighting is requested but <code>Length_m</code> is missing, non-finite, or non-positive
                     for a given row, a fallback weight of 1.0 is substituted for that row rather than discarding it.
+                    Length weighting is the recommended default for fracture-trace data, because an unweighted count
+                    of traces gives equal influence to a metre-scale joint and to a basin-scale fault and therefore
+                    describes the sampling process at least as much as the fracture fabric itself
+                    <a class="cite" href="#ref-sanderson2020">(Sanderson and Peacock, 2020)</a>.
                 </p>
 
                 <h3 id="4.3">4.3 Histogram Binning</h3>
@@ -252,10 +259,19 @@ w_i = 1      (Weight petals by = "Count")</div>
                 </p>
                 <div class="formula-block">
 e_k = k · (180° / B),    k = 0, 1, …, B</div>
-                <p>Each observation's folded strike is assigned to exactly one bin via NumPy's weighted histogram, producing bin totals and midpoints:</p>
+                <p>Each observation's folded strike is assigned to exactly one bin via NumPy's weighted histogram <a class="cite" href="#ref-harris2020">(Harris et al., 2020)</a>, producing bin totals and midpoints:</p>
                 <div class="formula-block">
-V_k = Σ_{i : e_k ≤ strike_i < e_{k+1}} w_i
+V_k = Σ_{i : e_k ≤ strike_i &lt; e_{k+1}} w_i
 m_k = (e_k + e_{k+1}) / 2</div>
+                <p>
+                    The class interval is a genuinely free parameter of the method rather than a cosmetic setting:
+                    too few bins smooth out real modes, while too many produce spurious spikes that reflect
+                    sampling noise <a class="cite" href="#ref-wells2000">(Wells, 2000)</a>. The 10°
+                    interval implied by the default <em>B</em>&nbsp;=&nbsp;18 follows long-standing practice for
+                    two-dimensional geological orientation data
+                    <a class="cite" href="#ref-curray1956">(Curray, 1956)</a>, but it is
+                    advisable to inspect two or three bin counts before selecting the figure to publish.
+                </p>
 
                 <h3 id="4.4">4.4 Equal-Area (Square-Root) Radius Transform</h3>
                 <p>
@@ -269,7 +285,14 @@ r_k = √V_k</div>
                 <p>
                     This equal-area convention prevents bins with high raw frequency from visually dominating the
                     diagram disproportionately, and ensures that comparisons of petal area between diagrams are
-                    quantitatively meaningful.
+                    quantitatively meaningful. The argument for the square-root radius was set out explicitly by
+                    <a class="cite" href="#ref-nemec1988">Nemec (1988)</a>, who showed that a
+                    linear-radius rose exaggerates the dominant class because the reader's eye integrates sector
+                    area rather than sector radius; the same conclusion is reached from a perceptual standpoint by
+                    <a class="cite" href="#ref-wells2000">Wells (2000)</a> and is recommended as
+                    standard practice by <a class="cite" href="#ref-sanderson2020">Sanderson and
+                    Peacock (2020)</a>. FracSTAT applies the transform unconditionally, in both plot modes, so no
+                    combination of settings can produce a linear-radius (area-distorting) rose.
                 </p>
 
                 <h3 id="4.5">4.5 Full-Circle Mirroring</h3>
@@ -282,8 +305,14 @@ r_k = √V_k</div>
                 <div class="formula-block">
 θ_full = { m_k } ∪ { m_k + 180° },     r_full = { r_k } ∪ { r_k }</div>
                 <p>
-                    This produces a visually symmetric diagram about the origin, matching the universal convention
-                    for axial rose diagrams in the structural-geology literature.
+                    This produces a visually symmetric diagram about the origin, matching the long-established
+                    convention for axial rose diagrams in the structural-geology literature
+                    <a class="cite" href="#ref-curray1956">(Curray, 1956)</a>. Note that the
+                    mirrored half contains no information that is not already in the first half; it is a display
+                    convention, and the choice between the full circle and the half rose of
+                    <a href="#3.2">Section 3.2</a> is therefore purely presentational (see the discussion of
+                    rose-diagram conventions in
+                    <a class="cite" href="#ref-sanderson2020">Sanderson and Peacock, 2020</a>).
                 </p>
 
                 <h3 id="4.6">4.6 Colour Mapping (FracSTAT Mode)</h3>
@@ -298,6 +327,18 @@ c_k = Colormap( m_k / 180° ),     Norm: [0°, 180°] → [0, 1]</div>
                     ensures the same azimuth is always rendered in the same colour across different datasets and
                     sessions — important when visually comparing rose diagrams from multiple outcrops or wells.
                 </p>
+                <div class="note-box">
+                    <strong>Choice of colormap.</strong> The colour here encodes an <em>angle</em>, which is a
+                    cyclic quantity, so a cyclic scale (HSV, Twilight, Rainbow&nbsp;(cyclic)) avoids the artificial
+                    discontinuity that a sequential scale introduces between 0° and 180°. Conversely, the classic
+                    non-uniform rainbow scales (Jet in particular) are known to create perceptual boundaries where
+                    none exist in the data and to fail for readers with colour-vision deficiency
+                    <a class="cite" href="#ref-borland2007">(Borland and Taylor, 2007;</a>
+                    <a class="cite" href="#ref-crameri2020">Crameri et al., 2020)</a>. The default
+                    Viridis and the Cividis option are perceptually uniform and colour-vision-deficiency safe
+                    <a class="cite" href="#ref-crameri2020">(Crameri et al., 2020)</a>, and are the
+                    recommended choices for figures intended for publication.
+                </div>
 
                 <h3 id="4.7">4.7 Percentage Reference Circles</h3>
                 <p>When enabled, three dashed reference circles are drawn at radii that are simple fractions of the maximum plotted radius <em>r<sub>max</sub></em>:</p>
@@ -313,7 +354,12 @@ Percentage_k = round( 100 · (k/3)² )</div>
                 <p>
                     The three default circles are therefore labelled approximately 11%, 44%, and 100% of the peak
                     weighted bin value, giving a calibrated visual scale for judging petal size without reading
-                    exact numbers from an axis.
+                    exact numbers from an axis. Providing such a scale addresses a specific and frequently made
+                    criticism of published rose diagrams — that they are drawn without any indication of the
+                    magnitude the petals represent, and so cannot be read quantitatively
+                    <a class="cite" href="#ref-sanderson2020">(Sanderson and Peacock, 2020)</a>.
+                    Enabling this option, and reporting <em>n</em> in the title, is recommended for any rose
+                    diagram intended for publication.
                 </p>
 
                 <!-- ================================================= -->
@@ -415,8 +461,15 @@ Percentage_k = round( 100 · (k/3)² )</div>
                     Ordinary arithmetic averaging is invalid for orientation data because of wrap-around
                     discontinuities — for example, the arithmetic mean of 179° and 1° is 90°, which is
                     geometrically nonsensical for near-parallel fractures straddling the 0°/180° boundary.
-                    FracSTAT instead uses the doubled-angle circular-statistics method, implemented in
-                    <code>_static_axial_mean(strikes, weights)</code>:
+                    The correct treatment is to average the observations as unit vectors and take the direction of
+                    the resultant <a class="cite" href="#ref-fisher1993">(Fisher, 1993)</a>. For
+                    axial (180°-periodic) data such as strike, the standard device is to double each angle before
+                    forming the resultant and halve the result afterwards — the doubling transform of
+                    <a class="cite" href="#ref-mardia2000">Mardia and Jupp (2000, §2.3.2)</a>,
+                    introduced for two-dimensional geological orientation data by
+                    <a class="cite" href="#ref-krumbein1939">Krumbein (1939)</a> and
+                    <a class="cite" href="#ref-curray1956">Curray (1956)</a>. FracSTAT implements
+                    exactly this in <code>_static_axial_mean(strikes, weights)</code>:
                 </p>
                 <div class="formula-block">
 S = Σ w_i · sin(2 · strike_i)
@@ -428,8 +481,21 @@ strike_mean = ½ · atan2(S, C)  (mod 180°)</div>
                     circular domain, where conventional vector-resultant averaging is valid; halving the resultant
                     direction maps the answer back onto the physically meaningful 0°–180° range. The mean is
                     always computed from the raw, unbinned observations — not the discretised histogram — so its
-                    value is independent of the chosen Number of bins.
+                    value is independent of the chosen Number of bins. The same weights
+                    <em>w<sub>i</sub></em> defined in <a href="#4.2">Section 4.2</a> are used, so the reported mean
+                    is a length-weighted mean whenever length weighting is active.
                 </p>
+                <div class="note-box">
+                    <strong>Interpret the mean strike only for unimodal data.</strong> A resultant direction is a
+                    meaningful summary of a single preferred orientation. For a bimodal fabric — a conjugate set,
+                    for instance — the resultant falls between the two modes, at an azimuth along which few or no
+                    fractures actually trend <a class="cite" href="#ref-mardia2000">(Mardia and
+                    Jupp, 2000)</a>. FracSTAT reports the mean unconditionally and does not test for uniformity or
+                    for multimodality, so the diagram itself must be inspected before the value is quoted. Formal
+                    tests of preferred orientation for axial data are described by
+                    <a class="cite" href="#ref-mardia2000">Mardia and Jupp (2000, ch. 6)</a> and
+                    <a class="cite" href="#ref-fisher1993">Fisher (1993, ch. 4)</a>.
+                </div>
 
                 <h3 id="6.2">6.2 Dominant Bin</h3>
                 <p>
@@ -437,7 +503,14 @@ strike_mean = ½ · atan2(S, C)  (mod 180°)</div>
                     carries the largest weighted total: <code>argmax_k(V_k)</code>. Unlike the axial mean, this
                     statistic is sensitive to the chosen bin count and edge alignment, and should be interpreted
                     as a discretised estimate of the peak of the underlying orientation distribution rather than
-                    an exact value.
+                    an exact value. Its resolution is bounded below by the class interval itself, 180°/<em>B</em>
+                    — 10° at the default setting — and for a peak that straddles a bin boundary the reported value
+                    can jump by one full interval in response to a change of a single bin
+                    <a class="cite" href="#ref-wells2000">(Wells, 2000)</a>. Where a
+                    bin-independent estimate of the modal orientation is required, a kernel-density or
+                    parametric-distribution approach on the unbinned angles is appropriate
+                    <a class="cite" href="#ref-fisher1993">(Fisher, 1993, §2.4)</a>; neither is
+                    implemented in this tab.
                 </p>
 
                 <h3 id="6.3">6.3 Summary of Reported Statistics</h3>
@@ -448,6 +521,21 @@ strike_mean = ½ · atan2(S, C)  (mod 180°)</div>
                     <tr><td>Dominant Bin</td><td>argmax of weighted histogram</td><td>Yes</td><td>Yes</td></tr>
                     <tr><td>Total Length</td><td>Σ Length_m over all segments</td><td>No</td><td>No</td></tr>
                 </table>
+                <p>
+                    Total Length is computed over every row of the results table, including rows whose strike was
+                    discarded as non-finite, so it reports the total mapped trace length of the dataset rather than
+                    the sum of the plotted weights. It is therefore not equal to Σ<em>V<sub>k</sub></em> in general,
+                    and does not change with the weighting mode.
+                </p>
+                <div class="note-box">
+                    <strong>No dispersion statistic is reported.</strong> The Statistics card gives no measure of
+                    how tightly the fractures cluster about the mean strike — no circular standard deviation, and no
+                    normalised resultant length <em>R</em>. A mean strike derived from a near-uniform fabric is
+                    presented in exactly the same way as one from a tightly clustered set. Standard circular
+                    dispersion measures appropriate for axial data are given by
+                    <a class="cite" href="#ref-fisher1993">Fisher (1993, §2.3.1)</a> and
+                    <a class="cite" href="#ref-mardia2000">Mardia and Jupp (2000, §2.3.4)</a>.
+                </div>
 
                 <!-- ================================================= -->
                 <h2 id="visualization">7. Visualization &amp; Figure Components</h2>
@@ -537,15 +625,28 @@ strike_mean = ½ · atan2(S, C)  (mod 180°)</div>
                     regardless of length; Length weighting emphasises the orientations carrying the greatest total
                     trace length. Running both modes and comparing the resulting Dominant Bin and Mean Strike
                     values is a standard diagnostic for distinguishing "many small" versus "few large" fracture
-                    populations — a meaningful distinction for flow-model permeability anisotropy inputs.
+                    populations — a meaningful distinction for flow-model permeability anisotropy inputs
+                    <a class="cite" href="#ref-odling1997">(Odling, 1997)</a>. Because fracture
+                    length distributions in rock are typically heavy-tailed, often approximately power-law
+                    <a class="cite" href="#ref-bonnet2001">(Bonnet et al., 2001)</a>, a small
+                    number of long traces can carry a large fraction of the total length, and the two weighting
+                    modes can legitimately identify different dominant sets in the same dataset.
                 </p>
 
                 <h3 id="8.3">8.3 Example 3 — Publication-Quality Figure Preparation</h3>
+                <p>
+                    The steps below assemble a figure that carries the information a reader needs in order to
+                    interpret it — sample size, class interval, weighting mode, and a magnitude scale — which is
+                    what distinguishes a usable rose diagram from a decorative one
+                    <a class="cite" href="#ref-sanderson2020">(Sanderson and Peacock, 2020;</a>
+                    <a class="cite" href="#ref-rougier2014">Rougier et al., 2014)</a>.
+                </p>
                 <ol class="step-list">
-                    <li>Set <strong>Colorbar position</strong> to "Bottom" and choose a colour-blind-friendly colormap such as Viridis or Cividis.</li>
+                    <li>Set <strong>Colorbar position</strong> to "Bottom" and choose a colour-blind-friendly colormap such as Viridis or Cividis (see <a href="#4.6">Section 4.6</a>).</li>
                     <li>Disable <strong>Show grid lines</strong> for a cleaner appearance, but enable <strong>Show cardinal labels</strong> and <strong>Show % reference circles</strong> for quantitative legibility.</li>
-                    <li>Enter a descriptive <strong>Custom title</strong> (e.g., "Joint set orientations, Outcrop A, n = 214").</li>
+                    <li>Enter a descriptive <strong>Custom title</strong> (e.g., "Joint set orientations, Outcrop A, n = 214"). Note that a custom title replaces the automatic one, which is where <em>n</em> would otherwise appear — so include <em>n</em> in the text you type.</li>
                     <li>Increase <strong>Border Width</strong> slightly (e.g., to 1.4) for improved visibility at reduced print size.</li>
+                    <li>State the bin count and the weighting mode in the figure caption; neither is rendered on the plot itself.</li>
                     <li>Click <strong>Save Image</strong> to export a high-resolution PNG to the project's plot-exports folder.</li>
                 </ol>
 
@@ -570,19 +671,33 @@ strike_mean = ½ · atan2(S, C)  (mod 180°)</div>
                     uniaxial extension direction or systematic joints related to a single tectonic episode. Two
                     petals separated by an acute angle (commonly 40°–70°) are the classic signature of a conjugate
                     shear-fracture pair, and their angular bisector approximates the orientation of the maximum
-                    principal compressive stress (σ₁) at the time of formation, following the Andersonian/Coulomb
-                    faulting framework used in FracSTAT's Dynamic Analyzer. Multiple broadly distributed petals of
-                    comparable magnitude suggest a polymodal or polyphase fracture history.
+                    principal compressive stress (σ₁) at the time of formation
+                    <a class="cite" href="#ref-anderson1951">(Anderson, 1951)</a>, following the
+                    Andersonian/Coulomb faulting framework used in FracSTAT's Dynamic Analyzer. Multiple broadly
+                    distributed petals of comparable magnitude suggest a polymodal or polyphase fracture history.
                 </p>
+                <div class="note-box">
+                    <strong>The conjugate-bisector inference is not unconditional.</strong> It assumes the two sets
+                    are genuinely conjugate — coeval, with opposite senses of shear and a dihedral angle consistent
+                    with the rock's friction angle — rather than two unrelated sets formed in separate episodes.
+                    Coeval and non-coeval sets can be indistinguishable on a rose diagram alone; abutting and
+                    cross-cutting relationships observed in the field or on the trace map are needed to establish
+                    relative age <a class="cite" href="#ref-peacock2016">(Peacock et al., 2016)</a>.
+                    Orientation data alone therefore constrain, but do not determine, the palaeostress
+                    interpretation.
+                </div>
 
                 <h4 id="9.2">9.2 Significance of Length Weighting</h4>
                 <p>
                     Length-weighted rose diagrams better represent the orientation distribution of throughgoing,
                     hydraulically or mechanically significant fractures, since long fractures typically dominate
-                    bulk rock-mass permeability and mechanical anisotropy. Count-based diagrams better represent
-                    the orientation distribution of fracture initiation events and can be more sensitive to
-                    sampling bias toward short, easily digitised features. The two diagrams together provide a
-                    complementary picture of the fracture population.
+                    bulk rock-mass permeability and mechanical anisotropy
+                    <a class="cite" href="#ref-odling1997">(Odling, 1997)</a>. Count-based diagrams
+                    better represent the orientation distribution of fracture initiation events and can be more
+                    sensitive to sampling bias toward short, easily digitised features. The two diagrams together
+                    provide a complementary picture of the fracture population, and reporting both is recommended
+                    practice <a class="cite" href="#ref-sanderson2020">(Sanderson and Peacock,
+                    2020)</a>.
                 </p>
 
                 <h4 id="9.3">9.3 The Mean Strike as a Design Parameter</h4>
@@ -590,22 +705,39 @@ strike_mean = ½ · atan2(S, C)  (mod 180°)</div>
                     The reported Mean Strike is frequently used as an input for downstream engineering workflows —
                     for example, orienting a horizontal wellbore trajectory to intersect the dominant fracture set
                     at a favourable angle for stimulation, or orienting a slope-stability kinematic analysis with
-                    respect to the governing discontinuity set. Because the statistic uses the doubled-angle
-                    axial-mean method, it remains geometrically valid even when the underlying distribution
-                    straddles the 0°/180° boundary — a common pitfall when analysts instead average raw azimuths
-                    arithmetically.
+                    respect to the governing discontinuity set
+                    <a class="cite" href="#ref-priest1993">(Priest, 1993)</a>. Because the statistic
+                    uses the doubled-angle axial-mean method, it remains geometrically valid even when the underlying
+                    distribution straddles the 0°/180° boundary — a common pitfall when analysts instead average raw
+                    azimuths arithmetically <a class="cite" href="#ref-mardia2000">(Mardia and Jupp,
+                    2000)</a>. It remains a summary of a single mode, however, and the caution in
+                    <a href="#6.1">Section 6.1</a> applies before the value is carried into a design calculation.
                 </p>
 
                 <h4 id="9.4">9.4 Caution Regarding Sampling Bias</h4>
                 <p>
                     As with any orientation-frequency analysis derived from a two-dimensional trace map or outcrop
-                    pavement, the rose diagram is subject to the well-documented Terzaghi (1965) sampling-line
-                    bias: fractures oriented sub-parallel to the mapping direction are systematically
-                    under-sampled relative to fractures oriented perpendicular to it. Users should consult the
-                    Static Analyzer's Connectivity and Intensity &amp; Density tabs, and consider the geometry of
-                    the original mapping traverse or outcrop exposure, when assessing whether an apparently
-                    dominant or subordinate petal reflects a genuine geological fabric or a sampling artefact.
+                    pavement, the rose diagram is subject to orientation sampling bias: fractures whose strike is
+                    sub-parallel to a linear exposure, scanline, or window edge are systematically under-sampled
+                    relative to fractures oriented perpendicular to it. The standard correction is the weighting
+                    scheme of <a class="cite" href="#ref-terzaghi1965">Terzaghi (1965)</a>, in which
+                    each observation is weighted by the reciprocal of the sine of the angle between the fracture and
+                    the sampling line or surface; censoring of long traces at the boundaries of a finite window
+                    biases length-weighted diagrams in addition
+                    <a class="cite" href="#ref-priest1981">(Priest and Hudson, 1981;</a>
+                    <a class="cite" href="#ref-mauldon1998">Mauldon, 1998)</a>.
                 </p>
+                <div class="note-box">
+                    <strong>No Terzaghi correction is applied in this tab.</strong> The weights used here are those
+                    of <a href="#4.2">Section 4.2</a> only — trace length or unit count — so the petals report the
+                    <em>sampled</em> orientation distribution, not a bias-corrected estimate of the true fabric.
+                    Where the exposure geometry is strongly anisotropic (a single cliff face, a road cut, a core
+                    scanline), the reported dominant orientation may be an artefact of that geometry. Users should
+                    consult the Static Analyzer's Connectivity and Intensity &amp; Density tabs, and consider the
+                    geometry of the original mapping traverse or outcrop exposure, when assessing whether an
+                    apparently dominant or subordinate petal reflects a genuine geological fabric or a sampling
+                    artefact.
+                </div>
 
                 <!-- ================================================= -->
                 <h2 id="performance">10. Performance Optimization</h2>
@@ -614,9 +746,10 @@ strike_mean = ½ · atan2(S, C)  (mod 180°)</div>
                 <p>
                     All per-observation operations — modulo folding, weight resolution, and the weighted histogram
                     itself — are performed with NumPy array operations (<code>np.histogram</code>, boolean
-                    masking, <code>np.where</code>) rather than per-row Python loops, giving effectively
-                    linear-time performance in the number of fracture segments, which routinely numbers in the
-                    thousands to tens of thousands for digitised trace maps.
+                    masking, <code>np.where</code>) rather than per-row Python loops
+                    <a class="cite" href="#ref-harris2020">(Harris et al., 2020)</a>, giving
+                    effectively linear-time performance in the number of fracture segments, which routinely numbers
+                    in the thousands to tens of thousands for digitised trace maps.
                 </p>
 
                 <h3 id="10.2">10.2 Colormap Resolution Caching</h3>
@@ -651,12 +784,16 @@ strike_mean = ½ · atan2(S, C)  (mod 180°)</div>
 
                 <h3 id="11.1">11.1 Colormap Library</h3>
                 <p>
-                    The Colormap dropdown draws from the same 23-entry, application-wide colour-scale catalogue
+                    The Colormap dropdown draws from the same 25-entry, application-wide colour-scale catalogue
                     used throughout FracSTAT, spanning perceptually uniform scientific colormaps (Viridis, Plasma,
                     Inferno, Magma, Cividis), classic scales (Turbo, Jet, Parula — a bundled MATLAB-style
                     approximation), diverging scales (Coolwarm, Spectral, Red-Yellow-Blue), cyclic scales (HSV,
-                    Twilight) well suited to angular data, and several thematic/sequential scales (Hot, Ocean,
-                    Terrain, Earth, and others).
+                    Twilight, Rainbow&nbsp;(cyclic)) well suited to angular data, and several thematic/sequential
+                    scales (Hot, Ocean, Terrain, Earth, and others). For the reasons set out in
+                    <a href="#4.6">Section 4.6</a>, the perceptually uniform and cyclic families are preferable for
+                    quantitative figures, and the classic non-uniform rainbow scales are best reserved for
+                    exploratory work <a class="cite" href="#ref-crameri2020">(Crameri et al.,
+                    2020)</a>.
                 </p>
 
                 <h3 id="11.2">11.2 Half-Circle vs Full-Circle Presentation</h3>
@@ -690,17 +827,84 @@ strike_mean = ½ · atan2(S, C)  (mod 180°)</div>
                     workspace (<code>dynamic_rose_tab.py</code>). That implementation supports colouring petals by
                     a resolved stress attribute (slip tendency, dilation tendency, fracture susceptibility, or
                     critical-stress state) rather than by strike itself, and additionally supports overlaying the
-                    σ₁ azimuth as a reference line. The two modules share the equal-area square-root radius
-                    convention and the general polar-histogram construction, but the Static Rose tab documented
-                    here performs no stress resolution and requires no stress-tensor input.
+                    σ₁ azimuth as a reference line. Those attributes derive from resolving a stress tensor onto each
+                    fracture plane, in the slip- and dilation-tendency framework of
+                    <a class="cite" href="#ref-morris1996">Morris et al. (1996)</a> and
+                    <a class="cite" href="#ref-ferrill1999">Ferrill et al. (1999)</a>. The two
+                    modules share the equal-area square-root radius convention and the general polar-histogram
+                    construction, but the Static Rose tab documented here performs no stress resolution and requires
+                    no stress-tensor input.
                 </p>
 
                 <!-- ================================================= -->
                 <h2 id="limitations">12. Limitations</h2>
                 <table>
                     <tr><th>Limitation</th><th>Description</th></tr>
-                    <tr><td>Dominant bin sensitivity</td><td>The Dominant Bin statistic is a discretised estimate dependent on the chosen Number of bins and on the fixed bin-edge alignment starting at 0°. It is not a continuous-distribution mode estimate (e.g. from kernel density estimation) and can shift between adjacent bins for small changes in bin count on noisy or sparse datasets.</td></tr>
+                    <tr><td>Dominant bin sensitivity</td><td>The Dominant Bin statistic is a discretised estimate dependent on the chosen Number of bins and on the fixed bin-edge alignment starting at 0°. It is not a continuous-distribution mode estimate (e.g. from kernel density estimation) and can shift between adjacent bins for small changes in bin count on noisy or sparse datasets <a class="cite" href="#ref-wells2000">(Wells, 2000)</a>.</td></tr>
+                    <tr><td>No orientation-bias correction</td><td>Petal magnitudes are raw sampled totals. The Terzaghi (1965) weighting for fractures sub-parallel to the exposure or scanline, and length-bias corrections for traces censored at a window boundary, are not applied <a class="cite" href="#ref-terzaghi1965">(Terzaghi, 1965;</a> <a class="cite" href="#ref-priest1981">Priest and Hudson, 1981)</a>. See <a href="#9.4">Section 9.4</a>.</td></tr>
+                    <tr><td>No dispersion or significance measure</td><td>No circular standard deviation, resultant length, confidence interval on the mean strike, or test against a uniform distribution is computed, so the diagram cannot indicate whether an apparent preferred orientation is statistically distinguishable from a random fabric <a class="cite" href="#ref-mardia2000">(Mardia and Jupp, 2000, ch. 6)</a>.</td></tr>
+                    <tr><td>Mean strike assumes unimodality</td><td>A single resultant direction is reported regardless of the shape of the distribution; for bimodal or polymodal fabrics it falls between the modes and is not physically meaningful (<a href="#6.1">Section 6.1</a>).</td></tr>
+                    <tr><td>Fixed bin origin</td><td>Bin edges always begin at exactly 0°. A mode centred on a bin boundary is split between two adjacent petals, and there is no option to offset the bin origin to test the stability of the apparent modes.</td></tr>
+                    <tr><td>Two-dimensional projection only</td><td>Only strike is used; dip is ignored entirely. Two fracture sets with identical strike but very different dip are indistinguishable on this diagram, and a rose diagram of strike alone cannot represent a three-dimensional fracture fabric. Use the Stereonet tab for full orientation analysis <a class="cite" href="#ref-priest1993">(Priest, 1993)</a>.</td></tr>
+                    <tr><td>Segment-level, not fracture-level</td><td>The histogram is built from the segments present in the results table. Where a single curved or polyline fracture trace is stored as multiple segments, it contributes multiple observations, so count weighting reflects segmentation of the digitised geometry as much as the number of fractures. Length weighting is largely insensitive to this.</td></tr>
+                    <tr><td>Silent fallback weights</td><td>Rows with missing, non-finite, or non-positive <code>Length_m</code> receive a fallback weight of 1.0 under length weighting rather than being excluded, and no warning is shown. On a dataset with many incomplete length values, the diagram is a silent hybrid of length and count weighting.</td></tr>
                 </table>
+
+                <!-- ================================================= -->
+                <h2 id="references">13. References</h2>
+                <p>
+                    Sources are listed alphabetically. In-text citations throughout this page link to the
+                    corresponding entry below; the reference list is self-contained, so this page can be cited or
+                    printed independently of the rest of the documentation.
+                </p>
+
+                <h3 id="13.1">13.1 Rose Diagrams and Orientation Statistics</h3>
+                <ul class="ref-list">
+                    <li id="ref-curray1956">Curray, J. R. (1956). The analysis of two-dimensional orientation data. <em>The Journal of Geology</em>, 64(2), 117–131. <a href="https://doi.org/10.1086/626329" target="_blank" rel="noopener">https://doi.org/10.1086/626329</a></li>
+                    <li id="ref-fisher1993">Fisher, N. I. (1993). <em>Statistical Analysis of Circular Data</em>. Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511564345" target="_blank" rel="noopener">https://doi.org/10.1017/CBO9780511564345</a></li>
+                    <li id="ref-krumbein1939">Krumbein, W. C. (1939). Preferred orientation of pebbles in sedimentary deposits. <em>The Journal of Geology</em>, 47(7), 673–706. <a href="https://doi.org/10.1086/624827" target="_blank" rel="noopener">https://doi.org/10.1086/624827</a></li>
+                    <li id="ref-mardia2000">Mardia, K. V., &amp; Jupp, P. E. (2000). <em>Directional Statistics</em>. John Wiley &amp; Sons. <a href="https://doi.org/10.1002/9780470316979" target="_blank" rel="noopener">https://doi.org/10.1002/9780470316979</a></li>
+                    <li id="ref-nemec1988">Nemec, W. (1988). The shape of the rose. <em>Sedimentary Geology</em>, 59(1–2), 149–152. <a href="https://doi.org/10.1016/0037-0738(88)90105-4" target="_blank" rel="noopener">https://doi.org/10.1016/0037-0738(88)90105-4</a></li>
+                    <li id="ref-sanderson2020">Sanderson, D. J., &amp; Peacock, D. C. P. (2020). Making rose diagrams fit-for-purpose. <em>Earth-Science Reviews</em>, 201, 103055. <a href="https://doi.org/10.1016/j.earscirev.2019.103055" target="_blank" rel="noopener">https://doi.org/10.1016/j.earscirev.2019.103055</a></li>
+                    <li id="ref-wells2000">Wells, N. A. (2000). Are there better alternatives to standard rose diagrams? <em>Journal of Sedimentary Research</em>, 70(1), 37–46. <a href="https://doi.org/10.1306/2DC408FC-0E47-11D7-8643000102C1865D" target="_blank" rel="noopener">https://doi.org/10.1306/2DC408FC-0E47-11D7-8643000102C1865D</a></li>
+                </ul>
+
+                <h3 id="13.2">13.2 Fracture Sampling, Geometry, and Interpretation</h3>
+                <ul class="ref-list">
+                    <li id="ref-anderson1951">Anderson, E. M. (1951). <em>The Dynamics of Faulting and Dyke Formation with Applications to Britain</em> (2nd ed.). Oliver and Boyd, Edinburgh.</li>
+                    <li id="ref-bonnet2001">Bonnet, E., Bour, O., Odling, N. E., Davy, P., Main, I., Cowie, P., &amp; Berkowitz, B. (2001). Scaling of fracture systems in geological media. <em>Reviews of Geophysics</em>, 39(3), 347–383. <a href="https://doi.org/10.1029/1999RG000074" target="_blank" rel="noopener">https://doi.org/10.1029/1999RG000074</a></li>
+                    <li id="ref-ferrill1999">Ferrill, D. A., Winterle, J., Wittmeyer, G., Sims, D., Colton, S., Armstrong, A., &amp; Morris, A. P. (1999). Stressed rock strains groundwater at Yucca Mountain, Nevada. <em>GSA Today</em>, 9(5), 1–8.</li>
+                    <li id="ref-mauldon1998">Mauldon, M. (1998). Estimating mean fracture trace length and density from observations in convex windows. <em>Rock Mechanics and Rock Engineering</em>, 31(4), 201–216. <a href="https://doi.org/10.1007/s006030050021" target="_blank" rel="noopener">https://doi.org/10.1007/s006030050021</a></li>
+                    <li id="ref-morris1996">Morris, A., Ferrill, D. A., &amp; Henderson, D. B. (1996). Slip-tendency analysis and fault reactivation. <em>Geology</em>, 24(3), 275–278. <a href="https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2" target="_blank" rel="noopener">https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2</a></li>
+                    <li id="ref-odling1997">Odling, N. E. (1997). Scaling and connectivity of joint systems in sandstones from western Norway. <em>Journal of Structural Geology</em>, 19(10), 1257–1271. <a href="https://doi.org/10.1016/S0191-8141(97)00041-2" target="_blank" rel="noopener">https://doi.org/10.1016/S0191-8141(97)00041-2</a></li>
+                    <li id="ref-peacock2016">Peacock, D. C. P., Nixon, C. W., Rotevatn, A., Sanderson, D. J., &amp; Zuluaga, L. F. (2016). Glossary of fault and other fracture networks. <em>Journal of Structural Geology</em>, 92, 12–29. <a href="https://doi.org/10.1016/j.jsg.2016.09.008" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2016.09.008</a></li>
+                    <li id="ref-priest1993">Priest, S. D. (1993). <em>Discontinuity Analysis for Rock Engineering</em>. Chapman &amp; Hall, London. <a href="https://doi.org/10.1007/978-94-011-1498-1" target="_blank" rel="noopener">https://doi.org/10.1007/978-94-011-1498-1</a></li>
+                    <li id="ref-priest1981">Priest, S. D., &amp; Hudson, J. A. (1981). Estimation of discontinuity spacing and trace length using scanline surveys. <em>International Journal of Rock Mechanics and Mining Sciences &amp; Geomechanics Abstracts</em>, 18(3), 183–197. <a href="https://doi.org/10.1016/0148-9062(81)90973-6" target="_blank" rel="noopener">https://doi.org/10.1016/0148-9062(81)90973-6</a></li>
+                    <li id="ref-terzaghi1965">Terzaghi, R. D. (1965). Sources of error in joint surveys. <em>Géotechnique</em>, 15(3), 287–304. <a href="https://doi.org/10.1680/geot.1965.15.3.287" target="_blank" rel="noopener">https://doi.org/10.1680/geot.1965.15.3.287</a></li>
+                </ul>
+
+                <h3 id="13.3">13.3 Scientific Visualization and Software</h3>
+                <ul class="ref-list">
+                    <li id="ref-borland2007">Borland, D., &amp; Taylor, R. M. (2007). Rainbow color map (still) considered harmful. <em>IEEE Computer Graphics and Applications</em>, 27(2), 14–17. <a href="https://doi.org/10.1109/MCG.2007.323435" target="_blank" rel="noopener">https://doi.org/10.1109/MCG.2007.323435</a></li>
+                    <li id="ref-crameri2020">Crameri, F., Shephard, G. E., &amp; Heron, P. J. (2020). The misuse of colour in science communication. <em>Nature Communications</em>, 11, 5444. <a href="https://doi.org/10.1038/s41467-020-19160-7" target="_blank" rel="noopener">https://doi.org/10.1038/s41467-020-19160-7</a></li>
+                    <li id="ref-harris2020">Harris, C. R., Millman, K. J., van der Walt, S. J., Gommers, R., Virtanen, P., Cournapeau, D., … Oliphant, T. E. (2020). Array programming with NumPy. <em>Nature</em>, 585(7825), 357–362. <a href="https://doi.org/10.1038/s41586-020-2649-2" target="_blank" rel="noopener">https://doi.org/10.1038/s41586-020-2649-2</a></li>
+                    <li id="ref-hunter2007">Hunter, J. D. (2007). Matplotlib: A 2D graphics environment. <em>Computing in Science &amp; Engineering</em>, 9(3), 90–95. <a href="https://doi.org/10.1109/MCSE.2007.55" target="_blank" rel="noopener">https://doi.org/10.1109/MCSE.2007.55</a></li>
+                    <li id="ref-rougier2014">Rougier, N. P., Droettboom, M., &amp; Bourne, P. E. (2014). Ten simple rules for better figures. <em>PLoS Computational Biology</em>, 10(9), e1003833. <a href="https://doi.org/10.1371/journal.pcbi.1003833" target="_blank" rel="noopener">https://doi.org/10.1371/journal.pcbi.1003833</a></li>
+                </ul>
+
+                <div class="cite-box">
+                    <p><strong>Methods statement for the Rose Plot tab.</strong> If a figure produced by this tab
+                    appears in a publication, the details below are what a reader needs in order to reproduce it,
+                    and are what the citations above assume:</p>
+                    <p>Equal-area (square-root radius) rose diagram of fracture strike, folded to the 0°–180° axial
+                    domain, computed with <em>B</em> equal-width bins and weighted by trace length (or by count, as
+                    stated), from <em>n</em> observations. Mean strike computed as the doubled-angle weighted
+                    circular mean. Rendered with Matplotlib
+                    <a class="cite" href="#ref-hunter2007">(Hunter, 2007)</a> over NumPy
+                    <a class="cite" href="#ref-harris2020">(Harris et al., 2020)</a>. Report
+                    <em>B</em>, <em>n</em>, and the weighting mode; note that no orientation-bias correction is
+                    applied (<a href="#9.4">Section 9.4</a>).</p>
+                </div>
 
                 <!-- Pagination Navigation -->
                 <div class="pagination-nav"></div>

@@ -253,7 +253,7 @@
                     styling the map does not affect the ternary diagrams and vice versa.
                 </p>
 
-                <h4 id="3.4">3.4.1 Map Settings — Plot Elements</h4>
+                <h4 id="3.4.1">3.4.1 Map Settings — Plot Elements</h4>
                 <table>
                     <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Outer background</td><td>theme background</td><td>Figure-level (canvas) background colour of the spatial map.</td></tr>
@@ -272,7 +272,7 @@
                     <tr><td>Grid line width</td><td>0.6</td><td>Line width (pt) of the map's gridlines when shown.</td></tr>
                 </table>
 
-                <h4 id="3.4">3.4.2 Map Settings — Background Image</h4>
+                <h4 id="3.4.2">3.4.2 Map Settings — Background Image</h4>
                 <table>
                     <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Show real photo behind nodes</td><td>Off</td><td>Enables a calibrated photograph drawn behind the spatial node map (the ternary diagrams do not use a background image). If no image path is yet known, automatically prompts a file browser or reuses an image already calibrated elsewhere in the project.</td></tr>
@@ -280,13 +280,13 @@
                     <tr><td>Image opacity (0–1)</td><td>1.0</td><td>Alpha blending factor applied to the background image via Matplotlib's <code>imshow(alpha=...)</code>.</td></tr>
                 </table>
 
-                <h4 id="3.4">3.4.3 Ternary Settings — Display Options</h4>
+                <h4 id="3.4.3">3.4.3 Ternary Settings — Display Options</h4>
                 <table>
                     <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Ternary plot heading</td><td>blank (automatic)</td><td>Custom title overriding the automatic heading on all five ternary diagrams (dashboard and individual views alike).</td></tr>
                 </table>
 
-                <h4 id="3.4">3.4.4 Ternary Settings — Plot Elements</h4>
+                <h4 id="3.4.4">3.4.4 Ternary Settings — Plot Elements</h4>
                 <table>
                     <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Outer background</td><td>theme background</td><td>Figure-level (canvas) background colour of the ternary diagrams.</td></tr>
@@ -301,7 +301,7 @@
                     <tr><td>Grid line width</td><td>0.6</td><td>Line width (pt) of the ternary gridlines when shown.</td></tr>
                 </table>
 
-                <h4 id="3.4">3.4.5 Ternary Settings — Grid &amp; Axis Controls</h4>
+                <h4 id="3.4.5">3.4.5 Ternary Settings — Grid &amp; Axis Controls</h4>
                 <table>
                     <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Grid interval</td><td>0.2</td><td>Spacing between reference gridlines on the ternary axes — a choice of 0.1, 0.2, or 0.25.</td></tr>
@@ -313,7 +313,7 @@
                     <tr><td>Dashboard vertical gap</td><td>0.10</td><td>Vertical spacing (Matplotlib <code>hspace</code>) between the four subplots of the 2×2 Ternary Dashboard.</td></tr>
                 </table>
 
-                <h4 id="3.4">3.4.6 Ternary Settings — Data &amp; Reference Elements</h4>
+                <h4 id="3.4.6">3.4.6 Ternary Settings — Data &amp; Reference Elements</h4>
                 <table>
                     <tr><th>Control</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Show point coordinates</td><td>Off</td><td>Annotates the observed data point on each ternary diagram with its raw coordinate values.</td></tr>
@@ -327,7 +327,7 @@
                     <tr><td>Show summary box</td><td>On</td><td>Toggles the small annotated text box (e.g. "C_L = 3.12") drawn on the C_L, C_B, and Branch Topology diagrams — see <a href="#3.4">Section 3.4.7</a> for its drag behaviour.</td></tr>
                 </table>
 
-                <h4 id="3.4">3.4.7 Interactive Dragging</h4>
+                <h4 id="3.4.7">3.4.7 Interactive Dragging</h4>
                 <p>
                     When the workspace's "Move Layout Elements" edit mode is enabled, two figure annotations become
                     click-and-draggable so they can be repositioned to avoid overlapping the underlying data:
@@ -342,7 +342,7 @@
                     the drag, so repositioning an annotation never accidentally pans the underlying axes.
                 </p>
 
-                <h4 id="3.4">3.4.8 Reset Defaults</h4>
+                <h4 id="3.4.8">3.4.8 Reset Defaults</h4>
                 <p>
                     Because the Map Settings and Ternary Settings panels are independent, each has its own reset
                     button, and only the button for the panel currently on screen is shown:
@@ -366,9 +366,13 @@
 
                 <h3 id="4.1">4.1 Node Classes</h3>
                 <p>
-                    Following the terminology introduced for fracture network topology (Manzocchi, 2002; Sanderson
-                    &amp; Nixon, 2015), every distinct point where the network terminates or crosses itself is
-                    classified into exactly one of three mutually exclusive categories. The classification is a
+                    Following the terminology introduced for fracture network topology
+                    <a class="cite" href="#ref-manzocchi2002">(Manzocchi, 2002;</a>
+                    <a class="cite" href="#ref-sanderson2015">Sanderson and Nixon, 2015)</a>, every distinct point
+                    where the network terminates or crosses itself is
+                    classified into exactly one of three mutually exclusive categories. The node names used here
+                    follow the standard fracture-network glossary
+                    <a class="cite" href="#ref-peacock2016">(Peacock et al., 2016)</a>. The classification is a
                     property of the <strong>trace</strong>, not of the individual straight segments a polyline
                     happens to be digitised with: only the first point of a trace's first segment and the last point
                     of its last segment are trace tips, and interior polyline vertices are never nodes.
@@ -406,8 +410,9 @@ C̄  = (3·N_Y + 4·N_X) / N_B                  (average connections per branch)
                     theoretical maximum C̄ = 2.
                 </p>
                 <p>
-                    The identity N_B = (N_I + 3·N_Y + 4·N_X) / 2 is the node-degree relation of Sanderson &amp; Nixon
-                    (2015, eq. 5): summing the branch ends meeting at every node counts each branch exactly twice.
+                    The identity N_B = (N_I + 3·N_Y + 4·N_X) / 2 is the node-degree relation of
+                    <a class="cite" href="#ref-sanderson2015">Sanderson and Nixon (2015, eq. 5)</a>:
+                    summing the branch ends meeting at every node counts each branch exactly twice.
                     Because every node contributes an integer number of ends, the sum is always even and N_B is
                     always an integer for a correctly classified network — a non-integer result is a diagnostic that
                     some contact has been given the wrong node class.
@@ -431,9 +436,12 @@ B₂₂ = L_total² / (A · N_B)          (branch-normalised intensity — resul
 P₂₂ = L_total² / (A · N_traces)     (trace-normalised intensity — result.dimensionless_trace_intensity)</div>
                 <p>
                     B₂₂ is the square of the cumulative trace length L_total, divided by the sample area A and
-                    further normalised by the total branch count N_B, following Sanderson &amp; Nixon (2015, eq. 9).
+                    further normalised by the total branch count N_B, following
+                    <a class="cite" href="#ref-sanderson2015">Sanderson and Nixon (2015, eq. 9)</a>.
                     It is a scale-independent measure of overall fracture density that can be compared directly
-                    between outcrops of different sizes. <code>ConnectivityResult</code> also exposes a companion,
+                    between outcrops of different sizes, and belongs to the same P₁₀/P₂₁/P₂₂ family of intensity
+                    measures reviewed by <a class="cite" href="#ref-zhang2000">Zhang and Einstein (2000)</a>.
+                    <code>ConnectivityResult</code> also exposes a companion,
                     trace-normalised measure, P₂₂, computed the same way but dividing by the number of distinct
                     traces (<code>trace_count</code>) instead of the branch count. P₂₂ is available on the result
                     object for programmatic use but is not currently surfaced as a sidebar statistic in the
@@ -517,7 +525,8 @@ p_II = (1 − p_C)²        p_CC = p_C²        p_IC = 2·p_C·(1 − p_C)</div>
                     The locus is plotted as a smooth blue curve with tick marks at C_B = 0.0, 0.5, 1.0, 1.5, 2.0,
                     giving the analyst an immediate visual reference for how far the observed network departs from a
                     purely random connectivity structure. Real fracture networks are typically displaced toward the
-                    C-C corner relative to this random-model curve.
+                    C-C corner relative to this random-model curve
+                    <a class="cite" href="#ref-sanderson2018">(Sanderson and Nixon, 2018)</a>.
                 </p>
 
                 <!-- ================================================= -->
@@ -832,7 +841,13 @@ where ε = 1×10⁻¹⁰.</div>
                 <p>
                     The principal sources of uncertainty are (a) digitisation error in the original trace map, (b)
                     sensitivity to the chosen snap tolerance, and (c) truncation/censoring at the edges of the
-                    mapped domain.
+                    mapped domain. None of the three is propagated into a reported confidence interval, so the
+                    recommended practice is a sensitivity sweep: recompute the node census at two or three snap
+                    tolerances and report the spread. The same node-counting definitions are implemented in the
+                    established open fracture-network toolboxes
+                    <a class="cite" href="#ref-healy2017">(Healy et al., 2017;</a>
+                    <a class="cite" href="#ref-nyberg2018">Nyberg et al., 2018)</a>, so counts from this tab are
+                    directly comparable with theirs provided the tolerance and window are matched.
                 </p>
 
                 <!-- ================================================= -->
@@ -1011,10 +1026,14 @@ C_B = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82         (identical to C̄ by constr
                 <p>
                     Fracture connectivity, not fracture density alone, is frequently the controlling factor in
                     whether a naturally fractured reservoir, aquifer, or rock mass behaves as an effective flow or
-                    mechanical system. Two intervals with identical fracture intensity (P10, P21, or B₂₂) can have
+                    mechanical system <a class="cite" href="#ref-nrc1996">(National Research Council, 1996)</a>. Two
+                    intervals with identical fracture intensity (P10, P21, or B₂₂) can have
                     dramatically different bulk permeability if one is dominated by isolated fractures (high
                     I-node fraction, low CF) while the other forms an interconnected lattice (high X/Y-node
-                    fraction, high CF).
+                    fraction, high CF) — the classic result that effective permeability rises steeply with the
+                    degree of interconnection rather than with fracture abundance
+                    <a class="cite" href="#ref-long1985">(Long and Witherspoon, 1985;</a>
+                    <a class="cite" href="#ref-odling1999">Odling et al., 1999)</a>.
                 </p>
 
                 <h4 id="9.2">9.2 Node-Type Ratios and Network Maturity</h4>
@@ -1031,13 +1050,17 @@ C_B = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82         (identical to C̄ by constr
                 <h4 id="9.3">9.3 Percolation and Effective Connectivity Thresholds</h4>
                 <p>
                     The C_L = 3.57 and C_B ≈ 2 reference values on the ternary diagrams derive from
-                    topological/percolation-theory studies of two-dimensional fracture networks (see <a href="#references">Section 13</a>,
-                    References), where networks below the threshold are statistically unlikely to form a fully
+                    topological and percolation-theory studies of two-dimensional fracture networks
+                    <a class="cite" href="#ref-robinson1983">(Robinson, 1983;</a>
+                    <a class="cite" href="#ref-berkowitz1995">Berkowitz, 1995;</a>
+                    <a class="cite" href="#ref-sanderson2018">Sanderson and Nixon, 2018)</a>,
+                    where networks below the threshold are statistically unlikely to form a fully
                     connected percolating cluster spanning the sample domain, while networks above typically do.
                     These are heuristic reference values rather than universal physical constants: the true
                     percolation threshold for any specific network depends on the fracture-length distribution,
                     orientation distribution, and aperture/permeability contrast, quantified separately in other
-                    FracSTAT tabs.
+                    FracSTAT tabs. Spatial correlation between fractures shifts the threshold further still
+                    <a class="cite" href="#ref-manzocchi2002">(Manzocchi, 2002)</a>.
                 </p>
 
                 <h4 id="9.4">9.4 Dead-End Branches (I-C) and Hydraulic Significance</h4>
@@ -1058,7 +1081,11 @@ C_B = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82         (identical to C̄ by constr
                     boundary-I-node exclusion option partially corrects for this effect, but only when a sampling
                     window has been entered — it is the window edge that defines an artificial termination. Analysts
                     should still be cautious when comparing connectivity statistics computed from maps of
-                    substantially different physical size or aspect ratio.
+                    substantially different physical size or aspect ratio
+                    <a class="cite" href="#ref-watkins2015">(Watkins et al., 2015)</a>. Where an unbiased,
+                    edge-effect-free intensity estimate is the objective, the circular-window and circular-scanline
+                    estimators <a class="cite" href="#ref-mauldon2001">(Mauldon et al., 2001)</a> are the
+                    established alternative to a rectangular window; they are not implemented in this tab.
                 </p>
 
                 <!-- ================================================= -->
@@ -1202,18 +1229,67 @@ C_B = (3·20 + 4·10) / 55 = 100/55 ≈ 1.82         (identical to C̄ by constr
                 <table>
                     <tr><th>Limitation</th><th>Description</th></tr>
                     <tr><td>Greedy point-clustering</td><td>The order-dependent greedy clustering algorithm can produce weakly order-dependent cluster centroids in rare pathological configurations of closely spaced, nearly-collinear candidate points. In practice, at sensible tolerances, this has negligible effect on reported statistics.</td></tr>
-                    <tr><td>Heuristic reference contours</td><td>The C_L = 3.57 and C_B ≈ 2 reference contours are values drawn from the published topological fracture-network literature and are not dynamically recalculated for the specific length or orientation distribution of the loaded data set.</td></tr>
-                    <tr><td>Rectangular boundary assumption</td><td>The sampling window is a rectangle. For irregularly shaped mapped areas, boundary I-node exclusion can over- or under-exclude genuine edge-truncated tips relative to the true panel outline. Leaving the window blank falls back to the trace bounding box, in which case no tip can be identified as a boundary tip at all and every tip is counted as an I node.</td></tr>
+                    <tr><td>Heuristic reference contours</td><td>The C_L = 3.57 and C_B ≈ 2 reference contours are values drawn from the published topological fracture-network literature <a class="cite" href="#ref-sanderson2015">(Sanderson and Nixon, 2015,</a> <a class="cite" href="#ref-sanderson2018">2018)</a> and are not dynamically recalculated for the specific length or orientation distribution of the loaded data set. Percolation thresholds are genuinely distribution-dependent <a class="cite" href="#ref-berkowitz1995">(Berkowitz, 1995)</a>.</td></tr>
+                    <tr><td>Rectangular boundary assumption</td><td>The sampling window is a rectangle. For irregularly shaped mapped areas, boundary I-node exclusion can over- or under-exclude genuine edge-truncated tips relative to the true panel outline. Leaving the window blank falls back to the trace bounding box, in which case no tip can be identified as a boundary tip at all and every tip is counted as an I node. Circular windows <a class="cite" href="#ref-mauldon2001">(Mauldon et al., 2001)</a> are not supported.</td></tr>
+                    <tr><td>No orientation- or length-bias correction</td><td>Nodes and branches are counted exactly as digitised. No Terzaghi-style orientation weighting and no correction for censored (edge-truncated) or truncated (below-resolution) trace lengths is applied, so the census reflects the sampling geometry as well as the network <a class="cite" href="#ref-watkins2015">(Watkins et al., 2015)</a>.</td></tr>
+                    <tr><td>No inferential statistics</td><td>Every quantity is a deterministic descriptive count or ratio (<a href="#statistics">Section 6</a>). No confidence interval, resampling distribution, or significance test accompanies CF, C̄, C_L, C_B, or B₂₂, and no uncertainty is propagated from the digitisation or from the snap tolerance.</td></tr>
+                    <tr><td>Purely two-dimensional topology</td><td>Node and branch classes are defined on a planar trace map. A 2D X node may be two non-intersecting fractures passing at different depths, and a 2D I node may connect out of the plane, so connectivity measured here is a lower bound on true three-dimensional connectivity <a class="cite" href="#ref-berkowitz1995">(Berkowitz, 1995)</a>.</td></tr>
+                    <tr><td>Connectivity is not permeability</td><td>C_B, CF, and the branch-class proportions are topological descriptors. They are correlated with, but not a substitute for, an effective-permeability calculation, which additionally requires aperture, length, and flow-solution information <a class="cite" href="#ref-long1985">(Long and Witherspoon, 1985;</a> <a class="cite" href="#ref-nrc1996">National Research Council, 1996)</a>.</td></tr>
+                    <tr><td>P₂₂ not surfaced in the interface</td><td>The trace-normalised dimensionless intensity P₂₂ is computed and exposed on the result object but is not displayed as a sidebar statistic (<a href="#4.3">Section 4.3</a>); only the branch-normalised B₂₂ is shown. Comparison with intensity measures reported elsewhere <a class="cite" href="#ref-zhang2000">(Zhang and Einstein, 2000)</a> requires care over which normalisation is meant.</td></tr>
+                    <tr><td>Node counts are tolerance-dependent</td><td>The snap tolerance is a free parameter with no data-driven optimum. Raising it merges nearby candidate points and converts I pairs into Y nodes; lowering it splits genuine contacts apart. Reported statistics should always be quoted together with the tolerance used, and ideally with a sensitivity sweep (<a href="#statistics">Section 6</a>).</td></tr>
                 </table>
 
                 <!-- ================================================= -->
                 <h2 id="references">13. References</h2>
-                <p>Manzocchi, T. (2002). The connectivity of two-dimensional networks of spatially correlated fractures. <em>Water Resources Research</em>, 38(9), 1162.</p>
-                <p>Sanderson, D. J. &amp; Nixon, C. W. (2015). The use of topology in fracture network characterization. <em>Journal of Structural Geology</em>, 72, 55–66.</p>
-                <p>Sanderson, D. J. &amp; Nixon, C. W. (2018). Topology, connectivity and percolation in fracture networks. <em>Journal of Structural Geology</em>, 115, 167–177.</p>
-                <p>Mauldon, M., Dunne, W. M. &amp; Rohrbaugh, M. B. (2001). Circular scanlines and circular windows: new tools for characterizing the geometry of fracture traces. <em>Journal of Structural Geology</em>, 23(2–3), 247–258.</p>
-                <p>Odling, N. E. et al. (1999). Variations in fracture system geometry and their implications for fluid flow in fractured hydrocarbon reservoirs. <em>Petroleum Geoscience</em>, 5(4), 373–384.</p>
-                <p>National Research Council (1996). <em>Rock Fractures and Fluid Flow: Contemporary Understanding and Applications</em>. National Academies Press, Washington, D.C.</p>
+                <p>
+                    Sources are listed alphabetically within each group. In-text citations throughout this page link
+                    to the corresponding entry below.
+                </p>
+
+                <h3 id="13.1">13.1 Fracture-Network Topology</h3>
+                <ul class="ref-list">
+                    <li id="ref-manzocchi2002">Manzocchi, T. (2002). The connectivity of two-dimensional networks of spatially correlated fractures. <em>Water Resources Research</em>, 38(9), 1162. <a href="https://doi.org/10.1029/2000WR000180" target="_blank" rel="noopener">https://doi.org/10.1029/2000WR000180</a></li>
+                    <li id="ref-peacock2016">Peacock, D. C. P., Nixon, C. W., Rotevatn, A., Sanderson, D. J., &amp; Zuluaga, L. F. (2016). Glossary of fault and other fracture networks. <em>Journal of Structural Geology</em>, 92, 12–29. <a href="https://doi.org/10.1016/j.jsg.2016.09.008" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2016.09.008</a></li>
+                    <li id="ref-sanderson2015">Sanderson, D. J., &amp; Nixon, C. W. (2015). The use of topology in fracture network characterization. <em>Journal of Structural Geology</em>, 72, 55–66. <a href="https://doi.org/10.1016/j.jsg.2015.01.005" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2015.01.005</a></li>
+                    <li id="ref-sanderson2018">Sanderson, D. J., &amp; Nixon, C. W. (2018). Topology, connectivity and percolation in fracture networks. <em>Journal of Structural Geology</em>, 115, 167–177. <a href="https://doi.org/10.1016/j.jsg.2018.07.011" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2018.07.011</a></li>
+                </ul>
+
+                <h3 id="13.2">13.2 Percolation, Connectivity and Fluid Flow</h3>
+                <ul class="ref-list">
+                    <li id="ref-berkowitz1995">Berkowitz, B. (1995). Analysis of fracture network connectivity using percolation theory. <em>Mathematical Geology</em>, 27(4), 467–483. <a href="https://doi.org/10.1007/BF02084422" target="_blank" rel="noopener">https://doi.org/10.1007/BF02084422</a></li>
+                    <li id="ref-long1985">Long, J. C. S., &amp; Witherspoon, P. A. (1985). The relationship of the degree of interconnection to permeability in fracture networks. <em>Journal of Geophysical Research: Solid Earth</em>, 90(B4), 3087–3098. <a href="https://doi.org/10.1029/JB090iB04p03087" target="_blank" rel="noopener">https://doi.org/10.1029/JB090iB04p03087</a></li>
+                    <li id="ref-nrc1996">National Research Council (1996). <em>Rock Fractures and Fluid Flow: Contemporary Understanding and Applications</em>. National Academies Press, Washington, D.C. <a href="https://doi.org/10.17226/2309" target="_blank" rel="noopener">https://doi.org/10.17226/2309</a></li>
+                    <li id="ref-odling1999">Odling, N. E., Gillespie, P., Bourgine, B., Castaing, C., Chilès, J. P., Christensen, N. P., … Watterson, J. (1999). Variations in fracture system geometry and their implications for fluid flow in fractured hydrocarbon reservoirs. <em>Petroleum Geoscience</em>, 5(4), 373–384. <a href="https://doi.org/10.1144/petgeo.5.4.373" target="_blank" rel="noopener">https://doi.org/10.1144/petgeo.5.4.373</a></li>
+                    <li id="ref-robinson1983">Robinson, P. C. (1983). Connectivity of fracture systems — a percolation theory approach. <em>Journal of Physics A: Mathematical and General</em>, 16(3), 605–614. <a href="https://doi.org/10.1088/0305-4470/16/3/020" target="_blank" rel="noopener">https://doi.org/10.1088/0305-4470/16/3/020</a></li>
+                </ul>
+                <h3 id="13.3">13.3 Sampling, Intensity and Software Implementations</h3>
+                <ul class="ref-list">
+                    <li id="ref-harris2020">Harris, C. R., Millman, K. J., van der Walt, S. J., Gommers, R., Virtanen, P., Cournapeau, D., … Oliphant, T. E. (2020). Array programming with NumPy. <em>Nature</em>, 585(7825), 357–362. <a href="https://doi.org/10.1038/s41586-020-2649-2" target="_blank" rel="noopener">https://doi.org/10.1038/s41586-020-2649-2</a></li>
+                    <li id="ref-healy2017">Healy, D., Rizzo, R. E., Cornwell, D. G., Farrell, N. J. C., Watkins, H., Timms, N. E., … Smith, M. (2017). FracPaQ: A MATLAB™ toolbox for the quantification of fracture patterns. <em>Journal of Structural Geology</em>, 95, 1–16. <a href="https://doi.org/10.1016/j.jsg.2016.12.003" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2016.12.003</a></li>
+                    <li id="ref-hunter2007">Hunter, J. D. (2007). Matplotlib: A 2D graphics environment. <em>Computing in Science &amp; Engineering</em>, 9(3), 90–95. <a href="https://doi.org/10.1109/MCSE.2007.55" target="_blank" rel="noopener">https://doi.org/10.1109/MCSE.2007.55</a></li>
+                    <li id="ref-mauldon2001">Mauldon, M., Dunne, W. M., &amp; Rohrbaugh, M. B. (2001). Circular scanlines and circular windows: new tools for characterizing the geometry of fracture traces. <em>Journal of Structural Geology</em>, 23(2–3), 247–258. <a href="https://doi.org/10.1016/S0191-8141(00)00094-8" target="_blank" rel="noopener">https://doi.org/10.1016/S0191-8141(00)00094-8</a></li>
+                    <li id="ref-nyberg2018">Nyberg, B., Nixon, C. W., &amp; Sanderson, D. J. (2018). NetworkGT: A GIS tool for geometric and topological analysis of two-dimensional fracture networks. <em>Geosphere</em>, 14(4), 1618–1634. <a href="https://doi.org/10.1130/GES01595.1" target="_blank" rel="noopener">https://doi.org/10.1130/GES01595.1</a></li>
+                    <li id="ref-watkins2015">Watkins, H., Bond, C. E., Healy, D., &amp; Butler, R. W. H. (2015). Appraisal of fracture sampling methods and a new workflow to characterise heterogeneous fracture networks at outcrop. <em>Journal of Structural Geology</em>, 72, 67–82. <a href="https://doi.org/10.1016/j.jsg.2015.02.001" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2015.02.001</a></li>
+                    <li id="ref-zhang2000">Zhang, L., &amp; Einstein, H. H. (2000). Estimating the intensity of rock discontinuities. <em>International Journal of Rock Mechanics and Mining Sciences</em>, 37(5), 819–837. <a href="https://doi.org/10.1016/S1365-1609(00)00022-8" target="_blank" rel="noopener">https://doi.org/10.1016/S1365-1609(00)00022-8</a></li>
+                </ul>
+
+                <div class="cite-box">
+                    <p><strong>Methods statement for the Connectivity tab.</strong> If a figure or table produced by
+                    this tab appears in a publication, the details below are what a reader needs in order to
+                    reproduce it, and are what the citations above assume:</p>
+                    <p>I-Y-X node classification and I-I / I-C / C-C branch classification of a two-dimensional
+                    fracture trace map following the topological scheme of
+                    <a class="cite" href="#ref-sanderson2015">Sanderson and Nixon (2015,</a>
+                    <a class="cite" href="#ref-sanderson2018">2018)</a>, computed at a snap
+                    tolerance of <em>t</em> map units over <em>n</em> traces within a sampling window of area
+                    <em>A</em>, with boundary I nodes included or excluded as stated. Dimensionless intensity
+                    B₂₂ = L²/(A·N_B). Implemented in NumPy
+                    <a class="cite" href="#ref-harris2020">(Harris et al., 2020)</a> and rendered with Matplotlib
+                    <a class="cite" href="#ref-hunter2007">(Hunter, 2007)</a>. Report <em>t</em>, <em>A</em>, the
+                    boundary-exclusion setting, and whether the two branch counts of
+                    <a href="#4.2">Section 4.2</a> agree; note that no orientation- or length-bias correction is
+                    applied (<a href="#limitations">Section 12</a>).</p>
+                </div>
 
                 <!-- Pagination Navigation -->
                 <div class="pagination-nav"></div>

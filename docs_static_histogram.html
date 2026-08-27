@@ -63,6 +63,7 @@
                         <li><a href="#interpretation">9. Geological interpretation</a></li>
                         <li><a href="#limitations">10. Limitations</a></li>
                         <li><a href="#advanced">11. Advanced &amp; related capabilities</a></li>
+                        <li><a href="#references">12. References</a></li>
                     </ul>
                 </div>
 
@@ -383,10 +384,25 @@ total span:  Lmin − step/2  to  Lmax + step/2
                 </div>
                 <p>
                     Bin counts Ck are then obtained with a standard histogram accumulation (<code>numpy.histogram</code>)
-                    over these edges. In the degenerate case Lmin = Lmax (every observation identical, or n = 1), the
+                    over these edges <a class="cite" href="#ref-harris2020">(Harris et al., 2020)</a>.
+                    In the degenerate case Lmin = Lmax (every observation identical, or n = 1), the
                     module falls back to a single bin of unit width centred on that value, avoiding a division by
                     zero in the step calculation.
                 </p>
+                <div class="note-box">
+                    <p>
+                        <strong>The bin count is a free parameter, and no automatic rule is applied.</strong> The
+                        value entered is used as given; FracSTAT does not compute a data-driven bin width such as
+                        Sturges' rule <a class="cite" href="#ref-sturges1926">(Sturges, 1926)</a>,
+                        Scott's rule <a class="cite" href="#ref-scott1979">(Scott, 1979)</a>, or the
+                        Freedman–Diaconis rule
+                        <a class="cite" href="#ref-freedman1981">(Freedman and Diaconis, 1981)</a>,
+                        each of which selects a width that balances resolution against sampling noise. Because
+                        fracture-length samples are usually strongly right-skewed, the classical rules — derived
+                        under near-normal assumptions — tend to be conservative for this kind of data, and inspecting
+                        two or three bin counts before choosing one is more reliable than trusting any single value.
+                    </p>
+                </div>
                 <div class="note-box">
                     <p>
                         <strong>In Segment angles mode the bin grid and the reported extremes come from different
@@ -465,6 +481,23 @@ R² = corr(x, y)²   (squared Pearson correlation coefficient)
                     rather than a formal hypothesis test unless the regression assumptions (residual normality,
                     homoscedasticity, absence of leverage points) have been independently verified.
                 </p>
+                <div class="note-box">
+                    <p>
+                        <strong>A linear fit is the wrong model for most fracture scaling relationships.</strong>
+                        Aperture–length, displacement–length, and comparable relationships in rock are generally
+                        reported as power laws of the form <em>a</em>&nbsp;∝&nbsp;<em>L</em><sup><em>n</em></sup>,
+                        with the exponent itself the quantity of interest and estimates of <em>n</em> ranging from
+                        sublinear to approximately linear depending on the mechanism and dataset
+                        <a class="cite" href="#ref-vermilye1995">(Vermilye and Scholz, 1995;</a>
+                        <a class="cite" href="#ref-olson2003">Olson, 2003;</a>
+                        <a class="cite" href="#ref-schultz2008">Schultz et al., 2008)</a>. Fitting a
+                        straight line on linear axes estimates none of these exponents. Where a scaling exponent is
+                        the objective, the appropriate procedure is a regression in log–log space with explicit
+                        treatment of truncation and censoring
+                        <a class="cite" href="#ref-pickering1995">(Pickering et al., 1995)</a>;
+                        neither the log transform nor those corrections is applied by this tab.
+                    </p>
+                </div>
 
                 <h3 id="4.4">4.4 Angle Wrapping and Axial Statistics</h3>
                 <p>
@@ -474,9 +507,28 @@ R² = corr(x, y)²   (squared Pearson correlation coefficient)
                     fracture‑orientation convention used throughout the Static Analyzer. When the plot mode is set
                     to <strong>Segment angles</strong>, the tab computes and displays the circular axial mean
                     (CircMean) and circular standard deviation (CircStdDev) using 180°‑periodic double‑angle vector
-                    summation, together with the dominant bin orientation (Dominant), directly on the Statistics
+                    summation <a class="cite" href="#ref-mardia2000">(Mardia and Jupp, 2000, §2.3.2)</a>,
+                    together with the dominant bin orientation (Dominant), directly on the Statistics
                     card. For length‑weighted axial mean strike, consult the Rose Plot tab, which implements the
                     same circular‑statistics formula weighted by segment length.
+                </p>
+                <p>
+                    The dispersion measure is the circular standard deviation derived from the mean resultant length
+                    <em>R̄</em>, halved to return it to the axial domain:
+                </p>
+                <div class="formula-block">
+φ_i = 2·θ_i
+R̄   = | (1/n) Σ exp(i·φ_i) |
+s   = ½ · √( −2 · ln R̄ )     (in degrees after conversion)</div>
+                <p>
+                    This is the standard circular standard deviation of
+                    <a class="cite" href="#ref-mardia2000">Mardia and Jupp (2000, §2.3.4)</a> and
+                    <a class="cite" href="#ref-fisher1993">Fisher (1993, §2.3.1)</a>. It is
+                    unbounded as <em>R̄</em>&nbsp;→&nbsp;0: a perfectly uniform set of orientations drives
+                    <em>R̄</em> toward zero and <em>s</em> toward very large values, which is the correct behaviour
+                    for the formula but means a large CircStdDev should be read as "no preferred orientation" rather
+                    than as a literal angular spread. The implementation floors <em>R̄</em> at 10⁻¹² to keep the
+                    logarithm finite.
                 </p>
                 <p>
                     Wrapping also invalidates the ordinary extremes. On a mod‑180° coordinate, <code>min()</code>
@@ -492,7 +544,9 @@ widest gap  = the largest empty sector between neighbouring observations
 circular range = 180° − widest gap          (the complement of that empty sector)
 (Min, Max)  = (angle just after the widest gap, angle just before it)</div>
                 <p>
-                    following Fisher (1993, §2.3.3) and Mardia &amp; Jupp (2000, §2.3.2). The returned pair traverses
+                    following <a class="cite" href="#ref-fisher1993">Fisher (1993, §2.3.3)</a> and
+                    <a class="cite" href="#ref-mardia2000">Mardia and Jupp (2000, §2.3.2)</a>. The
+                    returned pair traverses
                     the arc in the direction of increasing angle and may wrap through the origin, exactly as the
                     orientations do; the algorithm is given in <a href="#5.6">Section 5.6</a>. Note that neither the
                     plain extremes nor the circular range is a robust statistic — a single stray outlier still
@@ -645,8 +699,18 @@ return float(angles[widest + 1]), float(angles[widest])</code></pre>
                     <tr><td>Min / Max (angles)</td><td>endpoints of the shortest containing arc (<a href="#5.6">Section 5.6</a>)</td><td>Angular support of the sample, wrap‑aware. Not order statistics: the pair may run "backwards" (Min &gt; Max) when the arc crosses 0°, and the difference Max − Min must be taken modulo 180° to recover the circular range.</td></tr>
                     <tr><td>Mean</td><td>(1/n) Σ xi</td><td>Central tendency; for heavy‑tailed (power‑law‑like) fracture length distributions the mean can be strongly influenced by a small number of very long traces and may not represent a "typical" fracture — the CDF tab's median and quantile statistics are often more robust.</td></tr>
                     <tr><td>Total Length / Sum</td><td>Σ xi</td><td>Aggregate fracture length in the sample area; directly relevant to fracture‑intensity metrics such as P21 computed elsewhere in FracSTAT (Intensity &amp; Density tab).</td></tr>
-                    <tr><td>Censored count</td><td>count of excluded boundary‑touching observations</td><td>Quantifies the magnitude of the truncation‑bias correction; a large censored fraction relative to n signals that the mapped area may be too small relative to the characteristic fracture length for unbiased length statistics.</td></tr>
+                    <tr><td>Censored count</td><td>count of excluded boundary‑touching observations</td><td>Quantifies the magnitude of the truncation‑bias correction; a large censored fraction relative to n signals that the mapped area may be too small relative to the characteristic fracture length for unbiased length statistics <a class="cite" href="#ref-priest1981">(Priest and Hudson, 1981)</a>.</td></tr>
                 </table>
+                <div class="note-box">
+                    <p>
+                        <strong>These are sample statistics, reported without uncertainty.</strong> No standard
+                        errors, confidence intervals, or goodness-of-fit measures accompany them, and no test is
+                        performed against any distributional model. Interval estimates for the mean of a heavy-tailed
+                        sample generally require a resampling approach rather than a normal approximation
+                        <a class="cite" href="#ref-efron1993">(Efron and Tibshirani, 1993)</a>; the
+                        CDF tab, not this one, provides that machinery (<a href="#6.1">Section 6.1</a>).
+                    </p>
+                </div>
 
                 <h3 id="6.1">6.1 Relationship to the CDF Tab</h3>
                 <p>
@@ -658,7 +722,11 @@ return float(angles[widest + 1]), float(angles[widest])</code></pre>
                     <code>Length_m</code> / <code>TraceLengthM</code> data. Analysts requiring a defensible power‑law
                     exponent or a formal comparison between candidate distributional models should proceed to the
                     CDF tab rather than inferring such conclusions from the equal‑width histogram alone, since bin
-                    width and placement are well known to bias the visual appearance of heavy‑tailed distributions.
+                    width and placement are well known to bias the visual appearance of heavy‑tailed distributions
+                    <a class="cite" href="#ref-clauset2009">(Clauset et al., 2009)</a>. Estimating a
+                    power-law exponent by regressing on binned frequencies — the procedure a histogram invites — is
+                    known to be biased, and maximum-likelihood estimation on the unbinned data is the recommended
+                    alternative <a class="cite" href="#ref-clauset2009">(Clauset et al., 2009)</a>.
                 </p>
 
                 <h3 id="cross-plot-regression-diagnostics">6.2 Cross‑Plot Regression Diagnostics</h3>
@@ -669,8 +737,11 @@ return float(angles[widest + 1]), float(angles[widest])</code></pre>
                     associated with x for the specific pair of attributes currently selected; it does not by itself
                     establish causation, and a low R² does not preclude a genuine non‑linear or threshold
                     relationship (many aperture–length relationships in the fracture‑mechanics literature follow
-                    power‑law rather than linear scaling, in which case a log–log transformation prior to
-                    interpretation — not currently automated by this tab — would be more appropriate).
+                    power‑law rather than linear scaling
+                    <a class="cite" href="#ref-vermilye1995">(Vermilye and Scholz, 1995;</a>
+                    <a class="cite" href="#ref-olson2003">Olson, 2003)</a>, in which case a log–log
+                    transformation prior to interpretation — not currently automated by this tab — would be more
+                    appropriate).
                 </p>
 
                 <!-- ================================================= -->
@@ -763,25 +834,50 @@ return float(angles[widest + 1]), float(angles[widest])</code></pre>
                     Fracture (and joint, vein, and fault) length populations in nature are widely documented to
                     follow heavy‑tailed distributions — commonly approximated by power‑law, log‑normal, or truncated
                     power‑law forms over some intermediate range of scales — reflecting scale‑invariant growth and
-                    coalescence processes during fracture propagation. A histogram that appears strongly
-                    right‑skewed, with most bars concentrated at short lengths and a long thin tail of rare, very
-                    long traces, is consistent with this expectation and should motivate a follow‑up analysis in the
-                    CDF tab rather than being taken as evidence of a log‑normal or exponential process from visual
-                    inspection alone, since equal‑width linear binning tends to obscure power‑law tail behaviour that
-                    is only clearly visible on logarithmic axes.
+                    coalescence processes during fracture propagation
+                    <a class="cite" href="#ref-bonnet2001">(Bonnet et al., 2001)</a>. A histogram
+                    that appears strongly right‑skewed, with most bars concentrated at short lengths and a long thin
+                    tail of rare, very long traces, is consistent with this expectation and should motivate a
+                    follow‑up analysis in the CDF tab rather than being taken as evidence of a log‑normal or
+                    exponential process from visual inspection alone, since equal‑width linear binning tends to
+                    obscure power‑law tail behaviour that is only clearly visible on logarithmic axes
+                    <a class="cite" href="#ref-clauset2009">(Clauset et al., 2009)</a>. Note also
+                    that power-law scaling in real fracture populations holds only over a finite range of scales, and
+                    is bounded below by mapping resolution and above by the size of the sampled area
+                    <a class="cite" href="#ref-bonnet2001">(Bonnet et al., 2001;</a>
+                    <a class="cite" href="#ref-marrett1999">Marrett et al., 1999)</a>.
                 </p>
 
                 <h4 id="9.2">9.2 Truncation and Censoring Bias</h4>
                 <p>
                     Because any finite outcrop, borehole image, or remotely sensed map necessarily has edges,
                     fractures that would naturally extend beyond the mapped area are recorded with an artificially
-                    shortened apparent length. The edge‑censoring feature provides a first‑order correction by
-                    removing affected traces entirely from the length statistics, trading a reduction in sample size
-                    for an improvement in the accuracy of the remaining Mean and Total Length values. Analysts
-                    working with small mapped areas relative to the expected fracture length scale should treat the
-                    uncensored Mean length statistic with particular caution, since it will systematically
-                    underestimate the true population mean.
+                    shortened apparent length. The distinction is conventionally drawn between <em>censoring</em>,
+                    the underestimation of traces cut off at a boundary, and <em>truncation</em>, the
+                    under-representation of short traces below the resolution limit; both distort length statistics
+                    and both bias a power-law exponent estimated without correction
+                    <a class="cite" href="#ref-pickering1995">(Pickering et al., 1995;</a>
+                    <a class="cite" href="#ref-priest1981">Priest and Hudson, 1981)</a>. The
+                    edge‑censoring feature provides a first‑order correction for the former by removing affected
+                    traces entirely from the length statistics, trading a reduction in sample size for an improvement
+                    in the accuracy of the remaining Mean and Total Length values. Analysts working with small mapped
+                    areas relative to the expected fracture length scale should treat the uncensored Mean length
+                    statistic with particular caution, since it will systematically underestimate the true population
+                    mean.
                 </p>
+                <div class="note-box">
+                    <p>
+                        <strong>Discarding censored traces is not an unbiased estimator.</strong> Removing every
+                        boundary-touching trace also removes the longest members of the population preferentially,
+                        because long traces are more likely to reach a boundary. The remaining sample is cleaner but
+                        still biased low, and the bias grows as the mapped area shrinks relative to the characteristic
+                        fracture length. Formal treatments that estimate the underlying length distribution from
+                        censored window observations, rather than discarding them, are given by
+                        <a class="cite" href="#ref-mauldon1998">Mauldon (1998)</a> and
+                        <a class="cite" href="#ref-zhang2000">Zhang and Einstein (2000)</a>; those
+                        estimators are not implemented here.
+                    </p>
+                </div>
 
                 <h4 id="9.3">9.3 Segment Angle Histograms and Structural Sets</h4>
                 <p>
@@ -789,7 +885,9 @@ return float(angles[widest + 1]), float(angles[widest])</code></pre>
                     polar/equal‑area) view of the strike‑angle distribution, folded to the 0–180° axial convention.
                     Multiple distinct peaks (modes) in this histogram are typically diagnostic of multiple structural
                     fracture sets formed under different regional or local stress orientations, or of a single set
-                    overprinted by a later, differently oriented set. The reported summary statistics are wrap‑aware:
+                    overprinted by a later, differently oriented set
+                    <a class="cite" href="#ref-peacock2016">(Peacock et al., 2016)</a>. The reported
+                    summary statistics are wrap‑aware:
                     CircMean and CircStdDev use 180°‑periodic double‑angle summation, and Min/Max are the endpoints
                     of the shortest containing arc (<a href="#4.4">Section 4.4</a>). The <em>bars</em>, however, are
                     not — the bin grid is a linear partition of the folded 0–180° domain, so a population whose true
@@ -806,11 +904,18 @@ return float(angles[widest + 1]), float(angles[widest])</code></pre>
                     Positive correlations between fracture length and aperture are frequently reported in the
                     structural geology and reservoir engineering literature and are commonly interpreted in terms of
                     linear elastic fracture mechanics scaling relationships between fracture length and
-                    displacement/aperture. The Cross Plot tool's OLS trend line and R² provide a rapid first
-                    assessment of such a relationship within a given dataset, but formal scaling‑law exponent
-                    estimation (which typically requires a log–log regression and awareness of truncation/censoring
-                    effects analogous to those discussed for length distributions) should be pursued using dedicated
-                    statistical tools outside FracSTAT if publication‑quality scaling exponents are required.
+                    displacement/aperture <a class="cite" href="#ref-vermilye1995">(Vermilye and
+                    Scholz, 1995;</a> <a class="cite" href="#ref-scholz2010">Scholz, 2010)</a>,
+                    although reported exponents vary and sublinear scaling is common
+                    <a class="cite" href="#ref-olson2003">(Olson, 2003)</a>. The relationship matters
+                    beyond descriptive interest: because flow through a fracture scales roughly with the cube of
+                    aperture, an aperture–length correlation propagates strongly into network-scale permeability
+                    <a class="cite" href="#ref-klimczak2010">(Klimczak et al., 2010)</a>. The Cross
+                    Plot tool's OLS trend line and R² provide a rapid first assessment of such a relationship within
+                    a given dataset, but formal scaling‑law exponent estimation (which requires a log–log regression
+                    and awareness of the truncation and censoring effects discussed in
+                    <a href="#9.2">Section 9.2</a>) should be pursued using dedicated statistical tools outside
+                    FracSTAT if publication‑quality scaling exponents are required.
                 </p>
 
                 <!-- ================================================= -->
@@ -818,9 +923,14 @@ return float(angles[widest + 1]), float(angles[widest])</code></pre>
                 <table>
                     <tr><th>Limitation</th><th>Description</th></tr>
                     <tr><td>Edge‑censoring is a simple heuristic</td><td>It is a boundary‑proximity test based on the dataset's own bounding box; it cannot detect truncation against an irregular (non‑rectangular) mapped‑area boundary, nor truncation caused by cloud cover, image saturation, or other non‑geometric data‑quality limitations.</td></tr>
+                    <tr><td>Censoring is handled by exclusion, not estimation</td><td>Boundary-touching traces are discarded rather than used to estimate the underlying length distribution, which preferentially removes long traces and leaves a residual low bias (<a href="#9.2">Section 9.2</a>). Window-based estimators that retain censored observations are described by <a class="cite" href="#ref-mauldon1998">Mauldon (1998)</a> and <a class="cite" href="#ref-zhang2000">Zhang and Einstein (2000)</a>.</td></tr>
+                    <tr><td>No correction for resolution truncation</td><td>Short traces below the mapping or digitisation resolution are simply absent from the sample. No lower truncation limit is estimated or reported, so the shape of the small-length end of the histogram reflects the mapping process as much as the geology <a class="cite" href="#ref-pickering1995">(Pickering et al., 1995)</a>.</td></tr>
                     <tr><td>Binning is linear, not circular</td><td>Segment‑angle <em>summary statistics</em> are wrap‑aware (circular axial mean and standard deviation, and a circular‑range Min/Max), but the histogram bins themselves are a linear partition of the folded 0–180° domain. A set straddling 0°/180° is therefore split across the two end bins and may read as bimodal; cross‑check against CircMean and the Rose Plot tab.</td></tr>
                     <tr><td>Circular range is not robust</td><td>The shortest containing arc is fixed by the two observations bounding the widest empty sector, so one stray strike widens it as much as a genuinely dispersed population would. It measures angular support, not concentration — use CircStdDev for the latter.</td></tr>
                     <tr><td>Angle bin grid spans the observed values, not the full domain</td><td>Bin edges run from <code>min(θ)</code> to <code>max(θ)</code> of the folded sample rather than a fixed 0–180° axis, so the horizontal extent of the bars differs between datasets and the bar positions of two histograms are not directly comparable without setting axis bounds manually.</td></tr>
+                    <tr><td>No automatic bin-width rule</td><td>The bin count is taken as entered. Standard data-driven rules <a class="cite" href="#ref-sturges1926">(Sturges, 1926;</a> <a class="cite" href="#ref-scott1979">Scott, 1979;</a> <a class="cite" href="#ref-freedman1981">Freedman and Diaconis, 1981)</a> are not offered, so the visual impression of the distribution remains partly under user control.</td></tr>
+                    <tr><td>No uncertainty on any statistic</td><td>Means, sums, and circular statistics are point estimates without standard errors or confidence intervals, and no test against a distributional model is performed. Interval estimates for heavy-tailed samples require resampling <a class="cite" href="#ref-efron1993">(Efron and Tibshirani, 1993)</a>; see the CDF tab.</td></tr>
+                    <tr><td>Cross-plot fit is linear only</td><td>The trend line is an OLS fit on linear axes with a Pearson R². It cannot estimate a power-law scaling exponent, which is the form these relationships usually take <a class="cite" href="#ref-olson2003">(Olson, 2003)</a>.</td></tr>
                 </table>
 
                 <!-- ================================================= -->
@@ -856,6 +966,59 @@ return float(angles[widest + 1]), float(angles[widest])</code></pre>
                     orientation analysis, and the <strong>Intensity &amp; Density tab</strong>'s P21/P10/P20
                     calculations — so nothing computed here is wasted downstream.
                 </p>
+
+                <!-- ================================================= -->
+                <h2 id="references">12. References</h2>
+                <p>
+                    Sources are listed alphabetically within each group. In-text citations throughout this page link
+                    to the corresponding entry below.
+                </p>
+
+                <h3 id="12.1">12.1 Fracture Length, Scaling, and Sampling Bias</h3>
+                <ul class="ref-list">
+                    <li id="ref-bonnet2001">Bonnet, E., Bour, O., Odling, N. E., Davy, P., Main, I., Cowie, P., &amp; Berkowitz, B. (2001). Scaling of fracture systems in geological media. <em>Reviews of Geophysics</em>, 39(3), 347–383. <a href="https://doi.org/10.1029/1999RG000074" target="_blank" rel="noopener">https://doi.org/10.1029/1999RG000074</a></li>
+                    <li id="ref-klimczak2010">Klimczak, C., Schultz, R. A., Parashar, R., &amp; Reeves, D. M. (2010). Cubic law with aperture-length correlation: implications for network scale fluid flow. <em>Hydrogeology Journal</em>, 18(4), 851–862. <a href="https://doi.org/10.1007/s10040-009-0572-6" target="_blank" rel="noopener">https://doi.org/10.1007/s10040-009-0572-6</a></li>
+                    <li id="ref-marrett1999">Marrett, R., Ortega, O. J., &amp; Kelsey, C. M. (1999). Extent of power-law scaling for natural fractures in rock. <em>Geology</em>, 27(9), 799–802. <a href="https://doi.org/10.1130/0091-7613(1999)027&lt;0799:EOPLSF&gt;2.3.CO;2" target="_blank" rel="noopener">https://doi.org/10.1130/0091-7613(1999)027&lt;0799:EOPLSF&gt;2.3.CO;2</a></li>
+                    <li id="ref-mauldon1998">Mauldon, M. (1998). Estimating mean fracture trace length and density from observations in convex windows. <em>Rock Mechanics and Rock Engineering</em>, 31(4), 201–216. <a href="https://doi.org/10.1007/s006030050021" target="_blank" rel="noopener">https://doi.org/10.1007/s006030050021</a></li>
+                    <li id="ref-olson2003">Olson, J. E. (2003). Sublinear scaling of fracture aperture versus length: An exception or the rule? <em>Journal of Geophysical Research: Solid Earth</em>, 108(B9), 2413. <a href="https://doi.org/10.1029/2001JB000419" target="_blank" rel="noopener">https://doi.org/10.1029/2001JB000419</a></li>
+                    <li id="ref-peacock2016">Peacock, D. C. P., Nixon, C. W., Rotevatn, A., Sanderson, D. J., &amp; Zuluaga, L. F. (2016). Glossary of fault and other fracture networks. <em>Journal of Structural Geology</em>, 92, 12–29. <a href="https://doi.org/10.1016/j.jsg.2016.09.008" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2016.09.008</a></li>
+                    <li id="ref-pickering1995">Pickering, G., Bull, J. M., &amp; Sanderson, D. J. (1995). Sampling power-law distributions. <em>Tectonophysics</em>, 248(1–2), 1–20. <a href="https://doi.org/10.1016/0040-1951(95)00030-Q" target="_blank" rel="noopener">https://doi.org/10.1016/0040-1951(95)00030-Q</a></li>
+                    <li id="ref-priest1981">Priest, S. D., &amp; Hudson, J. A. (1981). Estimation of discontinuity spacing and trace length using scanline surveys. <em>International Journal of Rock Mechanics and Mining Sciences &amp; Geomechanics Abstracts</em>, 18(3), 183–197. <a href="https://doi.org/10.1016/0148-9062(81)90973-6" target="_blank" rel="noopener">https://doi.org/10.1016/0148-9062(81)90973-6</a></li>
+                    <li id="ref-scholz2010">Scholz, C. H. (2010). A note on the scaling relations for opening mode fractures in rock. <em>Journal of Structural Geology</em>, 32(10), 1485–1487. <a href="https://doi.org/10.1016/j.jsg.2010.09.007" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2010.09.007</a></li>
+                    <li id="ref-schultz2008">Schultz, R. A., Soliva, R., Fossen, H., Okubo, C. H., &amp; Reeves, D. M. (2008). Dependence of displacement–length scaling relations for fractures and deformation bands on the volumetric changes across them. <em>Journal of Structural Geology</em>, 30(11), 1405–1411. <a href="https://doi.org/10.1016/j.jsg.2008.08.001" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2008.08.001</a></li>
+                    <li id="ref-vermilye1995">Vermilye, J. M., &amp; Scholz, C. H. (1995). Relation between vein length and aperture. <em>Journal of Structural Geology</em>, 17(3), 423–434. <a href="https://doi.org/10.1016/0191-8141(94)00058-8" target="_blank" rel="noopener">https://doi.org/10.1016/0191-8141(94)00058-8</a></li>
+                    <li id="ref-zhang2000">Zhang, L., &amp; Einstein, H. H. (2000). Estimating the intensity of rock discontinuities. <em>International Journal of Rock Mechanics and Mining Sciences</em>, 37(5), 819–837. <a href="https://doi.org/10.1016/S1365-1609(00)00022-8" target="_blank" rel="noopener">https://doi.org/10.1016/S1365-1609(00)00022-8</a></li>
+                </ul>
+
+                <h3 id="12.2">12.2 Statistical Methods</h3>
+                <ul class="ref-list">
+                    <li id="ref-clauset2009">Clauset, A., Shalizi, C. R., &amp; Newman, M. E. J. (2009). Power-law distributions in empirical data. <em>SIAM Review</em>, 51(4), 661–703. <a href="https://doi.org/10.1137/070710111" target="_blank" rel="noopener">https://doi.org/10.1137/070710111</a></li>
+                    <li id="ref-efron1993">Efron, B., &amp; Tibshirani, R. J. (1993). <em>An Introduction to the Bootstrap</em>. Chapman &amp; Hall, New York. <a href="https://doi.org/10.1201/9780429246593" target="_blank" rel="noopener">https://doi.org/10.1201/9780429246593</a></li>
+                    <li id="ref-fisher1993">Fisher, N. I. (1993). <em>Statistical Analysis of Circular Data</em>. Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511564345" target="_blank" rel="noopener">https://doi.org/10.1017/CBO9780511564345</a></li>
+                    <li id="ref-freedman1981">Freedman, D., &amp; Diaconis, P. (1981). On the histogram as a density estimator: L₂ theory. <em>Zeitschrift für Wahrscheinlichkeitstheorie und Verwandte Gebiete</em>, 57(4), 453–476. <a href="https://doi.org/10.1007/BF01025868" target="_blank" rel="noopener">https://doi.org/10.1007/BF01025868</a></li>
+                    <li id="ref-mardia2000">Mardia, K. V., &amp; Jupp, P. E. (2000). <em>Directional Statistics</em>. John Wiley &amp; Sons. <a href="https://doi.org/10.1002/9780470316979" target="_blank" rel="noopener">https://doi.org/10.1002/9780470316979</a></li>
+                    <li id="ref-scott1979">Scott, D. W. (1979). On optimal and data-based histograms. <em>Biometrika</em>, 66(3), 605–610. <a href="https://doi.org/10.1093/biomet/66.3.605" target="_blank" rel="noopener">https://doi.org/10.1093/biomet/66.3.605</a></li>
+                    <li id="ref-sturges1926">Sturges, H. A. (1926). The choice of a class interval. <em>Journal of the American Statistical Association</em>, 21(153), 65–66. <a href="https://doi.org/10.1080/01621459.1926.10502161" target="_blank" rel="noopener">https://doi.org/10.1080/01621459.1926.10502161</a></li>
+                </ul>
+
+                <h3 id="12.3">12.3 Software</h3>
+                <ul class="ref-list">
+                    <li id="ref-harris2020">Harris, C. R., Millman, K. J., van der Walt, S. J., Gommers, R., Virtanen, P., Cournapeau, D., … Oliphant, T. E. (2020). Array programming with NumPy. <em>Nature</em>, 585(7825), 357–362. <a href="https://doi.org/10.1038/s41586-020-2649-2" target="_blank" rel="noopener">https://doi.org/10.1038/s41586-020-2649-2</a></li>
+                    <li id="ref-hunter2007">Hunter, J. D. (2007). Matplotlib: A 2D graphics environment. <em>Computing in Science &amp; Engineering</em>, 9(3), 90–95. <a href="https://doi.org/10.1109/MCSE.2007.55" target="_blank" rel="noopener">https://doi.org/10.1109/MCSE.2007.55</a></li>
+                </ul>
+
+                <div class="cite-box">
+                    <p><strong>Methods statement for the Histogram tab.</strong> A caption for a figure exported from
+                    this tab should record the details that are not visible on the plot itself:</p>
+                    <p>Equal-width histogram of <em>attribute</em> from <em>n</em> observations using
+                    <em>nBins</em> bins (yielding <em>nBins</em>&nbsp;+&nbsp;1 bars over the observed range, see
+                    <a href="#4.2">Section 4.2</a>), with edge-censored traces excluded / included. For segment
+                    angles, CircMean and CircStdDev are the doubled-angle circular mean and circular standard
+                    deviation, and Min/Max are the endpoints of the shortest containing arc. Rendered with Matplotlib
+                    <a class="cite" href="#ref-hunter2007">(Hunter, 2007)</a> over NumPy
+                    <a class="cite" href="#ref-harris2020">(Harris et al., 2020)</a>. No truncation
+                    correction and no bin-width rule are applied.</p>
+                </div>
 
                 <!-- Pagination Navigation -->
                 <div class="pagination-nav"></div>

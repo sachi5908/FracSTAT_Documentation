@@ -344,7 +344,8 @@ for col in columns:
                 </div>
                 <p>
                     This is the standard Cauchy stress-resolution equation for a plane in a principal-axis
-                    coordinate frame: σₙ is the diagonal (normal) component of the traction vector and τ is the
+                    coordinate frame <a class="cite" href="#ref-jaeger2007">(Jaeger et al., 2007)</a>: σₙ is the
+                    diagonal (normal) component of the traction vector and τ is the
                     magnitude of its orthogonal in-plane component, obtained by subtracting σₙ² from the total
                     squared traction magnitude. σₙ is floored at 1×10⁻¹² MPa in the implementation to avoid
                     division-by-zero downstream.
@@ -352,7 +353,8 @@ for col in columns:
 
                 <h3 id="6.3">6.3 Slip Tendency (Ts, TsNorm)</h3>
                 <p>
-                    Slip tendency, following Morris, Ferrill &amp; Henderson (1996), expresses how close a plane is
+                    Slip tendency, following
+                    <a class="cite" href="#ref-morris1996">Morris et al. (1996)</a>, expresses how close a plane is
                     to frictional sliding under the resolved stress state, independent of any assumed cohesion or
                     pore pressure:
                 </p>
@@ -378,7 +380,9 @@ for col in columns:
                 <h3 id="6.4">6.4 Dilation Tendency (Td)</h3>
                 <div class="formula-block">Td = (σ1 − σₙ) / (σ1 − σ3)</div>
                 <p>
-                    Dilation tendency (Ferrill et al., 1999) measures the propensity of a fracture to open (dilate)
+                    Dilation tendency
+                    <a class="cite" href="#ref-ferrill2003">(Ferrill and Morris, 2003)</a> measures the propensity of
+                    a fracture to open (dilate)
                     rather than slip, and is highest for planes whose normal is closely aligned with σ3 (minimum
                     compressive stress), where the clamping normal stress is smallest relative to the overall
                     stress differential.
@@ -399,11 +403,15 @@ SfLegacy (original)           =  σₙ − τ / μ
                     Algebraically, SfLegacy = Sf + Pf whenever C₀ = 0, since the only structural difference between
                     the two formulas is the presence of the pore-pressure subtraction and the cohesion offset
                     inside the friction term. A lower Sf value indicates a plane closer to, or past, the failure
-                    envelope; Sf can be negative for critically or super-critically stressed planes.
+                    envelope; Sf can be negative for critically or super-critically stressed planes. Read as a
+                    pore-pressure margin, the corrected form is the quantity used to set sustainable injection
+                    pressures <a class="cite" href="#ref-streit2004">(Streit and Hillis, 2004)</a>.
                 </p>
 
                 <h3 id="6.6">6.6 Coulomb Critical-Stress Flag (CSF)</h3>
-                <p>The Mohr–Coulomb failure criterion used throughout FracSTAT is:</p>
+                <p>The Mohr–Coulomb failure criterion used throughout FracSTAT is
+                    <a class="cite" href="#ref-jaeger2007">(Jaeger et al., 2007;</a>
+                    <a class="cite" href="#ref-sibson1985">Sibson, 1985)</a>:</p>
                 <div class="formula-block">τ ≥ μ·(σₙ − Pf) + C₀   ⇒   plane is critically stressed</div>
                 <p>
                     This criterion is evaluated for every row during calculation and stored in the results DataFrame
@@ -417,8 +425,11 @@ SfLegacy (original)           =  σₙ − τ / μ
                 </p>
                 <p>
                     <code>Critical factor</code> is the friction coefficient the plane would need in order to resist
-                    its resolved shear, max(τ − C₀, 0) / (σₙ − Pf), and <code>State</code> bands the ratio of that
-                    demand to the entered μ at 50% / 75% / 100%. Two degenerate cases are handled explicitly rather
+                    its resolved shear, max(τ − C₀, 0) / (σₙ − Pf), which is directly comparable with the μ ≈ 0.6–0.85
+                    range measured for most rock types
+                    <a class="cite" href="#ref-byerlee1978">(Byerlee, 1978)</a>, and <code>State</code> bands the
+                    ratio of that demand to the entered μ at 50% / 75% / 100%. Two degenerate cases are handled
+                    explicitly rather
                     than producing a division error: if the effective normal stress σₙ − Pf is zero or negative the
                     factor is 0 when there is no driving shear and +∞ otherwise (so a tensile plane carrying shear
                     reports as Unstable), and if μ itself is zero the ratio is +∞ whenever the factor is positive.
@@ -778,7 +789,9 @@ SfLegacy (original)           =  σₙ − τ / μ
                 <p>
                     The Table Tab's numerical content supports several standard structural-geology and
                     reservoir-geomechanics interpretation workflows built on the Wallace–Bott hypothesis (that slip
-                    on a pre-existing fracture occurs in the direction of maximum resolved shear traction) and its
+                    on a pre-existing fracture occurs in the direction of maximum resolved shear traction
+                    <a class="cite" href="#ref-wallace1951">(Wallace, 1951;</a>
+                    <a class="cite" href="#ref-bott1959">Bott, 1959)</a>) and its
                     slip/dilation-tendency derivatives:
                 </p>
                 <ul>
@@ -800,7 +813,8 @@ SfLegacy (original)           =  σₙ − τ / μ
                     orientation inputs and observe, row-by-row in the Table Tab, how sensitive the
                     critically-stressed subset (CSF) and the slip/dilation-tendency rankings are to the assumed
                     stress state — a standard uncertainty-bracketing exercise given that in-situ stress magnitudes
-                    and orientations are rarely known with high precision.</li>
+                    and orientations are rarely known with high precision
+                    <a class="cite" href="#ref-zoback2007">(Zoback, 2007)</a>.</li>
                 </ul>
 
                 <!-- ================================================= -->
@@ -826,7 +840,8 @@ SfLegacy (original)           =  σₙ − τ / μ
                     restoration (<a href="#7.4">Section 7.4</a>, step 6) to work by simple string containment testing ("in
                     self.table.get_children()") without maintaining a separate lookup dictionary.</li>
                     <li><strong>Row-value construction</strong> is done with pandas'
-                    <code>itertuples(index=False)</code>, which is significantly faster than
+                    <code>itertuples(index=False)</code> <a class="cite" href="#ref-mckinney2010">(McKinney, 2010)</a>,
+                    which is significantly faster than
                     <code>iterrows()</code> for this row count and, unlike <code>iterrows()</code>, preserves each
                     column's native dtype as an attribute (<code>row.ID</code>, <code>row.StrikeDeg</code>, etc.)
                     rather than boxing every value into a single mixed-type Series per row.</li>
@@ -841,10 +856,54 @@ SfLegacy (original)           =  σₙ − τ / μ
                 </ul>
 
                 <!-- ================================================= -->
-                <h2 id="references">16. References</h2>
-                <p>Morris, A., Ferrill, D.A., Henderson, D.B. (1996). Slip-tendency analysis and fault reactivation. <em>Geology</em>, 24(3), 275–278.</p>
-                <p>Ferrill, D.A., Winterle, J., Wittmeyer, G., Sims, D., Colton, S., Armstrong, A., Morris, A.P. (1999). Stressed rock strains groundwater at Yucca Mountain, Nevada. <em>GSA Today</em>, 9(5), 1–8.</p>
-                <p>Jaeger, J.C., Cook, N.G.W., Zimmerman, R.W. (2007). <em>Fundamentals of Rock Mechanics</em>, 4th ed. Blackwell Publishing. (Mohr–Coulomb failure criterion and stress-transformation equations.)</p>
+                <h2 id="references">15. References</h2>
+                <p>
+                    Sources are listed alphabetically within each group. In-text citations throughout this page link
+                    to the corresponding entry below.
+                </p>
+
+                <h3 id="15.1">15.1 Stress Resolution and Failure Criteria</h3>
+                <ul class="ref-list">
+                    <li id="ref-byerlee1978">Byerlee, J. (1978). Friction of rocks. <em>Pure and Applied Geophysics</em>, 116(4–5), 615–626. <a href="https://doi.org/10.1007/BF00876528" target="_blank" rel="noopener">https://doi.org/10.1007/BF00876528</a></li>
+                    <li id="ref-jaeger2007">Jaeger, J. C., Cook, N. G. W., &amp; Zimmerman, R. W. (2007). <em>Fundamentals of Rock Mechanics</em> (4th ed.). Blackwell Publishing, Oxford. ISBN 978-0-632-05759-7. (Mohr–Coulomb failure criterion and stress-transformation equations.)</li>
+                    <li id="ref-sibson1985">Sibson, R. H. (1985). A note on fault reactivation. <em>Journal of Structural Geology</em>, 7(6), 751–754. <a href="https://doi.org/10.1016/0191-8141(85)90150-6" target="_blank" rel="noopener">https://doi.org/10.1016/0191-8141(85)90150-6</a></li>
+                    <li id="ref-zoback2007">Zoback, M. D. (2007). <em>Reservoir Geomechanics</em>. Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511586477" target="_blank" rel="noopener">https://doi.org/10.1017/CBO9780511586477</a></li>
+                </ul>
+
+                <h3 id="15.2">15.2 Tendency and Susceptibility Metrics</h3>
+                <ul class="ref-list">
+                    <li id="ref-bott1959">Bott, M. H. P. (1959). The mechanics of oblique slip faulting. <em>Geological Magazine</em>, 96(2), 109–117. <a href="https://doi.org/10.1017/S0016756800059987" target="_blank" rel="noopener">https://doi.org/10.1017/S0016756800059987</a></li>
+                    <li id="ref-ferrill2003">Ferrill, D. A., &amp; Morris, A. P. (2003). Dilational normal faults. <em>Journal of Structural Geology</em>, 25(2), 183–196. <a href="https://doi.org/10.1016/S0191-8141(02)00029-9" target="_blank" rel="noopener">https://doi.org/10.1016/S0191-8141(02)00029-9</a></li>
+                    <li id="ref-morris1996">Morris, A., Ferrill, D. A., &amp; Henderson, D. B. (1996). Slip-tendency analysis and fault reactivation. <em>Geology</em>, 24(3), 275–278. <a href="https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2" target="_blank" rel="noopener">https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2</a></li>
+                    <li id="ref-streit2004">Streit, J. E., &amp; Hillis, R. R. (2004). Estimating fault stability and sustainable fluid pressures for underground storage of CO₂ in porous rock. <em>Energy</em>, 29(9–10), 1445–1456. <a href="https://doi.org/10.1016/j.energy.2004.03.078" target="_blank" rel="noopener">https://doi.org/10.1016/j.energy.2004.03.078</a></li>
+                    <li id="ref-wallace1951">Wallace, R. E. (1951). Geometry of shearing stress and relation to faulting. <em>The Journal of Geology</em>, 59(2), 118–130. <a href="https://doi.org/10.1086/625831" target="_blank" rel="noopener">https://doi.org/10.1086/625831</a></li>
+                </ul>
+
+                <h3 id="15.3">15.3 Software</h3>
+                <ul class="ref-list">
+                    <li id="ref-harris2020">Harris, C. R., Millman, K. J., van der Walt, S. J., Gommers, R., Virtanen, P., Cournapeau, D., … Oliphant, T. E. (2020). Array programming with NumPy. <em>Nature</em>, 585(7825), 357–362. <a href="https://doi.org/10.1038/s41586-020-2649-2" target="_blank" rel="noopener">https://doi.org/10.1038/s41586-020-2649-2</a></li>
+                    <li id="ref-mckinney2010">McKinney, W. (2010). Data structures for statistical computing in Python. In <em>Proceedings of the 9th Python in Science Conference</em> (pp. 56–61). <a href="https://doi.org/10.25080/Majora-92bf1922-00a" target="_blank" rel="noopener">https://doi.org/10.25080/Majora-92bf1922-00a</a></li>
+                </ul>
+
+                <div class="cite-box">
+                    <p><strong>Methods statement for the Table Tab.</strong> If a table produced or exported by this
+                    tab appears in a publication, the details below are what a reader needs in order to reproduce it,
+                    and are what the citations above assume:</p>
+                    <p>Per-fracture resolved normal and shear stress computed by Cauchy transformation in the
+                    principal-axis frame <a class="cite" href="#ref-jaeger2007">(Jaeger et al., 2007)</a> for
+                    σ1/σ2/σ3 = … MPa, P_f = … MPa, C₀ = … MPa and μ = …, with principal axes built in Andersonian or
+                    general 3-D mode as stated. Reported metrics are slip tendency and its closed-form normalisation
+                    <a class="cite" href="#ref-morris1996">(Morris et al., 1996)</a>, dilation tendency
+                    <a class="cite" href="#ref-ferrill2003">(Ferrill and Morris, 2003)</a>, and fracture
+                    susceptibility in both the pore-pressure- and cohesion-corrected form
+                    <a class="cite" href="#ref-streit2004">(Streit and Hillis, 2004)</a> and the uncorrected legacy
+                    form (<a href="#6.5">Section 6.5</a>). Computed with pandas
+                    <a class="cite" href="#ref-mckinney2010">(McKinney, 2010)</a> over NumPy
+                    <a class="cite" href="#ref-harris2020">(Harris et al., 2020)</a>. Report the full stress tensor,
+                    the orientation mode, and which susceptibility column is quoted; note that the on-screen grid is
+                    capped at 1000 rows whereas the export contains every row
+                    (<a href="#10.1">Section 10.1</a>).</p>
+                </div>
 
                 <!-- Pagination Navigation -->
                 <div class="pagination-nav"></div>

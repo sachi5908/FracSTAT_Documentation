@@ -293,7 +293,9 @@
                     expressed in MPa and all angles in degrees unless stated otherwise. &sigma;&#8321; &ge;
                     &sigma;&#8322; &ge; &sigma;&#8323; denote the maximum, intermediate, and minimum principal
                     stresses respectively; P_f is pore pressure; C&#8320; is cohesion; &mu; is the coefficient of
-                    internal friction.
+                    internal friction. The conventions and derivations follow standard rock-mechanics treatments
+                    <a class="cite" href="#ref-jaeger2007">(Jaeger et al., 2007;</a>
+                    <a class="cite" href="#ref-zoback2007">Zoback, 2007)</a>.
                 </p>
 
                 <h3 id="5.1">5.1 Mohr Circle Construction</h3>
@@ -310,7 +312,10 @@ center = &frac12;(&sigma;i + &sigma;j)          radius = &frac12;(&sigma;i &minu
                 <p>
                     Because pore pressure acts equally on all faces, the diagram is drawn in effective-stress space
                     by subtracting P_f from every &sigma; coordinate before plotting (the circle centres shift left
-                    by P_f, radii are unchanged).
+                    by P_f, radii are unchanged) &mdash; the Terzaghi effective-stress convention that underlies
+                    fault-reactivation analysis <a class="cite" href="#ref-sibson1985">(Sibson, 1985)</a>. This
+                    assumes an isotropic, unit Biot coefficient; anisotropic poroelastic response is not modelled
+                    <a class="cite" href="#ref-healy2012">(Healy, 2012)</a>.
                 </p>
 
                 <h3 id="5.2">5.2 Effective Normal Stress and Failure Envelope</h3>
@@ -358,7 +363,14 @@ center = &frac12;(&sigma;i + &sigma;j)          radius = &frac12;(&sigma;i &minu
                 </p>
 
                 <h3 id="5.4">5.4 Tendency and Susceptibility Metrics</h3>
-                <p>These are computed upstream in <code>core/calculator.py</code> and simply displayed here:</p>
+                <p>
+                    These are computed upstream in <code>core/calculator.py</code> and simply displayed here. Slip
+                    tendency and its normalization follow
+                    <a class="cite" href="#ref-morris1996">Morris et al. (1996)</a>, dilation tendency follows
+                    <a class="cite" href="#ref-ferrill2003">Ferrill and Morris (2003)</a>, and fracture
+                    susceptibility &mdash; the pore-pressure increase required to bring a plane to failure &mdash;
+                    follows <a class="cite" href="#ref-streit2004">Streit and Hillis (2004)</a>:
+                </p>
                 <div class="formula-block">
 Slip Tendency:               Ts = &tau; / &sigma;n
 Normalized Ts:                Ts,norm = Ts / Ts,max,   Ts,max = (&sigma;1 &minus; &sigma;3) / ( 2&middot;&radic;(&sigma;1&middot;&sigma;3) )
@@ -748,7 +760,7 @@ def _mohr_field(sigma1, sigma2, sigma3, pore_pressure, cohesion, friction, value
                 <!-- ================================================= -->
                 <h2 id="examples">12. Practical Examples</h2>
 
-                <h3>Example 12.1 &mdash; Identifying Critically Stressed Fractures for Reservoir Stimulation</h3>
+                <h3 id="12.1">Example 12.1 &mdash; Identifying Critically Stressed Fractures for Reservoir Stimulation</h3>
                 <ol class="step-list">
                     <li>Load an SVG trace map or Excel orientation table of fractures via the workspace header, then enter the site's principal stresses, pore pressure, cohesion, and friction coefficient in the sidebar and press Calculate.</li>
                     <li>Open the Mohr Tab and check the "Critical fractures" colour-metric checkbox to shade the diagram by the four-tier Stable/Near Critical/Critical/Unstable field.</li>
@@ -757,7 +769,7 @@ def _mohr_field(sigma1, sigma2, sigma3, pore_pressure, cohesion, friction, value
                     <li>Re-run the calculation with a higher assumed pore pressure (e.g. simulating fluid injection) to observe how many additional fractures cross into the critical population, using the dry-envelope overlay to compare against the undrained case.</li>
                 </ol>
 
-                <h3>Example 12.2 &mdash; Preparing a Publication-Quality Mohr Diagram</h3>
+                <h3 id="12.2">Example 12.2 &mdash; Preparing a Publication-Quality Mohr Diagram</h3>
                 <ol class="step-list">
                     <li>Select the desired colour metric (e.g. Fracture susceptibility) and colour scale (e.g. Viridis) in the Information tab.</li>
                     <li>In the Settings tab, set the pole shape to Diamond, increase Pole size for visibility, and choose complementary Outer/Plot background colours.</li>
@@ -775,11 +787,11 @@ def _mohr_field(sigma1, sigma2, sigma3, pore_pressure, cohesion, friction, value
                     in-situ stress state.
                 </p>
                 <ul>
-                    <li><strong>Points plotting on or above the failure envelope</strong> (<code>CriticalStress = True</code>, &Delta;&tau; &ge; 0) represent fractures predicted to be frictionally unstable: the resolved shear stress equals or exceeds the frictional resistance available at that effective normal stress. In the field, such orientations are the ones most likely to have accommodated recent slip, to host fluid flow along dilated segments, or to be reactivated by an increase in pore pressure (e.g. injection-induced seismicity).</li>
+                    <li><strong>Points plotting on or above the failure envelope</strong> (<code>CriticalStress = True</code>, &Delta;&tau; &ge; 0) represent fractures predicted to be frictionally unstable: the resolved shear stress equals or exceeds the frictional resistance available at that effective normal stress. In the field, such orientations are the ones most likely to have accommodated recent slip, to host fluid flow along dilated segments, or to be reactivated by an increase in pore pressure (e.g. injection-induced seismicity) <a class="cite" href="#ref-sibson1985">(Sibson, 1985)</a>.</li>
                     <li><strong>Points plotting well below and to the right</strong> of the envelope, at high effective normal stress and low shear stress, represent fractures oriented close to a principal stress direction; these are mechanically stable and, absent significant pore-pressure increase, unlikely to slip.</li>
-                    <li><strong>Slip tendency (Ts)</strong> provides a continuous, normalized analogue of the same idea and is often mapped in colour across a fracture network to highlight which structural trends are, as a population, closest to reactivation &mdash; useful for ranking candidate flow pathways even where an explicit cohesion/friction pair is uncertain.</li>
-                    <li><strong>Dilation tendency (Td)</strong> highlights fractures oriented such that the normal stress acting across them is minimized relative to &sigma;&#8321;; such fractures are mechanically favoured to open (dilate) rather than to shear, and are frequently associated with enhanced permeability in fractured reservoirs even when they are not necessarily close to shear failure.</li>
-                    <li><strong>Fracture susceptibility (Sf)</strong> combines the effective normal stress and shear/cohesion/friction terms into a single MPa-valued index used in some legacy fracture-stability workflows; lower (more negative) values indicate a fracture closer to, or already past, the failure criterion.</li>
+                    <li><strong>Slip tendency (Ts)</strong> provides a continuous, normalized analogue of the same idea and is often mapped in colour across a fracture network to highlight which structural trends are, as a population, closest to reactivation &mdash; useful for ranking candidate flow pathways even where an explicit cohesion/friction pair is uncertain <a class="cite" href="#ref-morris1996">(Morris et al., 1996;</a> <a class="cite" href="#ref-worum2004">Worum et al., 2004)</a>.</li>
+                    <li><strong>Dilation tendency (Td)</strong> highlights fractures oriented such that the normal stress acting across them is minimized relative to &sigma;&#8321;; such fractures are mechanically favoured to open (dilate) rather than to shear, and are frequently associated with enhanced permeability in fractured reservoirs even when they are not necessarily close to shear failure <a class="cite" href="#ref-ferrill2003">(Ferrill and Morris, 2003)</a>.</li>
+                    <li><strong>Fracture susceptibility (Sf)</strong> combines the effective normal stress and shear/cohesion/friction terms into a single MPa-valued index used in some legacy fracture-stability workflows; lower (more negative) values indicate a fracture closer to, or already past, the failure criterion. Read as a pore-pressure margin, it is the quantity used to set sustainable injection pressures <a class="cite" href="#ref-streit2004">(Streit and Hillis, 2004)</a>.</li>
                 </ul>
                 <p>
                     Because the whole analysis is Andersonian or general 3D depending on the sidebar's Orientation
@@ -827,15 +839,66 @@ def _mohr_field(sigma1, sigma2, sigma3, pore_pressure, cohesion, friction, value
                     <tr><th>Limitation</th><th>Description</th></tr>
                     <tr><td>Bounded background field resolution</td><td>The continuous background tendency field is sampled on a fixed 58&times;116 polar/azimuthal grid; it is a smooth visual guide to the full orientation space rather than an exhaustive enumeration, and very thin features of the failure surface could in principle be under-resolved at that grid density.</td></tr>
                     <tr><td>Coupled pixel size and DPI</td><td>Manual pixel sizing fixes the on-screen and exported figure resolution together; changing DPI in the application Settings page after fixing a pixel size changes the physical (inches) size of the exported PNG.</td></tr>
+                    <tr><td>Linear Coulomb envelope only</td><td>Failure is modelled by a single straight line &tau; = C&#8320; + &mu;&middot;&sigma;n&prime;. No curved, pressure-dependent, or bi-linear envelope is offered, and no tensile cut-off is applied at negative &sigma;n&prime;, so predictions at very low or negative effective normal stress should be treated with caution <a class="cite" href="#ref-jaeger2007">(Jaeger et al., 2007)</a>.</td></tr>
+                    <tr><td>Friction and cohesion are user constants</td><td>&mu; and C&#8320; are single values applied to every fracture. Real friction coefficients vary with lithology, roughness, mineral coating, and normal stress; laboratory values cluster near &mu; &asymp; 0.6&ndash;0.85 but are not universal <a class="cite" href="#ref-byerlee1978">(Byerlee, 1978)</a>. No per-fracture or per-set assignment is supported.</td></tr>
+                    <tr><td>Stress tensor is uniform and user-supplied</td><td>One homogeneous stress tensor is applied across the whole dataset, entered by hand rather than inverted from data. Results are entirely conditional on that stress model and carry no uncertainty; constraining an in-situ tensor requires independent borehole or focal-mechanism data <a class="cite" href="#ref-zoback2007">(Zoback, 2007)</a>.</td></tr>
+                    <tr><td>Isotropic effective stress</td><td>Pore pressure is subtracted directly from each normal stress, i.e. a Biot coefficient of unity and isotropic poroelastic response. Anisotropic or fracture-compliance-dependent responses to pore-pressure change are not represented <a class="cite" href="#ref-healy2012">(Healy, 2012)</a>.</td></tr>
+                    <tr><td>Dataset-relative normalization</td><td>Normalized fracture susceptibility is rescaled from the loaded file's own minimum and maximum (<a href="#5.4">Section 5.4</a>), so S<sub>f,norm</sub> = 1.0 means "least stable plane in this file", not "at failure". Values must not be compared between datasets, and the same caution applies to the relative 5% "near envelope" threshold, which also scales with max(&tau;) in the loaded data.</td></tr>
+                    <tr><td>Static, single-realisation analysis</td><td>The tab evaluates one stress state at one instant. It does not model slip-induced stress redistribution, fault interaction, time-dependent healing, or the progressive reactivation sequence that numerical slip-tendency studies address <a class="cite" href="#ref-worum2004">(Worum et al., 2004)</a>; sensitivity to the stress model must be explored by re-running cases manually (<a href="#12.1">Section 12.1</a>).</td></tr>
                 </table>
 
                 <!-- ================================================= -->
                 <h2 id="references">16. References</h2>
-                <p>Jaeger, J.C., Cook, N.G.W., Zimmerman, R.W. (2007). <em>Fundamentals of Rock Mechanics</em>, 4th ed. Blackwell Publishing.</p>
-                <p>Sibson, R.H. (1985). A note on fault reactivation. <em>Journal of Structural Geology</em>, 7(6), 751&ndash;754.</p>
-                <p>Morris, A., Ferrill, D.A., Henderson, D.B. (1996). Slip-tendency analysis and fault reactivation. <em>Geology</em>, 24(3), 275&ndash;278.</p>
-                <p>Ferrill, D.A., Morris, A.P. (2003). Dilational normal faults. <em>Journal of Structural Geology</em>, 25(2), 183&ndash;196.</p>
-                <p>Zoback, M.D. (2007). <em>Reservoir Geomechanics</em>. Cambridge University Press.</p>
+                <p>
+                    Sources are listed alphabetically within each group. In-text citations throughout this page link
+                    to the corresponding entry below.
+                </p>
+
+                <h3 id="16.1">16.1 Rock Mechanics and the Mohr&ndash;Coulomb Criterion</h3>
+                <ul class="ref-list">
+                    <li id="ref-byerlee1978">Byerlee, J. (1978). Friction of rocks. <em>Pure and Applied Geophysics</em>, 116(4&ndash;5), 615&ndash;626. <a href="https://doi.org/10.1007/BF00876528" target="_blank" rel="noopener">https://doi.org/10.1007/BF00876528</a></li>
+                    <li id="ref-jaeger2007">Jaeger, J. C., Cook, N. G. W., &amp; Zimmerman, R. W. (2007). <em>Fundamentals of Rock Mechanics</em> (4th ed.). Blackwell Publishing, Oxford. ISBN 978-0-632-05759-7.</li>
+                    <li id="ref-sibson1985">Sibson, R. H. (1985). A note on fault reactivation. <em>Journal of Structural Geology</em>, 7(6), 751&ndash;754. <a href="https://doi.org/10.1016/0191-8141(85)90150-6" target="_blank" rel="noopener">https://doi.org/10.1016/0191-8141(85)90150-6</a></li>
+                    <li id="ref-zoback2007">Zoback, M. D. (2007). <em>Reservoir Geomechanics</em>. Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511586477" target="_blank" rel="noopener">https://doi.org/10.1017/CBO9780511586477</a></li>
+                </ul>
+
+                <h3 id="16.2">16.2 Slip, Dilation and Susceptibility Analysis</h3>
+                <ul class="ref-list">
+                    <li id="ref-ferrill2003">Ferrill, D. A., &amp; Morris, A. P. (2003). Dilational normal faults. <em>Journal of Structural Geology</em>, 25(2), 183&ndash;196. <a href="https://doi.org/10.1016/S0191-8141(02)00029-9" target="_blank" rel="noopener">https://doi.org/10.1016/S0191-8141(02)00029-9</a></li>
+                    <li id="ref-healy2012">Healy, D. (2012). Anisotropic poroelasticity and the response of faulted rock to changes in pore-fluid pressure. <em>Geological Society, London, Special Publications</em>, 367(1), 201&ndash;214. <a href="https://doi.org/10.1144/SP367.14" target="_blank" rel="noopener">https://doi.org/10.1144/SP367.14</a></li>
+                    <li id="ref-morris1996">Morris, A., Ferrill, D. A., &amp; Henderson, D. B. (1996). Slip-tendency analysis and fault reactivation. <em>Geology</em>, 24(3), 275&ndash;278. <a href="https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2" target="_blank" rel="noopener">https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2</a></li>
+                    <li id="ref-streit2004">Streit, J. E., &amp; Hillis, R. R. (2004). Estimating fault stability and sustainable fluid pressures for underground storage of CO&#8322; in porous rock. <em>Energy</em>, 29(9&ndash;10), 1445&ndash;1456. <a href="https://doi.org/10.1016/j.energy.2004.03.078" target="_blank" rel="noopener">https://doi.org/10.1016/j.energy.2004.03.078</a></li>
+                    <li id="ref-worum2004">Worum, G., van Wees, J.-D., Bada, G., van Balen, R. T., Cloetingh, S., &amp; Pagnier, H. (2004). Slip tendency analysis as a tool to constrain fault reactivation: A numerical approach applied to three-dimensional fault models in the Roer Valley rift system (southeast Netherlands). <em>Journal of Geophysical Research: Solid Earth</em>, 109(B2), B02401. <a href="https://doi.org/10.1029/2003JB002586" target="_blank" rel="noopener">https://doi.org/10.1029/2003JB002586</a></li>
+                </ul>
+
+                <h3 id="16.3">16.3 Software</h3>
+                <ul class="ref-list">
+                    <li id="ref-harris2020">Harris, C. R., Millman, K. J., van der Walt, S. J., Gommers, R., Virtanen, P., Cournapeau, D., &hellip; Oliphant, T. E. (2020). Array programming with NumPy. <em>Nature</em>, 585(7825), 357&ndash;362. <a href="https://doi.org/10.1038/s41586-020-2649-2" target="_blank" rel="noopener">https://doi.org/10.1038/s41586-020-2649-2</a></li>
+                    <li id="ref-hunter2007">Hunter, J. D. (2007). Matplotlib: A 2D graphics environment. <em>Computing in Science &amp; Engineering</em>, 9(3), 90&ndash;95. <a href="https://doi.org/10.1109/MCSE.2007.55" target="_blank" rel="noopener">https://doi.org/10.1109/MCSE.2007.55</a></li>
+                </ul>
+
+
+                <div class="cite-box">
+                    <p><strong>Methods statement for the Mohr Tab.</strong> If a figure produced by this tab appears
+                    in a publication, the details below are what a reader needs in order to reproduce it, and are
+                    what the citations above assume:</p>
+                    <p>Three-circle Mohr diagram in effective-stress space for &sigma;&#8321;/&sigma;&#8322;/&sigma;&#8323;
+                    = &hellip; MPa and pore pressure P_f = &hellip; MPa, with a linear Coulomb envelope
+                    &tau; = C&#8320; + &mu;&middot;&sigma;n&prime; for cohesion C&#8320; = &hellip; MPa and friction
+                    coefficient &mu; = &hellip;
+                    <a class="cite" href="#ref-jaeger2007">(Jaeger et al., 2007)</a>. Fracture poles coloured by
+                    normalized slip tendency <a class="cite" href="#ref-morris1996">(Morris et al., 1996)</a>,
+                    dilation tendency <a class="cite" href="#ref-ferrill2003">(Ferrill and Morris, 2003)</a>,
+                    fracture susceptibility <a class="cite" href="#ref-streit2004">(Streit and Hillis, 2004)</a>, or
+                    the four-tier critical-state classification of <a href="#5.3">Section 5.3</a>, over a continuous
+                    background field evaluated on a 58&times;116 orientation mesh
+                    (<a href="#5.5">Section 5.5</a>). Implemented in NumPy
+                    <a class="cite" href="#ref-harris2020">(Harris et al., 2020)</a> and rendered with Matplotlib
+                    <a class="cite" href="#ref-hunter2007">(Hunter, 2007)</a>. Report the full stress tensor, P_f,
+                    C&#8320;, &mu;, the orientation mode (Andersonian or general 3D), and which susceptibility column
+                    was used; state that normalized susceptibility is rescaled per dataset and is therefore not
+                    comparable between files (<a href="#5.4">Section 5.4</a>).</p>
+                </div>
 
                 <!-- Pagination Navigation -->
                 <div class="pagination-nav"></div>

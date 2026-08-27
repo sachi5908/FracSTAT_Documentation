@@ -340,9 +340,17 @@
                     The circular scanline method was developed to overcome a fundamental limitation of straight‑line
                     scanlines: the number of fracture intersections recorded by a straight scanline is
                     systematically biased against fractures that are sub‑parallel to the scanline direction (the
-                    well‑known Terzaghi orientation bias). A circular sampling window, having no preferred
-                    direction, removes this bias, provided fracture intensity is evaluated using the correct
-                    geometric estimator.
+                    well‑known Terzaghi orientation bias
+                    <a class="cite" href="#ref-terzaghi1965">(Terzaghi, 1965;</a>
+                    <a class="cite" href="#ref-priest1993">Priest, 1993)</a>). A circular sampling window, having no
+                    preferred direction, removes this bias, provided fracture intensity is evaluated using the
+                    correct geometric estimator
+                    <a class="cite" href="#ref-mauldon1998">(Mauldon, 1998;</a>
+                    <a class="cite" href="#ref-mauldon2001">Mauldon et al., 2001)</a>. Comparative appraisals of
+                    outcrop sampling schemes consistently find the circular-window family to be the least biased of
+                    the practical alternatives
+                    <a class="cite" href="#ref-zeeb2013">(Zeeb et al., 2013;</a>
+                    <a class="cite" href="#ref-watkins2015">Watkins et al., 2015)</a>.
                 </p>
 
                 <h3 id="5.1">5.1 Symbol Definitions</h3>
@@ -365,17 +373,22 @@
                     This relationship follows from integral‑geometry (Buffon‑type) arguments relating the expected
                     number of crossings of a fracture network with the boundary of a convex sampling window to the
                     total trace length enclosed, and holds regardless of the internal orientation distribution of
-                    the fractures — which is precisely why the method is orientation‑unbiased. In the
+                    the fractures — which is precisely why the method is orientation‑unbiased
+                    <a class="cite" href="#ref-mauldon1998">(Mauldon, 1998)</a>. In the
                     implementation, N corresponds to <code>N_circle</code>, the count of valid line‑segment/circle‑boundary
                     root crossings (<a  href="#sec-6-2">Section 6.2</a>), and I corresponds to one entry of the <code>I_grid</code> array.
+                    In the P<sub>ij</sub> notation of
+                    <a class="cite" href="#ref-dershowitz1992">Dershowitz and Herda (1992)</a> this quantity is P21:
+                    one‑dimensional features (trace length) measured over a two‑dimensional region.
                 </p>
 
                 <h3 id="sec-5-3">5.3 Circle‑Based P20 (Density) Estimator</h3>
                 <p>The companion density estimator counts fracture <strong>trace tips</strong> falling inside the circle:</p>
                 <div class="formula-block">D  =  M / (2π r²)</div>
                 <p>
-                    where M is the number of trace tips inside the window (Mauldon, Dunne &amp; Rohrbaugh, 2001,
-                    §2). This is coded as <code>M_circle / (2 * π * rCircle**2)</code>. The normalisation constant is
+                    where M is the number of trace tips inside the window
+                    (<a class="cite" href="#ref-mauldon2001">Mauldon et al., 2001, §2</a>).
+                    This is coded as <code>M_circle / (2 * π * rCircle**2)</code>. The normalisation constant is
                     2πr², not the naive πr², because a trace contributes <em>two</em> tips: for a tip density of
                     2d per unit area over a window of area πr², the expected count is E[M] = 2d·πr², so the
                     unbiased estimate of the trace density d is M/(2πr²). Dividing the two estimators returns the
@@ -383,7 +396,9 @@
                 </p>
                 <div class="formula-block">ℓ  =  I / D  =  [N / (4r)] / [M / (2π r²)]  =  π r N / (2 M)</div>
                 <p>
-                    which is exactly the mean‑length estimator published alongside them, so the constants are not
+                    which is exactly the mean‑length estimator published alongside them
+                    <a class="cite" href="#ref-mauldon1998">(Mauldon, 1998;</a>
+                    <a class="cite" href="#ref-rohrbaugh2002">Rohrbaugh et al., 2002)</a>, so the constants are not
                     free parameters that could be adjusted.
                 </p>
                 <div class="note-box">
@@ -415,7 +430,9 @@ P20_global  =  n_traces / A_map        where n_traces = df["Trace"].nunique()</d
                 <div class="note-box">
                     <p>
                         <strong>P20 is traces per unit area, not segments per unit area.</strong> In the
-                        P<sub>ij</sub> system of Dershowitz &amp; Herda (1992), the first index is the dimension of
+                        P<sub>ij</sub> system of
+                        <a class="cite" href="#ref-dershowitz1992">Dershowitz and Herda (1992)</a>, the first index
+                        is the dimension of
                         the sampling region and the second the dimension of the feature measured: P20 is
                         zero‑dimensional features (whole fractures) counted over a two‑dimensional region. A
                         polyline trace is one fracture however many vertices were clicked while digitising it, so
@@ -542,7 +559,7 @@ m_arr = ((d1_sq &lt; r_sq) &amp; tip1_mask[:, None]).astype(int) \
                 <h3 id="sec-6-4">6.4 Step 4 — Rendering Dispatch</h3>
                 <p>Based on <code>plot_style_var</code>, one of three rendering branches executes:</p>
 
-                <h4 id="6.4">6.4.1 Heatmap</h4>
+                <h4 id="6.4.1">6.4.1 Heatmap</h4>
                 <p>
                     The active grid (<code>I_grid</code> or <code>D_grid</code>, selected by
                     <code>plot_mode_var</code>) is masked wherever its value is exactly zero
@@ -552,7 +569,7 @@ m_arr = ((d1_sq &lt; r_sq) &amp; tip1_mask[:, None]).astype(int) \
                     axis spacing.
                 </p>
 
-                <h4 id="6.4">6.4.2 Contour (Filled) / Contour (Lines Only)</h4>
+                <h4 id="6.4.2">6.4.2 Contour (Filled) / Contour (Lines Only)</h4>
                 <p>
                     Both contour styles first interpolate the sparse per‑circle grid values onto a dense 100×100
                     regular mesh spanning the full bounding box. Two interpolation paths are supported:
@@ -639,7 +656,9 @@ m_arr = ((d1_sq &lt; r_sq) &amp; tip1_mask[:, None]).astype(int) \
                 <p>
                     When available, Ordinary Kriging is used for its property of exact interpolation at data points
                     combined with a principled treatment of spatial autocorrelation via the fitted linear variogram
-                    model. A linear variogram was selected as a robust, parameter‑light default appropriate for
+                    model <a class="cite" href="#ref-cressie1993">(Cressie, 1993;</a>
+                    <a class="cite" href="#ref-chiles2012">Chilès and Delfiner, 2012)</a>. A linear variogram was
+                    selected as a robust, parameter‑light default appropriate for
                     scan‑circle sampling grids of moderate size, avoiding the need for interactive variogram model
                     selection within the GUI. Because the variogram parameters are fixed rather than fit adaptively
                     to each dataset, users working with strongly clustered or highly heterogeneous fracture
@@ -650,7 +669,8 @@ m_arr = ((d1_sq &lt; r_sq) &amp; tip1_mask[:, None]).astype(int) \
                 <h3 id="7.3">7.3 Cubic Spline Fallback</h3>
                 <p>
                     In the absence of PyKrige, <code>scipy.interpolate.griddata</code> with
-                    <code>method='cubic'</code> provides a smooth, differentiable interpolation surface. Cubic
+                    <code>method='cubic'</code> provides a smooth, differentiable interpolation surface
+                    <a class="cite" href="#ref-virtanen2020">(Virtanen et al., 2020)</a>. Cubic
                     griddata does not honour the nugget/nugget‑free distinction of kriging and can produce mild
                     over/undershoot (Gibbs‑like ringing) near sharp gradients in the underlying scan‑circle values;
                     this is an accepted trade‑off for environments without the optional PyKrige dependency.
@@ -819,7 +839,8 @@ m_arr = ((d1_sq &lt; r_sq) &amp; tip1_mask[:, None]).astype(int) \
                     <li>High‑P21 corridors frequently mark active or reactivated fault zones, relay ramps, or fold‑hinge damage zones where strain has been concentrated, and are commonly zones of enhanced permeability in naturally fractured reservoirs.</li>
                     <li>Elevated P20 without a correspondingly high P21 can indicate a population of short, closely spaced fractures (e.g. from hydraulic shattering or thermal cracking) rather than a few long, throughgoing structures — an important distinction for connectivity and flow‑pathway modelling.</li>
                     <li>Spatially uniform P21/P20 across a mapped domain supports treating the domain as statistically homogeneous for upscaling purposes, whereas strong local heterogeneity (as visualised here) motivates domain sub‑division or the use of spatially variable DFN input statistics.</li>
-                    <li>Because the circular‑scanline estimator is explicitly designed to be orientation‑unbiased, P21/P20 values computed here are more directly comparable between outcrops or map sheets with different structural trends than values derived from straight‑line scanlines oriented arbitrarily with respect to the dominant fracture set.</li>
+                    <li>Because the circular‑scanline estimator is explicitly designed to be orientation‑unbiased, P21/P20 values computed here are more directly comparable between outcrops or map sheets with different structural trends than values derived from straight‑line scanlines oriented arbitrarily with respect to the dominant fracture set <a class="cite" href="#ref-terzaghi1965">(Terzaghi, 1965;</a> <a class="cite" href="#ref-zeeb2013">Zeeb et al., 2013)</a>.</li>
+                    <li>Both P21 and P20 are scale‑dependent quantities in a fractal or power‑law fracture population: the value obtained depends on the resolution at which traces were digitised and on the size of the sampling window, so comparisons between data sets are only meaningful at a matched observation scale <a class="cite" href="#ref-ortega2006">(Ortega et al., 2006)</a>.</li>
                 </ul>
                 <p>
                     Users should bear in mind that all statistics in this tab are 2‑D, trace‑map‑derived measures;
@@ -827,7 +848,9 @@ m_arr = ((d1_sq &lt; r_sq) &amp; tip1_mask[:, None]).astype(int) \
                     outcrop face, a satellite image, or a core photograph laid flat) and are not automatically
                     equivalent to volumetric (3‑D) fracture intensity (P32) without additional geometric assumptions
                     relating trace‑plane sampling to the true 3‑D fracture population — a conversion that FracSTAT's
-                    Static Analyzer does not perform in this tab.
+                    Static Analyzer does not perform in this tab, and which requires assumptions about the fracture
+                    size and orientation distributions
+                    <a class="cite" href="#ref-zhang2000">(Zhang and Einstein, 2000)</a>.
                 </p>
 
                 <!-- ================================================= -->
@@ -847,21 +870,68 @@ m_arr = ((d1_sq &lt; r_sq) &amp; tip1_mask[:, None]).astype(int) \
                 <h2 id="limitations">14. Limitations</h2>
                 <table>
                     <tr><th>Limitation</th><th>Description</th></tr>
-                    <tr><td>Tip‑based P20 estimator</td><td>The local P20 estimator counts trace <em>tips</em> inside each scan circle rather than trace <em>centres</em>. This is the published circular‑window estimator (Mauldon, Dunne &amp; Rohrbaugh, 2001) and is digitisation‑invariant, since interior polyline vertices are masked out by <code>_trace_tip_masks()</code>. It remains a sampling estimator, however: a long trace crossing the window without terminating in it contributes no tips, so a single circle placed on a sparse, long‑trace network can read low while the global P20 does not. Compare the map against the Global Results value (<a  href="#7.4">Section 7.4</a>) before treating a local minimum as real.</td></tr>
+                    <tr><td>Tip‑based P20 estimator</td><td>The local P20 estimator counts trace <em>tips</em> inside each scan circle rather than trace <em>centres</em>. This is the published circular‑window estimator <a class="cite" href="#ref-mauldon2001">(Mauldon et al., 2001)</a> and is digitisation‑invariant, since interior polyline vertices are masked out by <code>_trace_tip_masks()</code>. It remains a sampling estimator, however: a long trace crossing the window without terminating in it contributes no tips, so a single circle placed on a sparse, long‑trace network can read low while the global P20 does not. Compare the map against the Global Results value (<a  href="#7.4">Section 7.4</a>) before treating a local minimum as real.</td></tr>
                     <tr><td>Bounding‑box sampling area</td><td>Both global statistics are normalised by the data's own bounding box, A_map = Δx × Δy, not by an independently chosen sampling window. Where the mapped domain is not rectangular, or where traces do not reach the box edges, A_map overstates the true sampled area and both P21_global and P20_global are correspondingly biased low. The Connectivity tab, by contrast, accepts an explicit sampling window for exactly this reason.</td></tr>
-                    <tr><td>Fixed variogram model</td><td>The fixed linear‑variogram kriging model (<a  href="#sec-7-2">Section 7.2</a>) is not adaptively fit to each dataset's own spatial autocorrelation structure; it functions as a general‑purpose smoothing interpolator rather than a geostatistically optimal predictor for every possible fracture network.</td></tr>
+                    <tr><td>Fixed variogram model</td><td>The fixed linear‑variogram kriging model (<a  href="#sec-7-2">Section 7.2</a>) is not adaptively fit to each dataset's own spatial autocorrelation structure; it functions as a general‑purpose smoothing interpolator rather than a geostatistically optimal predictor for every possible fracture network <a class="cite" href="#ref-chiles2012">(Chilès and Delfiner, 2012)</a>. No kriging variance is reported, so the map carries no interpolation‑uncertainty estimate.</td></tr>
                     <tr><td>Indirect grid resolution control</td><td>Grid resolution is controlled indirectly, via the Number of scan circles field, which sets circle count along the shorter map dimension only — very elongated (high aspect‑ratio) datasets may produce an uneven number of circles along the two axes.</td></tr>
+                    <tr><td>No confidence intervals on local estimates</td><td>Each per‑circle P21 and P20 value is a single count divided by a geometric constant, so its sampling error is inherently large for small N or M. No standard error, Poisson interval, or bootstrap confidence band is computed, and adjacent circles are treated as independent even where they nearly touch <a class="cite" href="#ref-rohrbaugh2002">(Rohrbaugh et al., 2002)</a>.</td></tr>
+                    <tr><td>Scale dependence not quantified</td><td>Results are reported at one circle radius only. Because P21 and P20 in a power‑law fracture population depend on observation scale <a class="cite" href="#ref-ortega2006">(Ortega et al., 2006)</a>, no multi‑radius sweep or scaling exponent is produced, and values are not comparable across data sets digitised at different resolutions.</td></tr>
+                    <tr><td>Circles are not clipped to the mapped domain</td><td>The packing geometry (<a href="#sec-5-5">Section 5.5</a>) insets circle centres from the bounding box but does not guarantee that every circle lies wholly inside the digitised area. A circle overlapping unmapped ground records fewer crossings than it should and reads spuriously low; inspect coverage with Show scan circles enabled.</td></tr>
                 </table>
 
                 <!-- ================================================= -->
                 <h2 id="references">15. References</h2>
-                <p>Mauldon, M. (1998). Estimating mean fracture trace length and density from observations in convex windows. <em>Rock Mechanics and Rock Engineering</em>, 31(4), 201–216.</p>
-                <p>Mauldon, M., Dunne, W. M., &amp; Rohrbaugh, M. B. (2001). Circular scanlines and circular windows: new tools for characterizing the geometry of fracture traces. <em>Journal of Structural Geology</em>, 23(2–3), 247–258.</p>
-                <p>Dershowitz, W. S., &amp; Herda, H. H. (1992). Interpretation of fracture spacing and intensity. In <em>Proceedings of the 33rd U.S. Symposium on Rock Mechanics</em> (pp. 757–766). Balkema, Rotterdam. — source of the P<sub>ij</sub> notation; P20 is defined as the number of fractures per unit area.</p>
-                <p>Rohrbaugh, M. B., Dunne, W. M., &amp; Mauldon, M. (2002). Estimating fracture trace intensity, density, and mean length using circular scan lines and windows. <em>AAPG Bulletin</em>, 86(12), 2089–2104.</p>
-                <p>Terzaghi, R. D. (1965). Sources of error in joint surveys. <em>Géotechnique</em>, 15(3), 287–304.</p>
-                <p>Cressie, N. A. C. (1993). <em>Statistics for Spatial Data</em> (Revised Edition). John Wiley &amp; Sons.</p>
-                <p>Priest, S. D. (1993). <em>Discontinuity Analysis for Rock Engineering</em>. Chapman &amp; Hall, London.</p>
+                <p>
+                    Sources are listed alphabetically within each group. In-text citations throughout this page link
+                    to the corresponding entry below.
+                </p>
+
+                <h3 id="15.1">15.1 Fracture Intensity and Circular-Window Sampling</h3>
+                <ul class="ref-list">
+                    <li id="ref-dershowitz1992">Dershowitz, W. S., &amp; Herda, H. H. (1992). Interpretation of fracture spacing and intensity. In <em>Proceedings of the 33rd U.S. Symposium on Rock Mechanics</em> (pp. 757–766). Balkema, Rotterdam. — source of the P<sub>ij</sub> notation; P20 is defined as the number of fractures per unit area.</li>
+                    <li id="ref-mauldon1998">Mauldon, M. (1998). Estimating mean fracture trace length and density from observations in convex windows. <em>Rock Mechanics and Rock Engineering</em>, 31(4), 201–216. <a href="https://doi.org/10.1007/s006030050021" target="_blank" rel="noopener">https://doi.org/10.1007/s006030050021</a></li>
+                    <li id="ref-mauldon2001">Mauldon, M., Dunne, W. M., &amp; Rohrbaugh, M. B. (2001). Circular scanlines and circular windows: new tools for characterizing the geometry of fracture traces. <em>Journal of Structural Geology</em>, 23(2–3), 247–258. <a href="https://doi.org/10.1016/S0191-8141(00)00094-8" target="_blank" rel="noopener">https://doi.org/10.1016/S0191-8141(00)00094-8</a></li>
+                    <li id="ref-ortega2006">Ortega, O. J., Marrett, R. A., &amp; Laubach, S. E. (2006). A scale-independent approach to fracture intensity and average spacing measurement. <em>AAPG Bulletin</em>, 90(2), 193–208. <a href="https://doi.org/10.1306/08250505059" target="_blank" rel="noopener">https://doi.org/10.1306/08250505059</a></li>
+                    <li id="ref-rohrbaugh2002">Rohrbaugh, M. B., Dunne, W. M., &amp; Mauldon, M. (2002). Estimating fracture trace intensity, density, and mean length using circular scan lines and windows. <em>AAPG Bulletin</em>, 86(12), 2089–2104. <a href="https://doi.org/10.1306/61EEDE0E-173E-11D7-8645000102C1865D" target="_blank" rel="noopener">https://doi.org/10.1306/61EEDE0E-173E-11D7-8645000102C1865D</a></li>
+                    <li id="ref-zhang2000">Zhang, L., &amp; Einstein, H. H. (2000). Estimating the intensity of rock discontinuities. <em>International Journal of Rock Mechanics and Mining Sciences</em>, 37(5), 819–837. <a href="https://doi.org/10.1016/S1365-1609(00)00022-8" target="_blank" rel="noopener">https://doi.org/10.1016/S1365-1609(00)00022-8</a></li>
+                </ul>
+
+                <h3 id="15.2">15.2 Sampling Bias and Survey Practice</h3>
+                <ul class="ref-list">
+                    <li id="ref-priest1993">Priest, S. D. (1993). <em>Discontinuity Analysis for Rock Engineering</em>. Chapman &amp; Hall, London. <a href="https://doi.org/10.1007/978-94-011-1498-1" target="_blank" rel="noopener">https://doi.org/10.1007/978-94-011-1498-1</a></li>
+                    <li id="ref-terzaghi1965">Terzaghi, R. D. (1965). Sources of error in joint surveys. <em>Géotechnique</em>, 15(3), 287–304. <a href="https://doi.org/10.1680/geot.1965.15.3.287" target="_blank" rel="noopener">https://doi.org/10.1680/geot.1965.15.3.287</a></li>
+                    <li id="ref-watkins2015">Watkins, H., Bond, C. E., Healy, D., &amp; Butler, R. W. H. (2015). Appraisal of fracture sampling methods and a new workflow to characterise heterogeneous fracture networks at outcrop. <em>Journal of Structural Geology</em>, 72, 67–82. <a href="https://doi.org/10.1016/j.jsg.2015.02.001" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2015.02.001</a></li>
+                    <li id="ref-zeeb2013">Zeeb, C., Gomez-Rivas, E., Bons, P. D., &amp; Blum, P. (2013). Evaluation of sampling methods for fracture network characterization using outcrops. <em>AAPG Bulletin</em>, 97(9), 1545–1566. <a href="https://doi.org/10.1306/02131312042" target="_blank" rel="noopener">https://doi.org/10.1306/02131312042</a></li>
+                </ul>
+                <h3 id="15.3">15.3 Geostatistics, Interpolation and Software</h3>
+                <ul class="ref-list">
+                    <li id="ref-chiles2012">Chilès, J.-P., &amp; Delfiner, P. (2012). <em>Geostatistics: Modeling Spatial Uncertainty</em> (2nd ed.). John Wiley &amp; Sons. <a href="https://doi.org/10.1002/9781118136188" target="_blank" rel="noopener">https://doi.org/10.1002/9781118136188</a></li>
+                    <li id="ref-cressie1993">Cressie, N. A. C. (1993). <em>Statistics for Spatial Data</em> (Revised ed.). John Wiley &amp; Sons. <a href="https://doi.org/10.1002/9781119115151" target="_blank" rel="noopener">https://doi.org/10.1002/9781119115151</a></li>
+                    <li id="ref-harris2020">Harris, C. R., Millman, K. J., van der Walt, S. J., Gommers, R., Virtanen, P., Cournapeau, D., … Oliphant, T. E. (2020). Array programming with NumPy. <em>Nature</em>, 585(7825), 357–362. <a href="https://doi.org/10.1038/s41586-020-2649-2" target="_blank" rel="noopener">https://doi.org/10.1038/s41586-020-2649-2</a></li>
+                    <li id="ref-hunter2007">Hunter, J. D. (2007). Matplotlib: A 2D graphics environment. <em>Computing in Science &amp; Engineering</em>, 9(3), 90–95. <a href="https://doi.org/10.1109/MCSE.2007.55" target="_blank" rel="noopener">https://doi.org/10.1109/MCSE.2007.55</a></li>
+                    <li id="ref-virtanen2020">Virtanen, P., Gommers, R., Oliphant, T. E., Haberland, M., Reddy, T., Cournapeau, D., … van Mulbregt, P. (2020). SciPy 1.0: fundamental algorithms for scientific computing in Python. <em>Nature Methods</em>, 17(3), 261–272. <a href="https://doi.org/10.1038/s41592-019-0686-2" target="_blank" rel="noopener">https://doi.org/10.1038/s41592-019-0686-2</a></li>
+                </ul>
+
+                <div class="cite-box">
+                    <p><strong>Methods statement for the Intensity &amp; Density tab.</strong> If a figure produced by
+                    this tab appears in a publication, the details below are what a reader needs in order to
+                    reproduce it, and are what the citations above assume:</p>
+                    <p>Spatially resolved fracture intensity P21 = N/(4r) and density P20 = M/(2πr²) estimated with
+                    the circular-scanline/circular-window estimators of
+                    <a class="cite" href="#ref-mauldon1998">Mauldon (1998)</a> and
+                    <a class="cite" href="#ref-mauldon2001">Mauldon et al. (2001)</a>, on a grid of
+                    <em>n</em> non-overlapping scan circles of radius <em>r</em> spanning the mapped bounding box of
+                    area <em>A</em>. Values interpolated for display by ordinary kriging with a linear variogram
+                    (PyKrige) or by cubic <code>griddata</code>
+                    <a class="cite" href="#ref-virtanen2020">(Virtanen et al., 2020)</a> where PyKrige is
+                    unavailable; rendered with Matplotlib
+                    <a class="cite" href="#ref-hunter2007">(Hunter, 2007)</a> over NumPy
+                    <a class="cite" href="#ref-harris2020">(Harris et al., 2020)</a>. Report <em>r</em>, the circle
+                    count, the interpolation method, and the global P21/P20 alongside the map; note that the
+                    interpolated surface is a visual aid and the rigorous estimate exists only at circle centres
+                    (<a href="#7.1">Section 7.1</a>), and that these are two-dimensional trace-map measures, not P32
+                    (<a href="#interpretation">Section 12</a>).</p>
+                </div>
                 <!-- Pagination Navigation -->
                 <div class="pagination-nav"></div>
             </div>

@@ -238,8 +238,8 @@ Mean Segment Length = (1/nₛ) · Σ Lᵢ</div>
                 <p>
                     Fracture strikes are axial data — a fracture measured at azimuth θ is physically
                     indistinguishable from one measured at θ + 180°. Ordinary (linear) circular statistics would
-                    therefore be biased; the module instead uses the doubled-angle method of Mardia and Jupp for
-                    axial data. Each strike θᵢ (already folded into 0°–180°) is doubled to 2θᵢ, mapped onto the
+                    therefore be biased; the module instead uses the doubled-angle method for
+                    axial data <a class="cite" href="#ref-mardia2000">(Mardia and Jupp, 2000, sec. 2.3.4)</a>. Each strike θᵢ (already folded into 0°–180°) is doubled to 2θᵢ, mapped onto the
                     full circle, and averaged as a set of unit vectors:
                 </p>
                 <div class="formula-block">
@@ -260,7 +260,9 @@ Circular Std. Dev. = ½ · √(−2 ln R)  (in degrees, after conversion from ra
                 <h3 id="5.3">5.3 Connectivity and Topology (I-Y-X Node Theory)</h3>
                 <p>
                     The connectivity statistics implement the standard structural-geology I-Y-X node classification
-                    (Sanderson &amp; Nixon, 2015). Classification is performed at <strong>trace</strong> level, not
+                    <a class="cite" href="#ref-sanderson2015">(Sanderson and Nixon, 2015)</a>; the node and branch
+                    terminology follows the fracture-network glossary
+                    <a class="cite" href="#ref-peacock2016">(Peacock et al., 2016)</a>. Classification is performed at <strong>trace</strong> level, not
                     segment level: a trace's only tips are the start of its first segment and the end of its last,
                     and the interior vertices of a digitised polyline are not nodes at all. Each node is then one of
                     three types, distinguished by how many branches meet there:
@@ -285,7 +287,7 @@ Connections per Line:    N_L = (N_I + N_Y) / 2         C_L = 2(N_X + N_Y) / N_L
 Connections per Branch:  N_B = (N_I + 3N_Y + 4N_X) / 2  C_B = (3N_Y + 4N_X) / N_B</div>
                 <p>
                     C_L and C_B are the average-connections-per-line and average-connections-per-branch indices of
-                    Sanderson &amp; Nixon (2015, eqs. 4–8); both increase toward their theoretical maxima (4 for C_L
+                    <a class="cite" href="#ref-sanderson2015">Sanderson and Nixon (2015, eqs. 4&ndash;8)</a>; both increase toward their theoretical maxima (4 for C_L
                     on a fully crossing network, 2 for C_B) as the network becomes progressively better connected.
                     The N_B expression is the node-degree identity: each I node terminates one branch, each Y node
                     three, each X node four, and every branch has exactly two ends, hence the division by two. It
@@ -318,7 +320,7 @@ Connections per Branch:  N_B = (N_I + 3N_Y + 4N_X) / 2  C_B = (3N_Y + 4N_X) / N_
                     other), and C-C (connected at both ends). Their counts, n<sub>II</sub>, n<sub>IC</sub>,
                     n<sub>CC</sub>, are reported directly, sum to the Branch Count, and feed the branch-topology
                     (Sanderson) ternary diagram on the Connectivity tab. The Dimensionless Intensity, B22, is the
-                    branch-normalised intensity of Sanderson &amp; Nixon (2015, eq. 9):
+                    branch-normalised intensity of <a class="cite" href="#ref-sanderson2015">Sanderson and Nixon (2015, eq. 9)</a>:
                 </p>
                 <div class="formula-block">B22 = (Total Length)² / (Sample Area × N_B)</div>
                 <p>
@@ -341,7 +343,7 @@ P21 (areal fracture intensity) = Total trace length / Map area                [u
 P20 (areal fracture density)   = Number of traces  / Map area                 [units: length⁻²]</div>
                 <p>
                     P20 counts <strong>whole traces</strong> (<code>df["Trace"].nunique()</code>), following the
-                    P<sub>ij</sub> definition of Dershowitz &amp; Herda (1992) in which the density of
+                    P<sub>ij</sub> definition of <a class="cite" href="#ref-dershowitz1992">Dershowitz and Herda (1992)</a> in which the density of
                     zero-dimensional features is a count of fractures per unit area. A digitised-segment count in
                     its place would report a density proportional to how finely the traces were drawn — ten times
                     too high for traces stored as ten segments each — while leaving P21 unaffected, since summed
@@ -350,8 +352,9 @@ P20 (areal fracture density)   = Number of traces  / Map area                 [u
                 <p>
                     The spatially resolved grids on the Intensity &amp; Density tab do use the Mauldon
                     circular-window estimators, I = N/(4r) from boundary crossings and D = M/(2πr²) from trace tips
-                    inside the circle; those are unbiased with respect to fracture orientation, because a circular
-                    sampling window intersects fractures of every strike with equal probability. The Results tab
+                    inside the circle <a class="cite" href="#ref-mauldon2001">(Mauldon et al., 2001)</a>; those are unbiased with respect to fracture orientation, because a circular
+                    sampling window intersects fractures of every strike with equal probability
+                    <a class="cite" href="#ref-terzaghi1965">(cf. Terzaghi, 1965)</a>. The Results tab
                     reports the <em>Scan Circle Radius</em> r and <em>Total Scan Circles</em> that produced them, but
                     reproduces only the two global scalars above.
                 </p>
@@ -363,7 +366,9 @@ P20 (areal fracture density)   = Number of traces  / Map area                 [u
                     Log-normal, Weibull (implemented as a stretched exponential), and Truncated Power-law. The
                     complete mathematical derivation of these fits (log-likelihood construction, AIC/AICc/BIC,
                     Kolmogorov–Smirnov statistics, bootstrap confidence intervals, and the parametric bootstrap
-                    goodness-of-fit p-value) is the responsibility of the CDF tab and is documented there; the
+                    goodness-of-fit p-value) follows the maximum-likelihood framework of
+                    <a class="cite" href="#ref-clauset2009">Clauset, Shalizi and Newman (2009)</a> and is the
+                    responsibility of the CDF tab, where it is documented; the
                     Results tab's role is purely to surface the cached fit object's parameters into the dashboard.
                     For completeness, the defining forms of each survival function P(L&gt;x) for x ≥ x_min are:
                 </p>
@@ -648,8 +653,13 @@ self.tabs.configure(command=_on_tab_click)</code></pre>
                 </table>
                 <p>
                     All AIC values use the small-sample-corrected AICc form when the ratio of tail sample size to
-                    number of free parameters falls below 40, matching the recommendation of Burnham and Anderson
-                    (2002) for model selection with limited data; this correction and the underlying rationale are
+                    number of free parameters falls below 40, matching the recommendation of
+                    <a class="cite" href="#ref-burnham2002">Burnham and Anderson (2002)</a> for model selection with
+                    limited data; AIC and BIC themselves are the criteria of
+                    <a class="cite" href="#ref-akaike1974">Akaike (1974)</a> and
+                    <a class="cite" href="#ref-schwarz1978">Schwarz (1978)</a>, and the pairwise likelihood-ratio
+                    comparison is the non-nested test of
+                    <a class="cite" href="#ref-vuong1989">Vuong (1989)</a>. This correction and the underlying rationale are
                     implemented and documented in the CDF tab, and simply reported verbatim here.
                 </p>
 
@@ -831,7 +841,9 @@ row_cells[1].text = clean_val</code></pre>
                     A Power-law fit with a low AIC/BIC relative to the Exponential and Log-normal alternatives,
                     combined with a high KS p-value, supports treating the fracture-length population as
                     approximately scale-invariant over the sampled range — a common finding for tectonic joint sets
-                    and consistent with self-similar brittle deformation processes. An Exponential or Log-normal
+                    <a class="cite" href="#ref-bonnet2001">(Bonnet et al., 2001)</a>
+                    and consistent with self-similar brittle deformation processes; note that the scaling range is
+                    itself usually finite <a class="cite" href="#ref-marrett1999">(Marrett et al., 1999)</a>. An Exponential or Log-normal
                     preference instead suggests a characteristic length scale exists, often associated with
                     mechanical layer thickness control on fracture propagation (bed-confined jointing) or a
                     specific genetic mechanism with a finite driving-stress range.
@@ -852,9 +864,11 @@ row_cells[1].text = clean_val</code></pre>
                     P21 and P20 provide areal-density measures directly comparable across different outcrops,
                     scanlines, or digital elevation models, because the Mauldon circular-scanline method removes
                     the orientation bias inherent in straight-line scanline sampling (the classical Terzaghi
-                    correction problem). Comparing P21 values between multiple mapped domains within the same
+                    correction problem) <a class="cite" href="#ref-terzaghi1965">(Terzaghi, 1965;</a>
+                    <a class="cite" href="#ref-mauldon2001">Mauldon et al., 2001)</a>. Comparing P21 values between multiple mapped domains within the same
                     project is a standard way to identify structural domains or damage zones associated with
-                    faults.
+                    faults, though the comparison is only as representative as the sampling scheme behind it
+                    <a class="cite" href="#ref-watkins2015">(Watkins et al., 2015)</a>.
                 </p>
 
                 <!-- ================================================= -->
@@ -898,12 +912,67 @@ row_cells[1].text = clean_val</code></pre>
 
                 <!-- ================================================= -->
                 <h2 id="references">16. References</h2>
-                <p>Clauset, A., Shalizi, C. R., &amp; Newman, M. E. J. (2009). Power-law distributions in empirical data. <em>SIAM Review</em>, 51(4), 661–703.</p>
-                <p>Sanderson, D. J., &amp; Nixon, C. W. (2015). The use of topology in fracture network characterization. <em>Journal of Structural Geology</em>, 72, 55–66.</p>
-                <p>Mauldon, M., Dunne, W. M., &amp; Rohrbaugh, M. B. (2001). Circular scanlines and circular windows: new tools for characterizing the geometry of fracture traces. <em>Journal of Structural Geology</em>, 23(2–3), 247–258.</p>
-                <p>Dershowitz, W. S., &amp; Herda, H. H. (1992). Interpretation of fracture spacing and intensity. In <em>Proceedings of the 33rd U.S. Symposium on Rock Mechanics</em> (pp. 757–766). Balkema, Rotterdam.</p>
-                <p>Mardia, K. V., &amp; Jupp, P. E. (2000). <em>Directional Statistics</em>. John Wiley &amp; Sons.</p>
-                <p>Burnham, K. P., &amp; Anderson, D. R. (2002). <em>Model Selection and Multimodel Inference: A Practical Information-Theoretic Approach</em> (2nd ed.). Springer.</p>
+                <p>
+                    Sources are listed alphabetically within each group. In-text citations throughout this page link
+                    to the corresponding entry below.
+                </p>
+
+                <h3 id="16.1">16.1 Fracture Intensity, Topology and Sampling</h3>
+                <ul class="ref-list">
+                    <li id="ref-dershowitz1992">Dershowitz, W. S., &amp; Herda, H. H. (1992). Interpretation of fracture spacing and intensity. In <em>Proceedings of the 33rd U.S. Symposium on Rock Mechanics</em> (pp. 757&ndash;766). Balkema, Rotterdam. ISBN 978-90-5410-045-3. (Source of the P<sub>ij</sub> notation; P20 is a count of fractures per unit area.)</li>
+                    <li id="ref-mauldon2001">Mauldon, M., Dunne, W. M., &amp; Rohrbaugh, M. B. (2001). Circular scanlines and circular windows: new tools for characterizing the geometry of fracture traces. <em>Journal of Structural Geology</em>, 23(2&ndash;3), 247&ndash;258. <a href="https://doi.org/10.1016/S0191-8141(00)00094-8" target="_blank" rel="noopener">https://doi.org/10.1016/S0191-8141(00)00094-8</a></li>
+                    <li id="ref-peacock2016">Peacock, D. C. P., Nixon, C. W., Rotevatn, A., Sanderson, D. J., &amp; Zuluaga, L. F. (2016). Glossary of fault and other fracture networks. <em>Journal of Structural Geology</em>, 92, 12&ndash;29. <a href="https://doi.org/10.1016/j.jsg.2016.09.008" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2016.09.008</a></li>
+                    <li id="ref-sanderson2015">Sanderson, D. J., &amp; Nixon, C. W. (2015). The use of topology in fracture network characterization. <em>Journal of Structural Geology</em>, 72, 55&ndash;66. <a href="https://doi.org/10.1016/j.jsg.2015.01.005" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2015.01.005</a> (I-Y-X nodes; C_L, C_B and B22.)</li>
+                    <li id="ref-terzaghi1965">Terzaghi, R. D. (1965). Sources of error in joint surveys. <em>G&eacute;otechnique</em>, 15(3), 287&ndash;304. <a href="https://doi.org/10.1680/geot.1965.15.3.287" target="_blank" rel="noopener">https://doi.org/10.1680/geot.1965.15.3.287</a></li>
+                    <li id="ref-watkins2015">Watkins, H., Bond, C. E., Healy, D., &amp; Butler, R. W. H. (2015). Appraisal of fracture sampling methods and a new workflow to characterise heterogeneous fracture networks at outcrop. <em>Journal of Structural Geology</em>, 72, 67&ndash;82. <a href="https://doi.org/10.1016/j.jsg.2015.02.001" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2015.02.001</a></li>
+                </ul>
+
+                <h3 id="16.2">16.2 Distribution Fitting and Model Selection</h3>
+                <ul class="ref-list">
+                    <li id="ref-akaike1974">Akaike, H. (1974). A new look at the statistical model identification. <em>IEEE Transactions on Automatic Control</em>, 19(6), 716&ndash;723. <a href="https://doi.org/10.1109/TAC.1974.1100705" target="_blank" rel="noopener">https://doi.org/10.1109/TAC.1974.1100705</a></li>
+                    <li id="ref-burnham2002">Burnham, K. P., &amp; Anderson, D. R. (2002). <em>Model Selection and Multimodel Inference: A Practical Information-Theoretic Approach</em> (2nd ed.). Springer, New York. <a href="https://doi.org/10.1007/b97636" target="_blank" rel="noopener">https://doi.org/10.1007/b97636</a> (AICc when n/K &lt; 40; Akaike weights.)</li>
+                    <li id="ref-clauset2009">Clauset, A., Shalizi, C. R., &amp; Newman, M. E. J. (2009). Power-law distributions in empirical data. <em>SIAM Review</em>, 51(4), 661&ndash;703. <a href="https://doi.org/10.1137/070710111" target="_blank" rel="noopener">https://doi.org/10.1137/070710111</a></li>
+                    <li id="ref-schwarz1978">Schwarz, G. (1978). Estimating the dimension of a model. <em>The Annals of Statistics</em>, 6(2), 461&ndash;464. <a href="https://doi.org/10.1214/aos/1176344136" target="_blank" rel="noopener">https://doi.org/10.1214/aos/1176344136</a></li>
+                    <li id="ref-vuong1989">Vuong, Q. H. (1989). Likelihood ratio tests for model selection and non-nested hypotheses. <em>Econometrica</em>, 57(2), 307&ndash;333. <a href="https://doi.org/10.2307/1912557" target="_blank" rel="noopener">https://doi.org/10.2307/1912557</a></li>
+                </ul>
+
+                <h3 id="16.3">16.3 Fracture-Length Scaling and Directional Statistics</h3>
+                <ul class="ref-list">
+                    <li id="ref-bonnet2001">Bonnet, E., Bour, O., Odling, N. E., Davy, P., Main, I., Cowie, P., &amp; Berkowitz, B. (2001). Scaling of fracture systems in geological media. <em>Reviews of Geophysics</em>, 39(3), 347&ndash;383. <a href="https://doi.org/10.1029/1999RG000074" target="_blank" rel="noopener">https://doi.org/10.1029/1999RG000074</a></li>
+                    <li id="ref-mardia2000">Mardia, K. V., &amp; Jupp, P. E. (2000). <em>Directional Statistics</em>. John Wiley &amp; Sons. <a href="https://doi.org/10.1002/9780470316979" target="_blank" rel="noopener">https://doi.org/10.1002/9780470316979</a> (Sec. 2.3.4: doubled-angle summaries for axial data.)</li>
+                    <li id="ref-marrett1999">Marrett, R., Ortega, O. J., &amp; Kelsey, C. M. (1999). Extent of power-law scaling for natural fractures in rock. <em>Geology</em>, 27(9), 799&ndash;802. <a href="https://doi.org/10.1130/0091-7613(1999)027&lt;0799:EOPLSF&gt;2.3.CO;2" target="_blank" rel="noopener">https://doi.org/10.1130/0091-7613(1999)027&lt;0799:EOPLSF&gt;2.3.CO;2</a></li>
+                </ul>
+
+                <div class="cite-box">
+                    <p><strong>Methods statement for the Results tab.</strong> The Results tab performs no
+                    independent fitting; it surfaces values computed elsewhere in the Static Analyzer. If a table
+                    exported from it appears in a publication, the details below are what a reader needs, and are
+                    what the citations above assume:</p>
+                    <p>Strike summaries are axial circular statistics computed on doubled angles
+                    <a class="cite" href="#ref-mardia2000">(Mardia and Jupp, 2000)</a>. Connectivity indices are the
+                    trace-level I-Y-X node counts and the derived C_L, C_B and B22 of
+                    <a class="cite" href="#ref-sanderson2015">Sanderson and Nixon (2015)</a>, with node and branch
+                    terms as defined by <a class="cite" href="#ref-peacock2016">Peacock et al. (2016)</a>. Global
+                    intensity and density use the P<sub>ij</sub> convention
+                    <a class="cite" href="#ref-dershowitz1992">(Dershowitz and Herda, 1992)</a> over the data
+                    bounding box, with P20 counting whole traces; the orientation-unbiased circular-window
+                    estimators are reported on the Intensity &amp; Density tab
+                    <a class="cite" href="#ref-mauldon2001">(Mauldon et al., 2001;</a>
+                    <a class="cite" href="#ref-terzaghi1965">cf. Terzaghi, 1965)</a>. Length-distribution
+                    parameters are maximum-likelihood tail fits with x<sub>min</sub> selection and bootstrap
+                    goodness of fit <a class="cite" href="#ref-clauset2009">(Clauset et al., 2009)</a>, ranked by
+                    AIC/AICc <a class="cite" href="#ref-akaike1974">(Akaike, 1974;</a>
+                    <a class="cite" href="#ref-burnham2002">Burnham and Anderson, 2002)</a>, BIC
+                    <a class="cite" href="#ref-schwarz1978">(Schwarz, 1978)</a> and non-nested likelihood-ratio
+                    tests <a class="cite" href="#ref-vuong1989">(Vuong, 1989)</a>. Report the sampling window used
+                    for B22 separately from the bounding box used for P21/P20, since the two need not agree, and
+                    state that scale-invariance claims apply only over the fitted range
+                    <a class="cite" href="#ref-marrett1999">(Marrett et al., 1999;</a>
+                    <a class="cite" href="#ref-bonnet2001">Bonnet et al., 2001)</a>. Because reported values depend
+                    on whether the CDF and Connectivity tabs have been run, and on the sampling scheme itself
+                    <a class="cite" href="#ref-watkins2015">(Watkins et al., 2015)</a>, record the session settings
+                    alongside any exported summary.</p>
+                </div>
 
                 <!-- Pagination Navigation -->
                 <div class="pagination-nav"></div>

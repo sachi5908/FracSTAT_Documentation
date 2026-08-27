@@ -296,13 +296,20 @@
 <p>
     For dimensionality <em>d = 9</em> and sample size <em>N</em>, LHS partitions the [0,1] probability
     range of each dimension into N equal-probability strata. Exactly one sample is taken from every
-    stratum in each dimension, while the stratum indices are independently permuted between dimensions.
-    FracSTAT generates the design using <code>scipy.stats.qmc.LatinHypercube(d, seed)</code>.
+    stratum in each dimension, while the stratum indices are independently permuted between dimensions
+    <a class="cite" href="#ref-mckay1979">(McKay et al., 1979)</a>.
+    FracSTAT generates the design using <code>scipy.stats.qmc.LatinHypercube(d, seed)</code>
+    <a class="cite" href="#ref-virtanen2020">(Virtanen et al., 2020)</a>.
 </p>
 <p>
     This produces evenly stratified one-dimensional projections and generally reduces the variance of
     estimated output statistics, especially quantiles, compared with simple pseudo-random Monte Carlo
-    sampling of the same size.
+    sampling of the same size <a class="cite" href="#ref-mckay1979">(McKay et al., 1979)</a>;
+    <a class="cite" href="#ref-helton2003">Helton and Davis (2003)</a> document the same behaviour for
+    propagation through complex system models. The design is a plain Latin hypercube: the strata are
+    permuted independently and no space-filling criterion is optimised over candidate permutations
+    <a class="cite" href="#ref-morris1995">(cf. Morris and Mitchell, 1995)</a>, and no rank-correlation
+    structure is induced across dimensions <a class="cite" href="#ref-iman1982">(cf. Iman and Conover, 1982)</a>.
 </p>
 
 <div class="tip-box">
@@ -332,7 +339,7 @@
     <strong>The values entered are the moments of the law that is actually sampled.</strong> SciPy's
     <code>truncnorm</code> takes <code>loc</code>/<code>scale</code> as the <em>parent</em> normal's μ and σ,
     and the truncated distribution's own mean and standard deviation differ from those whenever a bound is
-    within reach (Johnson, Kotz &amp; Balakrishnan 1994, Vol. 1, sec. 13.10):
+    within reach <a class="cite" href="#ref-johnson1994">(Johnson, Kotz and Balakrishnan, 1994, Vol. 1, sec. 13.10)</a>:
 </p>
 <div class="code-window">
 <div class="code-header"><span class="code-lang">formula</span></div>
@@ -365,7 +372,8 @@ Var[X] = σ² · [ 1 + (α·φ(α) − β·φ(β))/Z − ((φ(α) − φ(β))/Z)
 <h3 id="5.3">5.3 Orientation sampling</h3>
 <p>
     Strike and SHmax are circular/azimuthal quantities, so a linear normal distribution is unsuitable
-    near the 0°/360° wrap-around. FracSTAT uses the <strong>Von Mises</strong> distribution, where
+    near the 0°/360° wrap-around. FracSTAT uses the <strong>Von Mises</strong> distribution
+    <a class="cite" href="#ref-mardia2000">(Mardia and Jupp, 2000, ch. 3)</a>, where
     concentration <em>k</em> controls clustering: k = 0 is uniform and larger k produces tighter
     concentration around the mean.
 </p>
@@ -373,7 +381,8 @@ Var[X] = σ² · [ 1 + (α·φ(α) − β·φ(β))/Z − ((φ(α) − φ(β))/Z)
     Dip is bounded to 0–90° and is sampled from a bounded Truncated Normal distribution whose
     standard deviation is derived from the concentration parameter. Alternatively,
     <strong>Fisher 3D</strong> couples Strike and Dip through a single spherical orientation
-    distribution using Strike's concentration parameter.
+    distribution using Strike's concentration parameter
+    <a class="cite" href="#ref-fisher1953">(Fisher, 1953)</a>.
 </p>
 <p>
     SHmax always uses its own independent Von Mises concentration because the maximum horizontal
@@ -384,7 +393,10 @@ Var[X] = σ² · [ 1 + (α·φ(α) − β·φ(β))/Z − ((φ(α) − φ(β))/Z)
 <p>
     The sampler guarantees <strong>σ1 &gt; σ2 &gt; σ3</strong> by drawing σ3 directly and constructing
     σ2 and σ1 from σ3 plus two non-negative stress gaps. The configured stress distributions are retained
-    while the gap construction prevents principal-stress crossing.
+    while the gap construction prevents principal-stress crossing. The three regimes follow the
+    Andersonian classification, in which one principal stress is vertical because the free surface carries
+    no shear traction <a class="cite" href="#ref-anderson1951">(Anderson, 1951)</a>; see also
+    <a class="cite" href="#ref-zoback2007">Zoback (2007, ch. 1)</a> for the modern stress-state formulation.
 </p>
 <table>
 <tr><th>Regime</th><th>Vertical stress</th><th>Calculation remap</th></tr>
@@ -435,20 +447,24 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
 </div>
 <table>
 <tr><th>Metric</th><th>Formula</th><th>Interpretation</th></tr>
-<tr><td>Slip Tendency (Ts)</td><td>Ts = τ / σ<sub>used</sub></td><td>Ratio of resolved shear to normal stress.</td></tr>
-<tr><td>Dilation Tendency (Td)</td><td>Td = (σ1<sub>used</sub> − σ<sub>used</sub>) / (σ1<sub>used</sub> − σ3<sub>used</sub>)</td><td>Normalized tendency for extensional dilation/opening. Evaluated from the <em>unpermuted</em> sampled σ1 and σ3 (both reduced by Pp when the effective-stress switch is on), so it is a property of the stress state rather than of the calculator's slot assignment.</td></tr>
-<tr><td>Fracture Susceptibility (Sf)</td><td>Sf = σ′<sub>n</sub> − (τ − C0) / μ = (σ<sub>n</sub> − Pp) − (τ − C0) / μ</td><td>The <em>sustainable pore-pressure increase</em> before the fault reaches the Coulomb criterion, in MPa. Always on effective normal stress — see below.</td></tr>
-<tr><td>Coulomb Failure Index (Fsi)</td><td>Fsi = τ / (C0 + μσ<sub>used</sub>)</td><td>Fsi ≥ 1 indicates predicted shear failure.</td></tr>
+<tr><td>Slip Tendency (Ts)</td><td>Ts = τ / σ<sub>used</sub></td><td>Ratio of resolved shear to normal stress; a plane is expected to slip as Ts approaches μ <a class="cite" href="#ref-morris1996">(Morris et al., 1996)</a>.</td></tr>
+<tr><td>Dilation Tendency (Td)</td><td>Td = (σ1<sub>used</sub> − σ<sub>used</sub>) / (σ1<sub>used</sub> − σ3<sub>used</sub>)</td><td>Normalized tendency for extensional dilation/opening <a class="cite" href="#ref-ferrill2003">(Ferrill and Morris, 2003)</a>. Evaluated from the <em>unpermuted</em> sampled σ1 and σ3 (both reduced by Pp when the effective-stress switch is on), so it is a property of the stress state rather than of the calculator's slot assignment.</td></tr>
+<tr><td>Fracture Susceptibility (Sf)</td><td>Sf = σ′<sub>n</sub> − (τ − C0) / μ = (σ<sub>n</sub> − Pp) − (τ − C0) / μ</td><td>The <em>sustainable pore-pressure increase</em> before the fault reaches the Coulomb criterion, in MPa <a class="cite" href="#ref-mildren2002">(Mildren et al., 2002;</a> <a class="cite" href="#ref-streit2004">Streit and Hillis, 2004)</a>. Always on effective normal stress — see below.</td></tr>
+<tr><td>Coulomb Failure Index (Fsi)</td><td>Fsi = τ / (C0 + μσ<sub>used</sub>)</td><td>Fsi ≥ 1 indicates predicted shear failure on the linear Mohr–Coulomb envelope <a class="cite" href="#ref-jaeger2007">(Jaeger et al., 2007, ch. 4)</a>.</td></tr>
 </table>
 <p>
-    Effective normal stress is σ′<sub>n</sub> = σ<sub>n</sub> − Pp. The Effective-Stress switch determines
+    Effective normal stress is σ′<sub>n</sub> = σ<sub>n</sub> − Pp, the Terzaghi effective-stress form
+    <a class="cite" href="#ref-terzaghi1943">(Terzaghi, 1943)</a> as applied to faulting by
+    <a class="cite" href="#ref-hubbert1959">Hubbert and Rubey (1959)</a>. The Effective-Stress switch determines
     whether total or effective stress is used for Ts, Td and Fsi.
 </p>
 <div class="note-box">
     <strong>Sf is exempt from the switch.</strong> Sf answers "how much more pore pressure can this fault
-    take?", a question that only exists under the effective-stress principle (Terzaghi 1943; Hubbert &amp;
-    Rubey 1959), and its standard definition is on σ′<sub>n</sub> (Mildren, Hillis &amp; Kaldi 2002; Streit
-    &amp; Hillis 2004). There is no total-stress form of it. When Sf was allowed to follow the switch, the
+    take?", a question that only exists under the effective-stress principle
+    <a class="cite" href="#ref-terzaghi1943">(Terzaghi, 1943;</a>
+    <a class="cite" href="#ref-hubbert1959">Hubbert and Rubey, 1959)</a>, and its standard definition is on
+    σ′<sub>n</sub> <a class="cite" href="#ref-mildren2002">(Mildren, Hillis and Kaldi, 2002;</a>
+    <a class="cite" href="#ref-streit2004">Streit and Hillis, 2004)</a>. There is no total-stress form of it. When Sf was allowed to follow the switch, the
     default total-stress mode dropped Pp entirely and the reported margin became statistically independent of
     pore pressure — measured correlation <strong>−0.005168</strong> with an SRC of <strong>−0.0005</strong>,
     i.e. the one control an operator can actually manipulate registered as having no influence on the metric
@@ -476,7 +492,9 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
 <p>
     <strong>SRC</strong> is obtained from ordinary least-squares regression of standardized target
     output against standardized inputs. <strong>PRCC</strong> measures rank correlation after the
-    effect of all other inputs has been removed in rank space. Both range from −1 to +1; magnitude
+    effect of all other inputs has been removed in rank space
+    <a class="cite" href="#ref-iman1988">(Iman and Helton, 1988;</a>
+    <a class="cite" href="#ref-marino2008">Marino et al., 2008)</a>. Both range from −1 to +1; magnitude
     indicates relative influence and sign indicates direction.
 </p>
 <p>
@@ -493,13 +511,16 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
     varies across its faults. Fitting the un-aggregated rows replicates each input vector n<sub>faults</sub>
     times and folds purely within-realization scatter — variation no input can explain, since the inputs are
     constant across it — into a model whose unit of observation is really the realization, inflating the
-    apparent sample size and deflating R² (Efron &amp; Tibshirani 1993, ch. 8; Field &amp; Welsh 2007). The
+    apparent sample size and deflating R² <a class="cite" href="#ref-efron1993">(Efron and Tibshirani, 1993, ch. 8;</a>
+    <a class="cite" href="#ref-field2007">Field and Welsh, 2007)</a>. The
     sidebar therefore reports paired samples (realizations), not rows.
 </div>
 <p>
     Squared SRCs partition the output variance — that is, they satisfy <strong>ΣSRC² = R²</strong> and may be
     read as variance shares — <em>only</em> when the inputs are mutually uncorrelated and the response is
-    linear in them (Iman &amp; Helton 1988; Saltelli et al. 2008, ch. 1; Marino et al. 2008, sec. 2). Neither
+    linear in them <a class="cite" href="#ref-iman1988">(Iman and Helton, 1988;</a>
+    <a class="cite" href="#ref-saltelli2008">Saltelli et al., 2008, ch. 1;</a>
+    <a class="cite" href="#ref-marino2008">Marino et al., 2008, sec. 2)</a>. Neither
     condition is guaranteed here: the ordered-gap construction of <a href="#5.4">Section 5.4</a> can draw σ1,
     σ2 and σ3 with strong mutual correlation. The module therefore reports three diagnostics with every run —
     <strong>model R²</strong>, <strong>ΣSRC²</strong>, and the <strong>largest |r| between inputs</strong> —
@@ -528,10 +549,12 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
     Strike (period 180°, axial) and the SHmax azimuth (period 360°, directional) wrap, so neither has a
     meaningful arithmetic mean or standard deviation. When one of them is the displayed variable, the location
     and spread are computed on the circle instead — the mean resultant vector of the angles mapped onto the
-    full circle, with mean = atan2(S, C) and s.d. = √(−2·ln R), scaled back by period/360° (Mardia &amp; Jupp
-    2000, sec. 2.2.1, 2.3.2 and 2.3.4; Fisher 1993, sec. 2.3.1). The P10/mean/P90 overlay on those two inputs
+    full circle, with mean = atan2(S, C) and s.d. = √(−2·ln R), scaled back by period/360°
+    <a class="cite" href="#ref-mardia2000">(Mardia and Jupp, 2000, sec. 2.2.1, 2.3.2 and 2.3.4;</a>
+    <a class="cite" href="#ref-fisher1993">Fisher, 1993, sec. 2.3.1)</a>. The P10/mean/P90 overlay on those two inputs
     is likewise taken on the angular residual about the circular mean, and a band that straddles the wrap point
-    is drawn as the two arcs it actually occupies. Measured on a von Mises sample centred on a true strike of
+    is drawn as the two arcs it actually occupies.
+    Measured on a von Mises sample centred on a true strike of
     0.04°, the linear arithmetic mean read <strong>89.89°</strong> — the perpendicular orientation; an SHmax
     azimuth concentrated on 359.98° read <strong>180.28°</strong>. Dip is a plunge confined to 0–90° and does
     not wrap, so it keeps the linear summary.
@@ -647,16 +670,18 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
     rule "passed" 10 of 40 runs at 512 realizations, and <strong>8 of those 10 were still more than 2% away</strong>
     from a 400,000-realization reference; the true remaining error reached <strong>1.9×</strong> the increment
     that had been inspected. The precision condition supplies the missing piece — a Monte&nbsp;Carlo standard
-    error is the actual measure of sampling precision (Helton &amp; Davis 2003; Saltelli et al. 2008, ch. 2) —
-    while the two-increment stability requirement is the standard successive-refinement check (Roache 1998,
-    ch. 5).
+    error is the actual measure of sampling precision <a class="cite" href="#ref-helton2003">(Helton and Davis, 2003;</a>
+    <a class="cite" href="#ref-saltelli2008">Saltelli et al., 2008, ch. 2)</a> —
+    while the two-increment stability requirement is the standard successive-refinement check
+    <a class="cite" href="#ref-roache1998">(Roache, 1998, ch. 5)</a>.
 </p>
 <p>
     <strong>The standard error resamples realizations, not rows.</strong> In a multi-fault run every fault of a
     realization shares one sampled stress state, so the rows are clustered and an ordinary row bootstrap would
     treat n<sub>faults</sub> correlated values as independent evidence and understate the SEM.
     <code>_cluster_bootstrap_standard_errors</code> resamples whole realizations with replacement instead
-    (Efron &amp; Tibshirani 1993, ch. 8; Field &amp; Welsh 2007), using 200 resamples, reduced to 60 above
+    (<a class="cite" href="#ref-efron1993">Efron and Tibshirani, 1993, ch. 8;</a>
+    <a class="cite" href="#ref-field2007">Field and Welsh, 2007)</a>, using 200 resamples, reduced to 60 above
     20,000 rows for runtime; a checkpoint with fewer than two realizations returns NaN. In a single-fault run it
     reduces to the ordinary bootstrap.
 </p>
@@ -824,22 +849,27 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
 
 <h3 id="13.1">13.1 Slip Tendency (Ts)</h3>
 <p>
-    Ts is the ratio of resolved shear stress to normal stress. A plane reaches frictional sliding when
+    Ts is the ratio of resolved shear stress to normal stress
+    <a class="cite" href="#ref-morris1996">(Morris et al., 1996)</a>. A plane reaches frictional sliding when
     Ts approaches the static friction coefficient μ. Values around or above approximately 0.6 are commonly
-    treated as near-critical in cohesionless applications, but the actual interpretation should follow the
-    friction and cohesion assumptions used in the simulation.
+    treated as near-critical in cohesionless applications, following Byerlee's experimental μ ≈ 0.6–0.85 for
+    most rock types <a class="cite" href="#ref-byerlee1978">(Byerlee, 1978)</a>, but the actual interpretation
+    should follow the friction and cohesion assumptions used in the simulation.
 </p>
 
 <h3 id="13.2">13.2 Dilation Tendency (Td)</h3>
 <p>
-    Td identifies planes favourably oriented to open under the applied stress state. High Td can indicate
+    Td identifies planes favourably oriented to open under the applied stress state
+    <a class="cite" href="#ref-ferrill2003">(Ferrill and Morris, 2003)</a>. High Td can indicate
     fracture orientations that are more favourable for dilation and fluid-flow pathways.
 </p>
 
 <h3 id="13.3">13.3 Fracture Susceptibility (Sf)</h3>
 <p>
     Sf is expressed in MPa and is read as the <strong>pore-pressure increase the fault can sustain</strong>
-    before the Coulomb criterion is met at the resolved shear stress: an Sf of 4 MPa means roughly 4 MPa of
+    before the Coulomb criterion is met at the resolved shear stress
+    <a class="cite" href="#ref-mildren2002">(Mildren et al., 2002;</a>
+    <a class="cite" href="#ref-streit2004">Streit and Hillis, 2004)</a>: an Sf of 4 MPa means roughly 4 MPa of
     additional pressure would be expected to reactivate it. Positive Sf indicates a stable margin; Sf ≤ 0
     indicates predicted shear failure at current conditions. Because it is a pressure margin it is always
     computed on effective normal stress, whatever the Effective-Stress switch is set to, and it is reported as
@@ -874,9 +904,9 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
 <tr><th>Topic</th><th>Implementation note</th></tr>
 <tr><td>Shared Monte Carlo code path</td><td><code>uncertainty_lhs_tab.py</code> and <code>uncertainty_montecarlo_tab.py</code> both delegate to <code>UncertaintySamplingTab.build</code>; only the sampling method differs.</td></tr>
 <tr><td>Standard-normal intermediate representation</td><td>Both methods use a common standard-normal coordinate representation before input-specific transforms.</td></tr>
-<tr><td>Reproducibility metadata</td><td>Exports record method, requested/actual sample counts, seed, effective distributions, analysis options, source hash and package versions.</td></tr>
+<tr><td>Reproducibility metadata</td><td>Exports record method, requested/actual sample counts, seed, effective distributions, analysis options, source hash and package versions (Python, NumPy <a class="cite" href="#ref-harris2020">(Harris et al., 2020)</a>, pandas <a class="cite" href="#ref-mckinney2010">(McKinney, 2010)</a>, SciPy <a class="cite" href="#ref-virtanen2020">(Virtanen et al., 2020)</a> and Matplotlib <a class="cite" href="#ref-hunter2007">(Hunter, 2007)</a>).</td></tr>
 <tr><td>Independent session state</td><td>Uncertainty state is stored/autosaved separately from Static and Dynamic Analyzer state.</td></tr>
-<tr><td>Matplotlib integration</td><td>Plots are native Matplotlib Figures embedded using <code>FigureCanvasTkAgg</code>.</td></tr>
+<tr><td>Matplotlib integration</td><td>Plots are native Matplotlib Figures <a class="cite" href="#ref-hunter2007">(Hunter, 2007)</a> embedded using <code>FigureCanvasTkAgg</code>.</td></tr>
 <tr><td>Matplotlib boxplot compatibility</td><td>The Visualization module detects whether the installed Matplotlib version expects <code>labels</code> or <code>tick_labels</code>.</td></tr>
 </table>
 
@@ -914,35 +944,97 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
 </ul>
 
 <h2 id="references">16. References</h2>
-<ul>
-    <li>Anderson, E.M. (1951). <em>The Dynamics of Faulting and Dyke Formation with Applications to Britain</em>. Oliver and Boyd, Edinburgh.</li>
-    <li>Byerlee, J. (1978). Friction of Rocks. <em>Pure and Applied Geophysics</em>, 116, 615–626.</li>
-    <li>Efron, B., Tibshirani, R.J. (1993). <em>An Introduction to the Bootstrap</em>. Chapman &amp; Hall. (Ch. 8: bootstrapping clustered, non-independent data.)</li>
-    <li>Field, C.A., Welsh, A.H. (2007). Bootstrapping Clustered Data. <em>Journal of the Royal Statistical Society: Series B</em>, 69(3), 369–390.</li>
-    <li>Fisher, N.I. (1993). <em>Statistical Analysis of Circular Data</em>. Cambridge University Press. (Sec. 2.3.1: circular mean and circular standard deviation.)</li>
-    <li>Fisher, R.A. (1953). Dispersion on a Sphere. <em>Proceedings of the Royal Society of London A</em>, 217, 295–305.</li>
-    <li>Helton, J.C., Davis, F.J. (2003). Latin Hypercube Sampling and the Propagation of Uncertainty in Analyses of Complex Systems. <em>Reliability Engineering &amp; System Safety</em>, 81(1), 23–69.</li>
-    <li>Hubbert, M.K., Rubey, W.W. (1959). Role of Fluid Pressure in Mechanics of Overthrust Faulting. <em>Geological Society of America Bulletin</em>, 70(2), 115–166.</li>
-    <li>Iman, R.L., Conover, W.J. (1982). A Distribution-Free Approach to Inducing Rank Correlation Among Variables. <em>Communications in Statistics – Simulation and Computation</em>, 11(3), 311–334.</li>
-    <li>Iman, R.L., Helton, J.C. (1988). An Investigation of Uncertainty and Sensitivity Analysis Techniques for Computer Models. <em>Risk Analysis</em>, 8(1), 71–90.</li>
-    <li>Jaeger, J.C., Cook, N.G.W., Zimmerman, R.W. (2007). <em>Fundamentals of Rock Mechanics</em>, 4th ed. Blackwell Publishing.</li>
-    <li>Johnson, N.L., Kotz, S., Balakrishnan, N. (1994). <em>Continuous Univariate Distributions</em>, Vol. 1, 2nd ed. John Wiley &amp; Sons. (Sec. 13.10: moments of the truncated normal.)</li>
-    <li>Mardia, K.V., Jupp, P.E. (2000). <em>Directional Statistics</em>. John Wiley &amp; Sons. (Sec. 2.2.1, 2.3.2 and 2.3.4: circular and axial summaries.)</li>
-    <li>Marino, S., Hogue, I.B., Ray, C.J., Kirschner, D.E. (2008). A Methodology for Performing Global Uncertainty and Sensitivity Analysis in Systems Biology. <em>Journal of Theoretical Biology</em>, 254(1), 178–196.</li>
-    <li>McKay, M.D., Beckman, R.J., Conover, W.J. (1979). A Comparison of Three Methods for Selecting Values of Input Variables in the Analysis of Output from a Computer Code. <em>Technometrics</em>, 21(2), 239–245.</li>
-    <li>Mildren, S.D., Hillis, R.R., Kaldi, J. (2002). Calibrating Predictions of Fault Seal Reactivation in the Timor Sea. <em>APPEA Journal</em>, 42(1), 187–202.</li>
-    <li>Morris, M.D., Mitchell, T.J. (1995). Exploratory Designs for Computational Experiments. <em>Journal of Statistical Planning and Inference</em>, 43(3), 381–402.</li>
-    <li>Roache, P.J. (1998). <em>Verification and Validation in Computational Science and Engineering</em>. Hermosa Publishers. (Ch. 5: successive-refinement stability.)</li>
-    <li>Saltelli, A., Ratto, M., Andres, T., Campolongo, F., Cariboni, J., Gatelli, D., Saisana, M., Tarantola, S. (2008). <em>Global Sensitivity Analysis: The Primer</em>. John Wiley &amp; Sons.</li>
-    <li>Streit, J.E., Hillis, R.R. (2004). Estimating Fault Stability and Sustainable Fluid Pressures for Underground Storage of CO<sub>2</sub> in Porous Rock. <em>Energy</em>, 29(9–10), 1445–1456.</li>
-    <li>Terzaghi, K. (1943). <em>Theoretical Soil Mechanics</em>. John Wiley &amp; Sons.</li>
-    <li>Zoback, M.D. (2007). <em>Reservoir Geomechanics</em>. Cambridge University Press.</li>
-    <li>Virtanen, P. et al. (2020). SciPy 1.0: Fundamental Algorithms for Scientific Computing in Python. <em>Nature Methods</em>, 17, 261–272.</li>
-    <li>Harris, C.R. et al. (2020). Array Programming with NumPy. <em>Nature</em>, 585, 357–362.</li>
+<p>
+    Sources are listed alphabetically within each group. In-text citations throughout this page link
+    to the corresponding entry below.
+</p>
+
+<h3 id="16.1">16.1 Rock Mechanics, Effective Stress and Fault Stability</h3>
+<ul class="ref-list">
+    <li id="ref-anderson1951">Anderson, E. M. (1951). <em>The Dynamics of Faulting and Dyke Formation with Applications to Britain</em> (2nd ed.). Oliver and Boyd, Edinburgh. (Classification of normal, strike-slip and reverse faulting regimes.)</li>
+    <li id="ref-byerlee1978">Byerlee, J. (1978). Friction of rocks. <em>Pure and Applied Geophysics</em>, 116(4&ndash;5), 615&ndash;626. <a href="https://doi.org/10.1007/BF00876528" target="_blank" rel="noopener">https://doi.org/10.1007/BF00876528</a></li>
+    <li id="ref-ferrill2003">Ferrill, D. A., &amp; Morris, A. P. (2003). Dilational normal faults. <em>Journal of Structural Geology</em>, 25(2), 183&ndash;196. <a href="https://doi.org/10.1016/S0191-8141(02)00029-9" target="_blank" rel="noopener">https://doi.org/10.1016/S0191-8141(02)00029-9</a></li>
+    <li id="ref-hubbert1959">Hubbert, M. K., &amp; Rubey, W. W. (1959). Role of fluid pressure in mechanics of overthrust faulting. <em>Geological Society of America Bulletin</em>, 70(2), 115&ndash;166. <a href="https://doi.org/10.1130/0016-7606(1959)70[115:ROFPIM]2.0.CO;2" target="_blank" rel="noopener">https://doi.org/10.1130/0016-7606(1959)70[115:ROFPIM]2.0.CO;2</a></li>
+    <li id="ref-jaeger2007">Jaeger, J. C., Cook, N. G. W., &amp; Zimmerman, R. W. (2007). <em>Fundamentals of Rock Mechanics</em> (4th ed.). Blackwell Publishing, Oxford. ISBN 978-0-632-05759-7. (Mohr&ndash;Coulomb failure theory, effective stress.)</li>
+    <li id="ref-mildren2002">Mildren, S. D., Hillis, R. R., &amp; Kaldi, J. (2002). Calibrating predictions of fault seal reactivation in the Timor Sea. <em>The APPEA Journal</em>, 42(1), 187&ndash;202. <a href="https://doi.org/10.1071/AJ01011" target="_blank" rel="noopener">https://doi.org/10.1071/AJ01011</a></li>
+    <li id="ref-morris1996">Morris, A., Ferrill, D. A., &amp; Henderson, D. B. (1996). Slip-tendency analysis and fault reactivation. <em>Geology</em>, 24(3), 275&ndash;278. <a href="https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2" target="_blank" rel="noopener">https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2</a></li>
+    <li id="ref-streit2004">Streit, J. E., &amp; Hillis, R. R. (2004). Estimating fault stability and sustainable fluid pressures for underground storage of CO<sub>2</sub> in porous rock. <em>Energy</em>, 29(9&ndash;10), 1445&ndash;1456. <a href="https://doi.org/10.1016/j.energy.2004.03.078" target="_blank" rel="noopener">https://doi.org/10.1016/j.energy.2004.03.078</a></li>
+    <li id="ref-terzaghi1943">Terzaghi, K. (1943). <em>Theoretical Soil Mechanics</em>. John Wiley &amp; Sons, New York. <a href="https://doi.org/10.1002/9780470172766" target="_blank" rel="noopener">https://doi.org/10.1002/9780470172766</a> (Effective-stress principle.)</li>
+    <li id="ref-zoback2007">Zoback, M. D. (2007). <em>Reservoir Geomechanics</em>. Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511586477" target="_blank" rel="noopener">https://doi.org/10.1017/CBO9780511586477</a></li>
 </ul>
 
+<h3 id="16.2">16.2 Probability Distributions and Directional Statistics</h3>
+<ul class="ref-list">
+    <li id="ref-fisher1953">Fisher, R. A. (1953). Dispersion on a sphere. <em>Proceedings of the Royal Society of London A</em>, 217(1130), 295&ndash;305. <a href="https://doi.org/10.1098/rspa.1953.0064" target="_blank" rel="noopener">https://doi.org/10.1098/rspa.1953.0064</a></li>
+    <li id="ref-fisher1993">Fisher, N. I. (1993). <em>Statistical Analysis of Circular Data</em>. Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511564345" target="_blank" rel="noopener">https://doi.org/10.1017/CBO9780511564345</a> (Sec. 2.3.1: circular mean and circular standard deviation.)</li>
+    <li id="ref-johnson1994">Johnson, N. L., Kotz, S., &amp; Balakrishnan, N. (1994). <em>Continuous Univariate Distributions</em> (Vol. 1, 2nd ed.). John Wiley &amp; Sons. ISBN 978-0-471-58495-7. (Sec. 13.10: moments of the truncated normal.)</li>
+    <li id="ref-mardia2000">Mardia, K. V., &amp; Jupp, P. E. (2000). <em>Directional Statistics</em>. John Wiley &amp; Sons. <a href="https://doi.org/10.1002/9780470316979" target="_blank" rel="noopener">https://doi.org/10.1002/9780470316979</a> (Sec. 2.2.1, 2.3.2, 2.3.4 and ch. 3: circular and axial summaries, von Mises law.)</li>
+</ul>
+
+<h3 id="16.3">16.3 Sampling, Sensitivity and Convergence</h3>
+<ul class="ref-list">
+    <li id="ref-efron1993">Efron, B., &amp; Tibshirani, R. J. (1993). <em>An Introduction to the Bootstrap</em>. Chapman &amp; Hall. <a href="https://doi.org/10.1007/978-1-4899-4541-9" target="_blank" rel="noopener">https://doi.org/10.1007/978-1-4899-4541-9</a> (Ch. 8: bootstrapping clustered and non-iid data.)</li>
+    <li id="ref-field2007">Field, C. A., &amp; Welsh, A. H. (2007). Bootstrapping clustered data. <em>Journal of the Royal Statistical Society: Series B</em>, 69(3), 369&ndash;390. <a href="https://doi.org/10.1111/j.1467-9868.2007.00593.x" target="_blank" rel="noopener">https://doi.org/10.1111/j.1467-9868.2007.00593.x</a></li>
+    <li id="ref-helton2003">Helton, J. C., &amp; Davis, F. J. (2003). Latin hypercube sampling and the propagation of uncertainty in analyses of complex systems. <em>Reliability Engineering &amp; System Safety</em>, 81(1), 23&ndash;69. <a href="https://doi.org/10.1016/S0951-8320(03)00058-9" target="_blank" rel="noopener">https://doi.org/10.1016/S0951-8320(03)00058-9</a></li>
+    <li id="ref-iman1982">Iman, R. L., &amp; Conover, W. J. (1982). A distribution-free approach to inducing rank correlation among input variables. <em>Communications in Statistics &mdash; Simulation and Computation</em>, 11(3), 311&ndash;334. <a href="https://doi.org/10.1080/03610918208812265" target="_blank" rel="noopener">https://doi.org/10.1080/03610918208812265</a></li>
+    <li id="ref-iman1988">Iman, R. L., &amp; Helton, J. C. (1988). An investigation of uncertainty and sensitivity analysis techniques for computer models. <em>Risk Analysis</em>, 8(1), 71&ndash;90. <a href="https://doi.org/10.1111/j.1539-6924.1988.tb01155.x" target="_blank" rel="noopener">https://doi.org/10.1111/j.1539-6924.1988.tb01155.x</a></li>
+    <li id="ref-marino2008">Marino, S., Hogue, I. B., Ray, C. J., &amp; Kirschner, D. E. (2008). A methodology for performing global uncertainty and sensitivity analysis in systems biology. <em>Journal of Theoretical Biology</em>, 254(1), 178&ndash;196. <a href="https://doi.org/10.1016/j.jtbi.2008.04.011" target="_blank" rel="noopener">https://doi.org/10.1016/j.jtbi.2008.04.011</a></li>
+    <li id="ref-mckay1979">McKay, M. D., Beckman, R. J., &amp; Conover, W. J. (1979). A comparison of three methods for selecting values of input variables in the analysis of output from a computer code. <em>Technometrics</em>, 21(2), 239&ndash;245. <a href="https://doi.org/10.2307/1268522" target="_blank" rel="noopener">https://doi.org/10.2307/1268522</a></li>
+    <li id="ref-morris1995">Morris, M. D., &amp; Mitchell, T. J. (1995). Exploratory designs for computational experiments. <em>Journal of Statistical Planning and Inference</em>, 43(3), 381&ndash;402. <a href="https://doi.org/10.1016/0378-3758(94)00035-T" target="_blank" rel="noopener">https://doi.org/10.1016/0378-3758(94)00035-T</a></li>
+    <li id="ref-roache1998">Roache, P. J. (1998). <em>Verification and Validation in Computational Science and Engineering</em>. Hermosa Publishers, Albuquerque. ISBN 978-0-913478-08-0. (Ch. 5: successive-refinement stability as a convergence test.)</li>
+    <li id="ref-saltelli2008">Saltelli, A., Ratto, M., Andres, T., Campolongo, F., Cariboni, J., Gatelli, D., Saisana, M., &amp; Tarantola, S. (2008). <em>Global Sensitivity Analysis: The Primer</em>. John Wiley &amp; Sons. <a href="https://doi.org/10.1002/9780470725184" target="_blank" rel="noopener">https://doi.org/10.1002/9780470725184</a></li>
+</ul>
+
+<h3 id="16.4">16.4 Software</h3>
+<ul class="ref-list">
+    <li id="ref-harris2020">Harris, C. R., Millman, K. J., van der Walt, S. J., Gommers, R., Virtanen, P., Cournapeau, D., &hellip; Oliphant, T. E. (2020). Array programming with NumPy. <em>Nature</em>, 585(7825), 357&ndash;362. <a href="https://doi.org/10.1038/s41586-020-2649-2" target="_blank" rel="noopener">https://doi.org/10.1038/s41586-020-2649-2</a></li>
+    <li id="ref-hunter2007">Hunter, J. D. (2007). Matplotlib: A 2D graphics environment. <em>Computing in Science &amp; Engineering</em>, 9(3), 90&ndash;95. <a href="https://doi.org/10.1109/MCSE.2007.55" target="_blank" rel="noopener">https://doi.org/10.1109/MCSE.2007.55</a></li>
+    <li id="ref-mckinney2010">McKinney, W. (2010). Data structures for statistical computing in Python. In <em>Proceedings of the 9th Python in Science Conference</em> (pp. 56&ndash;61). <a href="https://doi.org/10.25080/Majora-92bf1922-00a" target="_blank" rel="noopener">https://doi.org/10.25080/Majora-92bf1922-00a</a></li>
+    <li id="ref-virtanen2020">Virtanen, P., Gommers, R., Oliphant, T. E., Haberland, M., Reddy, T., Cournapeau, D., &hellip; van Mulbregt, P. (2020). SciPy 1.0: fundamental algorithms for scientific computing in Python. <em>Nature Methods</em>, 17(3), 261&ndash;272. <a href="https://doi.org/10.1038/s41592-019-0686-2" target="_blank" rel="noopener">https://doi.org/10.1038/s41592-019-0686-2</a></li>
+</ul>
+
+<div class="cite-box">
+    <p><strong>Methods statement for the LHS tab.</strong> If a figure or table produced by this tab appears in
+    a publication, the details below are what a reader needs in order to reproduce it, and are what the
+    citations above assume:</p>
+    <p>Latin hypercube propagation of stress, strength and orientation uncertainty through the
+    Mohr&ndash;Coulomb fault-stability model
+    <a class="cite" href="#ref-jaeger2007">(Jaeger et al., 2007)</a>, with <em>N</em> realizations per fault
+    drawn from a nine-dimensional stratified design
+    <a class="cite" href="#ref-mckay1979">(McKay et al., 1979)</a> generated by
+    <code>scipy.stats.qmc.LatinHypercube</code> under integer seed <em>s</em>
+    <a class="cite" href="#ref-virtanen2020">(SciPy; Virtanen et al., 2020)</a> and mapped to the stated
+    marginal distributions by inverse CDF; Normal selections on bounded inputs are replaced by
+    moment-matched truncated normals <a class="cite" href="#ref-johnson1994">(Johnson et al., 1994)</a>, and
+    fault orientations are sampled either from independent von Mises laws
+    <a class="cite" href="#ref-mardia2000">(Mardia and Jupp, 2000)</a> or from a coupled Fisher spherical
+    distribution <a class="cite" href="#ref-fisher1953">(Fisher, 1953)</a>. Faulting regime follows the
+    Andersonian classification <a class="cite" href="#ref-anderson1951">(Anderson, 1951)</a> and effective
+    normal stress uses the Terzaghi form
+    <a class="cite" href="#ref-terzaghi1943">(Terzaghi, 1943;</a>
+    <a class="cite" href="#ref-hubbert1959">Hubbert and Rubey, 1959)</a>. Reported response metrics are slip
+    tendency <a class="cite" href="#ref-morris1996">(Morris et al., 1996)</a>, dilation tendency
+    <a class="cite" href="#ref-ferrill2003">(Ferrill and Morris, 2003)</a>, fracture susceptibility
+    <a class="cite" href="#ref-mildren2002">(Mildren et al., 2002;</a>
+    <a class="cite" href="#ref-streit2004">Streit and Hillis, 2004)</a>, and the Coulomb failure index, with
+    the assumed friction range referenced to laboratory values
+    <a class="cite" href="#ref-byerlee1978">(Byerlee, 1978;</a>
+    <a class="cite" href="#ref-zoback2007">Zoback, 2007)</a>. Sensitivity is reported as standardized
+    regression and partial rank correlation coefficients
+    <a class="cite" href="#ref-iman1982">(Iman and Conover, 1982;</a>
+    <a class="cite" href="#ref-iman1988">Iman and Helton, 1988;</a>
+    <a class="cite" href="#ref-saltelli2008">Saltelli et al., 2008)</a> computed on realization-aggregated
+    rows, and convergence as a bootstrap precision bound
+    <a class="cite" href="#ref-efron1993">(Efron and Tibshirani, 1993)</a>
+    <a class="cite" href="#ref-helton2003">(Helton and Davis, 2003)</a> combined with a successive-refinement
+    stability test <a class="cite" href="#ref-roache1998">(Roache, 1998)</a>. Analyses were run in Python with
+    NumPy <a class="cite" href="#ref-harris2020">(Harris et al., 2020)</a>, pandas
+    <a class="cite" href="#ref-mckinney2010">(McKinney, 2010)</a> and Matplotlib
+    <a class="cite" href="#ref-hunter2007">(Hunter, 2007)</a>; the exported metadata sheet records the exact
+    versions, seed and input hash.</p>
+</div>
+
 <div class="note-box">
-    <strong>Source basis:</strong> This documentation was rebuilt from the supplied
     <em>FracSTAT_LHS_Technical_User_Guide.docx</em> and formatted to follow the structure and
     presentation style of the supplied <em>docs_static_map.html</em>.
 </div>

@@ -56,6 +56,7 @@
                         <li><a href="#algorithms">5. Implementation: How the Text Is Built</a></li>
                         <li><a href="#focal">6. Focal-Mechanism Mode</a></li>
                         <li><a href="#relationship">7. Relationship to Other Dynamic Analyzer Tabs</a></li>
+                        <li><a href="#references">8. References</a></li>
                     </ul>
                 </div>
 
@@ -215,7 +216,7 @@ c₃ = n · σ̂₃   (horizontal component, perpendicular to σ₁)</div>
                     <strong>Which principal stress is vertical is an explicit parameter, not a hidden assumption.</strong>
                     <code>stress_on_plane_3d()</code> and the helper that builds the axes,
                     <code>andersonian_principal_axes()</code>, both take a <code>vertical_axis</code> argument
-                    selecting the Andersonian regime (Anderson 1951, <em>The Dynamics of Faulting</em>, 2nd ed.):
+                    selecting the Andersonian regime <a class="cite" href="#ref-anderson1951">(Anderson, 1951)</a>:
                     <code>"sigma1"</code> for normal faulting (S<sub>v</sub> = σ₁), <code>"sigma2"</code> for
                     strike-slip (S<sub>v</sub> = σ₂), <code>"sigma3"</code> for reverse/thrust
                     (S<sub>v</sub> = σ₃). The default is <code>"sigma2"</code>, which is exactly what the Dynamic
@@ -238,10 +239,10 @@ c₃ = n · σ̂₃   (horizontal component, perpendicular to σ₁)</div>
                 </p>
                 <table>
                     <tr><th>Symbol</th><th>Name</th><th>Formula</th></tr>
-                    <tr><td>T<sub>s</sub></td><td>Slip tendency</td><td>T<sub>s</sub> = τ / σₙ</td></tr>
-                    <tr><td>T<sub>d</sub></td><td>Dilation tendency</td><td>T<sub>d</sub> = (σ₁ − σₙ) / (σ₁ − σ₃)</td></tr>
-                    <tr><td>S<sub>f</sub></td><td>Susceptibility / fracture stability margin</td><td>S<sub>f</sub> = σₙ − Pᶠ − (τ − C₀) / μ</td></tr>
-                    <tr><td>CSF</td><td>Critical stress flag</td><td>True where τ ≥ μ(σₙ − Pᶠ) + C₀</td></tr>
+                    <tr><td>T<sub>s</sub></td><td>Slip tendency</td><td>T<sub>s</sub> = τ / σₙ <a class="cite" href="#ref-morris1996">(Morris et al., 1996)</a></td></tr>
+                    <tr><td>T<sub>d</sub></td><td>Dilation tendency</td><td>T<sub>d</sub> = (σ₁ − σₙ) / (σ₁ − σ₃) <a class="cite" href="#ref-ferrill2003">(Ferrill and Morris, 2003)</a></td></tr>
+                    <tr><td>S<sub>f</sub></td><td>Susceptibility / fracture stability margin</td><td>S<sub>f</sub> = σₙ − Pᶠ − (τ − C₀) / μ <a class="cite" href="#ref-mildren2002">(Mildren et al., 2002;</a> <a class="cite" href="#ref-streit2004">Streit and Hillis, 2004)</a></td></tr>
+                    <tr><td>CSF</td><td>Critical stress flag</td><td>True where τ ≥ μ(σₙ − Pᶠ) + C₀ <a class="cite" href="#ref-jaeger2007">(Jaeger et al., 2007)</a></td></tr>
                 </table>
                 <p>
                     Here Pᶠ is pore-fluid pressure, C₀ is cohesion, and μ is the coefficient of friction — the same
@@ -256,8 +257,9 @@ c₃ = n · σ̂₃   (horizontal component, perpendicular to σ₁)</div>
                 <p>
                     S<sub>f</sub> is reported directly in the working stress unit, not on a 0–1 scale, and has a
                     physical reading: it is the <strong>additional pore-pressure increase the plane can sustain
-                    before the effective-stress Coulomb envelope is reached</strong> (Mildren, Hillis &amp; Kaldi
-                    2002; Streit &amp; Hillis 2004). Written as S<sub>f</sub> = σₙ′ − (τ − C₀)/μ with
+                    before the effective-stress Coulomb envelope is reached</strong>
+                    <a class="cite" href="#ref-mildren2002">(Mildren, Hillis and Kaldi, 2002;</a>
+                    <a class="cite" href="#ref-streit2004">Streit and Hillis, 2004)</a>. Written as S<sub>f</sub> = σₙ′ − (τ − C₀)/μ with
                     σₙ′ = σₙ − Pᶠ, that reading is explicit: a large positive value means a large pressure margin,
                     S<sub>f</sub> = 0 means the plane is already critically stressed, and a negative value means it
                     sits beyond the envelope. Because the quantity <em>is</em> a pore-pressure increment, the
@@ -358,15 +360,17 @@ text.configure(state="disabled")</code></pre>
                     When a Slip (rake) value is supplied for a nodal plane, FracSTAT goes beyond simple stress
                     resolution: it projects the resolved shear traction onto the true three-dimensional slip vector
                     constructed from that plane's strike, dip, and rake, following the Wallace–Bott hypothesis that
-                    slip occurs parallel to the resolved shear stress on the fault plane. The angular difference
+                    slip occurs parallel to the resolved shear stress on the fault plane
+                    <a class="cite" href="#ref-wallace1951">(Wallace, 1951;</a>
+                    <a class="cite" href="#ref-bott1959">Bott, 1959)</a>. The angular difference
                     between the observed slip direction and the direction the entered stress tensor predicts is
                     reported as the <strong>Rake Misfit</strong> — a low misfit indicates that the assumed stress
                     state is kinematically consistent with the recorded earthquake, while a high misfit suggests the
                     entered principal stress orientation and/or ratio should be reconsidered.
                 </p>
                 <div class="note-box">
-                    <strong>Rake sign convention:</strong> rake is interpreted in the standard Aki &amp; Richards
-                    (1980) convention used by the GlobalCMT catalogue — measured within the fault plane from the
+                    <strong>Rake sign convention:</strong> rake is interpreted in the standard convention of
+                    <a class="cite" href="#ref-aki1980">Aki and Richards (1980, §4.2)</a>, as used by the GlobalCMT catalogue — measured within the fault plane from the
                     strike direction, positive towards the <em>up-dip</em> direction, so that
                     <code>rake&nbsp;=&nbsp;0°</code> is left-lateral, <code>+90°</code> is pure thrust,
                     <code>180°</code> (or <code>-180°</code>) is right-lateral, and <code>-90°</code> is pure normal
@@ -376,7 +380,7 @@ text.configure(state="disabled")</code></pre>
                     stresses as <em>compression-positive</em> magnitudes, the Cauchy traction built from them is
                     negated before the shear component is extracted, so that the resolved shear vector points in the
                     sense the hanging wall is driven to move. <strong>Predicted Rake</strong> is reported in the same
-                    Aki &amp; Richards convention as the input, which means rake values taken directly from a
+                    convention as the input, which means rake values taken directly from a
                     GlobalCMT-style catalogue can be compared with it without any sign or reference-direction
                     conversion.
                 </div>

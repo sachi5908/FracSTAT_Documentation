@@ -291,21 +291,21 @@
                     <tr><td>Critical fractures</td><td>CriticalStateValue (four-tier)</td><td>—</td><td>0 = Stable, 1 = Near Critical, 2 = Critical, 3 = Unstable, banded from threshold_ratio = [(τ − C₀) / (σₙ − P_f)] / μ at 50%/75%/100%</td></tr>
                 </table>
 
-                <h4 id="5.1">5.1.1 Definition of Terms</h4>
+                <h4 id="5.1.1">5.1.1 Definition of Terms</h4>
                 <ul>
-                    <li><strong>σₙ</strong> — normal stress resolved on the fracture plane (MPa).</li>
+                    <li><strong>σₙ</strong> — normal stress resolved on the fracture plane (MPa), from the standard Cauchy stress transformation <a class="cite" href="#ref-jaeger2007">(Jaeger et al., 2007)</a>.</li>
                     <li><strong>τ</strong> — shear stress resolved on the fracture plane (MPa).</li>
                     <li><strong>σ₁, σ₃</strong> — maximum and minimum principal stresses (MPa).</li>
                     <li><strong>P_f</strong> — pore-fluid pressure (MPa).</li>
                     <li><strong>C₀</strong> — cohesion of the fracture surface (MPa).</li>
                     <li><strong>μ</strong> — coefficient of friction (dimensionless).</li>
-                    <li><strong>Tₛ (Slip Tendency)</strong> — the ratio of resolved shear to normal stress; a plane slips when Tₛ approaches or exceeds μ.</li>
-                    <li><strong>T_d (Dilation Tendency)</strong> — the propensity of a fracture to open (dilate) under the current stress state, normalized between the two principal stress extremes.</li>
-                    <li><strong>S_f (Fracture Susceptibility)</strong> — a Mohr-Coulomb failure-margin proxy combining effective normal stress and cohesion-corrected shear stress; lower (more negative) values indicate closer proximity to shear failure.</li>
+                    <li><strong>Tₛ (Slip Tendency)</strong> — the ratio of resolved shear to normal stress; a plane slips when Tₛ approaches or exceeds μ <a class="cite" href="#ref-morris1996">(Morris et al., 1996)</a>.</li>
+                    <li><strong>T_d (Dilation Tendency)</strong> — the propensity of a fracture to open (dilate) under the current stress state, normalized between the two principal stress extremes <a class="cite" href="#ref-ferrill2003">(Ferrill and Morris, 2003)</a>.</li>
+                    <li><strong>S_f (Fracture Susceptibility)</strong> — a Mohr-Coulomb failure-margin proxy combining effective normal stress and cohesion-corrected shear stress; lower (more negative) values indicate closer proximity to shear failure, and the value is read most naturally as a tolerable pore-pressure increase <a class="cite" href="#ref-streit2004">(Streit and Hillis, 2004)</a>.</li>
                     <li><strong>threshold_ratio (Critical Fractures)</strong> — the friction coefficient required to resist the resolved shear stress, expressed as a fraction of the entered friction coefficient μ; see <code>core.calculator.critical_factor_and_state()</code>.</li>
                 </ul>
 
-                <h4 id="5.1">5.1.2 Normalization</h4>
+                <h4 id="5.1.2">5.1.2 Normalization</h4>
                 <p>
                     When "Color by normalized Tₛ" is enabled, Slip Tendency is divided by a theoretical maximum
                     Tₛ,max computed analytically from σ₁ and σ₃ alone (independent of the sampled fracture set — see
@@ -379,7 +379,10 @@
                 <p>
                     where latitude_mean is the arithmetic mean latitude of the plotted events. This keeps
                     circular/point features visually undistorted at the map's characteristic latitude, using a lower
-                    bound of 0.15 to avoid an unbounded aspect ratio near the poles.
+                    bound of 0.15 to avoid an unbounded aspect ratio near the poles. It is a local aspect correction,
+                    not a true cartographic projection
+                    <a class="cite" href="#ref-snyder1987">(Snyder, 1987)</a>, so distances and areas should not be
+                    measured off the plotted axes.
                 </p>
 
                 <h3 id="5.6">5.6 Interactive Zoom Mathematics</h3>
@@ -497,13 +500,16 @@
                     When Map Style is set to Grid Heatmap or either Contour mode, the Cartesian renderer
                     (<code>_draw_map_svg</code>) delegates surface construction to <code>_krige_map_surface()</code>
                     rather than drawing the raw <code>LineCollection</code> alone. This engine interpolates the
-                    selected attribute across a regular grid spanning the data bounding box:
+                    selected attribute across a regular grid spanning the data bounding box, using the ordinary
+                    kriging predictor and its underlying variogram model of spatial autocorrelation
+                    <a class="cite" href="#ref-cressie1993">(Cressie, 1993;</a>
+                    <a class="cite" href="#ref-chiles2012">Chilès and Delfiner, 2012)</a>:
                 </p>
                 <ol class="step-list">
                     <li><strong>Sample-point extraction</strong> — each fracture segment contributes one (midpoint-only) or three (start, midpoint, end — see <a href="#6.6b">below</a>) spatial sample points, depending on the "Sample along segment length" setting, each tagged with the segment's value for the active colouring attribute.</li>
                     <li><strong>Cache lookup</strong> — a BLAKE2b hash is computed over the sample dataset, the selected value column, the spatial bounds, the chosen variogram model, and the grid resolution. If an identical hash is found in <code>self._map_krige_cache</code>, the previously computed grid is reused immediately and no recomputation occurs — this makes toggling between Map Style options or cosmetic settings instantaneous after the first interpolation.</li>
                     <li><strong>Asynchronous computation</strong> — on a cache miss, <code>_show_map_kriging_loader()</code> displays a progress overlay on the plot canvas and the interpolation itself is dispatched to a background daemon thread, keeping the Qt main thread (and therefore the rest of the UI) responsive while the surface is computed.</li>
-                    <li><strong>Interpolation fallback chain</strong> — the engine first attempts <code>OrdinaryKriging</code> from the PyKrige library using the selected variogram model. If PyKrige is not installed, or the kriging system is singular for the current sample configuration (raising a <code>LinAlgWarning</code>), the engine falls back to SciPy's <code>griddata</code>, itself attempted in order of decreasing interpolation quality: <code>cubic</code> → <code>linear</code> → <code>nearest</code>, so that a surface is always produced even for degenerate or sparse sample sets.</li>
+                    <li><strong>Interpolation fallback chain</strong> — the engine first attempts <code>OrdinaryKriging</code> from the PyKrige library using the selected variogram model. If PyKrige is not installed, or the kriging system is singular for the current sample configuration (raising a <code>LinAlgWarning</code>), the engine falls back to SciPy's <code>griddata</code> <a class="cite" href="#ref-virtanen2020">(Virtanen et al., 2020)</a>, itself attempted in order of decreasing interpolation quality: <code>cubic</code> → <code>linear</code> → <code>nearest</code>, so that a surface is always produced even for degenerate or sparse sample sets.</li>
                     <li><strong>Result caching and marshalling</strong> — once the background thread completes, the resulting grid is stored in <code>self._map_krige_cache</code> keyed by the hash computed in step 2, and the map is redrawn; the redraw call that triggered the original cache miss will, on completion, hit the now-populated cache.</li>
                 </ol>
 
@@ -642,7 +648,8 @@
                     as a single Matplotlib <code>LineCollection</code> rather than as individually plotted lines.
                     This is both a performance optimization (<a href="#performance">Section 11</a>) and a
                     visual-consistency measure, since a <code>LineCollection</code> guarantees uniform handling of
-                    colour mapping, z-ordering, and anti-aliasing across the entire fracture population.
+                    colour mapping, z-ordering, and anti-aliasing across the entire fracture population
+                    <a class="cite" href="#ref-hunter2007">(Hunter, 2007)</a>.
                 </p>
 
                 <h3 id="9.2">9.2 Beachball Diagram Insets</h3>
@@ -650,7 +657,11 @@
                     For focal-mechanism datasets that supply a Beachball URL, selecting an event renders an inset
                     diagram card near that event's marker using Matplotlib's offsetbox machinery
                     (<code>AnnotationBbox</code>, <code>OffsetImage</code>, <code>VPacker</code>,
-                    <code>DrawingArea</code>, <code>TextArea</code>). The inset card displays:
+                    <code>DrawingArea</code>, <code>TextArea</code>). The beachball itself is a lower-hemisphere
+                    equal-area plot of the radiation pattern in the standard seismological convention
+                    <a class="cite" href="#ref-aki1980">(Aki and Richards, 1980;</a>
+                    <a class="cite" href="#ref-dahlen1998">Dahlen and Tromp, 1998)</a>, retrieved as a pre-rendered
+                    image rather than computed here. The inset card displays:
                 </p>
                 <ul>
                     <li>A bold title line showing the event label (or "Focal mechanism" if unavailable);</li>
@@ -816,7 +827,10 @@
                     fault-reactivation risk assessment, induced-seismicity screening, and
                     reservoir-compartmentalization studies, such clusters are frequently used to prioritize which
                     mapped structures warrant closer geomechanical scrutiny or avoidance during operations such as
-                    fluid injection.
+                    fluid injection <a class="cite" href="#ref-morris1996">(Morris et al., 1996;</a>
+                    <a class="cite" href="#ref-zoback2007">Zoback, 2007)</a>. Borehole studies find that the
+                    permeable fractures in crystalline rock are predominantly those that are critically stressed in
+                    exactly this sense <a class="cite" href="#ref-barton1995">(Barton et al., 1995)</a>.
                 </p>
 
                 <h4 id="13.2">13.2 Dilation Tendency Maps</h4>
@@ -825,7 +839,8 @@
                     shearing) under the current stress state. These orientations are of particular interest in
                     fractured-reservoir permeability studies, since dilated fractures typically provide the dominant
                     fluid-flow pathways, whereas fractures with low dilation tendency but high slip tendency are more
-                    likely to behave as shear (and potentially seismogenic) structures.
+                    likely to behave as shear (and potentially seismogenic) structures
+                    <a class="cite" href="#ref-ferrill2003">(Ferrill and Morris, 2003)</a>.
                 </p>
 
                 <h4 id="13.3">13.3 Fracture Susceptibility Maps</h4>
@@ -834,7 +849,8 @@
                     (MPa) rather than as a dimensionless ratio, making it directly comparable to engineering
                     pressure changes (e.g. planned pore-pressure increases during injection). Areas or orientation
                     sets with low (near-zero or negative) susceptibility values are closest to failure and warrant
-                    the greatest operational caution.
+                    the greatest operational caution — the same reasoning used to set sustainable injection pressures
+                    for subsurface storage <a class="cite" href="#ref-streit2004">(Streit and Hillis, 2004)</a>.
                 </p>
 
                 <h4 id="13.4">13.4 Critical Fracture Maps</h4>
@@ -862,10 +878,12 @@
                 <h4 id="13.6">13.6 Focal-Mechanism Maps</h4>
                 <p>
                     Cross-referencing observed earthquake locations and nodal planes against a candidate regional
-                    stress tensor via the Critical Fractures colouring and Rake Misfit statistic (Wallace-Bott
-                    hypothesis; see the Method tab and the Dynamic Analyzer documentation) provides an independent,
-                    seismicity-based test of whether a proposed stress model is consistent with the historical
-                    earthquake record in the study area.
+                    stress tensor via the Critical Fractures colouring and Rake Misfit statistic (the Wallace–Bott
+                    hypothesis, that slip occurs parallel to the resolved shear traction
+                    <a class="cite" href="#ref-wallace1951">(Wallace, 1951;</a>
+                    <a class="cite" href="#ref-bott1959">Bott, 1959)</a>; see the Method tab and the Dynamic Analyzer
+                    documentation) provides an independent, seismicity-based test of whether a proposed stress model
+                    is consistent with the historical earthquake record in the study area.
                 </p>
 
                 <!-- ================================================= -->
@@ -900,16 +918,74 @@
                     <li>Background-photograph alignment assumes the photograph's full pixel extent corresponds exactly to the calibrated data bounding box; a photograph that does not cover the same physical area as the digitized traces will not register correctly.</li>
                     <li>The raw-vs-scaled coordinate heuristic (<a href="#5.3">Section 5.3</a>) is a tolerance-based inference rather than an explicit calibration flag, and could in principle misclassify a genuinely calibrated profile whose dimensions happen to coincide closely with the uncalibrated 260 × 100 default.</li>
                     <li>Very large fracture populations rendered via a single <code>LineCollection</code> remain efficient to draw, but per-segment tooltip/hover interactivity is not implemented in this module (unlike the Mohr tab's point-hover annotation).</li>
+                    <li>Interpolated surfaces carry no uncertainty estimate. The variogram model is user-selected rather than fitted to the data, and no kriging variance map is produced, so the surface should be read as a smoothing aid rather than a geostatistically optimal predictor <a class="cite" href="#ref-chiles2012">(Chilès and Delfiner, 2012)</a>. Where kriging fails, the silent fallback to <code>griddata</code> changes the interpolator without changing the figure's appearance.</li>
+                    <li>Geographic mode applies a latitude-dependent aspect correction rather than a cartographic projection <a class="cite" href="#ref-snyder1987">(Snyder, 1987)</a>, so the plot is not suitable for measuring distances, areas, or azimuths, and the correction degrades over large latitude ranges.</li>
+                    <li>Beachball diagrams are fetched as pre-rendered images from an external URL supplied with the data <a class="cite" href="#ref-dahlen1998">(Dahlen and Tromp, 1998)</a>. They are not computed from the loaded nodal-plane parameters, so a mismatch between the image and the tabulated strike/dip/rake cannot be detected by the application, and no diagram is available offline.</li>
+                    <li>All colouring is conditional on a single, spatially uniform, user-entered stress tensor. The map shows no sensitivity to that assumption and no confidence bounds; comparing scenarios requires re-entering the tensor and re-reading the figure <a class="cite" href="#ref-zoback2007">(Zoback, 2007)</a>.</li>
                 </ul>
 
                 <!-- ================================================= -->
                 <h2 id="references">16. References</h2>
-                <p>Wallace, R. E. (1951). Geometry of shearing stress and relation to faulting. <em>Journal of Geology</em>, 59(2), 118–130.</p>
-                <p>Bott, M. H. P. (1959). The mechanics of oblique slip faulting. <em>Geological Magazine</em>, 96(2), 109–117.</p>
-                <p>Morris, A., Ferrill, D. A., &amp; Henderson, D. B. (1996). Slip-tendency analysis and fault reactivation. <em>Geology</em>, 24(3), 275–278.</p>
+                <p>
+                    Sources are listed alphabetically within each group. In-text citations throughout this page link
+                    to the corresponding entry below.
+                </p>
+
+                <h3 id="16.1">16.1 Stress, Reactivation and Fault Kinematics</h3>
+                <ul class="ref-list">
+                    <li id="ref-barton1995">Barton, C. A., Zoback, M. D., &amp; Moos, D. (1995). Fluid flow along potentially active faults in crystalline rock. <em>Geology</em>, 23(8), 683&ndash;686. <a href="https://doi.org/10.1130/0091-7613(1995)023&lt;0683:FFAPAF&gt;2.3.CO;2" target="_blank" rel="noopener">https://doi.org/10.1130/0091-7613(1995)023&lt;0683:FFAPAF&gt;2.3.CO;2</a></li>
+                    <li id="ref-bott1959">Bott, M. H. P. (1959). The mechanics of oblique slip faulting. <em>Geological Magazine</em>, 96(2), 109&ndash;117. <a href="https://doi.org/10.1017/S0016756800059987" target="_blank" rel="noopener">https://doi.org/10.1017/S0016756800059987</a></li>
+                    <li id="ref-ferrill2003">Ferrill, D. A., &amp; Morris, A. P. (2003). Dilational normal faults. <em>Journal of Structural Geology</em>, 25(2), 183&ndash;196. <a href="https://doi.org/10.1016/S0191-8141(02)00029-9" target="_blank" rel="noopener">https://doi.org/10.1016/S0191-8141(02)00029-9</a></li>
+                    <li id="ref-jaeger2007">Jaeger, J. C., Cook, N. G. W., &amp; Zimmerman, R. W. (2007). <em>Fundamentals of Rock Mechanics</em> (4th ed.). Blackwell Publishing, Oxford. ISBN 978-0-632-05759-7.</li>
+                    <li id="ref-morris1996">Morris, A., Ferrill, D. A., &amp; Henderson, D. B. (1996). Slip-tendency analysis and fault reactivation. <em>Geology</em>, 24(3), 275&ndash;278. <a href="https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2" target="_blank" rel="noopener">https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2</a></li>
+                    <li id="ref-streit2004">Streit, J. E., &amp; Hillis, R. R. (2004). Estimating fault stability and sustainable fluid pressures for underground storage of CO&#8322; in porous rock. <em>Energy</em>, 29(9&ndash;10), 1445&ndash;1456. <a href="https://doi.org/10.1016/j.energy.2004.03.078" target="_blank" rel="noopener">https://doi.org/10.1016/j.energy.2004.03.078</a></li>
+                    <li id="ref-wallace1951">Wallace, R. E. (1951). Geometry of shearing stress and relation to faulting. <em>The Journal of Geology</em>, 59(2), 118&ndash;130. <a href="https://doi.org/10.1086/625831" target="_blank" rel="noopener">https://doi.org/10.1086/625831</a></li>
+                    <li id="ref-zoback2007">Zoback, M. D. (2007). <em>Reservoir Geomechanics</em>. Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511586477" target="_blank" rel="noopener">https://doi.org/10.1017/CBO9780511586477</a></li>
+                </ul>
+
+                <h3 id="16.2">16.2 Seismology and Focal-Mechanism Conventions</h3>
+                <ul class="ref-list">
+                    <li id="ref-aki1980">Aki, K., &amp; Richards, P. G. (1980). <em>Quantitative Seismology: Theory and Methods</em> (Vol. 1), §4.2. W. H. Freeman, San Francisco.</li>
+                    <li id="ref-dahlen1998">Dahlen, F. A., &amp; Tromp, J. (1998). <em>Theoretical Global Seismology</em>. Princeton University Press. <a href="https://doi.org/10.1515/9780691216157" target="_blank" rel="noopener">https://doi.org/10.1515/9780691216157</a></li>
+                </ul>
+
                 <p>Ferrill, D. A., &amp; Morris, A. P. (2003). Dilational normal faults. <em>Journal of Structural Geology</em>, 25(2), 183–196.</p>
                 <p>Jaeger, J. C., Cook, N. G. W., &amp; Zimmerman, R. W. (2007). <em>Fundamentals of Rock Mechanics</em> (4th ed.). Blackwell Publishing.</p>
                 <p>Dahlen, F. A., &amp; Tromp, J. (1998). <em>Theoretical Global Seismology</em>. Princeton University Press. (Reference for focal-mechanism / beachball diagram conventions.)</p>
+
+                <h3 id="16.3">16.3 Geostatistics, Projection and Software</h3>
+                <ul class="ref-list">
+                    <li id="ref-chiles2012">Chilès, J.-P., &amp; Delfiner, P. (2012). <em>Geostatistics: Modeling Spatial Uncertainty</em> (2nd ed.). John Wiley &amp; Sons. <a href="https://doi.org/10.1002/9781118136188" target="_blank" rel="noopener">https://doi.org/10.1002/9781118136188</a></li>
+                    <li id="ref-cressie1993">Cressie, N. A. C. (1993). <em>Statistics for Spatial Data</em> (Revised ed.). John Wiley &amp; Sons. <a href="https://doi.org/10.1002/9781119115151" target="_blank" rel="noopener">https://doi.org/10.1002/9781119115151</a></li>
+                    <li id="ref-harris2020">Harris, C. R., Millman, K. J., van der Walt, S. J., Gommers, R., Virtanen, P., Cournapeau, D., &hellip; Oliphant, T. E. (2020). Array programming with NumPy. <em>Nature</em>, 585(7825), 357&ndash;362. <a href="https://doi.org/10.1038/s41586-020-2649-2" target="_blank" rel="noopener">https://doi.org/10.1038/s41586-020-2649-2</a></li>
+                    <li id="ref-hunter2007">Hunter, J. D. (2007). Matplotlib: A 2D graphics environment. <em>Computing in Science &amp; Engineering</em>, 9(3), 90&ndash;95. <a href="https://doi.org/10.1109/MCSE.2007.55" target="_blank" rel="noopener">https://doi.org/10.1109/MCSE.2007.55</a></li>
+                    <li id="ref-snyder1987">Snyder, J. P. (1987). <em>Map Projections &mdash; A Working Manual</em>. U.S. Geological Survey Professional Paper 1395. <a href="https://doi.org/10.3133/pp1395" target="_blank" rel="noopener">https://doi.org/10.3133/pp1395</a></li>
+                    <li id="ref-virtanen2020">Virtanen, P., Gommers, R., Oliphant, T. E., Haberland, M., Reddy, T., Cournapeau, D., &hellip; van Mulbregt, P. (2020). SciPy 1.0: fundamental algorithms for scientific computing in Python. <em>Nature Methods</em>, 17(3), 261&ndash;272. <a href="https://doi.org/10.1038/s41592-019-0686-2" target="_blank" rel="noopener">https://doi.org/10.1038/s41592-019-0686-2</a></li>
+                </ul>
+
+                <div class="cite-box">
+                    <p><strong>Methods statement for the Map Tab.</strong> If a figure produced by this tab appears in
+                    a publication, the details below are what a reader needs in order to reproduce it, and are what
+                    the citations above assume:</p>
+                    <p>Map of <em>n</em> fracture traces (or focal-mechanism epicentres) coloured by the selected
+                    stress-tendency metric &mdash; slip tendency
+                    <a class="cite" href="#ref-morris1996">(Morris et al., 1996)</a>, dilation tendency
+                    <a class="cite" href="#ref-ferrill2003">(Ferrill and Morris, 2003)</a>, fracture susceptibility
+                    <a class="cite" href="#ref-streit2004">(Streit and Hillis, 2004)</a>, or the four-tier
+                    critical-state code &mdash; for &sigma;&#8321;/&sigma;&#8322;/&sigma;&#8323; = &hellip; MPa,
+                    P_f = &hellip; MPa, C&#8320; = &hellip; MPa and &mu; = &hellip;
+                    <a class="cite" href="#ref-jaeger2007">(Jaeger et al., 2007)</a>. Where a heatmap or contour
+                    style is used, the surface is an ordinary-kriging interpolation with the stated variogram model
+                    <a class="cite" href="#ref-cressie1993">(Cressie, 1993)</a>, falling back to SciPy
+                    <code>griddata</code> <a class="cite" href="#ref-virtanen2020">(Virtanen et al., 2020)</a>;
+                    state the variogram model, grid resolution, the number of contour levels, and whether
+                    three-point segment sampling was enabled (<a href="#6.6b">Section 6.6.1</a>). Implemented in NumPy
+                    <a class="cite" href="#ref-harris2020">(Harris et al., 2020)</a> and rendered with Matplotlib
+                    <a class="cite" href="#ref-hunter2007">(Hunter, 2007)</a>. Report the stress tensor, the colour
+                    metric, and <em>n</em>; note that normalized susceptibility is rescaled per dataset
+                    (<a href="#5.1.2">Section 5.1.2</a>) and that interpolated surfaces carry no uncertainty estimate
+                    (<a href="#limitations">Section 15</a>).</p>
+                </div>
 
                 <!-- Pagination Navigation -->
                 <div class="pagination-nav"></div>

@@ -361,7 +361,9 @@
                 <h3 id="5.1">5.1 Strike Folding (Axial Data Convention)</h3>
                 <p>
                     A fracture strike is an axial quantity: strikes θ and θ+180° describe the identical line
-                    orientation. The module therefore folds every strike into the canonical 0–180° domain prior to
+                    orientation, so the appropriate statistical treatment is that of axial rather than directional
+                    data <a class="cite" href="#ref-mardia2000">(Mardia and Jupp, 2000)</a>. The module therefore
+                    folds every strike into the canonical 0–180° domain prior to
                     binning:
                 </p>
                 <div class="formula-block">θ_fold = θ_raw mod 180°</div>
@@ -385,8 +387,9 @@
                 <div class="formula-block">C_k = Σ w_i,  for all i such that e_k ≤ φ_i &lt; e_(k+1)</div>
                 <p>
                     This is computed via a single call to <code>numpy.histogram</code> with the <code>weights</code>
-                    argument set to the per-segment weight vector, which is the standard, numerically efficient
-                    implementation of a weighted circular histogram.
+                    argument set to the per-segment weight vector
+                    <a class="cite" href="#ref-harris2020">(Harris et al., 2020)</a>, which is the standard,
+                    numerically efficient implementation of a weighted circular histogram.
                 </p>
 
                 <h3 id="5.3">5.3 Equal-Area Petal Radius Transformation</h3>
@@ -394,8 +397,10 @@
                     A conventional rose diagram that plots petal radius directly proportional to bin frequency
                     visually over-emphasises the dominant orientation, because the area of a circular sector grows
                     with the square of its radius. FracSTAT follows the standard structural-geology convention of
-                    an equal-area (square-root) rose diagram, in which the plotted radius r_k of each petal is the
-                    square root of its weighted count:
+                    an equal-area (square-root) rose diagram
+                    <a class="cite" href="#ref-fisher1993">(Fisher, 1993;</a>
+                    <a class="cite" href="#ref-davis2011">Davis et al., 2011)</a>, in which the plotted radius r_k of
+                    each petal is the square root of its weighted count:
                 </p>
                 <div class="formula-block">r_k = √C_k</div>
                 <p>
@@ -409,7 +414,10 @@
                 <h3 id="5.4">5.4 Colour-Mapped Attribute Aggregation</h3>
                 <p>
                     Each petal's fill colour represents the mean value of the selected mechanical attribute A (one
-                    of Tₛ, Td, Sf, or the four-tier critical-fracture-state value) among all segments falling in that bin:
+                    of Tₛ <a class="cite" href="#ref-morris1996">(Morris et al., 1996)</a>, Td
+                    <a class="cite" href="#ref-ferrill2003">(Ferrill and Morris, 2003)</a>, Sf
+                    <a class="cite" href="#ref-streit2004">(Streit and Hillis, 2004)</a>, or the four-tier
+                    critical-fracture-state value) among all segments falling in that bin:
                 </p>
                 <div class="formula-block">Ā_k = nanmean{ A_i : e_k ≤ φ_i &lt; e_(k+1) }</div>
                 <p>
@@ -608,7 +616,9 @@ color_values = np.array(color_values)</code></pre>
                 <h3 id="8.1">8.1 Circular (Directional) Statistics Context</h3>
                 <p>
                     The rose diagram is fundamentally a graphical circular-statistics device for axial data
-                    (Mardia and Jupp, 2000; standard structural-geology practice, e.g. Davis, 2002). Because
+                    <a class="cite" href="#ref-mardia2000">(Mardia and Jupp, 2000;</a>
+                    <a class="cite" href="#ref-fisher1993">Fisher, 1993)</a>, and is standard structural-geology
+                    practice <a class="cite" href="#ref-davis2011">(Davis et al., 2011)</a>. Because
                     fracture strikes are axial (mod 180°) rather than directional (mod 360°) quantities, the
                     folding and mirroring steps described in <a href="#5.1">Section 5.1</a> are essential; failing to fold strikes
                     before binning would artificially split a genuinely unimodal fracture set into two
@@ -814,13 +824,17 @@ color_values = np.array(color_values)</code></pre>
 
                 <h4 id="13.1">13.1 Reactivation-Prone Set Identification</h4>
                 <p>
-                    Under Andersonian faulting theory, fractures oriented at the Coulomb-optimal angle to σ1
+                    Under Andersonian faulting theory
+                    <a class="cite" href="#ref-anderson1951">(Anderson, 1951)</a>, fractures oriented at the
+                    Coulomb-optimal angle to σ1
                     (approximately 2θ_opt = arctan(1/μ) from σ1, i.e. roughly 25°–35° for typical friction
                     coefficients) exhibit the highest ratio of shear to effective normal stress and are therefore
-                    the most prone to frictional reactivation. A petal that is both prominent (high frequency or
-                    cumulative length) and coloured toward high slip tendency or the "Critical"/"Unstable"
-                    classification at approximately this optimal angular offset is a strong candidate for active
-                    or potentially active slip under the assumed stress state.
+                    the most prone to frictional reactivation
+                    <a class="cite" href="#ref-jaeger2007">(Jaeger et al., 2007)</a>. A petal that is both prominent
+                    (high frequency or cumulative length) and coloured toward high slip tendency or the
+                    "Critical"/"Unstable" classification at approximately this optimal angular offset is a strong
+                    candidate for active or potentially active slip under the assumed stress state
+                    <a class="cite" href="#ref-morris1996">(Morris et al., 1996)</a>.
                 </p>
 
                 <h4 id="13.2">13.2 Dilation and Fluid-Flow Pathways</h4>
@@ -830,14 +844,18 @@ color_values = np.array(color_values)</code></pre>
                     field — these orientations are of particular interest for identifying preferential fluid-flow
                     pathways or high-permeability fracture corridors in naturally fractured reservoirs, since
                     dilated fractures typically exhibit enhanced hydraulic aperture relative to shear-dominated
-                    sets.
+                    sets <a class="cite" href="#ref-ferrill2003">(Ferrill and Morris, 2003;</a>
+                    <a class="cite" href="#ref-zoback2007">Zoback, 2007)</a>.
                 </p>
 
                 <h4 id="13.3">13.3 Fracture Susceptibility as a Composite Risk Indicator</h4>
                 <p>
                     Fracture susceptibility Sf combines the normal-stress clamping effect, pore pressure, cohesion,
                     and friction into a single margin-to-failure metric (see <a href="#maths">Section 5</a> of the Method tab
-                    documentation for the full formula). Colouring the rose by susceptibility allows an analyst to
+                    documentation for the full formula), read most naturally as the pore-pressure increase a plane
+                    can tolerate before it slips
+                    <a class="cite" href="#ref-streit2004">(Streit and Hillis, 2004)</a>. Colouring the rose by
+                    susceptibility allows an analyst to
                     rank strike sets by their overall geomechanical risk in a single view, complementing the
                     four-tier Critical fractures classification with a continuous gradation useful for
                     sensitivity or what-if stress-scenario comparisons.
@@ -907,17 +925,70 @@ color_values = np.array(color_values)</code></pre>
                     <tr><th>Limitation</th><th>Description</th></tr>
                     <tr><td>Unweighted colour aggregation</td><td>Per-bin colour aggregation uses a simple arithmetic mean with no weighting by segment length or count, which can make small-population bins visually as prominent in colour intensity as large, statistically robust bins; users must cross-reference petal size when interpreting colour.</td></tr>
                     <tr><td>Compass labels tied to Half rose toggle</td><td>The compass N/E/S/W annotations are suppressed for half-rose diagrams, which is an intentional design choice (the half rose only spans 0–180° and W/S annotations would be geometrically meaningless in that mode), but is not configurable independently of the Half rose toggle.</td></tr>
+                    <tr><td>No orientation-bias correction</td><td>Every fracture contributes with equal weight regardless of the angle at which the sampling line or outcrop face intersects it, so sets sub-parallel to the sampling direction are systematically under-represented. No Terzaghi weighting is applied <a class="cite" href="#ref-terzaghi1965">(Terzaghi, 1965)</a>.</td></tr>
+                    <tr><td>No circular summary statistics or significance tests</td><td>The tab is purely graphical: it reports no mean strike, resultant length, circular variance, or test of uniformity, all of which would be needed to state whether an apparent preferred orientation is statistically significant <a class="cite" href="#ref-mardia2000">(Mardia and Jupp, 2000;</a> <a class="cite" href="#ref-fisher1993">Fisher, 1993)</a>.</td></tr>
+                    <tr><td>Bin count is a free parameter</td><td>Petal count is set by hand with no data-driven rule. Because a rose diagram's apparent modality can change materially with bin width, the chosen bin count should always be reported and ideally varied to confirm that a peak is robust <a class="cite" href="#ref-fisher1993">(Fisher, 1993)</a>.</td></tr>
+                    <tr><td>Strike only, dip discarded</td><td>Folding to a 0–180° strike domain (<a href="#5.1">Section 5.1</a>) collapses the full three-dimensional plane orientation onto a single azimuth, so two sets sharing a strike but dipping oppositely are indistinguishable here. Use the Stereonet tab where dip matters <a class="cite" href="#ref-davis2011">(Davis et al., 2011)</a>.</td></tr>
+                    <tr><td>Colour scale is dataset-relative for susceptibility</td><td><code>FractureSusceptibilityNorm</code> is rescaled and inverted against the loaded file's own minimum and maximum (<a href="#5.5">Section 5.5</a>), so a saturated petal marks the least stable orientation in that file, not one at failure. Values are not comparable between datasets.</td></tr>
                 </table>
 
                 <!-- ================================================= -->
                 <h2 id="references">16. References</h2>
-                <p>Anderson, E.M. (1951). <em>The Dynamics of Faulting and Dyke Formation with Applications to Britain</em>. Oliver and Boyd, Edinburgh.</p>
-                <p>Davis, G.H., Reynolds, S.J. and Kluth, C.F. (2011). <em>Structural Geology of Rocks and Regions</em>, 3rd ed. John Wiley &amp; Sons.</p>
-                <p>Mardia, K.V. and Jupp, P.E. (2000). <em>Directional Statistics</em>. John Wiley &amp; Sons, Chichester.</p>
+                <p>
+                    Sources are listed alphabetically within each group. In-text citations throughout this page link
+                    to the corresponding entry below.
+                </p>
+
+                <h3 id="16.1">16.1 Circular and Directional Statistics</h3>
+                <ul class="ref-list">
+                    <li id="ref-fisher1993">Fisher, N. I. (1993). <em>Statistical Analysis of Circular Data</em>. Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511564345" target="_blank" rel="noopener">https://doi.org/10.1017/CBO9780511564345</a></li>
+                    <li id="ref-mardia2000">Mardia, K. V., &amp; Jupp, P. E. (2000). <em>Directional Statistics</em>. John Wiley &amp; Sons, Chichester. <a href="https://doi.org/10.1002/9780470316979" target="_blank" rel="noopener">https://doi.org/10.1002/9780470316979</a></li>
+                    <li id="ref-terzaghi1965">Terzaghi, R. D. (1965). Sources of error in joint surveys. <em>Géotechnique</em>, 15(3), 287&ndash;304. <a href="https://doi.org/10.1680/geot.1965.15.3.287" target="_blank" rel="noopener">https://doi.org/10.1680/geot.1965.15.3.287</a></li>
+                </ul>
+
+                <h3 id="16.2">16.2 Structural Geology, Stress and Reactivation</h3>
+                <ul class="ref-list">
+                    <li id="ref-anderson1951">Anderson, E. M. (1951). <em>The Dynamics of Faulting and Dyke Formation with Applications to Britain</em> (2nd ed.). Oliver and Boyd, Edinburgh.</li>
+                    <li id="ref-davis2011">Davis, G. H., Reynolds, S. J., &amp; Kluth, C. F. (2011). <em>Structural Geology of Rocks and Regions</em> (3rd ed.). John Wiley &amp; Sons. ISBN 978-0-471-15231-6.</li>
+                    <li id="ref-ferrill2003">Ferrill, D. A., &amp; Morris, A. P. (2003). Dilational normal faults. <em>Journal of Structural Geology</em>, 25(2), 183&ndash;196. <a href="https://doi.org/10.1016/S0191-8141(02)00029-9" target="_blank" rel="noopener">https://doi.org/10.1016/S0191-8141(02)00029-9</a></li>
+                    <li id="ref-jaeger2007">Jaeger, J. C., Cook, N. G. W., &amp; Zimmerman, R. W. (2007). <em>Fundamentals of Rock Mechanics</em> (4th ed.). Blackwell Publishing, Oxford. ISBN 978-0-632-05759-7.</li>
+                    <li id="ref-morris1996">Morris, A., Ferrill, D. A., &amp; Henderson, D. B. (1996). Slip-tendency analysis and fault reactivation. <em>Geology</em>, 24(3), 275&ndash;278. <a href="https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2" target="_blank" rel="noopener">https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2</a></li>
+                    <li id="ref-streit2004">Streit, J. E., &amp; Hillis, R. R. (2004). Estimating fault stability and sustainable fluid pressures for underground storage of CO&#8322; in porous rock. <em>Energy</em>, 29(9&ndash;10), 1445&ndash;1456. <a href="https://doi.org/10.1016/j.energy.2004.03.078" target="_blank" rel="noopener">https://doi.org/10.1016/j.energy.2004.03.078</a></li>
+                    <li id="ref-zoback2007">Zoback, M. D. (2007). <em>Reservoir Geomechanics</em>. Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511586477" target="_blank" rel="noopener">https://doi.org/10.1017/CBO9780511586477</a></li>
+                </ul>
+
+                <h3 id="16.3">16.3 Software</h3>
+                <ul class="ref-list">
+                    <li id="ref-harris2020">Harris, C. R., Millman, K. J., van der Walt, S. J., Gommers, R., Virtanen, P., Cournapeau, D., &hellip; Oliphant, T. E. (2020). Array programming with NumPy. <em>Nature</em>, 585(7825), 357&ndash;362. <a href="https://doi.org/10.1038/s41586-020-2649-2" target="_blank" rel="noopener">https://doi.org/10.1038/s41586-020-2649-2</a></li>
+                    <li id="ref-hunter2007">Hunter, J. D. (2007). Matplotlib: A 2D graphics environment. <em>Computing in Science &amp; Engineering</em>, 9(3), 90&ndash;95. <a href="https://doi.org/10.1109/MCSE.2007.55" target="_blank" rel="noopener">https://doi.org/10.1109/MCSE.2007.55</a></li>
+                </ul>
+
                 <p>Morris, A., Ferrill, D.A. and Henderson, D.B. (1996). "Slip-tendency analysis and fault reactivation." <em>Geology</em>, 24(3), pp. 275–278.</p>
                 <p>Ferrill, D.A. and Morris, A.P. (2003). "Dilational normal faults." <em>Journal of Structural Geology</em>, 25(2), pp. 183–196.</p>
                 <p>Zoback, M.D. (2007). <em>Reservoir Geomechanics</em>. Cambridge University Press.</p>
                 <p>Jaeger, J.C., Cook, N.G.W. and Zimmerman, R.W. (2007). <em>Fundamentals of Rock Mechanics</em>, 4th ed. Blackwell Publishing.</p>
+                <div class="cite-box">
+                    <p><strong>Methods statement for the Rose Tab.</strong> If a figure produced by this tab appears
+                    in a publication, the details below are what a reader needs in order to reproduce it, and are
+                    what the citations above assume:</p>
+                    <p>Equal-area (square-root radius) rose diagram of fracture strike, folded to the 0&ndash;180&deg;
+                    axial domain <a class="cite" href="#ref-mardia2000">(Mardia and Jupp, 2000)</a>, computed with
+                    <em>B</em> equal-width bins and weighted by trace length (or by count, as stated) from <em>n</em>
+                    observations, drawn as a half or mirrored full rose as stated. Petals coloured by the bin-mean
+                    value of the selected stress-tendency metric &mdash; slip tendency
+                    <a class="cite" href="#ref-morris1996">(Morris et al., 1996)</a>, dilation tendency
+                    <a class="cite" href="#ref-ferrill2003">(Ferrill and Morris, 2003)</a>, fracture susceptibility
+                    <a class="cite" href="#ref-streit2004">(Streit and Hillis, 2004)</a>, or the four-tier
+                    critical-state code &mdash; for &sigma;&#8321;/&sigma;&#8322;/&sigma;&#8323; = &hellip; MPa,
+                    P_f = &hellip; MPa, C&#8320; = &hellip; MPa and &mu; = &hellip;
+                    <a class="cite" href="#ref-jaeger2007">(Jaeger et al., 2007)</a>. Implemented in NumPy
+                    <a class="cite" href="#ref-harris2020">(Harris et al., 2020)</a> and rendered with Matplotlib
+                    <a class="cite" href="#ref-hunter2007">(Hunter, 2007)</a>. Report <em>B</em>, <em>n</em>, the
+                    weighting mode, the stress tensor, and the colour metric; note that petal colour is an unweighted
+                    bin mean (<a href="#8.3">Section 8.3</a>) and that no orientation-bias correction is applied
+                    (<a href="#limitations">Section 15</a>).</p>
+                </div>
+
                 <!-- Pagination Navigation -->
                 <div class="pagination-nav"></div>
 

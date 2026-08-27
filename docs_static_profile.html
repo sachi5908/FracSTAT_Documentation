@@ -48,7 +48,9 @@
                     This module digitizes the classical field scanline survey: a straight scanline is laid across
                     an outcrop and the fractures crossing it are logged together with their spacing, orientation,
                     and length, yielding a one-dimensional statistical sample of an otherwise two-dimensional
-                    fracture network — the basis of fracture-intensity metrics such as P10, P21, and P20. The module
+                    fracture network — the basis of fracture-intensity metrics such as P10, P21, and P20
+                    <a class="cite" href="#ref-priest1993">(Priest, 1993;</a>
+                    <a class="cite" href="#ref-dershowitz1992">Dershowitz and Herda, 1992)</a>. The module
                     operates exclusively within the Static Analyzer workspace, performing purely geometric analysis
                     with no dependency on stress, slip tendency, or any mechanical property computed in the Dynamic
                     Analyzer.
@@ -86,14 +88,16 @@
                 <ul>
                     <li>The one-dimensional position ("distance along") at which each fracture intersects the line, together with the trace length, segment length, or segment angle associated with that intersection;</li>
                     <li>The perpendicular offset ("distance from") of trace and segment midpoints relative to the line, again cross-plotted against trace length, segment length, or segment angle;</li>
-                    <li>A Mauldon-style circular-scanline estimate of fracture intensity (P21) and density (P20) evaluated at a user-specified number of positions along the line.</li>
+                    <li>A Mauldon-style circular-scanline estimate of fracture intensity (P21) and density (P20) evaluated at a user-specified number of positions along the line <a class="cite" href="#ref-mauldon2001">(Mauldon et al., 2001)</a>.</li>
                 </ul>
                 <p>
                     The module therefore serves two complementary purposes: it is a spatial-trend diagnostic tool,
                     letting the user determine whether fracture attributes vary systematically across a mapped
                     domain (for example, increasing intensity toward a fault zone), and it is a quantitative
                     intensity/density estimator that is robust to network anisotropy, because the Mauldon circular-window
-                    method removes the orientation bias inherent in straight scanline counts.
+                    method removes the orientation bias inherent in straight scanline counts
+                    <a class="cite" href="#ref-terzaghi1965">(Terzaghi, 1965;</a>
+                    <a class="cite" href="#ref-mauldon2001">Mauldon et al., 2001)</a>.
                 </p>
 
                 <!-- ================================================= -->
@@ -414,8 +418,12 @@ a = ‖B−A‖² ,  b = 2[(A−C)·(B−A)] ,  c = ‖A−C‖² − r²</div>
 
                 <h3 id="5.7">5.7 Fracture Intensity (P21) and Density (P20)</h3>
                 <p>
-                    Following the circular-scanline method (after Mauldon, and consistent with the Connectivity and
-                    Intensity &amp; Density tabs elsewhere in FracSTAT), each scan circle of radius r accumulates
+                    Following the circular-scanline method
+                    <a class="cite" href="#ref-mauldon1998">(Mauldon, 1998;</a>
+                    <a class="cite" href="#ref-mauldon2001">Mauldon et al., 2001;</a>
+                    <a class="cite" href="#ref-rohrbaugh2002">Rohrbaugh et al., 2002)</a>, and consistent with the
+                    Connectivity and
+                    Intensity &amp; Density tabs elsewhere in FracSTAT, each scan circle of radius r accumulates
                     two counts: N_int, the total number of segment–circle boundary crossings (from <a href="#5.6">Section 5.6</a>,
                     counting a fully interior segment once and a partially interior segment once for its single
                     boundary crossing), and m, the number of <strong>trace tips</strong> that fall strictly inside
@@ -432,7 +440,7 @@ P20 = m / (2πr²)          m = trace tips inside the circle</div>
                 </p>
                 <div class="note-box">
                     <strong>m counts trace tips, not segment endpoints.</strong>
-                    Mauldon, Dunne &amp; Rohrbaugh (2001) define the circular-window density estimator as
+                    <a class="cite" href="#ref-mauldon2001">Mauldon, Dunne and Rohrbaugh (2001)</a> define the circular-window density estimator as
                     P20 = m / (2πr²) with m the number of <em>trace</em> endpoints inside the window. Accumulating one
                     count per segment endpoint instead (i.e. adding both endpoints of every segment that lie inside
                     the circle) double-counts every interior vertex, so a single trace digitised into n segments
@@ -848,9 +856,9 @@ def _graphs_trace_tips(df):
                     outputs support several standard interpretive workflows:
                 </p>
                 <ul>
-                    <li><strong>Damage-zone characterisation</strong> — a local increase in P21/P20 intensity and/or a systematic rotation of fracture strike toward the along-line position of a mapped fault is the standard diagnostic signature of a fault damage zone, and the half-width of the elevated-intensity interval provides a first-order estimate of damage-zone width for comparison with regional fault-scaling relationships.</li>
-                    <li><strong>Stratigraphic (bed-thickness) control on fracture length</strong> — fracture length is frequently observed to correlate with mechanical layer thickness in layered sedimentary sequences. Running the reference line parallel to bedding and inspecting the "Segment/Trace length from" plots on either side of a bed boundary can reveal whether fracture populations terminate systematically at that boundary, consistent with bed-confined ("layer-bound") fracturing.</li>
-                    <li><strong>Anisotropy-independent intensity estimation</strong> — because straight-scanline (P10) sampling is well known to be biased against fracture sets sub-parallel to the scanline, the circular-window P21/P20 estimator implemented here removes this orientation bias, making the reported intensity/density profile more representative of the true areal fracture population than a simple count of scanline crossings would be.</li>
+                    <li><strong>Damage-zone characterisation</strong> — a local increase in P21/P20 intensity and/or a systematic rotation of fracture strike toward the along-line position of a mapped fault is the standard diagnostic signature of a fault damage zone <a class="cite" href="#ref-faulkner2010">(Faulkner et al., 2010)</a>, and the half-width of the elevated-intensity interval provides a first-order estimate of damage-zone width for comparison with regional fault-scaling relationships <a class="cite" href="#ref-savage2011">(Savage and Brodsky, 2011)</a>.</li>
+                    <li><strong>Stratigraphic (bed-thickness) control on fracture length</strong> — fracture length and spacing are frequently observed to correlate with mechanical layer thickness in layered sedimentary sequences <a class="cite" href="#ref-ladeira1981">(Ladeira and Price, 1981;</a> <a class="cite" href="#ref-narr1991">Narr and Suppe, 1991;</a> <a class="cite" href="#ref-bai2000">Bai and Pollard, 2000)</a>. Running the reference line parallel to bedding and inspecting the "Segment/Trace length from" plots on either side of a bed boundary can reveal whether fracture populations terminate systematically at that boundary, consistent with bed-confined ("layer-bound") fracturing.</li>
+                    <li><strong>Anisotropy-independent intensity estimation</strong> — because straight-scanline (P10) sampling is well known to be biased against fracture sets sub-parallel to the scanline <a class="cite" href="#ref-terzaghi1965">(Terzaghi, 1965)</a>, the circular-window P21/P20 estimator implemented here removes this orientation bias <a class="cite" href="#ref-mauldon2001">(Mauldon et al., 2001;</a> <a class="cite" href="#ref-rohrbaugh2002">Rohrbaugh et al., 2002)</a>, making the reported intensity/density profile more representative of the true areal fracture population than a simple count of scanline crossings would be.</li>
                     <li><strong>Spatial-trend screening</strong> — because the reference line can be placed anywhere and reoriented freely, the module functions as a rapid, exploratory tool for screening a mapped area for spatial trends in any measured fracture attribute before committing to a more elaborate grid-based analysis in the dedicated Intensity &amp; Density tab.</li>
                 </ul>
                 <div class="note-box">
@@ -858,7 +866,11 @@ def _graphs_trace_tips(df):
                     module are two-dimensional trace-map projections of what is, in reality, a three-dimensional
                     fracture network; length, spacing, and intensity measured on an exposed outcrop face or
                     planform map are subject to the standard suite of sampling biases (truncation, censoring, and
-                    orientation bias) recognised in the structural-geology literature, and the module's numerical
+                    orientation bias) recognised in the structural-geology literature
+                    <a class="cite" href="#ref-terzaghi1965">(Terzaghi, 1965;</a>
+                    <a class="cite" href="#ref-priest1993">Priest, 1993;</a>
+                    <a class="cite" href="#ref-zeeb2013">Zeeb et al., 2013;</a>
+                    <a class="cite" href="#ref-watkins2015">Watkins et al., 2015)</a>, and the module's numerical
                     outputs should always be interpreted alongside the geological context of the mapped surface.
                 </div>
 
@@ -903,15 +915,75 @@ def _graphs_trace_tips(df):
                     <tr><th>Limitation</th><th>Description</th></tr>
                     <tr><td>Unvectorised circular-scan loop</td><td>The circular-scan intensity/density computation is an unvectorised, per-segment Python loop and therefore does not scale as efficiently as the equivalent grid-based Mauldon calculation in the dedicated Intensity &amp; Density tab; very large datasets combined with a high scan-circle count may notice a perceptible delay.</td></tr>
                     <tr><td>Infinite-line "distance from"</td><td>The "distance from" calculation treats the reference line as infinite in both directions, so points far outside the finite segment between the two chosen endpoints still contribute a perpendicular-distance value; this is by design (consistent with treating the line as an axis of reference) but should not be mistaken for a bounded corridor sample.</td></tr>
-                    <tr><td>Planar assumption</td><td>The module assumes a two-dimensional, effectively planar fracture-trace map; no correction is applied for outcrop-surface curvature, oblique viewing angle, or true 3-D fracture orientation beyond what is already encoded in the loaded strike values.</td></tr>
+                    <tr><td>Planar assumption</td><td>The module assumes a two-dimensional, effectively planar fracture-trace map; no correction is applied for outcrop-surface curvature, oblique viewing angle, or true 3-D fracture orientation beyond what is already encoded in the loaded strike values. In particular no Terzaghi orientation-bias weighting is applied to the along-line crossing counts <a class="cite" href="#ref-terzaghi1965">(Terzaghi, 1965)</a>; the circular-window P21/P20 series is the orientation-robust estimator on this page.</td></tr>
+                    <tr><td>Topological terminology follows the trace-map convention</td><td>Counted trace tips are the isolated ends of digitised traces, which correspond to I-nodes in fracture-network topology; abutting (Y) and crossing (X) nodes are not classified here, and the terms are used as defined in the fracture-network glossary <a class="cite" href="#ref-peacock2016">(Peacock et al., 2016)</a>. Topological connectivity is the Connectivity tab's remit <a class="cite" href="#ref-sanderson2015">(Sanderson and Nixon, 2015)</a>.</td></tr>
                 </table>
 
                 <!-- ================================================= -->
                 <h2 id="references">16. References</h2>
-                <p>Mauldon, M., Dunne, W.M., Rohrbaugh, M.B. (2001). Circular scanlines and circular windows: new tools for characterizing the geometry of fracture traces. <em>Journal of Structural Geology</em>, 23, 247–258.</p>
-                <p>Priest, S.D. (1993). <em>Discontinuity Analysis for Rock Engineering</em>. Chapman &amp; Hall, London.</p>
-                <p>Rohrbaugh, M.B., Dunne, W.M., Mauldon, M. (2002). Estimating fracture trace intensity, density, and mean length using circular scan lines and windows. <em>AAPG Bulletin</em>, 86, 2089–2104.</p>
-                <p>Peacock, D.C.P., Nixon, C.W., Rotevatn, A., Sanderson, D.J., Zuluaga, L.F. (2016). Glossary of fault and other fracture networks. <em>Journal of Structural Geology</em>, 92, 12–29.</p>
+                <p>
+                    Sources are listed alphabetically within each group. In-text citations throughout this page link
+                    to the corresponding entry below.
+                </p>
+
+                <h3 id="16.1">16.1 Fracture Intensity and Circular-Window Sampling</h3>
+                <ul class="ref-list">
+                    <li id="ref-dershowitz1992">Dershowitz, W. S., &amp; Herda, H. H. (1992). Interpretation of fracture spacing and intensity. In <em>Proceedings of the 33rd U.S. Symposium on Rock Mechanics</em> (pp. 757&ndash;766). Balkema, Rotterdam. ISBN 978-90-5410-045-3. (Source of the P<sub>ij</sub> notation used for P10, P20 and P21.)</li>
+                    <li id="ref-mauldon1998">Mauldon, M. (1998). Estimating mean fracture trace length and density from observations in convex windows. <em>Rock Mechanics and Rock Engineering</em>, 31(4), 201&ndash;216. <a href="https://doi.org/10.1007/s006030050021" target="_blank" rel="noopener">https://doi.org/10.1007/s006030050021</a></li>
+                    <li id="ref-mauldon2001">Mauldon, M., Dunne, W. M., &amp; Rohrbaugh, M. B. (2001). Circular scanlines and circular windows: new tools for characterizing the geometry of fracture traces. <em>Journal of Structural Geology</em>, 23(2&ndash;3), 247&ndash;258. <a href="https://doi.org/10.1016/S0191-8141(00)00094-8" target="_blank" rel="noopener">https://doi.org/10.1016/S0191-8141(00)00094-8</a> (P21 = N/(4r), P20 = m/(2&pi;r&sup2;) with m the count of trace endpoints.)</li>
+                    <li id="ref-rohrbaugh2002">Rohrbaugh, M. B., Dunne, W. M., &amp; Mauldon, M. (2002). Estimating fracture trace intensity, density, and mean length using circular scan lines and windows. <em>AAPG Bulletin</em>, 86(12), 2089&ndash;2104. <a href="https://doi.org/10.1306/61EEDE0E-173E-11D7-8645000102C1865D" target="_blank" rel="noopener">https://doi.org/10.1306/61EEDE0E-173E-11D7-8645000102C1865D</a></li>
+                </ul>
+
+                <h3 id="16.2">16.2 Sampling Bias and Survey Practice</h3>
+                <ul class="ref-list">
+                    <li id="ref-priest1993">Priest, S. D. (1993). <em>Discontinuity Analysis for Rock Engineering</em>. Chapman &amp; Hall, London. <a href="https://doi.org/10.1007/978-94-011-1498-1" target="_blank" rel="noopener">https://doi.org/10.1007/978-94-011-1498-1</a> (Scanline survey practice and one-dimensional spacing statistics.)</li>
+                    <li id="ref-terzaghi1965">Terzaghi, R. D. (1965). Sources of error in joint surveys. <em>G&eacute;otechnique</em>, 15(3), 287&ndash;304. <a href="https://doi.org/10.1680/geot.1965.15.3.287" target="_blank" rel="noopener">https://doi.org/10.1680/geot.1965.15.3.287</a> (Orientation bias of linear sampling.)</li>
+                    <li id="ref-watkins2015">Watkins, H., Bond, C. E., Healy, D., &amp; Butler, R. W. H. (2015). Appraisal of fracture sampling methods and a new workflow to characterise heterogeneous fracture networks at outcrop. <em>Journal of Structural Geology</em>, 72, 67&ndash;82. <a href="https://doi.org/10.1016/j.jsg.2015.02.001" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2015.02.001</a></li>
+                    <li id="ref-zeeb2013">Zeeb, C., Gomez-Rivas, E., Bons, P. D., &amp; Blum, P. (2013). Evaluation of sampling methods for fracture network characterization using outcrops. <em>AAPG Bulletin</em>, 97(9), 1545&ndash;1566. <a href="https://doi.org/10.1306/02131312042" target="_blank" rel="noopener">https://doi.org/10.1306/02131312042</a></li>
+                </ul>
+                <h3 id="16.3">16.3 Fracture-Network Structure and Geological Controls</h3>
+                <ul class="ref-list">
+                    <li id="ref-bai2000">Bai, T., &amp; Pollard, D. D. (2000). Fracture spacing in layered rocks: a new explanation based on the stress transition. <em>Journal of Structural Geology</em>, 22(1), 43&ndash;57. <a href="https://doi.org/10.1016/S0191-8141(99)00137-6" target="_blank" rel="noopener">https://doi.org/10.1016/S0191-8141(99)00137-6</a></li>
+                    <li id="ref-faulkner2010">Faulkner, D. R., Jackson, C. A. L., Lunn, R. J., Schlische, R. W., Shipton, Z. K., Wibberley, C. A. J., &amp; Withjack, M. O. (2010). A review of recent developments concerning the structure, mechanics and fluid flow properties of fault zones. <em>Journal of Structural Geology</em>, 32(11), 1557&ndash;1575. <a href="https://doi.org/10.1016/j.jsg.2010.06.009" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2010.06.009</a></li>
+                    <li id="ref-ladeira1981">Ladeira, F. L., &amp; Price, N. J. (1981). Relationship between fracture spacing and bed thickness. <em>Journal of Structural Geology</em>, 3(2), 179&ndash;183. <a href="https://doi.org/10.1016/0191-8141(81)90013-4" target="_blank" rel="noopener">https://doi.org/10.1016/0191-8141(81)90013-4</a></li>
+                    <li id="ref-narr1991">Narr, W., &amp; Suppe, J. (1991). Joint spacing in sedimentary rocks. <em>Journal of Structural Geology</em>, 13(9), 1037&ndash;1048. <a href="https://doi.org/10.1016/0191-8141(91)90055-N" target="_blank" rel="noopener">https://doi.org/10.1016/0191-8141(91)90055-N</a></li>
+                    <li id="ref-peacock2016">Peacock, D. C. P., Nixon, C. W., Rotevatn, A., Sanderson, D. J., &amp; Zuluaga, L. F. (2016). Glossary of fault and other fracture networks. <em>Journal of Structural Geology</em>, 92, 12&ndash;29. <a href="https://doi.org/10.1016/j.jsg.2016.09.008" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2016.09.008</a></li>
+                    <li id="ref-sanderson2015">Sanderson, D. J., &amp; Nixon, C. W. (2015). The use of topology in fracture network characterization. <em>Journal of Structural Geology</em>, 72, 55&ndash;66. <a href="https://doi.org/10.1016/j.jsg.2015.01.005" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2015.01.005</a></li>
+                    <li id="ref-savage2011">Savage, H. M., &amp; Brodsky, E. E. (2011). Collateral damage: Evolution with displacement of fracture distribution and secondary fault strands in fault damage zones. <em>Journal of Geophysical Research: Solid Earth</em>, 116, B03405. <a href="https://doi.org/10.1029/2010JB007665" target="_blank" rel="noopener">https://doi.org/10.1029/2010JB007665</a></li>
+                </ul>
+                <div class="cite-box">
+                    <p><strong>Methods statement for the Profile Cross-section tab.</strong> If a figure produced by
+                    this tab appears in a publication, the details below are what a reader needs in order to
+                    reproduce it, and are what the citations above assume:</p>
+                    <p>Fracture attributes were sampled along a two-point reference line placed on a digitised
+                    trace map, reproducing a scanline traverse
+                    <a class="cite" href="#ref-priest1993">(Priest, 1993)</a>. Along-line intensity and density were
+                    estimated with <em>N</em> non-overlapping circular windows of radius r = L/(2N) centred on the
+                    line, using P21 = N<sub>int</sub>/(4r) and P20 = m/(2&pi;r&sup2;), where N<sub>int</sub> is the
+                    count of segment&ndash;boundary crossings and m the count of trace tips inside the window
+                    <a class="cite" href="#ref-mauldon1998">(Mauldon, 1998;</a>
+                    <a class="cite" href="#ref-mauldon2001">Mauldon et al., 2001;</a>
+                    <a class="cite" href="#ref-rohrbaugh2002">Rohrbaugh et al., 2002)</a>; the P<sub>ij</sub>
+                    notation follows <a class="cite" href="#ref-dershowitz1992">Dershowitz and Herda (1992)</a>.
+                    Because circular windows are orientation-unbiased, no Terzaghi weighting was applied
+                    <a class="cite" href="#ref-terzaghi1965">(Terzaghi, 1965)</a>. Reported values are
+                    two-dimensional trace-map estimates and remain subject to truncation and censoring bias
+                    <a class="cite" href="#ref-zeeb2013">(Zeeb et al., 2013;</a>
+                    <a class="cite" href="#ref-watkins2015">Watkins et al., 2015)</a>. Node and network terminology
+                    follows <a class="cite" href="#ref-peacock2016">Peacock et al. (2016)</a>; topological
+                    connectivity is reported by the Connectivity tab
+                    <a class="cite" href="#ref-sanderson2015">(Sanderson and Nixon, 2015)</a>. Interpretations of
+                    along-profile intensity peaks as damage zones, or of length&ndash;thickness relationships as
+                    stratigraphic control, should cite the relevant structural literature
+                    <a class="cite" href="#ref-faulkner2010">(Faulkner et al., 2010;</a>
+                    <a class="cite" href="#ref-savage2011">Savage and Brodsky, 2011;</a>
+                    <a class="cite" href="#ref-ladeira1981">Ladeira and Price, 1981;</a>
+                    <a class="cite" href="#ref-narr1991">Narr and Suppe, 1991;</a>
+                    <a class="cite" href="#ref-bai2000">Bai and Pollard, 2000)</a>. State the reference-line
+                    endpoints, the display unit, and the scan-circle count <em>N</em> alongside any published profile,
+                    since r and hence both estimators depend on N.</p>
+                </div>
+
                 <!-- Pagination Navigation -->
                 <div class="pagination-nav"></div>
             </div>

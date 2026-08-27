@@ -64,6 +64,7 @@
                         <li><a href="#limitations">12. Limitations</a></li>
                         <li><a href="#workflow">13. Step‑by‑step example workflow</a></li>
                         <li><a href="#advanced">14. Advanced &amp; related capabilities</a></li>
+                        <li><a href="#references">15. References</a></li>
                     </ul>
                 </div>
 
@@ -581,8 +582,8 @@ y' = (y − y_min) · scale</div>
                     to fill the profile rectangle exactly. That is an anisotropic transform — a similarity only when
                     sx&nbsp;=&nbsp;sy — so it does not preserve angles, and every orientation statistic downstream
                     (strike, rose diagrams, stereonets, Terzaghi weighting) is computed on a sheared network.
-                    Orientation analysis requires a conformal map (Priest, 1993, <em>Discontinuity Analysis for Rock
-                    Engineering</em>, ch. 3). Measured on a synthetic set, the anisotropic form displaced strike by up
+                    Orientation analysis requires a conformal map
+                    <a class="cite" href="#ref-priest1993">(Priest, 1993, ch. 3)</a>. Measured on a synthetic set, the anisotropic form displaced strike by up
                     to 25.3°, and the reported length of an identical‑length trace set varied by a factor of 2.5 with
                     azimuth alone. Isotropic scaling can leave unused margin on one side of the profile rectangle;
                     that empty space is the correct outcome, not a defect.
@@ -655,7 +656,9 @@ y_rot = x' · sin(θ) + y' · cos(θ)
                     Every time the geometry is recalculated, FracSTAT looks at how many segment endpoints coincide
                     at (roughly) the same point, and classifies each coincidence into a node type. These counts feed
                     the "Nodes" summary tile and the "Show segment nodes" overlay, and describe how well‑connected
-                    your fracture network is.
+                    your fracture network is. The node vocabulary is the standard fracture-network one
+                    <a class="cite" href="#ref-sanderson2015">(Sanderson and Nixon, 2015;</a>
+                    <a class="cite" href="#ref-peacock2016">Peacock et al., 2016)</a>.
                 </p>
                 <table>
                     <tr><th>Node type</th><th>How many segment ends meet there</th><th>Geological meaning</th></tr>
@@ -667,7 +670,9 @@ y_rot = x' · sin(θ) + y' · cos(θ)
                 <p>
                     The ratio of I : Y : X nodes is one of the best single indicators of network connectivity: a
                     network dominated by I‑nodes has low connectivity (fluid flow would be limited and tortuous),
-                    while one dominated by Y and X nodes is highly connected (numerous, well‑linked flow pathways).
+                    while one dominated by Y and X nodes is highly connected (numerous, well‑linked flow pathways)
+                    <a class="cite" href="#ref-sanderson2015">(Sanderson and Nixon, 2015;</a>
+                    <a class="cite" href="#ref-sanderson2018">Sanderson and Nixon, 2018)</a>.
                     This ratio is explored further, and plotted, on the Connectivity tab.
                 </p>
                 <div class="note-box">
@@ -676,8 +681,9 @@ y_rot = x' · sin(θ) + y' · cos(θ)
                     computed intersection points) to a 0.01‑unit grid and classifies each location by how many ends
                     coincide there, which is why it has a C‑node class at all. Two consecutive segments of one
                     polyline trace meet at a C‑node, so the count rises as a trace is digitised with more vertices.
-                    The Connectivity tab instead performs the Sanderson &amp; Nixon (2015) <em>trace‑level</em>
-                    classification: only a trace's first and last points are tips, interior vertices are not nodes,
+                    The Connectivity tab instead performs the <em>trace‑level</em>
+                    classification of <a class="cite" href="#ref-sanderson2015">Sanderson and Nixon (2015)</a>:
+                    only a trace's first and last points are tips, interior vertices are not nodes,
                     there is no C class, and two tips that merely touch stay I nodes because only two branches meet
                     there. Use this tile as a quick look at the map; use the Connectivity tab for any reported
                     topology.
@@ -700,7 +706,8 @@ y_rot = x' · sin(θ) + y' · cos(θ)
                     orientation sets are present, and their relative proportions. Where traces cross (X‑nodes), the
                     fracture that is cut by another is generally the older of the two (assuming they aren't exactly
                     coeval). Where a trace abuts another (Y‑nodes), the terminating fracture is younger than, or
-                    coeval with, the fracture it grew into.
+                    coeval with, the fracture it grew into
+                    <a class="cite" href="#ref-peacock2016">(Peacock et al., 2016)</a>.
                 </p>
 
                 <h4 id="10.3">10.3 Length distributions &amp; sampling bias</h4>
@@ -708,17 +715,22 @@ y_rot = x' · sin(θ) + y' · cos(θ)
                     Switching to <em>Segments by Length</em> or <em>Traces by Length</em> highlights two common
                     biases: <strong>truncation bias</strong> (an excess of very short fractures relative to a true
                     power‑law distribution — often a digitizing artefact) and <strong>censoring bias</strong> (traces
-                    whose true ends lie outside the mapped/scanned area). Traces whose endpoints lie fully inside the
+                    whose true ends lie outside the mapped/scanned area)
+                    <a class="cite" href="#ref-pickering1995">(Pickering et al., 1995;</a>
+                    <a class="cite" href="#ref-bonnet2001">Bonnet et al., 2001)</a>. Traces whose endpoints lie fully inside the
                     mapped area are "complete"; traces crossing the boundary are "censored". The balance between the
                     two matters a great deal for the reliability of length‑distribution statistics in the Histogram
-                    and CDF tabs.
+                    and CDF tabs, and is also sensitive to the sampling scheme itself
+                    <a class="cite" href="#ref-zeeb2013">(Zeeb et al., 2013;</a>
+                    <a class="cite" href="#ref-watkins2015">Watkins et al., 2015)</a>.
                 </p>
 
                 <h4 id="10.4">10.4 Network connectivity</h4>
                 <p>
                     Check the I : Y : X node ratio (<a href="#topology">Section 9</a>) — an I‑dominated network (e.g. 0.7 : 0.2 : 0.1) implies
                     poor connectivity, while a Y/X‑dominated network (e.g. 0.1 : 0.4 : 0.5) implies a highly connected,
-                    well‑linked flow network. The Connectivity tab visualises this on a standard ternary diagram.
+                    well‑linked flow network <a class="cite" href="#ref-sanderson2018">(Sanderson and Nixon, 2018)</a>.
+                    The Connectivity tab visualises this on a standard ternary diagram.
                 </p>
 
                 <!-- ================================================= -->
@@ -741,7 +753,7 @@ y_rot = x' · sin(θ) + y' · cos(θ)
                     <tr><th>Limitation</th><th>Description</th></tr>
                     <tr>
                         <td>Resolution truncation</td>
-                        <td>Very short fractures, below the digitizing pixel resolution, are systematically missed or over‑represented as noise.</td>
+                        <td>Very short fractures, below the digitizing pixel resolution, are systematically missed or over‑represented as noise, which truncates the low end of any length distribution fitted downstream <a class="cite" href="#ref-pickering1995">(Pickering et al., 1995)</a>.</td>
                     </tr>
                     <tr>
                         <td>Profile box is a bound, not an extent</td>
@@ -749,7 +761,11 @@ y_rot = x' · sin(θ) + y' · cos(θ)
                     </tr>
                     <tr>
                         <td>Map node tile is segment‑level</td>
-                        <td>The Nodes summary tile and the "Show segment nodes" overlay classify coincident <em>segment</em> ends on a 0.01‑unit snap grid and include a C (continuation) class, so their counts depend on how finely traces were digitised and will not equal the Connectivity tab's trace‑level I/Y/X census (<a href="#topology">Section 9</a>).</td>
+                        <td>The Nodes summary tile and the "Show segment nodes" overlay classify coincident <em>segment</em> ends on a 0.01‑unit snap grid and include a C (continuation) class, so their counts depend on how finely traces were digitised and will not equal the Connectivity tab's trace‑level I/Y/X census (<a href="#topology">Section 9</a>). Report the trace‑level census <a class="cite" href="#ref-sanderson2015">(Sanderson and Nixon, 2015)</a> rather than this tile.</td>
+                    </tr>
+                    <tr>
+                        <td>No orientation‑bias weighting on the map itself</td>
+                        <td>Strike values are plotted as measured; the map applies no Terzaghi correction for fracture sets oriented unfavourably relative to the exposure or scanline direction <a class="cite" href="#ref-terzaghi1965">(Terzaghi, 1965)</a>. Orientation‑unbiased intensity is estimated with circular windows on the Intensity &amp; Density and Profile tabs <a class="cite" href="#ref-mauldon2001">(Mauldon et al., 2001)</a>.</td>
                     </tr>
                 </table>
 
@@ -786,6 +802,55 @@ y_rot = x' · sin(θ) + y' · cos(θ)
                     width/length, unit, and any calibrated background image across, so you don't have to recalibrate
                     a second time.
                 </p>
+
+                <!-- ================================================= -->
+                <h2 id="references">15. References</h2>
+                <p>
+                    Sources are listed alphabetically within each group. In-text citations throughout this page link
+                    to the corresponding entry below.
+                </p>
+
+                <h3 id="15.1">15.1 Fracture Mapping, Topology and Sampling</h3>
+                <ul class="ref-list">
+                    <li id="ref-mauldon2001">Mauldon, M., Dunne, W. M., &amp; Rohrbaugh, M. B. (2001). Circular scanlines and circular windows: new tools for characterizing the geometry of fracture traces. <em>Journal of Structural Geology</em>, 23(2&ndash;3), 247&ndash;258. <a href="https://doi.org/10.1016/S0191-8141(00)00094-8" target="_blank" rel="noopener">https://doi.org/10.1016/S0191-8141(00)00094-8</a></li>
+                    <li id="ref-peacock2016">Peacock, D. C. P., Nixon, C. W., Rotevatn, A., Sanderson, D. J., &amp; Zuluaga, L. F. (2016). Glossary of fault and other fracture networks. <em>Journal of Structural Geology</em>, 92, 12&ndash;29. <a href="https://doi.org/10.1016/j.jsg.2016.09.008" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2016.09.008</a></li>
+                    <li id="ref-priest1993">Priest, S. D. (1993). <em>Discontinuity Analysis for Rock Engineering</em>. Chapman &amp; Hall, London. <a href="https://doi.org/10.1007/978-94-011-1498-1" target="_blank" rel="noopener">https://doi.org/10.1007/978-94-011-1498-1</a> (Ch. 3: orientation measurement and projection.)</li>
+                    <li id="ref-sanderson2015">Sanderson, D. J., &amp; Nixon, C. W. (2015). The use of topology in fracture network characterization. <em>Journal of Structural Geology</em>, 72, 55&ndash;66. <a href="https://doi.org/10.1016/j.jsg.2015.01.005" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2015.01.005</a></li>
+                    <li id="ref-sanderson2018">Sanderson, D. J., &amp; Nixon, C. W. (2018). Topology, connectivity and percolation in fracture networks. <em>Journal of Structural Geology</em>, 115, 167&ndash;177. <a href="https://doi.org/10.1016/j.jsg.2018.07.011" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2018.07.011</a></li>
+                    <li id="ref-terzaghi1965">Terzaghi, R. D. (1965). Sources of error in joint surveys. <em>G&eacute;otechnique</em>, 15(3), 287&ndash;304. <a href="https://doi.org/10.1680/geot.1965.15.3.287" target="_blank" rel="noopener">https://doi.org/10.1680/geot.1965.15.3.287</a></li>
+                    <li id="ref-watkins2015">Watkins, H., Bond, C. E., Healy, D., &amp; Butler, R. W. H. (2015). Appraisal of fracture sampling methods and a new workflow to characterise heterogeneous fracture networks at outcrop. <em>Journal of Structural Geology</em>, 72, 67&ndash;82. <a href="https://doi.org/10.1016/j.jsg.2015.02.001" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2015.02.001</a></li>
+                    <li id="ref-zeeb2013">Zeeb, C., Gomez-Rivas, E., Bons, P. D., &amp; Blum, P. (2013). Evaluation of sampling methods for fracture network characterization using outcrops. <em>AAPG Bulletin</em>, 97(9), 1545&ndash;1566. <a href="https://doi.org/10.1306/02131312042" target="_blank" rel="noopener">https://doi.org/10.1306/02131312042</a></li>
+                </ul>
+
+                <h3 id="15.2">15.2 Length Scaling and Truncation Bias</h3>
+                <ul class="ref-list">
+                    <li id="ref-bonnet2001">Bonnet, E., Bour, O., Odling, N. E., Davy, P., Main, I., Cowie, P., &amp; Berkowitz, B. (2001). Scaling of fracture systems in geological media. <em>Reviews of Geophysics</em>, 39(3), 347&ndash;383. <a href="https://doi.org/10.1029/1999RG000074" target="_blank" rel="noopener">https://doi.org/10.1029/1999RG000074</a></li>
+                    <li id="ref-pickering1995">Pickering, G., Bull, J. M., &amp; Sanderson, D. J. (1995). Sampling power-law distributions. <em>Tectonophysics</em>, 248(1&ndash;2), 1&ndash;20. <a href="https://doi.org/10.1016/0040-1951(95)00030-Q" target="_blank" rel="noopener">https://doi.org/10.1016/0040-1951(95)00030-Q</a> (Truncation and censoring effects on fracture-length samples.)</li>
+                </ul>
+
+                <div class="cite-box">
+                    <p><strong>Methods statement for the Fracture Map tab.</strong> If a map exported from this tab
+                    appears in a publication, the details below are what a reader needs in order to reproduce it,
+                    and are what the citations above assume:</p>
+                    <p>Fracture traces were digitised from a georeferenced or scale-calibrated raster and rendered
+                    with a single isotropic scale factor, so that angles are preserved and orientation statistics
+                    remain valid <a class="cite" href="#ref-priest1993">(Priest, 1993)</a>. State the
+                    units-per-pixel calibration (or the profile width and length used in its absence), the display
+                    unit, and the Y-axis azimuth from north applied to strike. Node counts shown on the map are a
+                    segment-level indicator including a continuation class; any reported topology should be the
+                    trace-level I-Y-X census from the Connectivity tab
+                    <a class="cite" href="#ref-sanderson2015">(Sanderson and Nixon, 2015;</a>
+                    <a class="cite" href="#ref-sanderson2018">Sanderson and Nixon, 2018)</a>, with terminology as
+                    defined by <a class="cite" href="#ref-peacock2016">Peacock et al. (2016)</a>. Length statistics
+                    read from this map are subject to truncation at the digitising resolution and censoring at the
+                    map boundary <a class="cite" href="#ref-pickering1995">(Pickering et al., 1995;</a>
+                    <a class="cite" href="#ref-bonnet2001">Bonnet et al., 2001)</a>, and no Terzaghi orientation
+                    weighting is applied <a class="cite" href="#ref-terzaghi1965">(Terzaghi, 1965)</a>; the
+                    orientation-unbiased intensity estimators are on the Intensity &amp; Density and Profile tabs
+                    <a class="cite" href="#ref-mauldon2001">(Mauldon et al., 2001)</a>. Record the sampling scheme
+                    used to select the mapped area <a class="cite" href="#ref-zeeb2013">(Zeeb et al., 2013;</a>
+                    <a class="cite" href="#ref-watkins2015">Watkins et al., 2015)</a>.</p>
+                </div>
 
                 <!-- Pagination Navigation -->
                 <div class="pagination-nav"></div>
