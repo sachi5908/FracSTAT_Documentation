@@ -44,7 +44,6 @@ web server — or GitHub Pages — can serve the directory as-is.
 - **`script.js`** — sidebar generation, Previous/Next pagination, AJAX page routing, tutorial gallery, video lightbox
 - **JSZip 3.10.1** (CDN, `admin.html` only) — builds the site-backup `.zip`
 - **Cloudinary** — hosts the logo, favicon, and screenshot assets
-- **Python 3.10+** (dev only) — runs `_check_html.py`, the structural validator
 
 ---
 
