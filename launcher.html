@@ -32,65 +32,7 @@
 
     <div class="docs-layout">
 
-        <aside class="docs-sidebar" id="docsSidebar">
-            
-            <div class="sidebar-section">
-                <button class="sidebar-toggle">
-                    Getting Started
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="introduction.html">Introduction</a></li>
-                    <li><a href="installation.html">Installation Guide</a></li>
-                    <li><a href="launcher.html" class="active">FracSTAT Home Page</a></li>
-                </ul>
-            </div>
-
-            <div class="sidebar-section">
-                <button class="sidebar-toggle">
-                    Static Analyzer
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="docs_static_map.html">Map Tab</a></li>
-                    <li><a href="docs_static_histogram.html">Histogram Tab</a></li>
-                    <li><a href="docs_static_cdf.html">CDF Tab</a></li>
-                    <li><a href="docs_static_rose.html">Rose Tab</a></li>
-                    <li><a href="docs_static_stereonet.html">Stereonet Tab</a></li>
-                    <li><a href="docs_static_connectivity.html">Connectivity Tab</a></li>
-                    <li><a href="docs_static_intensity.html">Intensity Tab</a></li>
-                    <li><a href="docs_static_profile.html">Profile Tab</a></li>
-                    <li><a href="docs_static_results.html">Results Tab</a></li>
-                </ul>
-            </div>
-
-            <div class="sidebar-section">
-                <button class="sidebar-toggle">
-                    Dynamic Analyzer
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="docs_dynamic_map.html">Map Tab</a></li>
-                    <li><a href="docs_dynamic_rose.html">Rose Tab</a></li>
-                    <li><a href="docs_dynamic_mohr.html">Mohr Tab</a></li>
-                    <li><a href="docs_dynamic_stereonet.html">Stereonet Tab</a></li>
-                    <li><a href="docs_dynamic_table.html">Table Tab</a></li>
-                    <li><a href="docs_dynamic_method.html">Method Tab</a></li>
-                </ul>
-            </div>
-
-            <div class="sidebar-section">
-                <button class="sidebar-toggle">
-                    Uncertainty Analyzer
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="docs_uncertainty_montecarlo.html">Monte Carlo Tab</a></li>
-                    <li><a href="docs_uncertainty_lhs.html">LHS Tab</a></li>
-                </ul>
-            </div>
-
-        </aside>
+        <aside class="docs-sidebar" id="docsSidebar"></aside>
 
         <!-- 3. The Main Content specific to this page -->
         <main class="docs-content">
@@ -125,10 +67,10 @@
                 
                 <p>The general workflow includes:</p>
                 <ul>
-                    <li><strong>Data Acquisition & Preparation:</strong> Start with outcrop photographs (including scale and view direction), digitized fault/fracture traces (preferably in SVG format), or tabulated data (Fault/Frac ID, Strike, Dip, Dip Direction, Length, Aperture).</li>
+                    <li><strong>Data Acquisition &amp; Preparation:</strong> Start with outcrop photographs (including scale and view direction), digitized fault/fracture traces (preferably in SVG format), or tabulated data (Fault/Frac ID, Strike, Dip, Dip Direction, Length, Aperture).</li>
                     <li><strong>Enter FracSTAT GUI:</strong> Use the launcher to import data, scale, and calibrate.</li>
                     <li><strong>Calculations:</strong> Choose between the Static Analyzer (for Trace/Segment Maps, Histogram Plots, Orientation Plots, Topology, Intensity, etc.), Dynamic Analyzer (for Stress Inputs, Slip Tendency, Dilatation Tendency, Mohr-Coulomb Plots, etc.), or the Uncertainty Analyzer (for Uncertainty Plots and Maps).</li>
-                    <li><strong>Visualization & Export:</strong> Export your finalized results as PNG/JPEG images, CSV/Excel spreadsheets, PDFs, or Word documents.</li>
+                    <li><strong>Visualization &amp; Export:</strong> Export your finalized results as PNG/JPEG images, CSV/Excel spreadsheets, PDFs, or Word documents.</li>
                 </ul>
 
                 <h2 id="navigating">Navigating the Launcher Interface</h2>
@@ -148,22 +90,34 @@
                 <ul>
                     <li><strong>Version Type of FracSTAT:</strong> A badge below the logo indicates your current running version (e.g., v1.0).</li>
                     <li><strong>Workspace Navigation:</strong> Use the sidebar links to switch between Home, Projects, Documentation, Settings, and About pages.</li>
-                    <li><strong>Project Information:</strong> A dedicated form allows you to easily create a new workspace. You must provide a Project Name, Location / Site, and designate a Save Directory before opening a module.</li>
+                    <li><strong>Project Information:</strong> A dedicated form allows you to easily create a new
+                        workspace. Only the <em>Project Name</em> is mandatory (marked with an asterisk); a
+                        <em>Location / Site</em> is optional, and the <em>Save Directory</em> defaults to your home
+                        folder if you do not browse for another one. Fill all three anyway &mdash; the location is
+                        what labels the entry in the Projects list, and the save directory is where per-project
+                        session state is written so a workspace reopens where you left it.</li>
                     <li><strong>Loaded and Saved Projects:</strong> A scrollable "Recent Projects" list allows you to quickly load previous sessions with a single click.</li>
                 </ul>
 
                 <h4 id="header-bar">2. The Top Header Bar</h4>
-                <p>The top right corner of the home interface provides quick outbound links:</p>
+                <p>The top right corner of the home interface provides two shortcut buttons:</p>
                 <ul>
-                    <li><strong>Link to online documentation and GitHub:</strong> Direct shortcut buttons are available to open the online docs or visit the project's source code repository.</li>
+                    <li><strong>Documentation:</strong> Opens the built-in Documentation page inside the launcher &mdash;
+                        it does not leave the application or require a network connection.</li>
+                    <li><strong>GitHub:</strong> Opens the project's source-code repository in your default web
+                        browser.</li>
                 </ul>
 
                 <h4 id="module-cards">3. The Module Cards (Main View)</h4>
                 <p>The center of the launcher features three large interactive cards corresponding to the primary FracSTAT modules. Each card highlights the tools available within.</p>
                 <ul>
-                    <li><strong>Static Module:</strong> Focused on geometric fracture characterization. Features include Trace and Segment classification, Histogram Plots, Rose Plots, Connectivity & topology mapping, Fracture intensity & Density, and Profile Cross-sections.</li>
-                    <li><strong>Dynamic Module:</strong> Focused on stress-based fracture evaluation. Features include Slip & dilation tendency, Mohr circle stress visualization, susceptibility mapping, and stereonet projections.</li>
-                    <li><strong>Uncertainty Module:</strong> Dedicated to probabilistic risk evaluation. It reserves tabs for Monte Carlo Simulations (MCS) and Latin Hypercube Sampling (LHS)<em>(in v1.0.0 this module is an under-construction placeholder framework, with each tab reserved for future development)</em>.</li>
+                    <li><strong>Static Module:</strong> Focused on geometric fracture characterization. Features include Trace and Segment classification, Histogram Plots, Rose Plots, Connectivity &amp; topology mapping, Fracture intensity &amp; Density, and Profile Cross-sections.</li>
+                    <li><strong>Dynamic Module:</strong> Focused on stress-based fracture evaluation. Features include Slip &amp; dilation tendency, Mohr circle stress visualization, susceptibility mapping, and stereonet projections.</li>
+                    <li><strong>Uncertainty Module:</strong> Dedicated to probabilistic risk evaluation, with a
+                        Monte Carlo Simulation (MCS) tab and a Latin Hypercube Sampling (LHS) tab. Both are full
+                        workspaces in v1.0.0 &mdash; each opens the same six analysis modules (Geomechanics,
+                        Statistics, Sensitivity, Visualization, Spatial Probability Map, and Validation &amp; Export)
+                        and differs only in how the uncertain stress inputs are sampled.</li>
                     <li><strong>Click to open Module:</strong> At the bottom of each card is a prominent button used to launch that specific environment with your defined project parameters.</li>
                 </ul>
 
@@ -174,8 +128,21 @@
                 
                 <ul>
                     <li><strong>Projects Page:</strong> View and manage all your recent workspaces. You can easily load existing sessions, delete old ones, or quickly create new projects from this menu.</li>
-                    <li><strong>Documentation Page:</strong> Access comprehensive in-app help. This section includes a quick-start guide, data format requirements, keyboard shortcuts, and detailed explanations of the Static, Dynamic, and Uncertainty Analyzers.</li>
-                    <li><strong>Settings Page:</strong> Customize your global application preferences[cite: 8]. Here you can configure default plot styling (fonts and colors), default stress parameters, map color scales, and export directories[cite: 8].</li>
+                    <li><strong>Documentation Page:</strong> A <em>Support &amp; Resources</em> grid of five cards
+                        rather than the manual text itself: <em>Online Documentation</em> (opens this website),
+                        <em>PDF User Manual</em> (opens the manual bundled alongside the application for offline use),
+                        <em>Video Tutorials</em>, <em>Report an Issue</em> (pick a developer address from the dropdown,
+                        then either open a pre-filled Gmail compose window or copy the address), and
+                        <em>GitHub Repository</em>.</li>
+                    <li><strong>Settings Page:</strong> Customize your global application preferences, grouped into
+                        six sections: <em>Workspace Text</em> (plot font family, size, bold, colour),
+                        <em>Default Stress Parameters</em> (&sigma;<sub>1</sub>, &sigma;<sub>2</sub>,
+                        &sigma;<sub>3</sub>, &sigma;<sub>1</sub> azimuth, friction coefficient, cohesion, pore
+                        pressure), <em>Analyzer Defaults</em> (curve step, fracture dip, profile width and length,
+                        Y-axis azimuth, display units), <em>Dynamic Analyzer</em> and <em>Static Analyzer</em>
+                        (default map mode and colour scales), and <em>Export</em> (plot DPI, default export directory,
+                        number of recent projects shown). Changes take effect once you press <em>Save Settings</em>;
+                        <em>Reset Defaults</em> restores the shipped values.</li>
                     <li><strong>About Page:</strong> Find information about the software's version, release notes, open-source licensing (MIT), and the underlying technology stack powering the application.</li>
                 </ul>
 

@@ -1590,6 +1590,84 @@ body.lightbox-open {
 }
 
 /* ==========================================================================
+   Academic citation system (author–date / Harvard, journal style)
+   In-text citations are hyperlinks into the page's alphabetical reference
+   list, e.g.
+       <a class="cite" href="#ref-mardia2000">(Mardia and Jupp, 2000)</a>
+   resolving to
+       <li id="ref-mardia2000">Mardia, K. V., &amp; Jupp, P. E. (2000). ...</li>
+   inside <ul class="ref-list">. Author–date was chosen over numbered
+   citations so entries can be added to any page without renumbering every
+   marker, and because it matches the reference style of the structural-geology
+   journals this documentation is written for.
+   ========================================================================== */
+.docs-content a.cite {
+    color: var(--primary-color);
+    text-decoration: none;
+    border-bottom: 1px dotted rgba(37, 99, 235, 0.55);
+    white-space: nowrap;
+}
+
+.docs-content a.cite:hover {
+    text-decoration: none;
+    border-bottom-style: solid;
+}
+
+/* Superscript numeric markers, used only where an inline author–date
+   citation would break a table cell or a formula caption. */
+.docs-content sup.cite-sup {
+    font-size: 0.72em;
+    line-height: 0;
+    vertical-align: super;
+    white-space: nowrap;
+    margin-left: 1px;
+}
+
+.docs-content sup.cite-sup a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* Alphabetical reference list with hanging indent, as in a journal
+   reference section. Resets the generic `.docs-content li` disc bullet. */
+.docs-content ul.ref-list {
+    list-style: none;
+    margin: 1rem 0 0 0;
+    padding: 0;
+    font-size: 0.94rem;
+    line-height: 1.65;
+}
+
+.docs-content ul.ref-list li {
+    list-style: none;
+    margin: 0 0 0.75rem 0;
+    padding: 0 0 0 2.2rem;
+    text-indent: -2.2rem;   /* hanging indent: continuation lines indent */
+}
+
+/* Highlight the entry a reader has just jumped to from an in-text citation */
+.docs-content ul.ref-list li:target {
+    border-radius: 8px;
+    background-color: rgba(37, 99, 235, 0.09);
+    box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.09);
+}
+
+/* "How to cite this page / software" block placed under References */
+.docs-content .cite-box {
+    border: 1px solid #e2e8f0;
+    border-left: 3px solid var(--primary-color);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0 0 0;
+    background-color: #f8fafc;
+    font-size: 0.92rem;
+}
+
+.docs-content .cite-box p { margin: 0 0 0.45rem 0; }
+.docs-content .cite-box p:last-child { margin-bottom: 0; }
+
+/* ==========================================================================
    Top Loading Progress Bar
    Shown during AJAX-routed doc navigation (see script.js loadPage()).
    Sits above everything, including the sticky navbar.
@@ -2263,6 +2341,34 @@ body::before {
 
 .toc-box a {
     color: var(--teal);
+}
+
+/* Citation system — theme-token overrides (see base rules above) */
+.docs-content a.cite {
+    color: var(--teal);
+    border-bottom-color: rgba(31, 133, 119, 0.5);
+}
+
+.docs-content a.cite:hover {
+    color: var(--rust);
+    border-bottom-color: var(--rust);
+}
+
+.docs-content sup.cite-sup a {
+    color: var(--teal);
+}
+
+.docs-content ul.ref-list li:target {
+    background-color: rgba(31, 133, 119, 0.12);
+    box-shadow: 0 0 0 5px rgba(31, 133, 119, 0.12);
+}
+
+.docs-content .cite-box {
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--teal);
+    border-radius: 14px;
+    background: rgba(235, 227, 205, 0.58);
+    color: var(--muted);
 }
 
 .code-window,

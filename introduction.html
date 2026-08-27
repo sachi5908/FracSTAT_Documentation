@@ -51,65 +51,8 @@
 
     <div class="docs-layout">
 
-        <aside class="docs-sidebar" id="docsSidebar">
-            
-            <div class="sidebar-section">
-                <button class="sidebar-toggle">
-                    Getting Started
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="introduction.html">Introduction</a></li>
-                    <li><a href="installation.html">Installation Guide</a></li>
-                    <li><a href="launcher.html">FracSTAT Home Page</a></li>
-                </ul>
-            </div>
+        <aside class="docs-sidebar" id="docsSidebar"></aside>
 
-            <div class="sidebar-section">
-                <button class="sidebar-toggle">
-                    Static Analyzer
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="docs_static_map.html">Map Tab</a></li>
-                    <li><a href="docs_static_histogram.html">Histogram Tab</a></li>
-                    <li><a href="docs_static_cdf.html">CDF Tab</a></li>
-                    <li><a href="docs_static_rose.html">Rose Tab</a></li>
-                    <li><a href="docs_static_stereonet.html">Stereonet Tab</a></li>
-                    <li><a href="docs_static_connectivity.html">Connectivity Tab</a></li>
-                    <li><a href="docs_static_intensity.html">Intensity Tab</a></li>
-                    <li><a href="docs_static_profile.html">Profile Tab</a></li>
-                    <li><a href="docs_static_results.html">Results Tab</a></li>
-                </ul>
-            </div>
-
-            <div class="sidebar-section">
-                <button class="sidebar-toggle">
-                    Dynamic Analyzer
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="docs_dynamic_map.html">Map Tab</a></li>
-                    <li><a href="docs_dynamic_rose.html">Rose Tab</a></li>
-                    <li><a href="docs_dynamic_mohr.html">Mohr Tab</a></li>
-                    <li><a href="docs_dynamic_stereonet.html">Stereonet Tab</a></li>
-                    <li><a href="docs_dynamic_table.html">Table Tab</a></li>
-                    <li><a href="docs_dynamic_method.html">Method Tab</a></li>
-                </ul>
-            </div>
-
-            <div class="sidebar-section">
-                <button class="sidebar-toggle">
-                    Uncertainty Analyzer
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-                <ul class="sidebar-links">
-                    <li><a href="docs_uncertainty_montecarlo.html">Monte Carlo Tab</a></li>
-                    <li><a href="docs_uncertainty_lhs.html">LHS Tab</a></li>
-                </ul>
-            </div>
-
-        </aside>
         <main class="docs-content">
             <div class="docs-content-inner">
                 
@@ -132,11 +75,42 @@
                     </p>
                 </div>
 
-                <h2>Why We Need FracSTAT</h2>
-                <p>Quantitative characterization of fracture networks has become an indispensable component of structural geology, rock mechanics, and reservoir characterization. These networks exert fundamental control over the mechanical, hydraulic, and transport properties of rocks, which in turn influences critical factors like fluid migration, reservoir productivity, geothermal circulation, groundwater flow, mineralization, and the long-term integrity of subsurface engineering systems.</p>
+                <div class="toc-box">
+                    <p>On this page</p>
+                    <ul>
+                        <li><a href="#why">Why We Need FracSTAT</a></li>
+                        <li><a href="#fragmentation">The Fragmentation Problem</a></li>
+                        <li><a href="#solution">The FracSTAT Solution</a></li>
+                        <li><a href="#ui-technology">User Interface Technology</a></li>
+                        <li><a href="#references">References</a></li>
+                    </ul>
+                </div>
+
+                <h2 id="why">Why We Need FracSTAT</h2>
+                <p>Quantitative characterization of fracture networks has become an indispensable component of
+                    structural geology, rock mechanics, and reservoir characterization. These networks exert
+                    fundamental control over the mechanical, hydraulic, and transport properties of rocks
+                    <a class="cite" href="#ref-nrc1996">(National Research Council, 1996)</a>, which in turn
+                    influences critical factors like fluid migration
+                    <a class="cite" href="#ref-berkowitz2002">(Berkowitz, 2002)</a>, reservoir productivity,
+                    geothermal circulation, groundwater flow, mineralization, and the long-term integrity of
+                    subsurface engineering systems. Because fracture populations are commonly scale-dependent, their
+                    length, spacing, and aperture distributions must be characterized statistically rather than
+                    described by single representative values
+                    <a class="cite" href="#ref-bonnet2001">(Bonnet et al., 2001)</a>, and both mechanical and
+                    chemical processes contribute to the patterns that are ultimately measured
+                    <a class="cite" href="#ref-laubach2019">(Laubach et al., 2019)</a>.</p>
                 
-                <h3>The Fragmentation Problem</h3>
-                <p>Despite significant advancements in software development over the past decade, the process of analyzing fracture networks often remains fragmented across multiple environments. This creates several bottlenecks for researchers and engineers:</p>
+                <h3 id="fragmentation">The Fragmentation Problem</h3>
+                <p>Despite significant advancements in software development over the past decade, the process of
+                    analyzing fracture networks often remains fragmented across multiple environments. Existing
+                    open tools each cover part of the problem well — trace-pattern quantification in FracPaQ
+                    <a class="cite" href="#ref-healy2017">(Healy et al., 2017)</a>, topological and geometric
+                    network analysis in NetworkGT
+                    <a class="cite" href="#ref-nyberg2018">(Nyberg et al., 2018)</a>, and spherical projection in
+                    OSXStereonet <a class="cite" href="#ref-cardozo2013">(Cardozo &amp; Allmendinger, 2013)</a> —
+                    but no single environment carries a dataset through all of them. This creates several
+                    bottlenecks for researchers and engineers:</p>
                 <ul>
                     <li>Digitization, topological analysis, statistical analysis, stress evaluation, and uncertainty quantification are frequently performed in entirely different software packages or through custom scripts.</li>
                     <li>This disjointed workflow requires unnecessary data transfer, repeated preprocessing, and leads to inconsistent parameter handling.</li>
@@ -144,20 +118,39 @@
                     <li>Many of these fragmented workflows rely on proprietary software environments, making comprehensive fracture characterization both technically demanding and time-consuming.</li>
                 </ul>
 
-                <h3>The FracSTAT Solution</h3>
+                <h3 id="solution">The FracSTAT Solution</h3>
                 <p>FracSTAT is not designed to simply replace existing software, but to provide a cohesive, open-source, and user-oriented computational framework that unifies these critical analytical components into a single application. Key benefits include:</p>
                 
                 <ul>
-                    <li><strong>Integrated Workflow:</strong> It combines geometric analysis, statistical characterization, spatial analysis, network topology, visualization, stress-based fracture assessment, and uncertainty quantification into a consistent, reproducible pipeline.</li>
+                    <li><strong>Integrated Workflow:</strong> It combines geometric analysis, statistical
+                        characterization, spatial analysis, network topology
+                        <a class="cite" href="#ref-sanderson2015">(Sanderson &amp; Nixon, 2015)</a>, visualization,
+                        stress-based fracture assessment
+                        <a class="cite" href="#ref-morris1996">(Morris et al., 1996)</a>, and uncertainty
+                        quantification into a consistent, reproducible pipeline.</li>
                     <li><strong>Seamless Data Utilization:</strong> Information generated in one module is smoothly transferred and utilized by subsequent modules, minimizing manual intervention and ensuring methodological consistency.</li>
-                    <li><strong>Open-Source Accessibility:</strong> FracSTAT is completely Python-based and open-source, removing the reliance on proprietary tools. It features a graphical user interface (GUI) that allows for advanced analysis without requiring deep programming expertise.</li>
+                    <li><strong>Open-Source Accessibility:</strong> FracSTAT is completely Python-based and
+                        open-source, building on NumPy
+                        <a class="cite" href="#ref-harris2020">(Harris et al., 2020)</a>, SciPy
+                        <a class="cite" href="#ref-virtanen2020">(Virtanen et al., 2020)</a>, pandas
+                        <a class="cite" href="#ref-mckinney2010">(McKinney, 2010)</a>, and Matplotlib
+                        <a class="cite" href="#ref-hunter2007">(Hunter, 2007)</a>, which removes the reliance on
+                        proprietary tools. It features a graphical user interface (GUI) that allows for advanced
+                        analysis without requiring deep programming expertise.</li>
                     <li><strong>Extensible Architecture:</strong> While accessible to beginners, its modular design provides advanced users with the flexibility to extend the software's capabilities as new research challenges arise.</li>
-                    <li><strong>Uncertainty Quantification:</strong> Modern geological investigations require more than deterministic measurements. FracSTAT answers this by incorporating rigorous quantification of uncertainties and evaluating their implications for geomechanical interpretation directly within the workflow.</li>
+                    <li><strong>Uncertainty Quantification:</strong> Modern geological investigations require more
+                        than deterministic measurements. FracSTAT answers this by incorporating rigorous
+                        quantification of uncertainties through Monte Carlo and Latin hypercube sampling
+                        <a class="cite" href="#ref-mckay1979">(McKay et al., 1979)</a>;
+                        <a class="cite" href="#ref-helton2003">Helton &amp; Davis (2003)</a>, with global
+                        sensitivity measures <a class="cite" href="#ref-saltelli2008">(Saltelli et al., 2008)</a>,
+                        and evaluating their implications for geomechanical interpretation directly within the
+                        workflow.</li>
                 </ul>
 
                 <p>Ultimately, FracSTAT serves as an integrated analytical platform intended to bridge the gap between conventional fracture characterization and modern quantitative structural analysis. It delivers a transparent, extensible framework to investigate all facets of a fracture network within one unified environment.</p>
                 
-                <h3>User Interface Technology</h3>
+                <h3 id="ui-technology">User Interface Technology</h3>
                 <p>FracSTAT's desktop interface is built on <strong>PySide6</strong> (Qt for Python). Plots are native Matplotlib figures embedded through Matplotlib's <code>backend_qtagg</code> Qt canvas.</p>
                 <div class="note-box">
                     <strong>Note for readers of the module pages:</strong> the widget classes named throughout this
@@ -168,6 +161,61 @@
                     implementing every widget on top of PySide6 (for example, <code>ttk.Treeview</code> is a
                     <code>QTreeWidget</code> subclass and <code>after()</code> is driven by <code>QTimer</code>).
                     These names therefore describe Qt widgets, not CustomTkinter or Tkinter ones.
+                </div>
+
+                <!-- ================================================= -->
+                <h2 id="references">References</h2>
+                <p>
+                    Sources are listed alphabetically within each group. In-text citations throughout this page link
+                    to the corresponding entry below.
+                </p>
+
+                <h3 id="ref-networks">Fracture Networks, Scaling and Topology</h3>
+                <ul class="ref-list">
+                    <li id="ref-berkowitz2002">Berkowitz, B. (2002). Characterizing flow and transport in fractured geological media: A review. <em>Advances in Water Resources</em>, 25(8–12), 861–884. <a href="https://doi.org/10.1016/S0309-1708(02)00042-8" target="_blank" rel="noopener">https://doi.org/10.1016/S0309-1708(02)00042-8</a></li>
+                    <li id="ref-bonnet2001">Bonnet, E., Bour, O., Odling, N. E., Davy, P., Main, I., Cowie, P., &amp; Berkowitz, B. (2001). Scaling of fracture systems in geological media. <em>Reviews of Geophysics</em>, 39(3), 347–383. <a href="https://doi.org/10.1029/1999RG000074" target="_blank" rel="noopener">https://doi.org/10.1029/1999RG000074</a></li>
+                    <li id="ref-laubach2019">Laubach, S. E., Lander, R. H., Criscenti, L. J., Anovitz, L. M., Urai, J. L., Pollyea, R. M., … Pyrak-Nolte, L. J. (2019). The role of chemistry in fracture pattern development and opportunities to advance interpretations of geological materials. <em>Reviews of Geophysics</em>, 57(3), 1065–1111. <a href="https://doi.org/10.1029/2019RG000671" target="_blank" rel="noopener">https://doi.org/10.1029/2019RG000671</a></li>
+                    <li id="ref-nrc1996">National Research Council (1996). <em>Rock Fractures and Fluid Flow: Contemporary Understanding and Applications</em>. National Academies Press, Washington, D.C. <a href="https://doi.org/10.17226/2309" target="_blank" rel="noopener">https://doi.org/10.17226/2309</a></li>
+                    <li id="ref-sanderson2015">Sanderson, D. J., &amp; Nixon, C. W. (2015). The use of topology in fracture network characterization. <em>Journal of Structural Geology</em>, 72, 55–66. <a href="https://doi.org/10.1016/j.jsg.2015.01.005" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2015.01.005</a></li>
+                </ul>
+
+                <h3 id="ref-software">Existing Fracture-Analysis Software</h3>
+                <ul class="ref-list">
+                    <li id="ref-cardozo2013">Cardozo, N., &amp; Allmendinger, R. W. (2013). Spherical projections with OSXStereonet. <em>Computers &amp; Geosciences</em>, 51, 193–205. <a href="https://doi.org/10.1016/j.cageo.2012.07.021" target="_blank" rel="noopener">https://doi.org/10.1016/j.cageo.2012.07.021</a></li>
+                    <li id="ref-healy2017">Healy, D., Rizzo, R. E., Cornwell, D. G., Farrell, N. J. C., Watkins, H., Timms, N. E., … Smith, M. (2017). FracPaQ: A MATLAB™ toolbox for the quantification of fracture patterns. <em>Journal of Structural Geology</em>, 95, 1–16. <a href="https://doi.org/10.1016/j.jsg.2016.12.003" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2016.12.003</a></li>
+                    <li id="ref-nyberg2018">Nyberg, B., Nixon, C. W., &amp; Sanderson, D. J. (2018). NetworkGT: A GIS tool for geometric and topological analysis of two-dimensional fracture networks. <em>Geosphere</em>, 14(4), 1618–1634. <a href="https://doi.org/10.1130/GES01595.1" target="_blank" rel="noopener">https://doi.org/10.1130/GES01595.1</a></li>
+                </ul>
+
+                <h3 id="ref-stress-uncertainty">Stress-Based Assessment and Uncertainty Quantification</h3>
+                <ul class="ref-list">
+                    <li id="ref-helton2003">Helton, J. C., &amp; Davis, F. J. (2003). Latin hypercube sampling and the propagation of uncertainty in analyses of complex systems. <em>Reliability Engineering &amp; System Safety</em>, 81(1), 23–69. <a href="https://doi.org/10.1016/S0951-8320(03)00058-9" target="_blank" rel="noopener">https://doi.org/10.1016/S0951-8320(03)00058-9</a></li>
+                    <li id="ref-mckay1979">McKay, M. D., Beckman, R. J., &amp; Conover, W. J. (1979). A comparison of three methods for selecting values of input variables in the analysis of output from a computer code. <em>Technometrics</em>, 21(2), 239&ndash;245. <a href="https://doi.org/10.2307/1268522" target="_blank" rel="noopener">https://doi.org/10.2307/1268522</a></li>
+                    <li id="ref-morris1996">Morris, A., Ferrill, D. A., &amp; Henderson, D. B. (1996). Slip-tendency analysis and fault reactivation. <em>Geology</em>, 24(3), 275–278. <a href="https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2" target="_blank" rel="noopener">https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2</a></li>
+                    <li id="ref-saltelli2008">Saltelli, A., Ratto, M., Andres, T., Campolongo, F., Cariboni, J., Gatelli, D., Saisana, M., &amp; Tarantola, S. (2008). <em>Global Sensitivity Analysis: The Primer</em>. John Wiley &amp; Sons. <a href="https://doi.org/10.1002/9780470725184" target="_blank" rel="noopener">https://doi.org/10.1002/9780470725184</a></li>
+                </ul>
+
+                <h3 id="ref-python">Scientific Python Stack</h3>
+                <ul class="ref-list">
+                    <li id="ref-harris2020">Harris, C. R., Millman, K. J., van der Walt, S. J., Gommers, R., Virtanen, P., Cournapeau, D., … Oliphant, T. E. (2020). Array programming with NumPy. <em>Nature</em>, 585(7825), 357–362. <a href="https://doi.org/10.1038/s41586-020-2649-2" target="_blank" rel="noopener">https://doi.org/10.1038/s41586-020-2649-2</a></li>
+                    <li id="ref-hunter2007">Hunter, J. D. (2007). Matplotlib: A 2D graphics environment. <em>Computing in Science &amp; Engineering</em>, 9(3), 90–95. <a href="https://doi.org/10.1109/MCSE.2007.55" target="_blank" rel="noopener">https://doi.org/10.1109/MCSE.2007.55</a></li>
+                    <li id="ref-mckinney2010">McKinney, W. (2010). Data structures for statistical computing in Python. In <em>Proceedings of the 9th Python in Science Conference</em> (pp. 56–61). <a href="https://doi.org/10.25080/Majora-92bf1922-00a" target="_blank" rel="noopener">https://doi.org/10.25080/Majora-92bf1922-00a</a></li>
+                    <li id="ref-virtanen2020">Virtanen, P., Gommers, R., Oliphant, T. E., Haberland, M., Reddy, T., Cournapeau, D., … van Mulbregt, P. (2020). SciPy 1.0: fundamental algorithms for scientific computing in Python. <em>Nature Methods</em>, 17(3), 261–272. <a href="https://doi.org/10.1038/s41592-019-0686-2" target="_blank" rel="noopener">https://doi.org/10.1038/s41592-019-0686-2</a></li>
+                </ul>
+
+                <div class="cite-box">
+                    <p><strong>How to cite FracSTAT.</strong> If any part of an analysis in a publication was
+                    produced with this software, cite the application itself in addition to the method sources listed
+                    on the individual tab pages:</p>
+                    <p>Mahanta, S. N., Kumar, P. C., Srivastava, E., Kumar, J., Rizzo, G. F., Gasparo Morticelli, M.,
+                    Sulli, A., &amp; Sain, K. (2026). <em>FracSTAT: an integrated open-source platform for fracture
+                    statistics, stress-based and uncertainty analysis</em> (Version 1.0.0) [Computer software].
+                    <a href="https://github.com/sachi5908/FracSTAT" target="_blank" rel="noopener">https://github.com/sachi5908/FracSTAT</a></p>
+                    <p>Also state the FracSTAT version (shown as the badge below the launcher logo, and in full on
+                    the in-app <em>About</em> page), the Python version, and whether the analysis was run from source
+                    or from the standalone desktop build &mdash; the version number is what fixes the algorithms and
+                    defaults a reader would need to reproduce a figure. Each tab page carries its own methods
+                    statement naming the estimators, conventions and parameter values that page's plots depend on;
+                    cite those in the methods section rather than citing this page alone.</p>
                 </div>
 
                 <!-- Spacer for scrolling -->
