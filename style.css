@@ -899,7 +899,7 @@ body {
 
 .footer-grid {
     display: grid;
-    grid-template-columns: 1.5fr 1fr 1.5fr 1fr;
+    grid-template-columns: 1.6fr 1fr 1fr 1fr;
     gap: 3rem;
     max-width: 1400px;
     margin: 0 auto;
@@ -946,21 +946,17 @@ body {
     line-height: 1.4;
 }
 
-.footer-list.affiliations li {
-    font-size: 0.85rem;
-}
-
-.footer-list.affiliations strong {
-    color: #cbd5e1;
-}
-
-.footer-list.emails a {
+/* Footer navigation columns. The mega-footer now links to the pages and
+   sections of the site instead of repeating author names, emails and
+   institution details — those are presented once each in the Contributors
+   grid and the "In Collaboration With" banner on index.html. */
+.footer-nav a {
     color: #94a3b8;
     text-decoration: none;
     transition: color 0.2s ease;
 }
 
-.footer-list.emails a:hover {
+.footer-nav a:hover {
     color: #60a5fa;
     text-decoration: underline;
 }
@@ -2082,6 +2078,247 @@ body::before {
     color: var(--teal);
 }
 
+/* Contributors ------------------------------------------------------------
+   Ported from the companion Presentation page so the landing page credits
+   the team with the same card, ring-hover and staggered-reveal treatment.
+   Avatar placeholders piggyback on the existing .lazy-wrap shimmer system
+   (see the .lazy-wrap rules above and script.js section 3b) rather than
+   introducing a second image-loading mechanism. */
+.contributors {
+    position: relative;
+    overflow: hidden;
+    padding: 6.5rem 5%;
+    background:
+        radial-gradient(ellipse 55% 45% at 85% 10%, rgba(31, 133, 119, 0.07), transparent),
+        radial-gradient(ellipse 50% 40% at 8% 90%, rgba(193, 100, 47, 0.06), transparent),
+        var(--stone);
+}
+
+.contributors-head {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 2.75rem;
+    text-align: center;
+}
+
+.contributors-head small {
+    color: var(--rust);
+    font-family: var(--mono-font);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.contributors-head h2 {
+    margin-top: 0.7rem;
+    color: var(--ink);
+    font-family: var(--display-font);
+    font-weight: 800;
+    font-size: clamp(1.8rem, 3.6vw, 2.6rem);
+    letter-spacing: -0.03em;
+}
+
+.contributors-head p {
+    max-width: 560px;
+    margin: 0.85rem auto 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.7;
+}
+
+.contributor-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.75rem 1.25rem;
+    max-width: 1180px;
+    margin: 0 auto;
+}
+
+.contributor {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.9rem 1.25rem 1.75rem;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--paper);
+    box-shadow: 0 1px 2px rgba(13, 19, 16, 0.04);
+    text-align: center;
+    transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.3, 1),
+                box-shadow 0.4s cubic-bezier(0.2, 0.7, 0.3, 1),
+                border-color 0.4s ease;
+}
+
+.contributor:hover {
+    transform: translateY(-8px);
+    border-color: transparent;
+    box-shadow: 0 26px 52px rgba(13, 19, 16, 0.12);
+}
+
+.contributor-avatar-wrap {
+    position: relative;
+    width: 104px;
+    height: 104px;
+    margin: 0 auto 1.15rem;
+}
+
+/* Conic gradient ring: idle-paused so it only spins while hovered. */
+.contributor-ring {
+    position: absolute;
+    inset: -5px;
+    z-index: 0;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, var(--rust), var(--teal), var(--sage), var(--rust));
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    animation: contributor-ring-spin 6s linear infinite;
+    animation-play-state: paused;
+}
+
+.contributor:hover .contributor-ring {
+    opacity: 1;
+    animation-play-state: running;
+}
+
+@keyframes contributor-ring-spin {
+    to { transform: rotate(360deg); }
+}
+
+.contributor-avatar {
+    position: relative;
+    z-index: 1;
+    width: 104px;
+    height: 104px;
+    border: 3px solid var(--paper);
+    border-radius: 50%;
+    box-shadow: 0 8px 20px rgba(13, 19, 16, 0.1);
+}
+
+.contributor-avatar img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    transition: opacity 0.4s ease, transform 0.6s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.contributor:hover .contributor-avatar img {
+    transform: scale(1.08);
+}
+
+.contributor h4 {
+    margin-bottom: 0.4rem;
+    color: var(--ink);
+    font-family: var(--display-font);
+    font-weight: 700;
+    font-size: 0.91rem;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+}
+
+.contributor-role {
+    color: var(--teal);
+    font-family: var(--mono-font);
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.contributor-affil {
+    margin-top: 0.58rem;
+    padding-top: 0.58rem;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.72rem;
+    line-height: 1.55;
+}
+
+.contributor-email {
+    display: inline-block;
+    margin-top: 0.62rem;
+    color: var(--rust);
+    font-family: var(--mono-font);
+    font-size: 0.63rem;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    word-break: break-all;
+    transition: color 0.25s ease;
+}
+
+.contributor-email:hover {
+    color: var(--teal);
+}
+
+/* Round shimmer placeholder for the avatars. */
+.lazy-wrap--avatar {
+    width: 104px;
+    height: 104px;
+    border-radius: 50%;
+}
+
+/* Scroll reveal (see script.js) — staggered per card. */
+.reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.reveal.show {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: var(--delay, 0s);
+}
+
+.contributor-grid .contributor:nth-child(1) { --delay: 0s; }
+.contributor-grid .contributor:nth-child(2) { --delay: 0.06s; }
+.contributor-grid .contributor:nth-child(3) { --delay: 0.12s; }
+.contributor-grid .contributor:nth-child(4) { --delay: 0.18s; }
+.contributor-grid .contributor:nth-child(5) { --delay: 0.24s; }
+.contributor-grid .contributor:nth-child(6) { --delay: 0.3s; }
+.contributor-grid .contributor:nth-child(7) { --delay: 0.36s; }
+.contributor-grid .contributor:nth-child(8) { --delay: 0.42s; }
+
+@media (max-width: 900px) {
+    .contributor-grid {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 520px;
+    }
+}
+
+@media (max-width: 480px) {
+    .contributor-avatar-wrap,
+    .contributor-avatar,
+    .lazy-wrap--avatar {
+        width: 88px;
+        height: 88px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .contributor,
+    .contributor-avatar img,
+    .contributor-ring {
+        transition: none;
+        animation: none !important;
+    }
+
+    .contributor:hover {
+        transform: none;
+    }
+
+    .reveal {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}
+
+
 .modern-footer {
     padding: 4.5rem 5% 1.8rem;
     border-top-color: var(--border-dark);
@@ -2122,13 +2359,12 @@ body::before {
 }
 
 .footer-list li,
-.footer-list.affiliations strong,
-.footer-list.emails a,
+.footer-nav a,
 .footer-legal-links a {
     color: #93a196;
 }
 
-.footer-list.emails a:hover,
+.footer-nav a:hover,
 .footer-legal-links a:hover {
     color: var(--teal-light);
 }

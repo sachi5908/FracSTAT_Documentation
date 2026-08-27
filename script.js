@@ -613,6 +613,33 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ---------------------------------------------------------
+    // 3c. Scroll reveal for .reveal elements (index.html
+    //     contributor cards). Mirrors the companion Presentation
+    //     page: each element fades/slides in once when it first
+    //     enters the viewport, then stops being observed.
+    //     Reduced-motion users get the content immediately, since
+    //     the CSS already neutralises the transform for them.
+    // ---------------------------------------------------------
+    const revealTargets = document.querySelectorAll(".reveal");
+    if (revealTargets.length) {
+        if (typeof IntersectionObserver === "undefined") {
+            // No observer support: show everything rather than
+            // leaving the cards permanently invisible.
+            revealTargets.forEach(el => el.classList.add("show"));
+        } else {
+            const revealObserver = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
+                    entry.target.classList.add("show");
+                    revealObserver.unobserve(entry.target);
+                });
+            }, { threshold: 0.12 });
+
+            revealTargets.forEach(el => revealObserver.observe(el));
+        }
+    }
+
+    // ---------------------------------------------------------
     // 4. Smooth Page Routing (No-Flicker Navigation)
     // ---------------------------------------------------------
     const contentContainer = document.querySelector(".docs-content");

@@ -361,6 +361,14 @@
     .file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
     .file-grid.drag-over { outline: 2px dashed var(--primary-light); outline-offset: 4px; border-radius: 8px; }
     
+    /* Site Pages block — pinned, non-draggable */
+    .file-section h2 .fs-note {
+        margin-left: auto; font-size: 0.7rem; font-weight: 600; color: var(--ink-light);
+        background: #f3f4f6; border: 1px solid var(--border); border-radius: 20px; padding: 0.15rem 0.6rem;
+    }
+    .fc-drag-handle--fixed { cursor: default; color: var(--ink-light); opacity: 0.55; }
+    .fc-drag-handle--fixed:hover { color: var(--ink-light); }
+
     .file-card {
         background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 1rem;
         display: flex; align-items: center; justify-content: space-between; transition: all 0.2s; position: relative;
@@ -878,7 +886,38 @@
         ]}
     ];
 
-    var EDITABLE_SELECTOR = "p, li, h1, h2, h3, h4, td, th, .ph-caption, figcaption, blockquote, .note-box, .tip-box, .code-lang, pre code, .tut-card-title, .tut-card-desc, .tut-tag, .tut-duration";
+    // Pages that are part of the public site but NOT part of the docs
+    // sidebar. They are deliberately kept out of FILE_SECTIONS so that
+    // "Save Order to Sidebar" (which regenerates SIDEBAR_SECTIONS and
+    // PAGE_ORDER in script.js from FILE_SECTIONS) can never inject them
+    // into the documentation navigation. They are still fully editable
+    // from the dashboard and are included in Backup & Export.
+    var SITE_PAGES = {
+        title: "Site Pages",
+        files: [
+            { file: "index.html", label: "Home Page" }
+        ]
+    };
+
+    var EDITABLE_SELECTOR = "p, li, h1, h2, h3, h4, td, th, .ph-caption, figcaption, blockquote, .note-box, .tip-box, .code-lang, pre code, .tut-card-title, .tut-card-desc, .tut-tag, .tut-duration, .contributor-role, .logo-name";
+
+    // index.html has no .docs-content-inner wrapper, so it marks its
+    // editable region with [data-admin-root] instead. Everything outside
+    // that element (navbar, hero, footer) stays untouched by the editor.
+    function getEditRoot(d) {
+        return d.querySelector(".docs-content-inner") ||
+            d.querySelector("[data-admin-root]") ||
+            d.body;
+    }
+
+    // Same lookup against a parsed document, but without the doc.body
+    // fallback — callers use it to decide whether they found a region
+    // they're allowed to overwrite.
+    function findEditRoot(parsedDoc) {
+        return parsedDoc.querySelector(".docs-content-inner") ||
+            parsedDoc.querySelector("[data-admin-root]");
+    }
+
 
     // ---------------------------------------------------------
     // Create-new-page helpers
@@ -905,6 +944,7 @@
         FILE_SECTIONS.forEach(function (s) {
             s.files.forEach(function (f) { if (f.file === filename) found = true; });
         });
+        SITE_PAGES.files.forEach(function (f) { if (f.file === filename) found = true; });
         return found;
     }
 
@@ -914,6 +954,9 @@
             s.files.forEach(function (f) {
                 if (f.file === file) result = { label: f.label, section: s.title };
             });
+        });
+        SITE_PAGES.files.forEach(function (f) {
+            if (f.file === file) result = { label: f.label, section: SITE_PAGES.title };
         });
         if (!result && NEW_PAGES[file]) {
             result = { label: NEW_PAGES[file].label, section: NEW_PAGES[file].section };
@@ -1368,6 +1411,32 @@
     // ---------------------------------------------------------
     // Dashboard rendering
     // ---------------------------------------------------------
+    function buildFileCard(entry, opts) {
+        var card = document.createElement("div");
+        card.className = "file-card";
+        card.draggable = !(opts && opts.fixed);
+        card.dataset.file = entry.file;
+        card.innerHTML =
+            '<div style="display:flex; align-items:center;">' +
+                (opts && opts.fixed
+                    ? '<span class="fc-drag-handle fc-drag-handle--fixed" title="This page is not part of the docs sidebar, so it can\'t be reordered"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>'
+                    : '<span class="fc-drag-handle" title="Drag to reorder"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"></circle><circle cx="15" cy="6" r="1.5"></circle><circle cx="9" cy="12" r="1.5"></circle><circle cx="15" cy="12" r="1.5"></circle><circle cx="9" cy="18" r="1.5"></circle><circle cx="15" cy="18" r="1.5"></circle></svg></span>') +
+                '<div class="fc-info">' +
+                    '<div class="fc-title">' + entry.label + '</div>' +
+                    '<div class="fc-name">' + entry.file + '</div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="fc-actions">' +
+                (PENDING_NEW_FILES.has(entry.file) ? '<span class="fc-badge fc-draft-badge">Draft</span>' : '<span class="fc-badge">Published</span>') +
+                '<button type="button" class="fc-edit" title="Edit Page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>' +
+            '</div>';
+        card.querySelector(".fc-edit").addEventListener("click", function () {
+            openEditor(entry.file, entry.label);
+        });
+        if (!(opts && opts.fixed)) bindCardDragEvents(card);
+        return card;
+    }
+
     function renderFileSections() {
         fileSectionsEl.innerHTML = "";
         FILE_SECTIONS.forEach(function (section) {
@@ -1389,41 +1458,50 @@
             grid.className = "file-grid";
 
             section.files.forEach(function (entry) {
-                var card = document.createElement("div");
-                card.className = "file-card";
-                card.draggable = true;
-                card.dataset.file = entry.file;
-                var draftBadge = PENDING_NEW_FILES.has(entry.file)
-                    ? '<span class="fc-draft-badge">Draft — not pushed yet</span>' : "";
-                card.innerHTML =
-            '<div style="display:flex; align-items:center;">' +
-                '<span class="fc-drag-handle" title="Drag to reorder"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"></circle><circle cx="15" cy="6" r="1.5"></circle><circle cx="9" cy="12" r="1.5"></circle><circle cx="15" cy="12" r="1.5"></circle><circle cx="9" cy="18" r="1.5"></circle><circle cx="15" cy="18" r="1.5"></circle></svg></span>' +
-                '<div class="fc-info">' +
-                    '<div class="fc-title">' + entry.label + '</div>' +
-                    '<div class="fc-name">' + entry.file + '</div>' +
-                '</div>' +
-            '</div>' +
-            '<div class="fc-actions">' +
-                (PENDING_NEW_FILES.has(entry.file) ? '<span class="fc-badge fc-draft-badge">Draft</span>' : '<span class="fc-badge">Published</span>') +
-                '<button type="button" class="fc-edit" title="Edit Page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>' +
-            '</div>';
-                card.querySelector(".fc-edit").addEventListener("click", function () {
-                    openEditor(entry.file, entry.label);
-                });
-                bindCardDragEvents(card);
-                grid.appendChild(card);
+                grid.appendChild(buildFileCard(entry, { fixed: false }));
             });
 
             bindGridDropEvents(grid);
             sectionEl.appendChild(grid);
             fileSectionsEl.appendChild(sectionEl);
         });
+
+        renderSitePagesSection();
         renderDashboardSummary();
+    }
+
+    // Site Pages (currently just index.html) render as a normal-looking
+    // section, but deliberately without any drag bindings and flagged with
+    // data-site-pages so rebuildFileSectionsFromDom() skips it. That keeps
+    // these pages editable without ever letting them leak into the
+    // generated docs sidebar.
+    function renderSitePagesSection() {
+        if (!SITE_PAGES.files.length) return;
+
+        var sectionEl = document.createElement("div");
+        sectionEl.className = "file-section";
+        sectionEl.dataset.sitePages = "true";
+        sectionEl.id = "module_" + slugify(SITE_PAGES.title);
+
+        var h2 = document.createElement("h2");
+        h2.innerHTML = '<span>' + SITE_PAGES.title + '</span>' +
+            '<span class="fs-note">Not in the docs sidebar</span>';
+        sectionEl.appendChild(h2);
+
+        var grid = document.createElement("div");
+        grid.className = "file-grid";
+        SITE_PAGES.files.forEach(function (entry) {
+            grid.appendChild(buildFileCard(entry, { fixed: true }));
+        });
+
+        sectionEl.appendChild(grid);
+        fileSectionsEl.appendChild(sectionEl);
     }
 
     function renderDashboardSummary() {
         var totalPages = 0;
         FILE_SECTIONS.forEach(function (s) { totalPages += s.files.length; });
+        totalPages += SITE_PAGES.files.length;
         var draftCount = 0;
         FILE_SECTIONS.forEach(function (s) {
             s.files.forEach(function (f) { if (PENDING_NEW_FILES.has(f.file)) draftCount++; });
@@ -1511,7 +1589,9 @@
     }
 
     function getSectionAfterElement(container, y) {
-        var sections = Array.prototype.slice.call(container.querySelectorAll(".file-section:not(.dragging-section)"));
+        var sections = Array.prototype.slice.call(
+            container.querySelectorAll('.file-section:not(.dragging-section):not([data-site-pages="true"])')
+        );
         var closest = null, closestOffset = Number.NEGATIVE_INFINITY;
         sections.forEach(function (sectionEl) {
             var box = sectionEl.getBoundingClientRect();
@@ -1532,8 +1612,15 @@
             e.dataTransfer.dropEffect = "move";
             container.classList.add("drag-over-sections");
             var after = getSectionAfterElement(container, e.clientY);
-            if (after == null) container.appendChild(draggingSection);
-            else if (after !== draggingSection) container.insertBefore(draggingSection, after);
+            // Keep the pinned Site Pages block at the bottom: dropping past
+            // the last docs section inserts before it rather than after.
+            var sitePagesEl = container.querySelector('.file-section[data-site-pages="true"]');
+            if (after == null) {
+                if (sitePagesEl) container.insertBefore(draggingSection, sitePagesEl);
+                else container.appendChild(draggingSection);
+            } else if (after !== draggingSection) {
+                container.insertBefore(draggingSection, after);
+            }
         });
         container.addEventListener("dragleave", function (e) {
             if (!container.contains(e.relatedTarget)) container.classList.remove("drag-over-sections");
@@ -1551,6 +1638,10 @@
     function rebuildFileSectionsFromDom() {
         var newSections = [];
         fileSectionsEl.querySelectorAll(".file-section").forEach(function (sectionEl) {
+            // The Site Pages block is rendered into the same container but is
+            // not part of the docs sidebar, so it must never be folded back
+            // into FILE_SECTIONS.
+            if (sectionEl.dataset.sitePages === "true") return;
             var h2El = sectionEl.querySelector("h2");
             var title = h2El ? h2El.textContent.trim() : "";
             var files = [];
@@ -1653,9 +1744,11 @@
                         allFiles.push(f.file);
                     });
                 });
-                
-                // Optional: Manually add your root system files to the backup
-                // allFiles.push("admin.html", "index.html", "script.js", "style.css");
+
+                // Plus the site pages that live outside the docs sidebar
+                SITE_PAGES.files.forEach(function (f) {
+                    allFiles.push(f.file);
+                });
 
                 // 2. Fetch the content of each file and add it to the ZIP archive
                 for (let i = 0; i < allFiles.length; i++) {
@@ -1940,11 +2033,24 @@
             ".docs-layout { height: 100vh !important; }" +
             ".docs-content { overflow-y: auto !important; -webkit-overflow-scrolling: touch; }" +
             ".pagination-nav { pointer-events: none !important; opacity: 0.35; }" +
+            // index.html specifics: the home-page preloader would sit on top
+            // of the editor, and the scroll-reveal cards start invisible, so
+            // force both out of the way while editing.
+            "#preloader { display: none !important; }" +
+            ".reveal { opacity: 1 !important; transform: none !important; }" +
+            // .lazy-wrap images are transparent until script.js adds
+            // .img-loaded. After an undo/redo re-renders the markup that
+            // class is gone and script.js won't run again, so pin them
+            // visible for the duration of the editing session.
+            ".lazy-wrap { background-color: transparent !important; }" +
+            ".lazy-wrap::before { animation: none !important; content: none !important; }" +
+            ".lazy-wrap img { opacity: 1 !important; }" +
             "[data-admin-editable] { outline: 1px dashed transparent; cursor: text; border-radius: 4px; transition: outline-color .15s ease, background-color .15s ease; }" +
             "[data-admin-editable]:hover { outline-color: #93c5fd; background-color: rgba(37,99,235,0.05); }" +
             "[data-admin-editable]:focus { outline: 2px solid #2563eb; background-color: rgba(37,99,235,0.07); }" +
             ".admin-img-overlay { position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center; gap: 0.6rem; background: rgba(17,24,39,0.45); opacity: 0; pointer-events: none; transition: opacity .2s ease; }" +
             ".figure-img-wrap:hover .admin-img-overlay { opacity: 1; pointer-events: auto; }" +
+            ".lazy-wrap:hover .admin-img-overlay { opacity: 1; pointer-events: auto; }" +
             ".admin-img-btn { display: flex; align-items: center; padding: 0.6rem 1.1rem; border: none; border-radius: 8px; background: #fff; color: #111827; font-weight: 700; font-size: 0.85rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.25); }" +
             ".admin-img-btn .svg-icon { margin-right: 0.4em; width: 1.2em; height: 1.2em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }" +
             ".admin-img-btn:hover { background: #2563eb; color: #fff; }" +
@@ -1985,7 +2091,7 @@
             ".admin-video-btn:hover { background: #2563eb; color: #fff; }";
         doc.head.appendChild(style);
 
-        var container = doc.querySelector(".docs-content-inner") || doc.body;
+        var container = getEditRoot(doc);
 
         hydrateEditableContent(doc, container);
 
@@ -2019,6 +2125,13 @@
             addImageOverlay(doc, wrap);
         });
 
+        // index.html wraps its images in .lazy-wrap (shimmer placeholder)
+        // rather than .figure-img-wrap, so give those the same
+        // upload/replace overlay.
+        container.querySelectorAll(".lazy-wrap").forEach(function (wrap) {
+            addImageOverlay(doc, wrap);
+        });
+
         // Initialize video controls for tutorial.html
         container.querySelectorAll(".tut-card").forEach(function (card) {
             addVideoOverlay(doc, card);
@@ -2032,7 +2145,12 @@
         var img = wrap.querySelector("img");
         if (!img) return;
 
-        if (!wrap.style.position) wrap.style.position = "relative";
+        // Only set an inline position when the stylesheet doesn't already
+        // establish a containing block (.lazy-wrap is already relative),
+        // otherwise the inline style gets written back into the saved HTML.
+        var view = doc.defaultView;
+        var computedPos = view ? view.getComputedStyle(wrap).position : "";
+        if (!wrap.style.position && computedPos === "static") wrap.style.position = "relative";
 
         var overlay = doc.createElement("div");
         overlay.className = "admin-img-overlay";
@@ -2738,7 +2856,7 @@
     function recordHistory(doc) {
         var h = doc.__adminHistory;
         if (!h) return;
-        var container = doc.querySelector(".docs-content-inner") || doc.body;
+        var container = getEditRoot(doc);
         var html = getCleanHTML(container);
         if (h.stack[h.index] === html) return; 
         h.stack = h.stack.slice(0, h.index + 1);
@@ -2777,7 +2895,7 @@
     }
 
     function restoreHistorySnapshot(doc, h) {
-        var container = doc.querySelector(".docs-content-inner") || doc.body;
+        var container = getEditRoot(doc);
         closeInsertMenu(doc);
         container.innerHTML = h.stack[h.index];
         hydrateEditableContent(doc, container);
@@ -2831,9 +2949,9 @@
             .then(function (rawHtml) {
                 var parser = new DOMParser();
                 var freshDoc = parser.parseFromString(rawHtml, "text/html");
-                var target = freshDoc.querySelector(".docs-content-inner");
+                var target = findEditRoot(freshDoc);
 
-                var container = doc.querySelector(".docs-content-inner") || doc.body;
+                var container = getEditRoot(doc);
                 var cleanHtml = getCleanHTML(container);
 
                 if (target) target.innerHTML = cleanHtml;
@@ -2884,7 +3002,7 @@
         editorStatus.textContent = isNewFile ? "Preparing to create this page on GitHub…" : "Preparing upload to GitHub…";
 
         try {
-            var container = doc.querySelector(".docs-content-inner") || doc.body;
+            var container = getEditRoot(doc);
             var cleanHtml = getCleanHTML(container);
             
             var rawHtml;
@@ -2898,7 +3016,7 @@
             
             var parser = new DOMParser();
             var freshDoc = parser.parseFromString(rawHtml, "text/html");
-            var target = freshDoc.querySelector(".docs-content-inner");
+            var target = findEditRoot(freshDoc);
             if (target) target.innerHTML = cleanHtml;
             
             var outHtml = "<!DOCTYPE html>\n" + freshDoc.documentElement.outerHTML;

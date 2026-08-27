@@ -25,6 +25,7 @@
         <ul class="nav-links">
             <li><a href="index.html" class="active">Home</a></li>
             <li><a href="introduction.html">Docs</a></li>
+            <li><a href="#contributors">Contributors</a></li>
             <li>
                 <a href="https://github.com/sachi5908/FracSTAT" target="_blank" class="github-link">
                     <svg height="20" width="20" viewBox="0 0 16 16" fill="currentColor">
@@ -86,6 +87,11 @@
         </div>
     </header>
 
+    <!-- Editable home-page content. The admin editor (admin.html) treats
+         [data-admin-root] as the editable region for pages that have no
+         .docs-content-inner wrapper, so the navbar, hero and footer stay
+         out of the editor while these three sections stay editable. -->
+    <div class="home-editable" data-admin-root>
     <section class="features">
         <h2>Core Capabilities</h2>
         <div class="feature-grid">
@@ -122,7 +128,128 @@
         </div>
     </section>
 
-    <!-- Collaboration Section -->
+    <!-- Contributors Section
+         Mirrors the companion Presentation page's contributor grid so both
+         surfaces credit the team with the same layout and hover treatment.
+         Avatars reuse the shared .lazy-wrap shimmer wrapper (see script.js
+         section 3b) instead of a bespoke loader. -->
+    <section class="contributors" id="contributors">
+        <div class="contributors-head">
+            <small>The Team</small>
+            <h2>Contributors</h2>
+            <p>The researchers and collaborators behind the development of FracSTAT.</p>
+        </div>
+
+        <div class="contributor-grid">
+            <article class="contributor reveal">
+                <div class="contributor-avatar-wrap">
+                    <div class="contributor-ring" aria-hidden="true"></div>
+                    <div class="contributor-avatar lazy-wrap lazy-wrap--avatar">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1787323019/Picture3_f7k8iv.png" alt="Sachida Nanda Mahanta" loading="lazy">
+                    </div>
+                </div>
+                <h4>Sachida Nanda Mahanta</h4>
+                <span class="contributor-role">M.Tech Applied Geology</span>
+                <p class="contributor-affil">Dr. Harisingh Gour Vishwavidalaya, Sagar<br>Madhya Pradesh, India</p>
+                <a class="contributor-email" href="mailto:sachida5908@gmail.com">sachida5908@gmail.com</a>
+            </article>
+
+            <article class="contributor reveal">
+                <div class="contributor-avatar-wrap">
+                    <div class="contributor-ring" aria-hidden="true"></div>
+                    <div class="contributor-avatar lazy-wrap lazy-wrap--avatar">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1787323013/Picture4_kor9ur.png" alt="Dr. Priyadarshi Chinmoy Kumar" loading="lazy">
+                    </div>
+                </div>
+                <h4>Dr. Priyadarshi Chinmoy Kumar</h4>
+                <span class="contributor-role">Scientist-C</span>
+                <p class="contributor-affil">WIHG-Dehradun, India</p>
+                <a class="contributor-email" href="mailto:chinmoy@wihg.res.in">chinmoy@wihg.res.in</a>
+            </article>
+
+            <article class="contributor reveal">
+                <div class="contributor-avatar-wrap">
+                    <div class="contributor-ring" aria-hidden="true"></div>
+                    <div class="contributor-avatar lazy-wrap lazy-wrap--avatar">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1787323020/Picture5_rjdkfl.png" alt="Dr. Eshaan Srivastava" loading="lazy">
+                    </div>
+                </div>
+                <h4>Dr. Eshaan Srivastava</h4>
+                <span class="contributor-role">Post-Doctoral Fellow</span>
+                <p class="contributor-affil">University of Palermo, Sicily, Italy</p>
+                <a class="contributor-email" href="mailto:eshaan.srivastava@unipa.it">eshaan.srivastava@unipa.it</a>
+            </article>
+
+            <article class="contributor reveal">
+                <div class="contributor-avatar-wrap">
+                    <div class="contributor-ring" aria-hidden="true"></div>
+                    <div class="contributor-avatar lazy-wrap lazy-wrap--avatar">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1787323028/Picture6_cspxpn.png" alt="Dr. Jitender Kumar" loading="lazy">
+                    </div>
+                </div>
+                <h4>Dr. Jitender Kumar</h4>
+                <span class="contributor-role">Scientist-B</span>
+                <p class="contributor-affil">WIHG-Dehradun, India</p>
+                <a class="contributor-email" href="mailto:jitender@wihg.res.in">jitender@wihg.res.in</a>
+            </article>
+
+            <article class="contributor reveal">
+                <div class="contributor-avatar-wrap">
+                    <div class="contributor-ring" aria-hidden="true"></div>
+                    <div class="contributor-avatar lazy-wrap lazy-wrap--avatar">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1787323024/Picture7_zt7nq8.png" alt="Giuseppe Francesco Rizzo" loading="lazy">
+                    </div>
+                </div>
+                <h4>Giuseppe Francesco Rizzo</h4>
+                <span class="contributor-role">Doctoral Fellow</span>
+                <p class="contributor-affil">University of Palermo, Sicily, Italy</p>
+                <a class="contributor-email" href="mailto:giuseppefrancesco@unipa.it">giuseppefrancesco@unipa.it</a>
+            </article>
+
+            <article class="contributor reveal">
+                <div class="contributor-avatar-wrap">
+                    <div class="contributor-ring" aria-hidden="true"></div>
+                    <div class="contributor-avatar lazy-wrap lazy-wrap--avatar">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1787323029/Picture8_kxfoia.png" alt="Dr. Maurizio Gasparo Morticelli" loading="lazy">
+                    </div>
+                </div>
+                <h4>Dr. Maurizio Gasparo Morticelli</h4>
+                <span class="contributor-role">Professor</span>
+                <p class="contributor-affil">University of Palermo, Sicily, Italy</p>
+                <a class="contributor-email" href="mailto:maurizio.gasparo@unipa.it">maurizio.gasparo@unipa.it</a>
+            </article>
+
+            <article class="contributor reveal">
+                <div class="contributor-avatar-wrap">
+                    <div class="contributor-ring" aria-hidden="true"></div>
+                    <div class="contributor-avatar lazy-wrap lazy-wrap--avatar">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1787323023/Picture9_rotwgs.png" alt="Dr. Attilo Sulli" loading="lazy">
+                    </div>
+                </div>
+                <h4>Dr. Attilo Sulli</h4>
+                <span class="contributor-role">Professor</span>
+                <p class="contributor-affil">University of Palermo, Sicily, Italy</p>
+                <a class="contributor-email" href="mailto:attilio.sulli@unipa.it">attilio.sulli@unipa.it</a>
+            </article>
+
+            <article class="contributor reveal">
+                <div class="contributor-avatar-wrap">
+                    <div class="contributor-ring" aria-hidden="true"></div>
+                    <div class="contributor-avatar lazy-wrap lazy-wrap--avatar">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1787323028/Picture10_pivbx5.png" alt="Dr. Kalachand Sain" loading="lazy">
+                    </div>
+                </div>
+                <h4>Dr. Kalachand Sain</h4>
+                <span class="contributor-role">JC Bose National Fellow</span>
+                <p class="contributor-affil">CSIR-NGRI, Hyderabad, India</p>
+                <a class="contributor-email" href="mailto:kalachandsain7@gmail.com">kalachandsain7@gmail.com</a>
+            </article>
+        </div>
+    </section>
+
+    <!-- Collaboration Section
+         Sits after the Contributors grid: the people are introduced first,
+         then the institutions they represent. -->
     <section class="institute-banner">
         <h3>In Collaboration With</h3>
         <div class="logo-track">
@@ -164,6 +291,7 @@
             </div>
         </div>
     </section>
+    </div><!-- /.home-editable -->
 
     <footer class="modern-footer">
         <div class="footer-grid">
@@ -176,46 +304,40 @@
                 <div class="footer-version">User Manual v1.0</div>
             </div>
 
-            <!-- Authors Column -->
+            <!-- Explore Column — jumps to sections already on this page.
+                 Author names, emails and institution details are no longer
+                 duplicated here: they live in the Contributors grid and the
+                 "In Collaboration With" banner above. -->
             <div class="footer-section">
-                <h4>Authors</h4>
-                <ul class="footer-list">
-                    <li>Sachida Nanda Mahanta</li>
-                    <li>Priyadarshi Chinmoy Kumar</li>
-                    <li>Eshan Srivastava</li>
-                    <li>Jitender Kumar</li>
-                    <li>Giuseppe Francesco Rizzo</li>
-                    <li>Maurizio Gasparo Morticelli</li>
-                    <li>Attilio Sulli</li>
-                    <li>Kalachand Sain</li>
+                <h4>Explore</h4>
+                <ul class="footer-list footer-nav">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="#contributors">Contributors</a></li>
+                    <li><a href="introduction.html">Documentation</a></li>
+                    <li><a href="tutorial.html">Video Tutorials</a></li>
                 </ul>
             </div>
 
-            <!-- Affiliations Column -->
+            <!-- Documentation Column -->
             <div class="footer-section">
-                <h4>Affiliated Institutions</h4>
-                <ul class="footer-list affiliations">
-                    <li><strong>DHSGSU</strong> - Dept. of Applied Geology, Sagar, India</li>
-                    <li><strong>WIHG</strong> - Wadia Institute of Himalayan Geology, Dehradun, India</li>
-                    <li><strong>Univ. of Palermo</strong> - Dept. of Earth and Marine Sciences, Italy</li>
-                    <li><strong>Univ. of Bari</strong> - Dept. of Earth Science and Geo-Environment, Italy</li>
-                    <li><strong>INGV</strong> - Istituto Nazionale di Geofisica e Vulcanologia, Rome, Italy</li>
-                    <li><strong>CSIR-NGRI</strong> - National Geophysical Research Institute, Hyderabad, India</li>
+                <h4>Documentation</h4>
+                <ul class="footer-list footer-nav">
+                    <li><a href="introduction.html">Introduction</a></li>
+                    <li><a href="installation.html">Installation Guide</a></li>
+                    <li><a href="docs_static_map.html">Static Analyzer</a></li>
+                    <li><a href="docs_dynamic_map.html">Dynamic Analyzer</a></li>
+                    <li><a href="docs_uncertainty_montecarlo.html">Uncertainty Analyzer</a></li>
                 </ul>
             </div>
 
-            <!-- Contact Column -->
+            <!-- Project Column -->
             <div class="footer-section">
-                <h4>Contact Emails</h4>
-                <ul class="footer-list emails">
-                    <li><a href="mailto:sachida5908@gmail.com">sachida5908@gmail.com</a></li>
-                    <li><a href="mailto:chinmoy@wihg.res.in">chinmoy@wihg.res.in</a></li>
-                    <li><a href="mailto:eshaan.srivastava@unipa.it">eshaan.srivastava@unipa.it</a></li>
-                    <li><a href="mailto:jitender@wihg.res.in">jitender@wihg.res.in</a></li>
-                    <li><a href="mailto:giuseppefrancesco.rizzo@unipa.it">giuseppefrancesco.rizzo@unipa.it</a></li>
-                    <li><a href="mailto:maurizio.gasparo@unipa.it">maurizio.gasparo@unipa.it</a></li>
-                    <li><a href="mailto:attilio.sulli@unipa.it">attilio.sulli@unipa.it</a></li>
-                    <li><a href="mailto:kalachandsain7@gmail.com">kalachandsain7@gmail.com</a></li>
+                <h4>Project</h4>
+                <ul class="footer-list footer-nav">
+                    <li><a href="https://github.com/sachi5908/FracSTAT" target="_blank" rel="noopener noreferrer">GitHub Repository</a></li>
+                    <li><a href="contact.html">Contact the Team</a></li>
+                    <li><a href="license.html">License</a></li>
+                    <li><a href="disclaimer.html">Disclaimer</a></li>
                 </ul>
             </div>
         </div>
