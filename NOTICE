@@ -37,9 +37,9 @@ CC BY 4.0 applies to the documentation content. Three categories are excluded:
         https://github.com/sachi5908/FracSTAT
 
     Reuse of code follows the MIT terms there, not CC BY 4.0. The small amount
-    of site machinery in this repository (script.js, style.css, admin.html) is
-    likewise offered under the MIT License so it can be reused without the
-    attribution requirement that applies to the prose.
+    of site machinery in this repository (script.js, style.css) is likewise
+    offered under the MIT License so it can be reused without the attribution
+    requirement that applies to the prose.
 
 2.  Trademarks and logos. The FracSTAT name and logo are not licensed under
     CC BY 4.0. You may use them to refer to the project, but not in a way that

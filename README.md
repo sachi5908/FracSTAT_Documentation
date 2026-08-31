@@ -1,7 +1,7 @@
 # FracSTAT Documentation
 
 Source for the FracSTAT documentation website — the user manual, installation guide,
-per-tab reference pages, and video tutorials for
+per-tab reference pages, video tutorials, and the downloadable PDF manual for
 [FracSTAT](https://github.com/sachi5908/FracSTAT), an open-source application for
 quantitative fracture-network analysis.
 
@@ -26,7 +26,8 @@ organized to mirror the application's three analyzers:
 | Dynamic Analyzer | `docs_dynamic_*.html` (6 pages) | Map, Rose, Mohr, Stereonet, Table, Method tabs |
 | Uncertainty Analyzer | `docs_uncertainty_*.html` (2 pages) | Monte Carlo and Latin Hypercube Sampling tabs |
 | Video Tutorials | `tutorial.html` | Filterable video gallery with a fullscreen lightbox |
-| Legal | `privacy-policy.html`, `license.html`, `disclaimer.html`, `terms-of-use.html`, `contact.html` | MIT license text, third-party dependency licenses, policies, contact details |
+| PDF User Manual | `manual.html` | Embedded viewer and download link for the complete User Manual PDF |
+| Legal | `privacy-policy.html`, `license.html`, `disclaimer.html`, `terms-of-use.html`, `contact.html` | Software and documentation license terms, third-party dependency licenses, policies, contact details |
 
 Each documentation page corresponds to a tab module in the application source
 (for example `docs_static_rose.html` documents `static_analyzer/tabs/static_rose_tab.py`).
@@ -42,8 +43,8 @@ web server — or GitHub Pages — can serve the directory as-is.
 - **HTML5** — one file per documentation page
 - **`style.css`** — all site styling, including the docs layout, sidebar, and dark-code blocks
 - **`script.js`** — sidebar generation, Previous/Next pagination, AJAX page routing, tutorial gallery, video lightbox
-- **JSZip 3.10.1** (CDN, `admin.html` only) — builds the site-backup `.zip`
 - **Cloudinary** — hosts the logo, favicon, and screenshot assets
+- **Google Drive** — hosts the User Manual PDF, embedded in `manual.html` via a `/preview` iframe
 
 ---
 
@@ -79,16 +80,17 @@ web server — or GitHub Pages — can serve the directory as-is.
 ├── docs_uncertainty_lhs.html
 │
 ├── tutorial.html                    # Video tutorial gallery
+├── manual.html                      # PDF User Manual viewer (embedded Google Drive preview)
 ├── contact.html                     # ── Legal / informational
 ├── disclaimer.html
 ├── license.html
 ├── privacy-policy.html
 ├── terms-of-use.html
 │
-├── admin.html                       # Browser-based content editor (auth-gated)
 ├── script.js                        # Site-wide behaviour + navigation source of truth
 ├── style.css                        # Site-wide styles
-├── LICENSE                          # MIT
+├── LICENSE                          # CC BY 4.0 legal text (verbatim)
+├── NOTICE                           # Copyright, attribution string, license scope
 └── README.md
 ```
 
@@ -121,16 +123,23 @@ HTML pages** — they are generated at runtime.
   marks the current page active.
 - **`PAGE_ORDER`** — the flat, linear reading order used by the Previous/Next buttons.
   `renderPaginationNav()` appends or updates a `.pagination-nav` block at the bottom of
-  `.docs-content-inner`. A page absent from `PAGE_ORDER` (such as `admin.html`) is skipped
-  rather than guessed at.
+  `.docs-content-inner`. A page absent from `PAGE_ORDER` is skipped rather than guessed at.
 - **`SIDEBAR_FOOTER_LINKS`** — the small plain-text legal links below the sidebar
   accordion.
+
+A section entry may also be a standalone button rather than a collapsible group by setting
+`isButton: true` with an `href` (used by `tutorial.html` and `manual.html`); its glyph
+comes from `SIDEBAR_BUTTON_ICONS` via an optional `icon` key, defaulting to `video`.
 
 `loadPage()` implements the AJAX router: it fetches the target page, swaps only
 `.docs-content-inner`, updates history via `pushState`, then re-runs
 `initDynamicBehaviors()`. This is why page-specific JavaScript must live in `script.js`
 and be invoked from `initDynamicBehaviors()` — an inline `<script>` inside a page body
-runs only on a hard load and silently stops working after an AJAX navigation.
+runs only on a hard load and silently stops working after an AJAX navigation. The same
+applies to CSS: a page-level `<style>` block sits outside `.docs-content-inner` and is
+discarded on in-site navigation, so **all styling must live in `style.css`**. Only
+same-site `.html` links are intercepted; external links (such as the Google Drive PDF)
+pass straight through.
 
 ---
 
@@ -174,8 +183,28 @@ in the [application repository](https://github.com/sachi5908/FracSTAT).
 
 ## License
 
-Released under the MIT License — see [LICENSE](LICENSE) for the full text, and
-[license.html](license.html) for the same terms alongside notes on third-party dependency
-licenses.
+The documentation content in this repository — the prose on every page, the tables,
+diagrams and annotated screenshots, and the PDF User Manual — is licensed under the
+[Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/)
+license (CC BY 4.0). You may share and adapt it, including commercially, provided you
+give credit, link to the license, and indicate any changes.
+
+Suggested attribution:
+
+> FracSTAT Documentation, FracSTAT Project — licensed under CC BY 4.0
+> https://creativecommons.org/licenses/by/4.0/
+
+The site machinery in this repository (`script.js`, `style.css`) is offered
+under the **MIT License** instead, so it can be reused without the attribution
+requirement that applies to the prose. The FracSTAT application itself is MIT-licensed in
+its [own repository](https://github.com/sachi5908/FracSTAT).
+
+Not covered by CC BY 4.0: the FracSTAT name and logo, and any third-party figures,
+equations, or excerpts reproduced here under attribution to their original publications —
+cite the original source for those.
+
+- [LICENSE](LICENSE) — the verbatim CC BY 4.0 legal text
+- [NOTICE](NOTICE) — copyright, attribution string, and the full scope carve-outs
+- [license.html](license.html) — the same terms on the site, plus third-party dependency licenses
 
 © 2026 FracSTAT Project.
