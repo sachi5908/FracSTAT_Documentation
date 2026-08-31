@@ -90,6 +90,12 @@ const SIDEBAR_SECTIONS = [
         title: "Video Tutorials",
         href: "tutorial.html",
         isButton: true
+    },
+    {
+        title: "PDF User Manual",
+        href: "manual.html",
+        isButton: true,
+        icon: "pdf"
     }
 ];
 
@@ -111,6 +117,18 @@ const SIDEBAR_FOOTER_LINKS = [
 
 const CHEVRON_SVG = '<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>';
 
+// Icons available to isButton entries in SIDEBAR_SECTIONS, selected with an
+// `icon` key. "video" stays the default so existing entries that predate this
+// map (and any future ones that don't care) keep the film-strip glyph.
+const SIDEBAR_BUTTON_ICONS = {
+    video: '<polygon points="23 7 16 12 23 17 23 7"></polygon>' +
+        '<rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>',
+    pdf: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>' +
+        '<polyline points="14 2 14 8 20 8"></polyline>' +
+        '<line x1="12" y1="18" x2="12" y2="12"></line>' +
+        '<polyline points="9 15 12 18 15 15"></polyline>'
+};
+
 function renderSidebar() {
     const sidebar = document.getElementById("docsSidebar");
     if (!sidebar) return;
@@ -122,12 +140,12 @@ function renderSidebar() {
         // just a direct link styled as a button (e.g. Video Tutorials).
         if (section.isButton) {
             const activeCls = section.href === currentPage ? " active" : "";
+            const iconPaths = SIDEBAR_BUTTON_ICONS[section.icon] || SIDEBAR_BUTTON_ICONS.video;
             return `
                 <div class="sidebar-section sidebar-section--button">
                     <a href="${section.href}" class="sidebar-button-link${activeCls}">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
-                            <polygon points="23 7 16 12 23 17 23 7"></polygon>
-                            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                            ${iconPaths}
                         </svg>
                         ${section.title}
                     </a>
@@ -206,6 +224,7 @@ const PAGE_ORDER = [
     { href: "docs_uncertainty_lhs.html", label: "Uncertainty LHS Tab" },
 
     { href: "tutorial.html", label: "Video Tutorials" },
+    { href: "manual.html", label: "PDF User Manual" },
     
     { href: "privacy-policy.html", label: "Privacy Policy" },
     { href: "license.html", label: "License" },

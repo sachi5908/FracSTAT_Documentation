@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF User Manual | FracSTAT Docs</title>
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/hcaqjcqf/image/upload/v1784441772/akioq6cgnbsigsemtf0f.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="docs-body">
+    <nav class="navbar docs-navbar">
+        <div class="logo-container">
+            <button id="mobileToggle" class="mobile-toggle-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+            <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1784441778/zgskue8vqbh15i7pnnev.png" alt="FracSTAT Logo" class="logo-img">
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="introduction.html" class="active">Docs</a></li>
+            <li>
+                <a href="https://github.com/sachi5908/FracSTAT" target="_blank" class="github-link">
+                    <svg height="20" width="20" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+                    </svg>
+                    GitHub
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="docs-layout">
+
+        <aside class="docs-sidebar" id="docsSidebar"></aside>
+
+        <main class="docs-content">
+            <div class="docs-content-inner">
+                <h1>PDF User Manual</h1>
+                <p>The complete FracSTAT documentation is also published as a single, print-ready PDF. It contains the same material as this website — installation, the three Analyzer modules, and the uncertainty workflow — collected into one continuous document, which is convenient for offline reading, for annotating during field or lab work, and for citing a fixed page number in a report or thesis.</p>
+
+                <div class="toc-box">
+                    <p>On this page</p>
+                    <ul>
+                        <li><a href="#download">Download or open the manual</a></li>
+                        <li><a href="#viewer">Read it here (embedded viewer)</a></li>
+                        <li><a href="#troubleshooting">If the viewer does not load</a></li>
+                    </ul>
+                </div>
+
+                <h2 id="download">Download or open the manual</h2>
+                <p>Use <strong>Download PDF</strong> to save a local copy, or <strong>Open in new tab</strong> if you prefer your browser's own full-window PDF reader over the embedded frame below.</p>
+
+                <!-- Action row. The download href uses Drive's direct-download
+                     endpoint rather than the /view page, so the browser saves the
+                     file instead of opening Drive's web UI. Both links are
+                     external, so script.js's SPA router deliberately ignores
+                     them (it only intercepts same-site .html hrefs). -->
+                <div class="pdf-actions">
+                    <a class="pdf-action-btn pdf-action-btn--primary"
+                       href="https://drive.google.com/uc?export=download&amp;id=1u9GfKnsNn6iAdyrc8-KM8NapCGXOpMCS"
+                       target="_blank" rel="noopener noreferrer">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Download PDF
+                    </a>
+                    <a class="pdf-action-btn"
+                       href="https://drive.google.com/file/d/1u9GfKnsNn6iAdyrc8-KM8NapCGXOpMCS/view?usp=sharing"
+                       target="_blank" rel="noopener noreferrer">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        Open in new tab
+                    </a>
+                </div>
+
+                <div class="pdf-meta">
+                    <span class="pdf-meta-item">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                        Format: PDF &middot; 2.7 MB
+                    </span>
+                    <span class="pdf-meta-item">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        User Manual v1.0
+                    </span>
+                    <span class="pdf-meta-item">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M14.83 14.83a4 4 0 1 1 0-5.66"></path>
+                        </svg>
+                        CC BY 4.0
+                    </span>
+                    <span class="pdf-meta-item">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                        </svg>
+                        Hosted on Google Drive
+                    </span>
+                </div>
+
+                <h2 id="viewer">Read it here (embedded viewer)</h2>
+                <p>The frame below is Google Drive's own PDF preview, so it brings its own page navigation, zoom, text search, and download control. No Google account is required — the file is shared publicly for reading.</p>
+
+                <div class="pdf-viewer-wrap">
+                    <iframe class="pdf-viewer-frame"
+                            src="https://drive.google.com/file/d/1u9GfKnsNn6iAdyrc8-KM8NapCGXOpMCS/preview"
+                            title="FracSTAT PDF User Manual"
+                            loading="lazy"
+                            allowfullscreen></iframe>
+                </div>
+                <p class="ph-caption">The FracSTAT User Manual, rendered in Google Drive's built-in PDF preview.</p>
+
+                <h2 id="troubleshooting">If the viewer does not load</h2>
+                <p>The embedded frame is a third-party resource, so a small number of environments will block it. The manual itself is always reachable through the two buttons above; the notes below cover the common causes.</p>
+
+                <ul>
+                    <li><strong>A blank or grey frame</strong> usually means a privacy extension, a corporate proxy, or a strict browser setting is blocking third-party frames from <code>drive.google.com</code>. Use <em>Open in new tab</em> instead — it loads Drive directly rather than through a frame.</li>
+                    <li><strong>Offline reading:</strong> download the file once with <em>Download PDF</em> and open it in any local reader. The desktop application also ships the same manual alongside the executable, reachable from the launcher's <em>Documentation</em> page (see <a href="launcher.html">FracSTAT Home Page</a>).</li>
+                    <li><strong>Printing:</strong> print from your own PDF reader after downloading rather than from the embedded frame — page breaks and figure scaling are set for A4 in the file itself.</li>
+                </ul>
+
+                <div class="tip-box">
+                    <strong>Tip:</strong> the website is the version that gets corrected first. If a statement in the PDF disagrees with a page on this site, treat the website as authoritative and, if it matters for your analysis, report the discrepancy from the <a href="contact.html">Contact</a> page.
+                </div>
+
+                <p class="ph-caption" style="text-align:left;">
+                    This manual, like the rest of the FracSTAT documentation, is released under
+                    <a href="license.html">Creative Commons Attribution 4.0 International (CC BY 4.0)</a> —
+                    you may redistribute, translate, or build on it, including commercially, as long as you
+                    credit the FracSTAT Project and note any changes.
+                </p>
+
+                <!-- Pagination Navigation -->
+                <div class="pagination-nav"></div>
+            </div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
