@@ -1,0 +1,73 @@
+FracSTAT Documentation
+Copyright (c) 2026 FracSTAT Project
+
+This repository contains the FracSTAT documentation website and the FracSTAT
+PDF User Manual.
+
+
+LICENSE
+-------
+
+All content in this repository -- the text of every documentation page, the
+tables, the diagrams and annotated screenshots, and the PDF User Manual -- is
+licensed under the Creative Commons Attribution 4.0 International license
+(CC BY 4.0). The full license text is in the LICENSE file at the root of this
+repository, and the human-readable summary is at:
+
+    https://creativecommons.org/licenses/by/4.0/
+
+You are free to share and adapt this material, including for commercial
+purposes, provided you give appropriate credit, link to the license, and
+indicate whether changes were made.
+
+Suggested attribution:
+
+    FracSTAT Documentation, FracSTAT Project -- licensed under CC BY 4.0
+    https://creativecommons.org/licenses/by/4.0/
+
+
+SCOPE -- WHAT THIS LICENSE DOES NOT COVER
+-----------------------------------------
+
+CC BY 4.0 applies to the documentation content. Three categories are excluded:
+
+1.  The FracSTAT software itself. The desktop application's source code lives
+    in a separate repository and is distributed under the MIT License:
+
+        https://github.com/sachi5908/FracSTAT
+
+    Reuse of code follows the MIT terms there, not CC BY 4.0. The small amount
+    of site machinery in this repository (script.js, style.css, admin.html) is
+    likewise offered under the MIT License so it can be reused without the
+    attribution requirement that applies to the prose.
+
+2.  Trademarks and logos. The FracSTAT name and logo are not licensed under
+    CC BY 4.0. You may use them to refer to the project, but not in a way that
+    suggests endorsement of a derivative work.
+
+3.  Third-party material. Where this documentation reproduces figures,
+    equations, or excerpts attributed to published sources -- for example the
+    Mauldon et al. (2001) circular-scanline method -- those items remain under
+    their original terms. Cite the original publication rather than relying on
+    this license.
+
+
+AUTHORS
+-------
+
+Sachida Nanda Mahanta        sachida5908@gmail.com
+Priyadarshi Chinmoy Kumar    chinmoy@wihg.res.in
+FracSTAT Support             fracstat@gmail.com
+
+Affiliations are listed on the Contact page of the documentation site.
+
+
+NO WARRANTY
+-----------
+
+This documentation describes FracSTAT's behaviour to the best of the authors'
+knowledge at the time of writing, and is provided without warranty of any kind
+under Section 5 of the license. FracSTAT is a research tool: its outputs are
+not a substitute for professional geological or engineering judgement, and
+must not be used as the sole basis for safety-critical decisions. See the
+Disclaimer page of the documentation site for the full statement.
