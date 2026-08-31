@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Uncertainty LHS Tab | FracSTAT Docs</title>
@@ -130,7 +129,7 @@
 
 <h3 id="2.3">2.3 Shared control bar</h3>
 <table>
-<tr><th>Control</th><th>Function</th></tr>
+<tbody><tr><th>Control</th><th>Function</th></tr>
 <tr><td><strong>SAMPLES</strong></td><td>Requested LHS design size N per fault. Valid range: 10–100,000.</td></tr>
 <tr><td><strong>SEED</strong></td><td>Integer seed forwarded to <code>scipy.stats.qmc.LatinHypercube</code> for reproducible designs.</td></tr>
 <tr><td><strong>FAULT</strong></td><td>Selects <em>All Faults</em> for a population run or one specific loaded fault.</td></tr>
@@ -138,7 +137,7 @@
 <tr><td><strong>Cancel</strong></td><td>Requests cooperative cancellation of an active simulation.</td></tr>
 <tr><td><strong>Method badge</strong></td><td>Displays <em>Latin Hypercube Sampling</em>.</td></tr>
 <tr><td><strong>Source badge</strong></td><td>Displays the loaded input filename and worksheet when applicable.</td></tr>
-</table>
+</tbody></table>
 
 <h2 id="data-input">3. Data Input</h2>
 <h3 id="3.1">3.1 Loading fault/fracture orientation data</h3>
@@ -153,7 +152,7 @@
 </p>
 
 <table class="excel-format-table">
-<tr><th>Canonical field</th><th>Recognized header aliases</th></tr>
+<tbody><tr><th>Canonical field</th><th>Recognized header aliases</th></tr>
 <tr><td><strong>fault_id</strong></td><td>ID No, ID, Frac_ID, Fault_ID, Fracture_ID, Fault Name, Fault_Name</td></tr>
 <tr><td><strong>strike</strong></td><td>Strike</td></tr>
 <tr><td><strong>dip</strong></td><td>Dip</td></tr>
@@ -162,7 +161,7 @@
 <tr><td><strong>cohesion</strong></td><td>Cohesion, C0, C, Cohesive Strength</td></tr>
 <tr><td><strong>pore_pressure</strong></td><td>Pore Pressure, Pf</td></tr>
 <tr><td><strong>shmax</strong></td><td>SHmax, S Haz, Shaz, Maximum Horizontal Stress Azimuth</td></tr>
-</table>
+</tbody></table>
 
 <div class="tip-box">
     <strong>Important:</strong> Strike and Dip are mandatory. Per-fault Sigma 1/2/3, friction,
@@ -173,14 +172,14 @@
 
 <h3 id="3.2">3.2 Input validation</h3>
 <table>
-<tr><th>Rule</th><th>Enforcement</th></tr>
+<tbody><tr><th>Rule</th><th>Enforcement</th></tr>
 <tr><td>Strike and Dip numeric</td><td>Missing or non-numeric values raise an error before the fault is added.</td></tr>
 <tr><td>Strike range</td><td>0° ≤ Strike &lt; 360°. Strike = 360° is rejected.</td></tr>
 <tr><td>Dip range</td><td>0° ≤ Dip ≤ 90°.</td></tr>
 <tr><td>Fault ID uniqueness</td><td>Duplicate identifiers are rejected.</td></tr>
 <tr><td>Fault ID non-empty</td><td>Blank or whitespace-only identifiers are rejected.</td></tr>
 <tr><td>No input file</td><td>A synthetic “Representative plane” with Strike 45° and Dip 60° is used.</td></tr>
-</table>
+</tbody></table>
 
 <h3 id="3.3">3.3 Spatial coordinate files</h3>
 <p>
@@ -188,10 +187,10 @@
     recognized automatically.
 </p>
 <table>
-<tr><th>Layout</th><th>Required columns</th><th>Optional columns</th><th>Rendering</th></tr>
+<tbody><tr><th>Layout</th><th>Required columns</th><th>Optional columns</th><th>Rendering</th></tr>
 <tr><td>Point coordinates</td><td>ID, X, Y</td><td>Easting/Northing and unit-tagged headers</td><td>One coloured marker per fault</td></tr>
 <tr><td>Trace coordinates</td><td>X1, Y1, X2, Y2</td><td>ID</td><td>One coloured line segment per fault</td></tr>
-</table>
+</tbody></table>
 <p>
     Units can be detected from bracketed or parenthesized headers such as <code>X-Coordinate [m]</code>
     or <code>X [km]</code>. Input and display units can be independently selected from km, m, cm and mm.
@@ -200,21 +199,21 @@
 <h2 id="settings">4. Settings and Controls</h2>
 <h3 id="4.1">4.1 Geomechanics — uncertainty inputs</h3>
 <table>
-<tr><th>Section</th><th>Inputs</th><th>Distribution choices</th><th>Notes</th></tr>
+<tbody><tr><th>Section</th><th>Inputs</th><th>Distribution choices</th><th>Notes</th></tr>
 <tr><td>Principal stresses</td><td>σ1, σ2, σ3 (MPa)</td><td>Normal, Truncated Normal, Gaussian, Lognormal, Gamma</td><td>σ1 &gt; σ2 &gt; σ3 and SD(σ1) ≥ SD(σ2) ≥ SD(σ3).</td></tr>
 <tr><td>Rock strength &amp; pressure</td><td>Friction, Cohesion, Pore Pressure</td><td>Same choices, plus Beta for friction</td><td>Friction is bounded [0,1]; cohesion and pore pressure are non-negative.</td></tr>
 <tr><td>Fault &amp; stress orientation</td><td>Strike, Dip, SHmax (deg)</td><td>Von Mises or Fisher 3D</td><td>Each orientation row has concentration parameter k; Fisher 3D couples Strike and Dip.</td></tr>
-</table>
+</tbody></table>
 
 <h3 id="4.1.1">4.1.1 Per-row controls</h3>
 <table>
-<tr><th>Control</th><th>Description</th></tr>
+<tbody><tr><th>Control</th><th>Description</th></tr>
 <tr><td>Mean</td><td>Central value in physical units. Per-fault values from the loaded file can override the global mean.</td></tr>
 <tr><td>STDV / k</td><td>Standard deviation for stress/strength rows; concentration k for orientation rows. Higher k means tighter orientation clustering.</td></tr>
 <tr><td>Distribution</td><td>Selects the probability law used for the input.</td></tr>
 <tr><td>Min / Max</td><td>Available for Uniform or Beta. Blank values allow automatic bound derivation from mean/SD.</td></tr>
 <tr><td>Auto STDV</td><td>Sets all STDV fields in a section to a selected 1–50% of the current mean.</td></tr>
-</table>
+</tbody></table>
 
 <h3 id="4.1.2">4.1.2 Stress regime selector</h3>
 <p>
@@ -243,37 +242,37 @@
 
 <h3 id="4.2">4.2 Statistics module</h3>
 <table>
-<tr><th>Control</th><th>Purpose</th></tr>
+<tbody><tr><th>Control</th><th>Purpose</th></tr>
 <tr><td>Plot Type</td><td>Metric Histogram, Sampled Input Distribution, Input-Response Plot, or Probabilistic Response (Single).</td></tr>
 <tr><td>Target Metric</td><td>Ts, Td, Sf or Fsi.</td></tr>
 <tr><td>Input Variable</td><td>One of the nine sampled inputs for input-dependent plots.</td></tr>
 <tr><td>Descriptive statistics</td><td>Mean, SD, Median, Mode, P10, P50, P90 and 95% CI of the mean.</td></tr>
 <tr><td>Appearance</td><td>Background/grid, bins, alpha/hatch, scatter styling, mean/range styling, trend curve, axes, legend and plot size.</td></tr>
-</table>
+</tbody></table>
 
 <h3 id="4.3">4.3 Sensitivity module</h3>
 <table>
-<tr><th>Control</th><th>Purpose</th></tr>
+<tbody><tr><th>Control</th><th>Purpose</th></tr>
 <tr><td>Target Output</td><td>Selects Ts, Td, Sf or Fsi.</td></tr>
 <tr><td>Tornado Metric</td><td>Switches between SRC and PRCC.</td></tr>
 <tr><td>Global Sensitivity Scores</td><td>Reports SRC/PRCC for all nine inputs.</td></tr>
 <tr><td>Sort Direction</td><td>Magnitude ascending, descending, or declaration order.</td></tr>
 <tr><td>Bar styling</td><td>Height, alpha, edge styling, colour mode and colour scale.</td></tr>
 <tr><td>Value labels</td><td>Displays numeric values on the bars.</td></tr>
-</table>
+</tbody></table>
 
 <h3 id="4.4">4.4 Validation &amp; Export</h3>
 <table>
-<tr><th>Control</th><th>Function</th></tr>
+<tbody><tr><th>Control</th><th>Function</th></tr>
 <tr><td>Convergence / Benchmarks / Reference cards</td><td>Pass/fail summaries for the three validation checks.</td></tr>
 <tr><td>Results Preview</td><td>Paginated read-only view of realization and calculated columns, 250 rows per page.</td></tr>
 <tr><td>Export Excel</td><td>Writes Results, Convergence, Benchmarks, Reference Check and Metadata worksheets to one .xlsx workbook.</td></tr>
 <tr><td>Export CSV</td><td>Writes results.csv, convergence.csv, analytical_benchmarks.csv and metadata.json.</td></tr>
-</table>
+</tbody></table>
 
 <h3 id="4.5">4.5 Spatial Probability Map</h3>
 <table>
-<tr><th>Control</th><th>Purpose</th></tr>
+<tbody><tr><th>Control</th><th>Purpose</th></tr>
 <tr><td>Load Coordinates</td><td>Loads point or trace coordinates from Excel/CSV.</td></tr>
 <tr><td>View Format</td><td>Shows the accepted coordinate layouts and example rows.</td></tr>
 <tr><td>Input / Display Unit</td><td>Controls source and rendered coordinate units independently.</td></tr>
@@ -282,7 +281,7 @@
 <tr><td>Colour Scale / Point-Line Size</td><td>Controls palette and marker/line thickness.</td></tr>
 <tr><td>Show fault IDs</td><td>Annotates points or traces with their identifiers.</td></tr>
 <tr><td>Export Data</td><td>Exports the merged coordinate and statistics table to .xlsx or .csv.</td></tr>
-</table>
+</tbody></table>
 
 <h3 id="4.6">4.6 Visualization module</h3>
 <p>
@@ -320,14 +319,14 @@
 
 <h3 id="5.2">5.2 Probability distributions</h3>
 <table class="excel-format-table">
-<tr><th>Distribution</th><th>Parameterisation</th><th>Typical use</th></tr>
+<tbody><tr><th>Distribution</th><th>Parameterisation</th><th>Typical use</th></tr>
 <tr><td>Truncated Normal</td><td>Requested <em>moments</em> (mean, SD) plus physical bounds [a,b]; the parent normal's μ, σ are solved for</td><td>Bounded stress/strength inputs.</td></tr>
 <tr><td>Normal / Gaussian</td><td>μ, σ (unbounded); the same moment-matched Truncated Normal when a finite physical bound applies</td><td>Symmetric measurement uncertainty; automatically replaced by Truncated Normal when a finite physical bound applies.</td></tr>
 <tr><td>Lognormal</td><td>Moment-matched μ, σ</td><td>Strictly positive, right-skewed quantities.</td></tr>
 <tr><td>Gamma</td><td>Mean and SD converted to shape/scale</td><td>Positive quantities with skew controlled by the coefficient of variation.</td></tr>
 <tr><td>Beta</td><td>μ, σ and [lo, hi]</td><td>Bounded quantities such as friction coefficient [0,1].</td></tr>
 <tr><td>Uniform</td><td>[min,max], or bounds derived from μ and σ</td><td>Complete lack of preference within a known range.</td></tr>
-</table>
+</tbody></table>
 
 <p>
     Physical bounds are enforced: friction is restricted to [0,1], cohesion and pore pressure are
@@ -399,11 +398,11 @@ Var[X] = σ² · [ 1 + (α·φ(α) − β·φ(β))/Z − ((φ(α) − φ(β))/Z)
     <a class="cite" href="#ref-zoback2007">Zoback (2007, ch. 1)</a> for the modern stress-state formulation.
 </p>
 <table>
-<tr><th>Regime</th><th>Vertical stress</th><th>Calculation remap</th></tr>
+<tbody><tr><th>Regime</th><th>Vertical stress</th><th>Calculation remap</th></tr>
 <tr><td>Normal Faulting</td><td>σ1</td><td>True σ1 is placed in the vertical slot.</td></tr>
 <tr><td>Strike-Slip</td><td>σ2</td><td>True σ2 is placed in the vertical slot.</td></tr>
 <tr><td>Reverse/Thrust</td><td>σ3</td><td>No remap; sampled ordering already matches the calculator convention.</td></tr>
-</table>
+</tbody></table>
 <div class="note-box">
     <strong>The remap permutes inputs, not geometry.</strong> <code>calculate_fault_stability</code> hard-codes
     one geometric assignment — its first argument onto the horizontal axis parallel to SHmax, its second onto
@@ -446,12 +445,12 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
     (<a href="#8.4">Section 8.4</a>).
 </div>
 <table>
-<tr><th>Metric</th><th>Formula</th><th>Interpretation</th></tr>
+<tbody><tr><th>Metric</th><th>Formula</th><th>Interpretation</th></tr>
 <tr><td>Slip Tendency (Ts)</td><td>Ts = τ / σ<sub>used</sub></td><td>Ratio of resolved shear to normal stress; a plane is expected to slip as Ts approaches μ <a class="cite" href="#ref-morris1996">(Morris et al., 1996)</a>.</td></tr>
 <tr><td>Dilation Tendency (Td)</td><td>Td = (σ1<sub>used</sub> − σ<sub>used</sub>) / (σ1<sub>used</sub> − σ3<sub>used</sub>)</td><td>Normalized tendency for extensional dilation/opening <a class="cite" href="#ref-ferrill2003">(Ferrill and Morris, 2003)</a>. Evaluated from the <em>unpermuted</em> sampled σ1 and σ3 (both reduced by Pp when the effective-stress switch is on), so it is a property of the stress state rather than of the calculator's slot assignment.</td></tr>
 <tr><td>Fracture Susceptibility (Sf)</td><td>Sf = σ′<sub>n</sub> − (τ − C0) / μ = (σ<sub>n</sub> − Pp) − (τ − C0) / μ</td><td>The <em>sustainable pore-pressure increase</em> before the fault reaches the Coulomb criterion, in MPa <a class="cite" href="#ref-mildren2002">(Mildren et al., 2002;</a> <a class="cite" href="#ref-streit2004">Streit and Hillis, 2004)</a>. Always on effective normal stress — see below.</td></tr>
 <tr><td>Coulomb Failure Index (Fsi)</td><td>Fsi = τ / (C0 + μσ<sub>used</sub>)</td><td>Fsi ≥ 1 indicates predicted shear failure on the linear Mohr–Coulomb envelope <a class="cite" href="#ref-jaeger2007">(Jaeger et al., 2007, ch. 4)</a>.</td></tr>
-</table>
+</tbody></table>
 <p>
     Effective normal stress is σ′<sub>n</sub> = σ<sub>n</sub> − Pp, the Terzaghi effective-stress form
     <a class="cite" href="#ref-terzaghi1943">(Terzaghi, 1943)</a> as applied to faulting by
@@ -571,7 +570,7 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
 
 <h2 id="algorithms">6. Algorithms</h2>
 <table>
-<tr><th>Algorithm</th><th>Implementation / role</th></tr>
+<tbody><tr><th>Algorithm</th><th>Implementation / role</th></tr>
 <tr><td>LHS design generation</td><td><code>sampling_engine._standard_samples</code> uses SciPy's LatinHypercube design and a probit transform.</td></tr>
 <tr><td>Column alias resolution</td><td><code>_normalise_name</code>, <code>_COLUMN_ALIASES</code> and <code>prepare_faults</code> identify supported input fields.</td></tr>
 <tr><td>Ordered principal stresses</td><td><code>_sample_inputs</code> constructs σ3 plus non-negative gaps to guarantee σ1 &gt; σ2 &gt; σ3.</td></tr>
@@ -584,7 +583,7 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
 <tr><td>Clustered standard errors</td><td><code>validation._cluster_bootstrap_standard_errors</code> resamples whole realizations rather than individual fault rows.</td></tr>
 <tr><td>Analytical benchmarks</td><td><code>validation.analytical_benchmarks</code> checks principal-axis edge cases, with Sf expected on effective normal stress.</td></tr>
 <tr><td>Reference comparison</td><td><code>validation.reference_comparison</code> compares the vectorized calculator against an independent per-row implementation built from the full stress tensor.</td></tr>
-</table>
+</tbody></table>
 
 <h2 id="workflow">7. Internal Workflow</h2>
 <h3 id="7.1">7.1 End-to-end run sequence</h3>
@@ -658,11 +657,11 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
 
 <h3 id="8.4">8.4 Validation diagnostics</h3>
 <table>
-<tr><th>Check</th><th>Method</th><th>Pass criterion</th></tr>
+<tbody><tr><th>Check</th><th>Method</th><th>Pass criterion</th></tr>
 <tr><td>Nested convergence</td><td>Progressively larger nested subsets are evaluated for Ts mean/P50/P90, Sf mean and failure probability. Each checkpoint carries a bootstrap standard error alongside its estimate.</td><td><strong>Both</strong> conditions, per metric: <em>precision</em> — 1.96 × SEM at the largest level within 2% of the final value (1 percentage point for failure probability); and <em>stability</em> — the last <strong>two</strong> successive increments both within the same tolerance. Fewer than two levels, or a non-finite SEM, fails.</td></tr>
 <tr><td>Analytical benchmarks</td><td>Principal-axis edge cases are checked against analytically expected values, including Sf on effective normal stress.</td><td>Absolute tolerance 1×10<sup>−10</sup>.</td></tr>
 <tr><td>Independent tensor reference</td><td>Vectorized results are compared with a separate per-row implementation that builds the full stress tensor σ = R·diag(σ1,σ2,σ3)·R<sup>T</sup>, forms the traction t = σ·n, and takes σn = n·t and τ = ‖t − σn·n‖.</td><td>Maximum absolute difference ≤1×10<sup>−10</sup>.</td></tr>
-</table>
+</tbody></table>
 <p>
     <strong>Why an increment is not an error bound.</strong> The nested levels form a geometric ladder, so a
     single small step between two neighbouring sizes says only that the estimate happened to move little there.
@@ -709,20 +708,20 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
 <h2 id="visualization">9. Visualization</h2>
 <h3 id="9.1">9.1 Geomechanics plots</h3>
 <table>
-<tr><th>Plot</th><th>Content</th></tr>
+<tbody><tr><th>Plot</th><th>Content</th></tr>
 <tr><td>Mohr uncertainty diagram</td><td>Translucent sampled Mohr circles, mean circles for σ1–σ3, σ1–σ2 and σ2–σ3, and the mean Coulomb envelope. An optional total-stress band provides comparison.</td></tr>
 <tr><td>Total-stress Mohr circles</td><td>Mohr diagram calculated entirely from total stress.</td></tr>
 <tr><td>Stress scatter</td><td>Normal-stress versus shear-stress realizations coloured by Ts, Td or Sf, with optional failure highlighting and Mohr overlays.</td></tr>
-</table>
+</tbody></table>
 
 <h3 id="9.2">9.2 Statistics plots</h3>
 <table>
-<tr><th>Plot type</th><th>Description</th></tr>
+<tbody><tr><th>Plot type</th><th>Description</th></tr>
 <tr><td>Metric Histogram</td><td>Frequency distribution with mean line and P10–P90 range.</td></tr>
 <tr><td>Sampled Input Distribution</td><td>Distribution of the selected raw input with mean/SD or concentration information.</td></tr>
 <tr><td>Input-Response Plot</td><td>Selected input versus selected metric, colour-mapped by response with a configurable trend curve.</td></tr>
 <tr><td>Probabilistic Response (Single)</td><td>Input histogram with response trend on a second Y axis.</td></tr>
-</table>
+</tbody></table>
 
 <h3 id="9.3">9.3 Sensitivity tornado</h3>
 <p>
@@ -739,7 +738,7 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
 
 <h3 id="9.5">9.5 Visualization single-plot catalog</h3>
 <table>
-<tr><th>Plot type</th><th>Description</th></tr>
+<tbody><tr><th>Plot type</th><th>Description</th></tr>
 <tr><td>Histogram / KDE / CDF</td><td>Frequency, kernel-density and cumulative-distribution views, with optional fitted Normal PDF.</td></tr>
 <tr><td>Violin / Box Plot</td><td>Distributional comparison of Ts, Td, Sf and Fsi.</td></tr>
 <tr><td>Ts–Td Density Contours</td><td>Bivariate density of Slip Tendency and Dilation Tendency.</td></tr>
@@ -751,17 +750,17 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
 <tr><td>Sensitivity Tornado</td><td>SRC/PRCC ranking with colour-mapped bars.</td></tr>
 <tr><td>Fault Uncertainty Envelope</td><td>Per-fault P10–P90 band and P50 line with metric-specific thresholds.</td></tr>
 <tr><td>Fault Behaviour Classification</td><td>Per-fault P50 Fsi classified as Moderately Stable or Critically Stressed using Fsi ≥ 0.80.</td></tr>
-</table>
+</tbody></table>
 
 <h3 id="9.6">9.6 Multi-panel layouts</h3>
 <table>
-<tr><th>Layout</th><th>Arrangement</th><th>Content</th></tr>
+<tbody><tr><th>Layout</th><th>Arrangement</th><th>Content</th></tr>
 <tr><td>Four-Panel Analysis Dashboard</td><td>2 × 2</td><td>Four independently selectable plot types.</td></tr>
 <tr><td>Input Parameter Distributions</td><td>2 × 4</td><td>Eight non-fault-ID inputs as annotated histograms.</td></tr>
 <tr><td>Response Metric Distributions</td><td>2 × 4</td><td>Histogram/CDF pairs for Ts, Td, Sf and Fsi.</td></tr>
 <tr><td>Probabilistic Response Analysis</td><td>3 × 3</td><td>Eight input-response panels plus a sensitivity tornado.</td></tr>
 <tr><td>Fault-Level Uncertainty Envelopes</td><td>2 × 3</td><td>Ts, Td, Sf, Fsi envelopes and Fault Behaviour Classification.</td></tr>
-</table>
+</tbody></table>
 
 <h2 id="advanced">10. Advanced Features</h2>
 <h3 id="10.1">10.1 Full-screen visualization</h3>
@@ -800,7 +799,7 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
 
 <h2 id="performance">11. Performance Optimization</h2>
 <table>
-<tr><th>Technique</th><th>Effect</th></tr>
+<tbody><tr><th>Technique</th><th>Effect</th></tr>
 <tr><td>Lazy module rendering</td><td>Only the visible module is redrawn after a run or fault switch.</td></tr>
 <tr><td>Fault-result caching</td><td>A completed All-Faults run can supply individual fault views without re-simulation.</td></tr>
 <tr><td>Debounced appearance refresh</td><td>Rapid colour/style changes are coalesced into a single redraw.</td></tr>
@@ -811,7 +810,7 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
 <tr><td>Selective canvas clearing</td><td>Only visible module canvases are cleared/redrawn when necessary.</td></tr>
 <tr><td>Subsampled Mohr display</td><td>Mohr visualization uses a configurable maximum number of representative circles (default 900).</td></tr>
 <tr><td>Dynamic spatial-map figure sizing</td><td>Uncertainty-chart height grows with fault count so labels remain readable.</td></tr>
-</table>
+</tbody></table>
 
 <h2 id="examples">12. Practical Examples</h2>
 <h3 id="12.1">12.1 Population-level reactivation screening</h3>
@@ -901,18 +900,18 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
 
 <h2 id="implementation">14. Implementation Notes</h2>
 <table>
-<tr><th>Topic</th><th>Implementation note</th></tr>
+<tbody><tr><th>Topic</th><th>Implementation note</th></tr>
 <tr><td>Shared Monte Carlo code path</td><td><code>uncertainty_lhs_tab.py</code> and <code>uncertainty_montecarlo_tab.py</code> both delegate to <code>UncertaintySamplingTab.build</code>; only the sampling method differs.</td></tr>
 <tr><td>Standard-normal intermediate representation</td><td>Both methods use a common standard-normal coordinate representation before input-specific transforms.</td></tr>
 <tr><td>Reproducibility metadata</td><td>Exports record method, requested/actual sample counts, seed, effective distributions, analysis options, source hash and package versions (Python, NumPy <a class="cite" href="#ref-harris2020">(Harris et al., 2020)</a>, pandas <a class="cite" href="#ref-mckinney2010">(McKinney, 2010)</a>, SciPy <a class="cite" href="#ref-virtanen2020">(Virtanen et al., 2020)</a> and Matplotlib <a class="cite" href="#ref-hunter2007">(Hunter, 2007)</a>).</td></tr>
 <tr><td>Independent session state</td><td>Uncertainty state is stored/autosaved separately from Static and Dynamic Analyzer state.</td></tr>
 <tr><td>Matplotlib integration</td><td>Plots are native Matplotlib Figures <a class="cite" href="#ref-hunter2007">(Hunter, 2007)</a> embedded using <code>FigureCanvasTkAgg</code>.</td></tr>
 <tr><td>Matplotlib boxplot compatibility</td><td>The Visualization module detects whether the installed Matplotlib version expects <code>labels</code> or <code>tick_labels</code>.</td></tr>
-</table>
+</tbody></table>
 
 <h3 id="14.1">14.1 Primary Python modules</h3>
 <table>
-<tr><th>Python file</th><th>Role</th></tr>
+<tbody><tr><th>Python file</th><th>Role</th></tr>
 <tr><td><code>uncertainty_lhs_tab.py</code></td><td>LHS tab dispatcher; fixes the shared sampling workspace to the LHS method.</td></tr>
 <tr><td><code>uncertainty_sampling_tab.py</code></td><td>Shared sampling workspace, controls, run orchestration, caching and module views.</td></tr>
 <tr><td><code>sampling_engine.py</code></td><td>LHS design generation, input sampling, stress ordering, orientation sampling and regime remapping.</td></tr>
@@ -925,7 +924,7 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
 <tr><td><code>spatial_probability_map.py</code></td><td>Coordinate loading, spatial probability rendering and uncertainty ranking.</td></tr>
 <tr><td><code>visualization.py</code></td><td>Advanced analytical plots, dashboards, appearance controls and image export.</td></tr>
 <tr><td><code>uncertainty_app.py</code></td><td>Top-level Uncertainty Analyzer application and workspace/session management.</td></tr>
-</table>
+</tbody></table>
 
 <h2 id="limitations">15. Limitations</h2>
 <ul>
@@ -952,20 +951,20 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
 <h3 id="16.1">16.1 Rock Mechanics, Effective Stress and Fault Stability</h3>
 <ul class="ref-list">
     <li id="ref-anderson1951">Anderson, E. M. (1951). <em>The Dynamics of Faulting and Dyke Formation with Applications to Britain</em> (2nd ed.). Oliver and Boyd, Edinburgh. (Classification of normal, strike-slip and reverse faulting regimes.)</li>
-    <li id="ref-byerlee1978">Byerlee, J. (1978). Friction of rocks. <em>Pure and Applied Geophysics</em>, 116(4&ndash;5), 615&ndash;626. <a href="https://doi.org/10.1007/BF00876528" target="_blank" rel="noopener">https://doi.org/10.1007/BF00876528</a></li>
-    <li id="ref-ferrill2003">Ferrill, D. A., &amp; Morris, A. P. (2003). Dilational normal faults. <em>Journal of Structural Geology</em>, 25(2), 183&ndash;196. <a href="https://doi.org/10.1016/S0191-8141(02)00029-9" target="_blank" rel="noopener">https://doi.org/10.1016/S0191-8141(02)00029-9</a></li>
-    <li id="ref-hubbert1959">Hubbert, M. K., &amp; Rubey, W. W. (1959). Role of fluid pressure in mechanics of overthrust faulting. <em>Geological Society of America Bulletin</em>, 70(2), 115&ndash;166. <a href="https://doi.org/10.1130/0016-7606(1959)70[115:ROFPIM]2.0.CO;2" target="_blank" rel="noopener">https://doi.org/10.1130/0016-7606(1959)70[115:ROFPIM]2.0.CO;2</a></li>
-    <li id="ref-jaeger2007">Jaeger, J. C., Cook, N. G. W., &amp; Zimmerman, R. W. (2007). <em>Fundamentals of Rock Mechanics</em> (4th ed.). Blackwell Publishing, Oxford. ISBN 978-0-632-05759-7. (Mohr&ndash;Coulomb failure theory, effective stress.)</li>
-    <li id="ref-mildren2002">Mildren, S. D., Hillis, R. R., &amp; Kaldi, J. (2002). Calibrating predictions of fault seal reactivation in the Timor Sea. <em>The APPEA Journal</em>, 42(1), 187&ndash;202. <a href="https://doi.org/10.1071/AJ01011" target="_blank" rel="noopener">https://doi.org/10.1071/AJ01011</a></li>
-    <li id="ref-morris1996">Morris, A., Ferrill, D. A., &amp; Henderson, D. B. (1996). Slip-tendency analysis and fault reactivation. <em>Geology</em>, 24(3), 275&ndash;278. <a href="https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2" target="_blank" rel="noopener">https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2</a></li>
-    <li id="ref-streit2004">Streit, J. E., &amp; Hillis, R. R. (2004). Estimating fault stability and sustainable fluid pressures for underground storage of CO<sub>2</sub> in porous rock. <em>Energy</em>, 29(9&ndash;10), 1445&ndash;1456. <a href="https://doi.org/10.1016/j.energy.2004.03.078" target="_blank" rel="noopener">https://doi.org/10.1016/j.energy.2004.03.078</a></li>
+    <li id="ref-byerlee1978">Byerlee, J. (1978). Friction of rocks. <em>Pure and Applied Geophysics</em>, 116(4–5), 615–626. <a href="https://doi.org/10.1007/BF00876528" target="_blank" rel="noopener">https://doi.org/10.1007/BF00876528</a></li>
+    <li id="ref-ferrill2003">Ferrill, D. A., &amp; Morris, A. P. (2003). Dilational normal faults. <em>Journal of Structural Geology</em>, 25(2), 183–196. <a href="https://doi.org/10.1016/S0191-8141(02)00029-9" target="_blank" rel="noopener">https://doi.org/10.1016/S0191-8141(02)00029-9</a></li>
+    <li id="ref-hubbert1959">Hubbert, M. K., &amp; Rubey, W. W. (1959). Role of fluid pressure in mechanics of overthrust faulting. <em>Geological Society of America Bulletin</em>, 70(2), 115–166. <a href="https://doi.org/10.1130/0016-7606(1959)70[115:ROFPIM]2.0.CO;2" target="_blank" rel="noopener">https://doi.org/10.1130/0016-7606(1959)70[115:ROFPIM]2.0.CO;2</a></li>
+    <li id="ref-jaeger2007">Jaeger, J. C., Cook, N. G. W., &amp; Zimmerman, R. W. (2007). <em>Fundamentals of Rock Mechanics</em> (4th ed.). Blackwell Publishing, Oxford. ISBN 978-0-632-05759-7. (Mohr–Coulomb failure theory, effective stress.)</li>
+    <li id="ref-mildren2002">Mildren, S. D., Hillis, R. R., &amp; Kaldi, J. (2002). Calibrating predictions of fault seal reactivation in the Timor Sea. <em>The APPEA Journal</em>, 42(1), 187–202. <a href="https://doi.org/10.1071/AJ01011" target="_blank" rel="noopener">https://doi.org/10.1071/AJ01011</a></li>
+    <li id="ref-morris1996">Morris, A., Ferrill, D. A., &amp; Henderson, D. B. (1996). Slip-tendency analysis and fault reactivation. <em>Geology</em>, 24(3), 275–278. <a href="https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2" target="_blank" rel="noopener">https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2</a></li>
+    <li id="ref-streit2004">Streit, J. E., &amp; Hillis, R. R. (2004). Estimating fault stability and sustainable fluid pressures for underground storage of CO<sub>2</sub> in porous rock. <em>Energy</em>, 29(9–10), 1445–1456. <a href="https://doi.org/10.1016/j.energy.2004.03.078" target="_blank" rel="noopener">https://doi.org/10.1016/j.energy.2004.03.078</a></li>
     <li id="ref-terzaghi1943">Terzaghi, K. (1943). <em>Theoretical Soil Mechanics</em>. John Wiley &amp; Sons, New York. <a href="https://doi.org/10.1002/9780470172766" target="_blank" rel="noopener">https://doi.org/10.1002/9780470172766</a> (Effective-stress principle.)</li>
     <li id="ref-zoback2007">Zoback, M. D. (2007). <em>Reservoir Geomechanics</em>. Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511586477" target="_blank" rel="noopener">https://doi.org/10.1017/CBO9780511586477</a></li>
 </ul>
 
 <h3 id="16.2">16.2 Probability Distributions and Directional Statistics</h3>
 <ul class="ref-list">
-    <li id="ref-fisher1953">Fisher, R. A. (1953). Dispersion on a sphere. <em>Proceedings of the Royal Society of London A</em>, 217(1130), 295&ndash;305. <a href="https://doi.org/10.1098/rspa.1953.0064" target="_blank" rel="noopener">https://doi.org/10.1098/rspa.1953.0064</a></li>
+    <li id="ref-fisher1953">Fisher, R. A. (1953). Dispersion on a sphere. <em>Proceedings of the Royal Society of London A</em>, 217(1130), 295–305. <a href="https://doi.org/10.1098/rspa.1953.0064" target="_blank" rel="noopener">https://doi.org/10.1098/rspa.1953.0064</a></li>
     <li id="ref-fisher1993">Fisher, N. I. (1993). <em>Statistical Analysis of Circular Data</em>. Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511564345" target="_blank" rel="noopener">https://doi.org/10.1017/CBO9780511564345</a> (Sec. 2.3.1: circular mean and circular standard deviation.)</li>
     <li id="ref-johnson1994">Johnson, N. L., Kotz, S., &amp; Balakrishnan, N. (1994). <em>Continuous Univariate Distributions</em> (Vol. 1, 2nd ed.). John Wiley &amp; Sons. ISBN 978-0-471-58495-7. (Sec. 13.10: moments of the truncated normal.)</li>
     <li id="ref-mardia2000">Mardia, K. V., &amp; Jupp, P. E. (2000). <em>Directional Statistics</em>. John Wiley &amp; Sons. <a href="https://doi.org/10.1002/9780470316979" target="_blank" rel="noopener">https://doi.org/10.1002/9780470316979</a> (Sec. 2.2.1, 2.3.2, 2.3.4 and ch. 3: circular and axial summaries, von Mises law.)</li>
@@ -974,23 +973,23 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
 <h3 id="16.3">16.3 Sampling, Sensitivity and Convergence</h3>
 <ul class="ref-list">
     <li id="ref-efron1993">Efron, B., &amp; Tibshirani, R. J. (1993). <em>An Introduction to the Bootstrap</em>. Chapman &amp; Hall. <a href="https://doi.org/10.1007/978-1-4899-4541-9" target="_blank" rel="noopener">https://doi.org/10.1007/978-1-4899-4541-9</a> (Ch. 8: bootstrapping clustered and non-iid data.)</li>
-    <li id="ref-field2007">Field, C. A., &amp; Welsh, A. H. (2007). Bootstrapping clustered data. <em>Journal of the Royal Statistical Society: Series B</em>, 69(3), 369&ndash;390. <a href="https://doi.org/10.1111/j.1467-9868.2007.00593.x" target="_blank" rel="noopener">https://doi.org/10.1111/j.1467-9868.2007.00593.x</a></li>
-    <li id="ref-helton2003">Helton, J. C., &amp; Davis, F. J. (2003). Latin hypercube sampling and the propagation of uncertainty in analyses of complex systems. <em>Reliability Engineering &amp; System Safety</em>, 81(1), 23&ndash;69. <a href="https://doi.org/10.1016/S0951-8320(03)00058-9" target="_blank" rel="noopener">https://doi.org/10.1016/S0951-8320(03)00058-9</a></li>
-    <li id="ref-iman1982">Iman, R. L., &amp; Conover, W. J. (1982). A distribution-free approach to inducing rank correlation among input variables. <em>Communications in Statistics &mdash; Simulation and Computation</em>, 11(3), 311&ndash;334. <a href="https://doi.org/10.1080/03610918208812265" target="_blank" rel="noopener">https://doi.org/10.1080/03610918208812265</a></li>
-    <li id="ref-iman1988">Iman, R. L., &amp; Helton, J. C. (1988). An investigation of uncertainty and sensitivity analysis techniques for computer models. <em>Risk Analysis</em>, 8(1), 71&ndash;90. <a href="https://doi.org/10.1111/j.1539-6924.1988.tb01155.x" target="_blank" rel="noopener">https://doi.org/10.1111/j.1539-6924.1988.tb01155.x</a></li>
-    <li id="ref-marino2008">Marino, S., Hogue, I. B., Ray, C. J., &amp; Kirschner, D. E. (2008). A methodology for performing global uncertainty and sensitivity analysis in systems biology. <em>Journal of Theoretical Biology</em>, 254(1), 178&ndash;196. <a href="https://doi.org/10.1016/j.jtbi.2008.04.011" target="_blank" rel="noopener">https://doi.org/10.1016/j.jtbi.2008.04.011</a></li>
-    <li id="ref-mckay1979">McKay, M. D., Beckman, R. J., &amp; Conover, W. J. (1979). A comparison of three methods for selecting values of input variables in the analysis of output from a computer code. <em>Technometrics</em>, 21(2), 239&ndash;245. <a href="https://doi.org/10.2307/1268522" target="_blank" rel="noopener">https://doi.org/10.2307/1268522</a></li>
-    <li id="ref-morris1995">Morris, M. D., &amp; Mitchell, T. J. (1995). Exploratory designs for computational experiments. <em>Journal of Statistical Planning and Inference</em>, 43(3), 381&ndash;402. <a href="https://doi.org/10.1016/0378-3758(94)00035-T" target="_blank" rel="noopener">https://doi.org/10.1016/0378-3758(94)00035-T</a></li>
+    <li id="ref-field2007">Field, C. A., &amp; Welsh, A. H. (2007). Bootstrapping clustered data. <em>Journal of the Royal Statistical Society: Series B</em>, 69(3), 369–390. <a href="https://doi.org/10.1111/j.1467-9868.2007.00593.x" target="_blank" rel="noopener">https://doi.org/10.1111/j.1467-9868.2007.00593.x</a></li>
+    <li id="ref-helton2003">Helton, J. C., &amp; Davis, F. J. (2003). Latin hypercube sampling and the propagation of uncertainty in analyses of complex systems. <em>Reliability Engineering &amp; System Safety</em>, 81(1), 23–69. <a href="https://doi.org/10.1016/S0951-8320(03)00058-9" target="_blank" rel="noopener">https://doi.org/10.1016/S0951-8320(03)00058-9</a></li>
+    <li id="ref-iman1982">Iman, R. L., &amp; Conover, W. J. (1982). A distribution-free approach to inducing rank correlation among input variables. <em>Communications in Statistics — Simulation and Computation</em>, 11(3), 311–334. <a href="https://doi.org/10.1080/03610918208812265" target="_blank" rel="noopener">https://doi.org/10.1080/03610918208812265</a></li>
+    <li id="ref-iman1988">Iman, R. L., &amp; Helton, J. C. (1988). An investigation of uncertainty and sensitivity analysis techniques for computer models. <em>Risk Analysis</em>, 8(1), 71–90. <a href="https://doi.org/10.1111/j.1539-6924.1988.tb01155.x" target="_blank" rel="noopener">https://doi.org/10.1111/j.1539-6924.1988.tb01155.x</a></li>
+    <li id="ref-marino2008">Marino, S., Hogue, I. B., Ray, C. J., &amp; Kirschner, D. E. (2008). A methodology for performing global uncertainty and sensitivity analysis in systems biology. <em>Journal of Theoretical Biology</em>, 254(1), 178–196. <a href="https://doi.org/10.1016/j.jtbi.2008.04.011" target="_blank" rel="noopener">https://doi.org/10.1016/j.jtbi.2008.04.011</a></li>
+    <li id="ref-mckay1979">McKay, M. D., Beckman, R. J., &amp; Conover, W. J. (1979). A comparison of three methods for selecting values of input variables in the analysis of output from a computer code. <em>Technometrics</em>, 21(2), 239–245. <a href="https://doi.org/10.2307/1268522" target="_blank" rel="noopener">https://doi.org/10.2307/1268522</a></li>
+    <li id="ref-morris1995">Morris, M. D., &amp; Mitchell, T. J. (1995). Exploratory designs for computational experiments. <em>Journal of Statistical Planning and Inference</em>, 43(3), 381–402. <a href="https://doi.org/10.1016/0378-3758(94)00035-T" target="_blank" rel="noopener">https://doi.org/10.1016/0378-3758(94)00035-T</a></li>
     <li id="ref-roache1998">Roache, P. J. (1998). <em>Verification and Validation in Computational Science and Engineering</em>. Hermosa Publishers, Albuquerque. ISBN 978-0-913478-08-0. (Ch. 5: successive-refinement stability as a convergence test.)</li>
     <li id="ref-saltelli2008">Saltelli, A., Ratto, M., Andres, T., Campolongo, F., Cariboni, J., Gatelli, D., Saisana, M., &amp; Tarantola, S. (2008). <em>Global Sensitivity Analysis: The Primer</em>. John Wiley &amp; Sons. <a href="https://doi.org/10.1002/9780470725184" target="_blank" rel="noopener">https://doi.org/10.1002/9780470725184</a></li>
 </ul>
 
 <h3 id="16.4">16.4 Software</h3>
 <ul class="ref-list">
-    <li id="ref-harris2020">Harris, C. R., Millman, K. J., van der Walt, S. J., Gommers, R., Virtanen, P., Cournapeau, D., &hellip; Oliphant, T. E. (2020). Array programming with NumPy. <em>Nature</em>, 585(7825), 357&ndash;362. <a href="https://doi.org/10.1038/s41586-020-2649-2" target="_blank" rel="noopener">https://doi.org/10.1038/s41586-020-2649-2</a></li>
-    <li id="ref-hunter2007">Hunter, J. D. (2007). Matplotlib: A 2D graphics environment. <em>Computing in Science &amp; Engineering</em>, 9(3), 90&ndash;95. <a href="https://doi.org/10.1109/MCSE.2007.55" target="_blank" rel="noopener">https://doi.org/10.1109/MCSE.2007.55</a></li>
-    <li id="ref-mckinney2010">McKinney, W. (2010). Data structures for statistical computing in Python. In <em>Proceedings of the 9th Python in Science Conference</em> (pp. 56&ndash;61). <a href="https://doi.org/10.25080/Majora-92bf1922-00a" target="_blank" rel="noopener">https://doi.org/10.25080/Majora-92bf1922-00a</a></li>
-    <li id="ref-virtanen2020">Virtanen, P., Gommers, R., Oliphant, T. E., Haberland, M., Reddy, T., Cournapeau, D., &hellip; van Mulbregt, P. (2020). SciPy 1.0: fundamental algorithms for scientific computing in Python. <em>Nature Methods</em>, 17(3), 261&ndash;272. <a href="https://doi.org/10.1038/s41592-019-0686-2" target="_blank" rel="noopener">https://doi.org/10.1038/s41592-019-0686-2</a></li>
+    <li id="ref-harris2020">Harris, C. R., Millman, K. J., van der Walt, S. J., Gommers, R., Virtanen, P., Cournapeau, D., … Oliphant, T. E. (2020). Array programming with NumPy. <em>Nature</em>, 585(7825), 357–362. <a href="https://doi.org/10.1038/s41586-020-2649-2" target="_blank" rel="noopener">https://doi.org/10.1038/s41586-020-2649-2</a></li>
+    <li id="ref-hunter2007">Hunter, J. D. (2007). Matplotlib: A 2D graphics environment. <em>Computing in Science &amp; Engineering</em>, 9(3), 90–95. <a href="https://doi.org/10.1109/MCSE.2007.55" target="_blank" rel="noopener">https://doi.org/10.1109/MCSE.2007.55</a></li>
+    <li id="ref-mckinney2010">McKinney, W. (2010). Data structures for statistical computing in Python. In <em>Proceedings of the 9th Python in Science Conference</em> (pp. 56–61). <a href="https://doi.org/10.25080/Majora-92bf1922-00a" target="_blank" rel="noopener">https://doi.org/10.25080/Majora-92bf1922-00a</a></li>
+    <li id="ref-virtanen2020">Virtanen, P., Gommers, R., Oliphant, T. E., Haberland, M., Reddy, T., Cournapeau, D., … van Mulbregt, P. (2020). SciPy 1.0: fundamental algorithms for scientific computing in Python. <em>Nature Methods</em>, 17(3), 261–272. <a href="https://doi.org/10.1038/s41592-019-0686-2" target="_blank" rel="noopener">https://doi.org/10.1038/s41592-019-0686-2</a></li>
 </ul>
 
 <div class="cite-box">
@@ -998,7 +997,7 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
     a publication, the details below are what a reader needs in order to reproduce it, and are what the
     citations above assume:</p>
     <p>Latin hypercube propagation of stress, strength and orientation uncertainty through the
-    Mohr&ndash;Coulomb fault-stability model
+    Mohr–Coulomb fault-stability model
     <a class="cite" href="#ref-jaeger2007">(Jaeger et al., 2007)</a>, with <em>N</em> realizations per fault
     drawn from a nine-dimensional stratified design
     <a class="cite" href="#ref-mckay1979">(McKay et al., 1979)</a> generated by
@@ -1034,16 +1033,13 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
     versions, seed and input hash.</p>
 </div>
 
-<div class="note-box">
-    <em>FracSTAT_LHS_Technical_User_Guide.docx</em> and formatted to follow the structure and
-    presentation style of the supplied <em>docs_static_map.html</em>.
-</div>
 
-<div class="pagination-nav"></div>
+
+<div class="pagination-nav"><a href="docs_uncertainty_montecarlo.html" class="nav-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>Previous: Uncertainty Monte Carlo Tab</a><a href="tutorial.html" class="nav-btn">Next: Video Tutorials<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></a></div>
 </div>
 
         </main>
     </div>
     <script src="script.js"></script>
-</body>
-</html>
+
+</body></html>
