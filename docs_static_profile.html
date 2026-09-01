@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Static Profile Tab | FracSTAT Docs</title>
@@ -118,12 +117,12 @@
                     the profile scale is changed.
                 </p>
                 <table>
-                    <tr><th>Attribute</th><th>Role in the Profile Cross-section module</th></tr>
+                    <tbody><tr><th>Attribute</th><th>Role in the Profile Cross-section module</th></tr>
                     <tr><td><code>self.results</code></td><td>Master per-segment geometry/attribute table (X1, Y1, X2, Y2, Length_m, StrikeDeg, Trace, Segment, ID …) shared by every Static Analyzer tab.</td></tr>
                     <tr><td><code>self._static_map_unit_var</code></td><td>Currently selected display unit (m, cm, mm, km); used to label every distance axis and statistic in this module.</td></tr>
                     <tr><td><code>self.graph_fig</code> / <code>self.graph_map_ax</code> / <code>self.graph_plot_ax</code></td><td>The Matplotlib Figure and its two subplots — the reference-line map (left) and the derived cross-section plot (right).</td></tr>
                     <tr><td><code>self.graph_canvas</code></td><td>The Qt/Matplotlib canvas embedding the Figure and receiving mouse-click events for interactive endpoint selection.</td></tr>
-                </table>
+                </tbody></table>
                 <p>
                     Because the module reads directly from <code>self.results</code>, any change made elsewhere in
                     the Static Analyzer (e.g. recalibrating the map scale, reloading a fracture file, or editing the
@@ -132,8 +131,8 @@
                 </p>
 
                 <figure class="figure-block">
-                    <div class="figure-img-wrap">
-                        <img src="put_your_img_here.png" alt="Static Analyzer tab bar showing the Profile Cross-section tab in context" loading="lazy">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1788225456/sjwo8kiwj7ccokulua1f.png" alt="Static Analyzer tab bar showing the Profile Cross-section tab in context" loading="lazy">
                         <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
                         </button>
@@ -185,8 +184,8 @@
                 </p>
 
                 <figure class="figure-block">
-                    <div class="figure-img-wrap">
-                        <img src="put_your_img_here.png" alt="Full Profile Cross-section tab layout with sidebar, fracture map, and cross-section plot" loading="lazy">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1788225525/zwmruj6qiwr2mjanu2yn.png" alt="Full Profile Cross-section tab layout with sidebar, fracture map, and cross-section plot" loading="lazy">
                         <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
                         </button>
@@ -194,25 +193,9 @@
                     <span class="ph-caption"><strong>Figure 2.1</strong> — Full Profile Cross-section tab layout: tabbed Info/Settings sidebar (left), fracture map with scan line (centre), and derived cross-section plot (right).</span>
                 </figure>
 
-                <figure class="figure-block">
-                    <div class="figure-img-wrap">
-                        <img src="put_your_img_here.png" alt="Close-up of the Info tab showing the Distance ALONG, Distance FROM, Plot Options, and Line End Points cards" loading="lazy">
-                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
-                        </button>
-                    </div>
-                    <span class="ph-caption"><strong>Figure 2.2</strong> — Close-up of the Info tab showing the Distance ALONG, Distance FROM, Plot Options, and Line End Points cards.</span>
-                </figure>
+                
 
-                <figure class="figure-block">
-                    <div class="figure-img-wrap">
-                        <img src="put_your_img_here.png" alt="Close-up of the Settings tab showing legend-position selectors, colour pickers, and Background Image controls" loading="lazy">
-                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
-                        </button>
-                    </div>
-                    <span class="ph-caption"><strong>Figure 2.3</strong> — Close-up of the Settings tab showing legend-position selectors, colour pickers, and the Background Image controls.</span>
-                </figure>
+                
 
                 <!-- ================================================= -->
                 <h2 id="data-input">3. Data Input Requirements</h2>
@@ -223,12 +206,12 @@
                     requires the following columns to be present with genuine spatial content:
                 </p>
                 <table>
-                    <tr><th>Column</th><th>Description</th><th>Required for</th></tr>
+                    <tbody><tr><th>Column</th><th>Description</th><th>Required for</th></tr>
                     <tr><td><code>X1, Y1, X2, Y2</code></td><td>Real-world (scaled) segment endpoint coordinates, in the currently selected display unit.</td><td>Map rendering; all along-line and from-line calculations.</td></tr>
                     <tr><td><code>Trace</code></td><td>Integer trace (fracture) identifier grouping contiguous segments.</td><td>Trace length aggregation for "Trace length along/from".</td></tr>
                     <tr><td><code>Length_m</code></td><td>Per-segment length, always internally expressed in the base unit and re-labelled with the active display unit.</td><td>Segment length series; trace length aggregation; intensity/density normalisation.</td></tr>
                     <tr><td><code>StrikeDeg</code></td><td>North-referenced segment strike/azimuth in degrees.</td><td>Segment angle along/from series.</td></tr>
-                </table>
+                </tbody></table>
                 <p>
                     If the currently loaded dataset originates from an orientation-only spreadsheet format (legacy
                     Strike/Dip fracture-plane tables or Trend/Plunge pole tables) that carries no genuine spatial
@@ -250,32 +233,32 @@
 
                 <h3 id="4.1">4.1 Distance ALONG the Line (Info tab)</h3>
                 <table>
-                    <tr><th>Control</th><th>Type</th><th>Effect</th></tr>
+                    <tbody><tr><th>Control</th><th>Type</th><th>Effect</th></tr>
                     <tr><td>Trace length</td><td>Checkbox</td><td>Plots, for every fracture line-scan intersection, the total length of the parent trace against the along-line distance of that intersection (series label "Trace length along").</td></tr>
                     <tr><td>Segment length</td><td>Checkbox</td><td>Plots the length of the individual intersected segment against along-line distance ("Segment length along").</td></tr>
                     <tr><td>Segment angle</td><td>Checkbox</td><td>Plots the north-referenced strike of the intersected segment against along-line distance ("Segment angle along").</td></tr>
                     <tr><td>Estimated intensity, P21</td><td>Checkbox</td><td>Enables the Mauldon circular-scanline P21 (fracture length per unit area) series, sampled at evenly spaced windows along the line.</td></tr>
                     <tr><td>Estimated density, P20</td><td>Checkbox</td><td>Enables the companion P20 (trace tips per unit area) series from the same scan-window computation.</td></tr>
                     <tr><td>Number of scan circles</td><td>Numeric entry</td><td>Sets the count of circular sampling windows distributed along the reference line for the P21/P20 calculation; internally clamped to the range 2–200 (default 12).</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3 id="4.2">4.2 Distance FROM the Line (Info tab)</h3>
                 <table>
-                    <tr><th>Control</th><th>Type</th><th>Effect</th></tr>
+                    <tbody><tr><th>Control</th><th>Type</th><th>Effect</th></tr>
                     <tr><td>Trace length</td><td>Checkbox</td><td>Plots each trace's total length against the perpendicular (signed) distance of that trace's length-weighted midpoint from the reference line ("Trace length from").</td></tr>
                     <tr><td>Segment length</td><td>Checkbox</td><td>Plots each segment's length against the perpendicular distance of the segment midpoint from the line ("Segment length from").</td></tr>
                     <tr><td>Segment angle</td><td>Checkbox</td><td>Plots each segment's strike against the perpendicular distance of the segment midpoint from the line ("Segment angle from").</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3 id="4.3">4.3 Plot Options and Line End Points</h3>
                 <table>
-                    <tr><th>Control</th><th>Type</th><th>Effect</th></tr>
+                    <tbody><tr><th>Control</th><th>Type</th><th>Effect</th></tr>
                     <tr><td>Join Line</td><td>Checkbox</td><td>When enabled, every selected output series is connected with a thin line in addition to its scatter markers, ordered by ascending X value; the two intensity/density series are always joined regardless of this setting, since they represent a continuous sampled function rather than discrete fracture events.</td></tr>
                     <tr><td>X1 / Y1 / X2 / Y2</td><td>Numeric entries</td><td>Direct numeric specification of the two reference-line endpoints, in the current display unit. Editing any field and pressing Enter or moving focus away immediately redraws both the map and the derived plot.</td></tr>
                     <tr><td>Select end points</td><td>Button</td><td>Activates interactive on-map picking mode (see <a href="#10.1">Section 10.1</a>); the next two mouse clicks on the fracture map set Point 1 and Point 2 respectively and populate the four coordinate fields automatically.</td></tr>
                     <tr><td>Status label</td><td>Read-only text</td><td>Reports the current stage of interactive picking ("Step 1 of 2…", "Step 2 of 2…", or a confirmation once both points are set).</td></tr>
                     <tr><td>Update Graphs</td><td>Button</td><td>Forces an unconditional redraw of the map and output plot using the current settings; primarily a convenience action, since virtually every other control already triggers a redraw automatically.</td></tr>
-                </table>
+                </tbody></table>
                 <div class="note-box">
                     <strong>Note:</strong> the four coordinate fields are automatically rescaled whenever the
                     workspace's overall map display unit changes (e.g. metres → centimetres). The internal
@@ -287,7 +270,7 @@
 
                 <h3 id="4.4">4.4 Settings Tab — Display and Appearance</h3>
                 <table>
-                    <tr><th>Control</th><th>Type</th><th>Effect</th></tr>
+                    <tbody><tr><th>Control</th><th>Type</th><th>Effect</th></tr>
                     <tr><td>Custom title (blank = auto)</td><td>Text entry</td><td>Overrides the automatically generated titles of both the map ("Selected Scan Line") and the output plot ("Selected Graphs") with a single user-supplied string.</td></tr>
                     <tr><td>Map (Legend) Position</td><td>Dropdown</td><td>Controls placement of the legend on the map subplot; options: best, upper right, upper left, lower left, lower right, center, Outside Right, Outside Bottom.</td></tr>
                     <tr><td>Plot (Legend) Position</td><td>Dropdown</td><td>Independently controls placement of the legend on the output-plot subplot, using the same option set.</td></tr>
@@ -310,7 +293,7 @@
                     <tr><td>Change Image…</td><td>Button</td><td>Opens a file-selection dialog to choose or replace the background photograph.</td></tr>
                     <tr><td>Image opacity (0–1)</td><td>Numeric entry</td><td>Alpha blending value applied to the background photograph.</td></tr>
                     <tr><td>Reset Defaults</td><td>Button</td><td>Restores every setting in this tab — title, legend positions, widths, all seven colours, the scale-bar toggle/style, the background-image toggle/path/opacity, and the custom plot-dimensions toggle/values — to its factory default via a full reinitialisation of the tab's settings (<code>_init_graph_settings()</code>), then rebuilds the Settings tab UI and redraws.</td></tr>
-                </table>
+                </tbody></table>
                 <div class="tip-box">
                     <strong>Tip:</strong> all numeric colour and width fields fail safely — an invalid entry (non-numeric text, or a malformed hex colour) is silently replaced by the previously valid default rather than raising an error, so a mistyped value can never crash the redraw.
                 </div>
@@ -637,7 +620,7 @@ def _graphs_trace_tips(df):
                     to answer.
                 </p>
                 <table>
-                    <tr><th>Series</th><th>Horizontal axis</th><th>Vertical axis / units</th><th>Geological question addressed</th></tr>
+                    <tbody><tr><th>Series</th><th>Horizontal axis</th><th>Vertical axis / units</th><th>Geological question addressed</th></tr>
                     <tr><td>Trace length along</td><td>Distance along line</td><td>Trace length (display unit)</td><td>Do longer fractures cluster at particular positions along the transect (e.g. near a fault core)?</td></tr>
                     <tr><td>Segment length along</td><td>Distance along line</td><td>Segment length (display unit)</td><td>Is local fracture length variable at fine spatial resolution along the transect?</td></tr>
                     <tr><td>Segment angle along</td><td>Distance along line</td><td>Strike (degrees)</td><td>Does fracture orientation rotate systematically along the transect (e.g. across a fold hinge)?</td></tr>
@@ -646,7 +629,7 @@ def _graphs_trace_tips(df):
                     <tr><td>Trace length from</td><td>Perpendicular distance from line</td><td>Trace length (display unit)</td><td>Are longer fractures preferentially located on one side of a chosen reference feature (e.g. a bedding plane or fault)?</td></tr>
                     <tr><td>Segment length from</td><td>Perpendicular distance from line</td><td>Segment length (display unit)</td><td>Is segment length asymmetric about the reference line?</td></tr>
                     <tr><td>Segment angle from</td><td>Perpendicular distance from line</td><td>Strike (degrees)</td><td>Does fracture orientation differ systematically on either side of the reference line?</td></tr>
-                </table>
+                </tbody></table>
                 <p>
                     All along-line and from-line series are discrete point clouds, one point per fracture segment
                     (or per trace, for the trace-length variants); the P21/P20 series are, by contrast, smooth
@@ -694,25 +677,9 @@ def _graphs_trace_tips(df):
                     when non-empty.
                 </p>
 
-                <figure class="figure-block">
-                    <div class="figure-img-wrap">
-                        <img src="put_your_img_here.png" alt="Reference-line map showing the fracture network, a diagonal scan line, endpoint markers, and scan circles" loading="lazy">
-                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
-                        </button>
-                    </div>
-                    <span class="ph-caption"><strong>Figure 9.1</strong> — Reference-line map showing the fracture network (blue), a diagonal scan line (magenta), endpoint markers, and faint circular scan windows used for the P21/P20 calculation.</span>
-                </figure>
+                
 
-                <figure class="figure-block">
-                    <div class="figure-img-wrap">
-                        <img src="put_your_img_here.png" alt="Output cross-section plot showing Segment length along, Segment angle along, and P21 intensity plotted together" loading="lazy">
-                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
-                        </button>
-                    </div>
-                    <span class="ph-caption"><strong>Figure 9.2</strong> — Output cross-section plot showing Segment length along, Segment angle along, and P21 intensity plotted together against distance along the reference line.</span>
-                </figure>
+                
 
                 <h3 id="9.4">9.4 Scale Bar (<code>_add_graphs_scale_bar</code>)</h3>
                 <p>
@@ -912,12 +879,12 @@ def _graphs_trace_tips(df):
                 <!-- ================================================= -->
                 <h2 id="limitations">15. Limitations</h2>
                 <table>
-                    <tr><th>Limitation</th><th>Description</th></tr>
+                    <tbody><tr><th>Limitation</th><th>Description</th></tr>
                     <tr><td>Unvectorised circular-scan loop</td><td>The circular-scan intensity/density computation is an unvectorised, per-segment Python loop and therefore does not scale as efficiently as the equivalent grid-based Mauldon calculation in the dedicated Intensity &amp; Density tab; very large datasets combined with a high scan-circle count may notice a perceptible delay.</td></tr>
                     <tr><td>Infinite-line "distance from"</td><td>The "distance from" calculation treats the reference line as infinite in both directions, so points far outside the finite segment between the two chosen endpoints still contribute a perpendicular-distance value; this is by design (consistent with treating the line as an axis of reference) but should not be mistaken for a bounded corridor sample.</td></tr>
                     <tr><td>Planar assumption</td><td>The module assumes a two-dimensional, effectively planar fracture-trace map; no correction is applied for outcrop-surface curvature, oblique viewing angle, or true 3-D fracture orientation beyond what is already encoded in the loaded strike values. In particular no Terzaghi orientation-bias weighting is applied to the along-line crossing counts <a class="cite" href="#ref-terzaghi1965">(Terzaghi, 1965)</a>; the circular-window P21/P20 series is the orientation-robust estimator on this page.</td></tr>
                     <tr><td>Topological terminology follows the trace-map convention</td><td>Counted trace tips are the isolated ends of digitised traces, which correspond to I-nodes in fracture-network topology; abutting (Y) and crossing (X) nodes are not classified here, and the terms are used as defined in the fracture-network glossary <a class="cite" href="#ref-peacock2016">(Peacock et al., 2016)</a>. Topological connectivity is the Connectivity tab's remit <a class="cite" href="#ref-sanderson2015">(Sanderson and Nixon, 2015)</a>.</td></tr>
-                </table>
+                </tbody></table>
 
                 <!-- ================================================= -->
                 <h2 id="references">16. References</h2>
@@ -928,27 +895,27 @@ def _graphs_trace_tips(df):
 
                 <h3 id="16.1">16.1 Fracture Intensity and Circular-Window Sampling</h3>
                 <ul class="ref-list">
-                    <li id="ref-dershowitz1992">Dershowitz, W. S., &amp; Herda, H. H. (1992). Interpretation of fracture spacing and intensity. In <em>Proceedings of the 33rd U.S. Symposium on Rock Mechanics</em> (pp. 757&ndash;766). Balkema, Rotterdam. ISBN 978-90-5410-045-3. (Source of the P<sub>ij</sub> notation used for P10, P20 and P21.)</li>
-                    <li id="ref-mauldon1998">Mauldon, M. (1998). Estimating mean fracture trace length and density from observations in convex windows. <em>Rock Mechanics and Rock Engineering</em>, 31(4), 201&ndash;216. <a href="https://doi.org/10.1007/s006030050021" target="_blank" rel="noopener">https://doi.org/10.1007/s006030050021</a></li>
-                    <li id="ref-mauldon2001">Mauldon, M., Dunne, W. M., &amp; Rohrbaugh, M. B. (2001). Circular scanlines and circular windows: new tools for characterizing the geometry of fracture traces. <em>Journal of Structural Geology</em>, 23(2&ndash;3), 247&ndash;258. <a href="https://doi.org/10.1016/S0191-8141(00)00094-8" target="_blank" rel="noopener">https://doi.org/10.1016/S0191-8141(00)00094-8</a> (P21 = N/(4r), P20 = m/(2&pi;r&sup2;) with m the count of trace endpoints.)</li>
-                    <li id="ref-rohrbaugh2002">Rohrbaugh, M. B., Dunne, W. M., &amp; Mauldon, M. (2002). Estimating fracture trace intensity, density, and mean length using circular scan lines and windows. <em>AAPG Bulletin</em>, 86(12), 2089&ndash;2104. <a href="https://doi.org/10.1306/61EEDE0E-173E-11D7-8645000102C1865D" target="_blank" rel="noopener">https://doi.org/10.1306/61EEDE0E-173E-11D7-8645000102C1865D</a></li>
+                    <li id="ref-dershowitz1992">Dershowitz, W. S., &amp; Herda, H. H. (1992). Interpretation of fracture spacing and intensity. In <em>Proceedings of the 33rd U.S. Symposium on Rock Mechanics</em> (pp. 757–766). Balkema, Rotterdam. ISBN 978-90-5410-045-3. (Source of the P<sub>ij</sub> notation used for P10, P20 and P21.)</li>
+                    <li id="ref-mauldon1998">Mauldon, M. (1998). Estimating mean fracture trace length and density from observations in convex windows. <em>Rock Mechanics and Rock Engineering</em>, 31(4), 201–216. <a href="https://doi.org/10.1007/s006030050021" target="_blank" rel="noopener">https://doi.org/10.1007/s006030050021</a></li>
+                    <li id="ref-mauldon2001">Mauldon, M., Dunne, W. M., &amp; Rohrbaugh, M. B. (2001). Circular scanlines and circular windows: new tools for characterizing the geometry of fracture traces. <em>Journal of Structural Geology</em>, 23(2–3), 247–258. <a href="https://doi.org/10.1016/S0191-8141(00)00094-8" target="_blank" rel="noopener">https://doi.org/10.1016/S0191-8141(00)00094-8</a> (P21 = N/(4r), P20 = m/(2πr²) with m the count of trace endpoints.)</li>
+                    <li id="ref-rohrbaugh2002">Rohrbaugh, M. B., Dunne, W. M., &amp; Mauldon, M. (2002). Estimating fracture trace intensity, density, and mean length using circular scan lines and windows. <em>AAPG Bulletin</em>, 86(12), 2089–2104. <a href="https://doi.org/10.1306/61EEDE0E-173E-11D7-8645000102C1865D" target="_blank" rel="noopener">https://doi.org/10.1306/61EEDE0E-173E-11D7-8645000102C1865D</a></li>
                 </ul>
 
                 <h3 id="16.2">16.2 Sampling Bias and Survey Practice</h3>
                 <ul class="ref-list">
                     <li id="ref-priest1993">Priest, S. D. (1993). <em>Discontinuity Analysis for Rock Engineering</em>. Chapman &amp; Hall, London. <a href="https://doi.org/10.1007/978-94-011-1498-1" target="_blank" rel="noopener">https://doi.org/10.1007/978-94-011-1498-1</a> (Scanline survey practice and one-dimensional spacing statistics.)</li>
-                    <li id="ref-terzaghi1965">Terzaghi, R. D. (1965). Sources of error in joint surveys. <em>G&eacute;otechnique</em>, 15(3), 287&ndash;304. <a href="https://doi.org/10.1680/geot.1965.15.3.287" target="_blank" rel="noopener">https://doi.org/10.1680/geot.1965.15.3.287</a> (Orientation bias of linear sampling.)</li>
-                    <li id="ref-watkins2015">Watkins, H., Bond, C. E., Healy, D., &amp; Butler, R. W. H. (2015). Appraisal of fracture sampling methods and a new workflow to characterise heterogeneous fracture networks at outcrop. <em>Journal of Structural Geology</em>, 72, 67&ndash;82. <a href="https://doi.org/10.1016/j.jsg.2015.02.001" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2015.02.001</a></li>
-                    <li id="ref-zeeb2013">Zeeb, C., Gomez-Rivas, E., Bons, P. D., &amp; Blum, P. (2013). Evaluation of sampling methods for fracture network characterization using outcrops. <em>AAPG Bulletin</em>, 97(9), 1545&ndash;1566. <a href="https://doi.org/10.1306/02131312042" target="_blank" rel="noopener">https://doi.org/10.1306/02131312042</a></li>
+                    <li id="ref-terzaghi1965">Terzaghi, R. D. (1965). Sources of error in joint surveys. <em>Géotechnique</em>, 15(3), 287–304. <a href="https://doi.org/10.1680/geot.1965.15.3.287" target="_blank" rel="noopener">https://doi.org/10.1680/geot.1965.15.3.287</a> (Orientation bias of linear sampling.)</li>
+                    <li id="ref-watkins2015">Watkins, H., Bond, C. E., Healy, D., &amp; Butler, R. W. H. (2015). Appraisal of fracture sampling methods and a new workflow to characterise heterogeneous fracture networks at outcrop. <em>Journal of Structural Geology</em>, 72, 67–82. <a href="https://doi.org/10.1016/j.jsg.2015.02.001" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2015.02.001</a></li>
+                    <li id="ref-zeeb2013">Zeeb, C., Gomez-Rivas, E., Bons, P. D., &amp; Blum, P. (2013). Evaluation of sampling methods for fracture network characterization using outcrops. <em>AAPG Bulletin</em>, 97(9), 1545–1566. <a href="https://doi.org/10.1306/02131312042" target="_blank" rel="noopener">https://doi.org/10.1306/02131312042</a></li>
                 </ul>
                 <h3 id="16.3">16.3 Fracture-Network Structure and Geological Controls</h3>
                 <ul class="ref-list">
-                    <li id="ref-bai2000">Bai, T., &amp; Pollard, D. D. (2000). Fracture spacing in layered rocks: a new explanation based on the stress transition. <em>Journal of Structural Geology</em>, 22(1), 43&ndash;57. <a href="https://doi.org/10.1016/S0191-8141(99)00137-6" target="_blank" rel="noopener">https://doi.org/10.1016/S0191-8141(99)00137-6</a></li>
-                    <li id="ref-faulkner2010">Faulkner, D. R., Jackson, C. A. L., Lunn, R. J., Schlische, R. W., Shipton, Z. K., Wibberley, C. A. J., &amp; Withjack, M. O. (2010). A review of recent developments concerning the structure, mechanics and fluid flow properties of fault zones. <em>Journal of Structural Geology</em>, 32(11), 1557&ndash;1575. <a href="https://doi.org/10.1016/j.jsg.2010.06.009" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2010.06.009</a></li>
-                    <li id="ref-ladeira1981">Ladeira, F. L., &amp; Price, N. J. (1981). Relationship between fracture spacing and bed thickness. <em>Journal of Structural Geology</em>, 3(2), 179&ndash;183. <a href="https://doi.org/10.1016/0191-8141(81)90013-4" target="_blank" rel="noopener">https://doi.org/10.1016/0191-8141(81)90013-4</a></li>
-                    <li id="ref-narr1991">Narr, W., &amp; Suppe, J. (1991). Joint spacing in sedimentary rocks. <em>Journal of Structural Geology</em>, 13(9), 1037&ndash;1048. <a href="https://doi.org/10.1016/0191-8141(91)90055-N" target="_blank" rel="noopener">https://doi.org/10.1016/0191-8141(91)90055-N</a></li>
-                    <li id="ref-peacock2016">Peacock, D. C. P., Nixon, C. W., Rotevatn, A., Sanderson, D. J., &amp; Zuluaga, L. F. (2016). Glossary of fault and other fracture networks. <em>Journal of Structural Geology</em>, 92, 12&ndash;29. <a href="https://doi.org/10.1016/j.jsg.2016.09.008" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2016.09.008</a></li>
-                    <li id="ref-sanderson2015">Sanderson, D. J., &amp; Nixon, C. W. (2015). The use of topology in fracture network characterization. <em>Journal of Structural Geology</em>, 72, 55&ndash;66. <a href="https://doi.org/10.1016/j.jsg.2015.01.005" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2015.01.005</a></li>
+                    <li id="ref-bai2000">Bai, T., &amp; Pollard, D. D. (2000). Fracture spacing in layered rocks: a new explanation based on the stress transition. <em>Journal of Structural Geology</em>, 22(1), 43–57. <a href="https://doi.org/10.1016/S0191-8141(99)00137-6" target="_blank" rel="noopener">https://doi.org/10.1016/S0191-8141(99)00137-6</a></li>
+                    <li id="ref-faulkner2010">Faulkner, D. R., Jackson, C. A. L., Lunn, R. J., Schlische, R. W., Shipton, Z. K., Wibberley, C. A. J., &amp; Withjack, M. O. (2010). A review of recent developments concerning the structure, mechanics and fluid flow properties of fault zones. <em>Journal of Structural Geology</em>, 32(11), 1557–1575. <a href="https://doi.org/10.1016/j.jsg.2010.06.009" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2010.06.009</a></li>
+                    <li id="ref-ladeira1981">Ladeira, F. L., &amp; Price, N. J. (1981). Relationship between fracture spacing and bed thickness. <em>Journal of Structural Geology</em>, 3(2), 179–183. <a href="https://doi.org/10.1016/0191-8141(81)90013-4" target="_blank" rel="noopener">https://doi.org/10.1016/0191-8141(81)90013-4</a></li>
+                    <li id="ref-narr1991">Narr, W., &amp; Suppe, J. (1991). Joint spacing in sedimentary rocks. <em>Journal of Structural Geology</em>, 13(9), 1037–1048. <a href="https://doi.org/10.1016/0191-8141(91)90055-N" target="_blank" rel="noopener">https://doi.org/10.1016/0191-8141(91)90055-N</a></li>
+                    <li id="ref-peacock2016">Peacock, D. C. P., Nixon, C. W., Rotevatn, A., Sanderson, D. J., &amp; Zuluaga, L. F. (2016). Glossary of fault and other fracture networks. <em>Journal of Structural Geology</em>, 92, 12–29. <a href="https://doi.org/10.1016/j.jsg.2016.09.008" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2016.09.008</a></li>
+                    <li id="ref-sanderson2015">Sanderson, D. J., &amp; Nixon, C. W. (2015). The use of topology in fracture network characterization. <em>Journal of Structural Geology</em>, 72, 55–66. <a href="https://doi.org/10.1016/j.jsg.2015.01.005" target="_blank" rel="noopener">https://doi.org/10.1016/j.jsg.2015.01.005</a></li>
                     <li id="ref-savage2011">Savage, H. M., &amp; Brodsky, E. E. (2011). Collateral damage: Evolution with displacement of fracture distribution and secondary fault strands in fault damage zones. <em>Journal of Geophysical Research: Solid Earth</em>, 116, B03405. <a href="https://doi.org/10.1029/2010JB007665" target="_blank" rel="noopener">https://doi.org/10.1029/2010JB007665</a></li>
                 </ul>
                 <div class="cite-box">
@@ -959,8 +926,8 @@ def _graphs_trace_tips(df):
                     trace map, reproducing a scanline traverse
                     <a class="cite" href="#ref-priest1993">(Priest, 1993)</a>. Along-line intensity and density were
                     estimated with <em>N</em> non-overlapping circular windows of radius r = L/(2N) centred on the
-                    line, using P21 = N<sub>int</sub>/(4r) and P20 = m/(2&pi;r&sup2;), where N<sub>int</sub> is the
-                    count of segment&ndash;boundary crossings and m the count of trace tips inside the window
+                    line, using P21 = N<sub>int</sub>/(4r) and P20 = m/(2πr²), where N<sub>int</sub> is the
+                    count of segment–boundary crossings and m the count of trace tips inside the window
                     <a class="cite" href="#ref-mauldon1998">(Mauldon, 1998;</a>
                     <a class="cite" href="#ref-mauldon2001">Mauldon et al., 2001;</a>
                     <a class="cite" href="#ref-rohrbaugh2002">Rohrbaugh et al., 2002)</a>; the P<sub>ij</sub>
@@ -973,7 +940,7 @@ def _graphs_trace_tips(df):
                     follows <a class="cite" href="#ref-peacock2016">Peacock et al. (2016)</a>; topological
                     connectivity is reported by the Connectivity tab
                     <a class="cite" href="#ref-sanderson2015">(Sanderson and Nixon, 2015)</a>. Interpretations of
-                    along-profile intensity peaks as damage zones, or of length&ndash;thickness relationships as
+                    along-profile intensity peaks as damage zones, or of length–thickness relationships as
                     stratigraphic control, should cite the relevant structural literature
                     <a class="cite" href="#ref-faulkner2010">(Faulkner et al., 2010;</a>
                     <a class="cite" href="#ref-savage2011">Savage and Brodsky, 2011;</a>
@@ -985,10 +952,10 @@ def _graphs_trace_tips(df):
                 </div>
 
                 <!-- Pagination Navigation -->
-                <div class="pagination-nav"></div>
+                <div class="pagination-nav"><a href="docs_static_intensity.html" class="nav-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>Previous: Static Intensity Tab</a><a href="docs_static_results.html" class="nav-btn">Next: Static Results Tab<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></a></div>
             </div>
         </main>
     </div>
     <script src="script.js"></script>
-</body>
-</html>
+
+</body></html>
