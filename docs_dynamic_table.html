@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Table Tab | FracSTAT Docs</title>
@@ -119,15 +118,7 @@
                     the same <code>select_segment()</code> entry point).
                 </p>
 
-                <figure class="figure-block">
-                    <div class="figure-img-wrap">
-                        <img src="put_your_img_here.png" alt="Dynamic Analyzer tab bar showing the six tabs with Table active" loading="lazy">
-                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
-                        </button>
-                    </div>
-                    <span class="ph-caption"><strong>Figure 1.1</strong> — The six-tab CTkTabview strip (Map · Rose · Mohr · Stereonet · Table · Method) as it appears at the top of the Dynamic Analyzer main content area, with "Table" the active selection.</span>
-                </figure>
+                
 
                 <!-- ================================================= -->
                 <h2 id="interface-overview">2. Interface Overview</h2>
@@ -154,8 +145,8 @@
                 </p>
 
                 <figure class="figure-block">
-                    <div class="figure-img-wrap">
-                        <img src="put_your_img_here.png" alt="Full view of the Table Tab showing the toolbar and the sixteen column results grid" loading="lazy">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1788226640/sbfpgzlqytwtqmpp83lv.png" alt="Full view of the Table Tab showing the toolbar and the sixteen column results grid" loading="lazy">
                         <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
                         </button>
@@ -199,7 +190,7 @@
 
                 <h3 id="provenance">3.1 Column Provenance Table</h3>
                 <table>
-                    <tr><th>DataFrame Field</th><th>Origin</th><th>Present For</th></tr>
+                    <tbody><tr><th>DataFrame Field</th><th>Origin</th><th>Present For</th></tr>
                     <tr><td>ID</td><td>Sequential row index assigned in <code>calculator.run_calculation()</code></td><td>All sources</td></tr>
                     <tr><td>Trace / Segment</td><td><code>Segment.trace_id</code> / <code>Segment.segment_id</code></td><td>All sources</td></tr>
                     <tr><td>StrikeDeg</td><td><code>models.segment_strike()</code> + <code>models.north_corrected_strike()</code> (SVG) or <code>Segment._preset_strike</code> (Excel)</td><td>All sources</td></tr>
@@ -210,7 +201,7 @@
                     <tr><td>DilationTendency</td><td><code>calculator.py</code></td><td>All sources</td></tr>
                     <tr><td>FractureSusceptibility, FractureSusceptibilityLegacy</td><td><code>calculator.py</code>, two historical MATLAB formula variants</td><td>All sources</td></tr>
                     <tr><td>CriticalStress, CriticalStressValue, CriticalFactor, CriticalState</td><td><code>calculator.py</code> Coulomb comparison (<code>critical_factor_and_state()</code> for the latter two)</td><td>All sources</td></tr>
-                </table>
+                </tbody></table>
 
                 <!-- ================================================= -->
                 <h2 id="controls">4. Settings and Controls</h2>
@@ -226,18 +217,18 @@
 
                 <h3 id="4.1">4.1 Toolbar Controls</h3>
                 <table>
-                    <tr><th>Control</th><th>Type</th><th>Behaviour</th></tr>
+                    <tbody><tr><th>Control</th><th>Type</th><th>Behaviour</th></tr>
                     <tr><td>"Segment results"</td><td>Static label (bold, 13 pt)</td><td>Section heading; no interactivity.</td></tr>
                     <tr><td>Export Excel</td><td>CTkButton, 120×30 px</td><td>Invokes <code>SlipTendencyApp.export_excel()</code>, which writes <code>self.results</code> to a user-chosen .xlsx workbook (sheet "Segment results") via a native Save dialog. If <code>self.results</code> is empty, an error dialog ("Nothing to export — Run a calculation first.") is shown instead. On success, the status bar and a confirmation dialog report the saved row count and file path.</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3 id="4.2">4.2 Data Grid Controls</h3>
                 <table>
-                    <tr><th>Control</th><th>Type</th><th>Behaviour</th></tr>
+                    <tbody><tr><th>Control</th><th>Type</th><th>Behaviour</th></tr>
                     <tr><td>Column headers (×16)</td><td>ttk.Treeview "heading" cells</td><td>Display the fixed column captions (see <a href="#columns">Section 5</a>). The "Length" heading is dynamically rewritten on every refresh to embed the active display unit, e.g. "Length (m)", "Length (cm)".</td></tr>
                     <tr><td>Row selection</td><td>ttk.Treeview single-row click / arrow-key navigation</td><td>Selecting a row fires the <code>&lt;&lt;TreeviewSelect&gt;&gt;</code> virtual event, handled by <code>on_table_select()</code>, which drives cross-tab highlighting (<a href="#sync">Section 8</a>).</td></tr>
                     <tr><td>Vertical scrollbar</td><td>ttk.Scrollbar, orient="vertical"</td><td>Bound bidirectionally to the Treeview's <code>yview</code>; scrolls through all loaded rows (subject to the 1000-row rendering cap, <a href="#performance">Section 10</a>).</td></tr>
-                </table>
+                </tbody></table>
 
                 <!-- ================================================= -->
                 <h2 id="columns">5. Column Reference and Symbol Table</h2>
@@ -258,7 +249,7 @@
                     physical quantity throughout the application.
                 </p>
                 <table>
-                    <tr><th>#</th><th>Column key</th><th>Heading shown</th><th>Format</th><th>Unit</th><th>Meaning</th></tr>
+                    <tbody><tr><th>#</th><th>Column key</th><th>Heading shown</th><th>Format</th><th>Unit</th><th>Meaning</th></tr>
                     <tr><td>1</td><td>ID</td><td>ID</td><td>integer</td><td>—</td><td>Sequential row identifier assigned during calculation; used as the Treeview row iid and as the cross-tab selection key.</td></tr>
                     <tr><td>2</td><td>Trace</td><td>Trace</td><td>integer</td><td>—</td><td>Parent trace/fracture-plane group identifier (multiple segments can share one trace for SVG-derived polylines).</td></tr>
                     <tr><td>3</td><td>Segment</td><td>Segment</td><td>integer</td><td>—</td><td>Index of this segment within its parent trace.</td></tr>
@@ -275,7 +266,7 @@
                     <tr><td>14</td><td>SfLegacy</td><td>S_f (legacy)</td><td>0.00 (2 dp) or "—"</td><td>MPa</td><td>Original (pre-correction) MATLAB-formula fracture susceptibility, FractureSusceptibilityLegacy; shown as an em-dash if absent.</td></tr>
                     <tr><td>15</td><td>Factor</td><td>Critical factor</td><td>0.000 (3 dp)</td><td>dimensionless</td><td>The friction coefficient required to resist the resolved shear stress, max(τ − C₀, 0) / (σₙ − Pf), CriticalFactor. Compare against the sidebar's entered friction coefficient μ to gauge how close a plane is to failure; see <a href="#6.6">Section 6.6</a> for the zero/negative effective-stress cases.</td></tr>
                     <tr><td>16</td><td>State</td><td>State</td><td>text</td><td>—</td><td>The four-tier critical-fracture classification, CriticalState: "Stable" (Factor/μ &lt; 50%), "Near Critical" (50–75%), "Critical" (75–100%), or "Unstable" (&gt;100%); see <a href="#6.6">Section 6.6</a>.</td></tr>
-                </table>
+                </tbody></table>
 
                 <div class="code-window">
                     <div class="code-header">
@@ -313,7 +304,7 @@ for col in columns:
 
                 <h3 id="6.1">6.1 Symbol Definitions</h3>
                 <table>
-                    <tr><th>Symbol</th><th>Description</th><th>Units</th></tr>
+                    <tbody><tr><th>Symbol</th><th>Description</th><th>Units</th></tr>
                     <tr><td>σ1, σ2, σ3</td><td>Maximum, intermediate, and minimum principal stress magnitudes (σ1 ≥ σ2 ≥ σ3)</td><td>MPa</td></tr>
                     <tr><td>azimuth / σ1 trend</td><td>Compass bearing of σ1 (Andersonian mode) or of the general 3-D σ1 axis</td><td>degrees from North</td></tr>
                     <tr><td>strike, dip</td><td>North-referenced strike and dip of the fracture plane</td><td>degrees</td></tr>
@@ -326,7 +317,7 @@ for col in columns:
                     <tr><td>Ts, Ts,max</td><td>Raw slip tendency and its theoretical maximum over all orientations</td><td>dimensionless</td></tr>
                     <tr><td>Td</td><td>Dilation tendency</td><td>dimensionless, 0–1</td></tr>
                     <tr><td>Sf</td><td>Fracture susceptibility (pore-pressure corrected)</td><td>MPa</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3 id="6.2">6.2 Stress Resolution (σₙ, τ, α)</h3>
                 <p>
@@ -524,7 +515,7 @@ SfLegacy (original)           =  σₙ − τ / μ
                     <code>self.appearance_var.get()</code>:
                 </p>
                 <table>
-                    <tr><th>Element</th><th>Light mode</th><th>Dark mode</th></tr>
+                    <tbody><tr><th>Element</th><th>Light mode</th><th>Dark mode</th></tr>
                     <tr><td>Treeview background / field background</td><td>#FFFFFF</td><td>#111821</td></tr>
                     <tr><td>Treeview foreground (row text)</td><td>#1F2933</td><td>#E6EDF3</td></tr>
                     <tr><td>Row height</td><td>26 px</td><td>26 px</td></tr>
@@ -533,7 +524,7 @@ SfLegacy (original)           =  σₙ − τ / μ
                     <tr><td>Heading foreground</td><td>white</td><td>white</td></tr>
                     <tr><td>Selected-row background</td><td>#DBEAFE</td><td>#255B7D</td></tr>
                     <tr><td>Selected-row foreground</td><td>#1F2933</td><td>#FFFFFF</td></tr>
-                </table>
+                </tbody></table>
                 <div class="note-box">
                     <strong>Note:</strong> <code>configure_table_style()</code> is called both at tab construction
                     and whenever <code>SlipTendencyApp.change_appearance()</code> runs, ensuring the Treeview's
@@ -584,15 +575,7 @@ SfLegacy (original)           =  σₙ − τ / μ
                     though the underlying Qt items were fully destroyed and rebuilt.</li>
                 </ol>
 
-                <figure class="figure-block">
-                    <div class="figure-img-wrap">
-                        <img src="put_your_img_here.png" alt="Sequence diagram of the calculate to refresh_table workflow across the Dynamic Analyzer tabs" loading="lazy">
-                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
-                        </button>
-                    </div>
-                    <span class="ph-caption"><strong>Figure 7.1</strong> — Sequence diagram showing calculate() → run_calculation() → self.results update → refresh_table() → row deletion, insertion, and selection restoration, running alongside the equivalent refresh calls on the Map, Rose, Mohr, and Stereonet tabs.</span>
-                </figure>
+                
 
                 <!-- ================================================= -->
                 <h2 id="sync">8. Cross-Tab Selection Synchronisation</h2>
@@ -653,12 +636,12 @@ SfLegacy (original)           =  σₙ − τ / μ
 
                 <h3 id="9.1">9.1 Interpreting Column Distributions</h3>
                 <table>
-                    <tr><th>Observation in the Table Tab</th><th>Geomechanical interpretation</th></tr>
+                    <tbody><tr><th>Observation in the Table Tab</th><th>Geomechanical interpretation</th></tr>
                     <tr><td>Many rows with CSF = "Yes"</td><td>The current stress tensor is close to, or exceeds, the assumed failure envelope for a large fraction of the fracture population — indicative of a critically stressed fracture network with elevated potential for fluid flow along reactivated planes.</td></tr>
                     <tr><td>TsNorm clustered near 1.0 for a subset of rows</td><td>Those planes are oriented close to the theoretically optimal slip-prone orientation for the current σ1–σ3 differential; in an Andersonian regime this typically corresponds to strikes sub-parallel to σ1 with dip near the frictional-lock angle (~30° from σ1 for μ ≈ 0.6).</td></tr>
                     <tr><td>Td consistently higher than Ts for the same rows</td><td>Planes are more prone to opening-mode dilation than to frictional slip under the current stress state — relevant when assessing which fractures are more likely to act as open conduits versus shear-reactivated conduits.</td></tr>
                     <tr><td>Sf and SfLegacy diverging substantially</td><td>Indicates a non-trivial pore-pressure (Pf) or cohesion (C₀) input; the magnitude of the divergence is, by construction, approximately equal to Pf when C₀ = 0 (<a href="#6.5">Section 6.5</a>).</td></tr>
-                </table>
+                </tbody></table>
 
                 <!-- ================================================= -->
                 <h2 id="performance">10. Performance Optimisation</h2>
@@ -906,10 +889,10 @@ SfLegacy (original)           =  σₙ − τ / μ
                 </div>
 
                 <!-- Pagination Navigation -->
-                <div class="pagination-nav"></div>
+                <div class="pagination-nav"><a href="docs_dynamic_stereonet.html" class="nav-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>Previous: Dynamic Stereonet Tab</a><a href="docs_dynamic_method.html" class="nav-btn">Next: Dynamic Method Tab<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></a></div>
             </div>
         </main>
     </div>
     <script src="script.js"></script>
-</body>
-</html>
+
+</body></html>
