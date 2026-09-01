@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Rose Tab | FracSTAT Docs</title>
@@ -99,7 +98,7 @@
                     exposes a defined contract of shared attributes and helper methods, listed below.
                 </p>
                 <table>
-                    <tr><th>Shared attribute / method</th><th>Origin</th><th>Role for the Rose Tab</th></tr>
+                    <tbody><tr><th>Shared attribute / method</th><th>Origin</th><th>Role for the Rose Tab</th></tr>
                     <tr><td><code>self.tabs</code></td><td><code>SlipTendencyApp._build_layout</code></td><td>CTkTabview hosting the "Rose" pane into which the tab's widgets are placed.</td></tr>
                     <tr><td><code>self.results</code></td><td><code>calculator.run_calculation()</code></td><td>Per-segment DataFrame of geometry, orientation, and resolved-stress columns; the sole data source for the diagram.</td></tr>
                     <tr><td><code>self.current_stress</code></td><td><code>SlipTendencyApp.calculate()</code></td><td>Dict of the active stress-tensor parameters.</td></tr>
@@ -107,7 +106,7 @@
                     <tr><td><code>self._selected_attribute()</code></td><td><code>SlipTendencyApp</code></td><td>Resolves the user's chosen colour-by metric (Map Display dropdown) to a (column, axis label, title fragment) triple.</td></tr>
                     <tr><td><code>self.attribute_colormap_and_norm()</code></td><td><code>SlipTendencyApp</code></td><td>Returns the (colormap, Normalize/BoundaryNorm, is_critical) triple used consistently by the Map, Rose, and Mohr tabs.</td></tr>
                     <tr><td><code>self.save_plot_image()</code></td><td><code>SlipTendencyApp</code></td><td>Serialises the current Matplotlib Figure to a PNG in the project's export directory.</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3 id="1.2">1.2 Intended Audience</h3>
                 <p>
@@ -128,8 +127,8 @@
                 </p>
 
                 <figure class="figure-block">
-                    <div class="figure-img-wrap">
-                        <img src="put_your_img_here.png" alt="Overall layout of the Dynamic Rose Tab showing the polar rose diagram and the settings sidebar" loading="lazy">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1788226426/d1i84msxpzljk2a7ov4e.png" alt="Overall layout of the Dynamic Rose Tab showing the polar rose diagram and the settings sidebar" loading="lazy">
                         <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
                         </button>
@@ -155,13 +154,13 @@
                     as a colour is confirmed in the picker dialog.
                 </p>
                 <table>
-                    <tr><th>Card</th><th>Controls contained</th></tr>
+                    <tbody><tr><th>Card</th><th>Controls contained</th></tr>
                     <tr><td>Data &amp; Bins</td><td>Bins, Weight by, Angle unit, Custom title, Half rose toggle</td></tr>
                     <tr><td>Petals</td><td>Petal gap fraction, Petal edge colour</td></tr>
                     <tr><td>Reference Circles</td><td>Show circles, show angular labels, show compass, show radial grid, circle line width, circle colour</td></tr>
                     <tr><td>Background Colours</td><td>Outer (figure) background, inner (axes) background, boundary colour, boundary line width</td></tr>
                     <tr><td>Colour Bar</td><td>Position, length fraction, show plot title toggle</td></tr>
-                </table>
+                </tbody></table>
                 <p>
                     A "Reset to Defaults" button is docked at the bottom of the settings panel and restores every
                     control listed above to its factory value in a single action (see <a href="#4.7">Section 4.7</a> for the precise
@@ -182,24 +181,24 @@
                     metric is currently selected for petal colouring.
                 </p>
                 <p>
-                    For each of the four states &mdash; Stable, Near Critical, Critical, Unstable, colour-coded to
-                    match the palette used elsewhere in the app &mdash; the table reports:
+                    For each of the four states — Stable, Near Critical, Critical, Unstable, colour-coded to
+                    match the palette used elsewhere in the app — the table reports:
                 </p>
                 <ul>
-                    <li><strong>Fractures (percentage)</strong> &mdash; the count and percentage of all loaded
+                    <li><strong>Fractures (percentage)</strong> — the count and percentage of all loaded
                     segments (regardless of orientation) whose <code>CriticalState</code> string column equals
                     that state, e.g. "34.2% (128)".</li>
-                    <li><strong>Dominant trends</strong> &mdash; among just the segments in that state, the strikes
-                    are folded to 0&ndash;180&deg; and binned into the same number of angular bins as the current
-                    rose diagram; the modal bin's centre and its axial conjugate (offset by 180&deg;) are reported
-                    as a "NNN&deg; / NNN&deg;" pair. This identifies which strike orientation is most represented
+                    <li><strong>Dominant trends</strong> — among just the segments in that state, the strikes
+                    are folded to 0–180° and binned into the same number of angular bins as the current
+                    rose diagram; the modal bin's centre and its axial conjugate (offset by 180°) are reported
+                    as a "NNN° / NNN°" pair. This identifies which strike orientation is most represented
                     within that risk tier, independent of the strike distribution of the population as a whole.
-                    Empty states display "&ndash;" in both columns.</li>
+                    Empty states display "–" in both columns.</li>
                 </ul>
                 <p>
                     Because it is always driven by <code>CriticalState</code> irrespective of the active colouring
                     metric, this table lets an analyst check the dataset's overall risk profile (e.g. "12% of
-                    fractures are Critical or Unstable, concentrated around 040&deg;/220&deg;") even while the rose
+                    fractures are Critical or Unstable, concentrated around 040°/220°") even while the rose
                     diagram itself is coloured by, say, Slip tendency or Fracture susceptibility.
                 </p>
 
@@ -214,11 +213,11 @@
                     summarised below.
                 </p>
                 <table>
-                    <tr><th>Column</th><th>Type</th><th>Used for</th></tr>
+                    <tbody><tr><th>Column</th><th>Type</th><th>Used for</th></tr>
                     <tr><td><code>StrikeDeg</code></td><td>float, 0–360°</td><td>Base orientation of each segment/plane; folded to 0–180° before binning.</td></tr>
                     <tr><td><code>Length_m</code></td><td>float</td><td>Optional length weighting when Weight by = Length.</td></tr>
                     <tr><td>&lt;attribute column&gt;</td><td>float or bool</td><td>Whichever column <code>self._selected_attribute()</code> resolves to (SlipTendency[Norm], DilationTendency, FractureSusceptibility[Norm], or CriticalStateValue); used to colour each petal.</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3 id="3.1">3.1 Data Provenance and Column Semantics</h3>
                 <p>
@@ -271,31 +270,31 @@
 
                 <h3 id="4.1">4.1 Data &amp; Bins Card</h3>
                 <table>
-                    <tr><th>Control</th><th>Variable</th><th>Type / Range</th><th>Default</th><th>Effect</th></tr>
+                    <tbody><tr><th>Control</th><th>Variable</th><th>Type / Range</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Bins</td><td><code>rose_bins_var</code></td><td>Entry (default 36, range 4–360)</td><td>36</td><td>Number of equal-width angular bins spanning the 0–180° (half rose) or 0–360° (full rose) range. Clamped internally to [4, 360] even if a value were entered programmatically outside the dropdown list.</td></tr>
                     <tr><td>Weight by</td><td><code>rose_weight_var</code></td><td>Dropdown: Length, Count, Equal</td><td>Length</td><td>Selects the per-segment weight fed into the weighted histogram (see <a href="#6.2">Section 6.2</a>).</td></tr>
                     <tr><td>Angle unit</td><td><code>rose_angle_unit_var</code></td><td>Dropdown: Degrees, Radians, Gradians</td><td>Degrees</td><td>Controls the numeric format of the angular tick labels only; the underlying binning is always performed in radians and is unaffected.</td></tr>
                     <tr><td>Custom title (blank = auto)</td><td><code>rose_title_var</code></td><td>Free text</td><td>"" (empty)</td><td>When non-blank and Show plot title is enabled, overrides the automatically generated title string.</td></tr>
                     <tr><td>Half rose (0–180° only)</td><td><code>rose_half_rose_var</code></td><td>Checkbox</td><td>Off</td><td>Restricts the diagram to a semicircular 0–180° wedge instead of mirroring every strike into both 0–180° and 180–360°.</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3 id="4.2">4.2 Petals Card</h3>
                 <table>
-                    <tr><th>Control</th><th>Variable</th><th>Range</th><th>Default</th><th>Effect</th></tr>
+                    <tbody><tr><th>Control</th><th>Variable</th><th>Range</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Gap between petals (0–1)</td><td><code>rose_petal_gap_var</code></td><td>0.1–1.0</td><td>0.92</td><td>Fraction of the full bin angular width actually drawn as the petal's bar width; the remainder appears as whitespace between adjacent petals. A value of 1.0 produces edge-to-edge petals; smaller values increase visual separation.</td></tr>
                     <tr><td>Petal edge colour</td><td><code>rose_petal_edge_color_var</code></td><td>Hex colour</td><td>#FFFFFF</td><td>Stroke colour applied to every petal's outline (linewidth fixed at 0.6&nbsp;pt in the drawing routine).</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3 id="4.3">4.3 Reference Circles Card</h3>
                 <table>
-                    <tr><th>Control</th><th>Variable</th><th>Type</th><th>Default</th><th>Effect</th></tr>
+                    <tbody><tr><th>Control</th><th>Variable</th><th>Type</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Show reference circles</td><td><code>rose_show_circles_var</code></td><td>Checkbox</td><td>On</td><td>Toggles visibility of the polar axes' outer boundary spine (labelled "circles" in the UI, technically the <code>ax.spines['polar']</code> outline).</td></tr>
                     <tr><td>Show angular labels</td><td><code>rose_show_labels_var</code></td><td>Checkbox</td><td>Off</td><td>Toggles the numeric/compass tick labels around the circumference.</td></tr>
                     <tr><td>Show compass (N/E/S/W)</td><td><code>rose_show_compass_var</code></td><td>Checkbox</td><td>On</td><td>Draws bold N/E/S/W text annotations just outside the outermost petal radius; only rendered when the diagram is a full (not half) rose.</td></tr>
                     <tr><td>Show radial grid</td><td><code>rose_show_grid_var</code></td><td>Checkbox</td><td>Off</td><td>Toggles both the angular and radial (y-axis) gridlines inside the polar plot.</td></tr>
                     <tr><td>Circle line width</td><td><code>rose_circle_lw_var</code></td><td>Numeric text, pt</td><td>0.8</td><td>Line width applied to the radial/angular grid lines when Show radial grid is enabled.</td></tr>
                     <tr><td>Circle colour</td><td><code>rose_circle_color_var</code></td><td>Hex colour</td><td>#D9E2EC</td><td>Colour applied to the radial/angular grid lines.</td></tr>
-                </table>
+                </tbody></table>
                 <div class="note-box">
                     <strong>Note:</strong> "Show reference circles" governs the single bold outer boundary (the
                     polar spine), whereas "Show radial grid" governs the internal concentric/radial gridlines. Both
@@ -307,20 +306,20 @@
 
                 <h3 id="4.4">4.4 Background Colours Card</h3>
                 <table>
-                    <tr><th>Control</th><th>Variable</th><th>Type</th><th>Default</th><th>Effect</th></tr>
+                    <tbody><tr><th>Control</th><th>Variable</th><th>Type</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Outer (figure) background</td><td><code>rose_outer_bg_var</code></td><td>Hex colour</td><td>#F5F7FA</td><td>Fills the Matplotlib Figure background, i.e. the area outside the circular plot but inside the plot card.</td></tr>
                     <tr><td>Inner (rose) background</td><td><code>rose_inner_bg_var</code></td><td>Hex colour</td><td>#FFFFFF</td><td>Fills the polar Axes background (the disc enclosed by the outer boundary).</td></tr>
                     <tr><td>Boundary colour</td><td><code>rose_boundary_color_var</code></td><td>Hex colour</td><td>#1F2933</td><td>Colour of the polar spine (outer circular boundary), when "Show reference circles" is enabled.</td></tr>
                     <tr><td>Boundary line width</td><td><code>rose_boundary_width_var</code></td><td>Numeric text, pt</td><td>1.5</td><td>Width of the outer boundary spine.</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3 id="4.5">4.5 Colour Bar Card</h3>
                 <table>
-                    <tr><th>Control</th><th>Variable</th><th>Type / Range</th><th>Default</th><th>Effect</th></tr>
+                    <tbody><tr><th>Control</th><th>Variable</th><th>Type / Range</th><th>Default</th><th>Effect</th></tr>
                     <tr><td>Position</td><td><code>rose_colorbar_pos_var</code></td><td>Dropdown: Bottom, Top, Left, Right, None</td><td>Bottom</td><td>Selects which side of the plot the colour-bar legend is docked to, or hides it entirely (None).</td></tr>
                     <tr><td>Length (e.g., 0.72 for 72%)</td><td><code>rose_colorbar_length_var</code></td><td>Numeric text, 0.1–1.0</td><td>0.72</td><td>Fractional length of the colour bar relative to the available figure dimension along its long axis.</td></tr>
                     <tr><td>Show plot title</td><td><code>rose_show_title_var</code></td><td>Checkbox</td><td>On</td><td>Toggles rendering of the diagram's title text (auto-generated or custom, per <a href="#4.1">Section 4.1</a>).</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3 id="4.6">4.6 Colour-by Metric (Controlled Elsewhere)</h3>
                 <p>
@@ -331,14 +330,14 @@
                     columns are listed below.
                 </p>
                 <table>
-                    <tr><th>Map Display selection</th><th>Normalised?</th><th>Resolved column</th><th>Colour-bar label</th></tr>
+                    <tbody><tr><th>Map Display selection</th><th>Normalised?</th><th>Resolved column</th><th>Colour-bar label</th></tr>
                     <tr><td>Slip tendency</td><td>Yes (default)</td><td><code>SlipTendencyNorm</code></td><td>Normalized slip tendency Tₛ</td></tr>
                     <tr><td>Slip tendency</td><td>No</td><td><code>SlipTendency</code></td><td>Slip tendency Tₛ</td></tr>
                     <tr><td>Dilation tendency</td><td>n/a</td><td><code>DilationTendency</code></td><td>Dilation tendency Td</td></tr>
-                    <tr><td>Fracture susceptibility</td><td>Yes</td><td><code>FractureSusceptibilityNorm</code></td><td>Normalized fracture susceptibility (inverted &mdash; 1 = least stable; see <a href="#5.5">Section 5.5</a>)</td></tr>
+                    <tr><td>Fracture susceptibility</td><td>Yes</td><td><code>FractureSusceptibilityNorm</code></td><td>Normalized fracture susceptibility (inverted — 1 = least stable; see <a href="#5.5">Section 5.5</a>)</td></tr>
                     <tr><td>Fracture susceptibility</td><td>No</td><td><code>FractureSusceptibility</code></td><td>Fracture susceptibility Sf, MPa</td></tr>
                     <tr><td>Critical fractures</td><td>n/a</td><td><code>CriticalStateValue</code></td><td>Critical fracture state: 0=Stable, 1=Near Critical, 2=Critical, 3=Unstable</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3 id="4.7">4.7 Reset to Defaults</h3>
                 <p>
@@ -437,12 +436,12 @@
                     finite data-driven minimum and maximum, with a small symmetric padding applied when the data
                     range collapses to a single value (to avoid a degenerate colour scale). Note that
                     <code>FractureSusceptibilityNorm</code> is <em>inverted</em> at source in
-                    <code>core/calculator.py</code> &mdash; 1 &minus; (S_f &minus; min) / (max &minus; min) &mdash;
+                    <code>core/calculator.py</code> — 1 − (S_f − min) / (max − min) —
                     because a lower S_f means a smaller remaining pore-pressure margin; on this tab that means a
                     petal at the top of the [0, 1] colour domain contains the <em>least</em> stable fractures, and
                     the scale is relative to the loaded dataset rather than to a failure threshold. The
                     CriticalStateValue attribute instead uses a discrete four-colour colormap/norm banding its
-                    integer codes 0&ndash;3 (Stable, Near Critical, Critical, Unstable), guaranteeing that each
+                    integer codes 0–3 (Stable, Near Critical, Critical, Unstable), guaranteeing that each
                     state maps unambiguously to its own flat colour swatch rather than a continuous gradient, and
                     the colour bar in this special case is manually re-ticked to read "Stable" / "Near Critical" /
                     "Critical" / "Unstable" instead of numeric values. Because each petal's colour value Ā_k is a
@@ -465,11 +464,11 @@
 
                 <h3 id="6.2">6.2 Weight Vector Construction</h3>
                 <table>
-                    <tr><th>Mode</th><th>Weight construction</th><th>Fallback condition</th></tr>
+                    <tbody><tr><th>Mode</th><th>Weight construction</th><th>Fallback condition</th></tr>
                     <tr><td>Length</td><td>w_i = Length_m_i (metres, or the active display unit)</td><td>If Length_m is absent, or every value is non-finite/≤0, w_i = 1.0 for all i (equal weighting).</td></tr>
                     <tr><td>Count</td><td>w_i = 1.0</td><td>None — always uniform.</td></tr>
                     <tr><td>Equal</td><td>w_i = 1.0</td><td>None — identical numerical result to Count in the current implementation.</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3 id="6.3">6.3 Mirroring for Full-Rose Display</h3>
                 <p>
@@ -510,10 +509,10 @@ counts, edges = np.histogram(strikes, bins=bins, weights=weights)
 centers = (edges[:-1] + edges[1:]) / 2.0
 widths = np.diff(edges)
 
-# per-bin mean attribute value -> petal colour
+# per-bin mean attribute value -&gt; petal colour
 color_values = []
 for low, high in zip(edges[:-1], edges[1:]):
-    mask = (strikes >= low) & (strikes < high)
+    mask = (strikes &gt;= low) &amp; (strikes &lt; high)
     color_values.append(
         float(np.nanmean(attribute_values[mask])) if mask.any() else 0.0
     )
@@ -528,11 +527,11 @@ color_values = np.array(color_values)</code></pre>
                     supported unit modes reformat the same tick positions rather than recomputing them:
                 </p>
                 <table>
-                    <tr><th>Unit mode</th><th>Tick spacing used for labels</th><th>Label format</th></tr>
+                    <tbody><tr><th>Unit mode</th><th>Tick spacing used for labels</th><th>Label format</th></tr>
                     <tr><td>Degrees</td><td>10° (0, 10, 20, …, 350)</td><td>"{n}°"</td></tr>
                     <tr><td>Radians</td><td>30° (0, 30, …, 330)</td><td>Multiples of π expressed as a decimal fraction, e.g. "0.33π"; the origin is rendered as "0"</td></tr>
                     <tr><td>Gradians</td><td>10° (0, 10, …, 350)</td><td>Degrees converted via g = d × 400/360 and rendered as "{g}g"</td></tr>
-                </table>
+                </tbody></table>
 
                 <h3 id="6.6">6.6 Colour-Bar Layout Algorithm</h3>
                 <p>
@@ -544,13 +543,13 @@ color_values = np.array(color_values)</code></pre>
                     0–1).
                 </p>
                 <table>
-                    <tr><th>Position</th><th>Colour-bar rectangle [x0, y0, w, h]</th><th>Polar-axes rectangle [x0, y0, w, h]</th><th>Orientation</th></tr>
+                    <tbody><tr><th>Position</th><th>Colour-bar rectangle [x0, y0, w, h]</th><th>Polar-axes rectangle [x0, y0, w, h]</th><th>Orientation</th></tr>
                     <tr><td>Bottom</td><td>[(1−L)/2, 0.06, L, 0.030]</td><td>[0.15, 0.20, 0.70, 0.65]</td><td>Horizontal</td></tr>
                     <tr><td>Top</td><td>[(1−L)/2, 0.92, L, 0.030]</td><td>[0.15, 0.10, 0.70, 0.65]</td><td>Horizontal</td></tr>
                     <tr><td>Left</td><td>[0.03, (1−L)/2, 0.025, L]</td><td>[0.18, 0.15, 0.70, 0.70]</td><td>Vertical</td></tr>
                     <tr><td>Right</td><td>[0.93, (1−L)/2, 0.025, L]</td><td>[0.10, 0.15, 0.70, 0.70]</td><td>Vertical</td></tr>
                     <tr><td>None</td><td>(hidden)</td><td>[0.15, 0.12, 0.70, 0.75]</td><td>n/a</td></tr>
-                </table>
+                </tbody></table>
                 <p>
                     L denotes the user-supplied colour-bar length fraction (<code>rose_colorbar_length_var</code>),
                     clamped to [0.1, 1.0]. This deterministic, closed-form layout avoids the layout-engine
@@ -704,24 +703,16 @@ color_values = np.array(color_values)</code></pre>
                     Dynamic Analyzer scale their text together.
                 </p>
 
-                <figure class="figure-block">
-                    <div class="figure-img-wrap">
-                        <img src="put_your_img_here.png" alt="Full-rose diagram coloured by normalized slip tendency, with 36 bins, and a bottom colour bar" loading="lazy">
-                        <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
-                        </button>
-                    </div>
-                    <span class="ph-caption"><strong>Figure 9.1</strong> — Full-rose diagram (360°) coloured by normalized slip tendency, with 36 bins, and a bottom-docked colour bar.</span>
-                </figure>
+                
 
                 <figure class="figure-block">
-                    <div class="figure-img-wrap">
-                        <img src="put_your_img_here.png" alt="Half-rose diagram length-weighted, coloured by fracture susceptibility, with radial grid and angular labels enabled" loading="lazy">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1788226541/quxe57wluvyaxqxziawn.png" alt="Half-rose diagram length-weighted, coloured by fracture susceptibility, with radial grid and angular labels enabled" loading="lazy">
                         <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
                         </button>
                     </div>
-                    <span class="ph-caption"><strong>Figure 9.2</strong> — Half-rose diagram (0–180°) length-weighted, coloured by fracture susceptibility, with radial grid and angular labels enabled.</span>
+                    <span class="ph-caption"><strong>Figure 9.2</strong> — Half-rose diagram (0–180°) length-weighted, coloured by fracture susceptibility, with radial grid labels enabled.</span>
                 </figure>
 
                 <!-- ================================================= -->
@@ -771,14 +762,14 @@ color_values = np.array(color_values)</code></pre>
                 <!-- ================================================= -->
                 <h2 id="performance">11. Performance Optimization</h2>
                 <table>
-                    <tr><th>Technique</th><th>Where applied</th><th>Benefit</th></tr>
+                    <tbody><tr><th>Technique</th><th>Where applied</th><th>Benefit</th></tr>
                     <tr><td>Vectorised NumPy histogram</td><td><a href="#6.2">Section 6.2</a>/<a href="#6.4">6.4</a>, <code>np.histogram(weights=...)</code></td><td>O(n) weighted binning without an explicit Python loop over segments.</td></tr>
                     <tr><td>Single <code>ax.bar()</code> call for all petals</td><td><a href="#9.2">Section 9.2</a></td><td>Avoids per-bin matplotlib artist creation overhead; scales to the maximum supported 360 bins without perceptible lag.</td></tr>
                     <tr><td><code>draw_idle()</code> rather than <code>draw()</code></td><td>End of <code>_draw_rose</code></td><td>Defers the actual canvas repaint to Qt's event loop, coalescing rapid successive setting changes (e.g., a slider or rapid typing) into fewer physical repaints.</td></tr>
                     <tr><td>Deterministic closed-form colour-bar layout</td><td><a href="#6.6">Section 6.6</a></td><td>Avoids the per-frame cost of matplotlib's automatic constrained/tight layout solvers.</td></tr>
                     <tr><td>Idempotent variable initialisation</td><td><a href="#7.1">Section 7.1</a>, <code>hasattr</code> guards in <code>_rose_init_vars</code></td><td>Prevents redundant variable churn if the tab-build path is ever invoked more than once.</td></tr>
                     <tr><td>Shared colormap/normalisation resolution</td><td><a href="#10.1">Section 10.1</a></td><td>Colour-scale computation logic lives in one place (SlipTendencyApp) rather than being duplicated per tab, reducing both code size and the chance of visual inconsistency.</td></tr>
-                </table>
+                </tbody></table>
                 <p>
                     No caching layer is applied to the Rose Tab's own computation, because the weighted-histogram
                     and colour-aggregation steps are computationally inexpensive (typically well under a few
@@ -911,18 +902,18 @@ color_values = np.array(color_values)</code></pre>
 
                 <h3 id="14.5">14.5 Dependency Summary</h3>
                 <table>
-                    <tr><th>Library</th><th>Role</th></tr>
+                    <tbody><tr><th>Library</th><th>Role</th></tr>
                     <tr><td><code>numpy</code></td><td>Weighted histogram binning, angular array manipulation, trigonometric conversions.</td></tr>
                     <tr><td><code>matplotlib</code> (pyplot Figure/Axes API)</td><td>Polar plot rendering, colour mapping (ScalarMappable), colour-bar construction.</td></tr>
                     <tr><td><code>matplotlib.backends.backend_qtagg</code></td><td>Embeds the Matplotlib Figure inside the Qt canvas widget (<code>FigureCanvasTkAgg</code>, the <code>ui_common.qtk</code> shim over <code>FigureCanvasQTAgg</code>).</td></tr>
                     <tr><td><code>ui_common.qtk</code> (ctk)</td><td>All settings-panel widgets: frames, labels, entries, checkboxes, option menus, buttons.</td></tr>
                     <tr><td><code>ui_common.ui_widgets</code></td><td>Supplies <code>_StaticColorButton</code>, the shared swatch/hex colour-picker widget.</td></tr>
-                </table>
+                </tbody></table>
 
                 <!-- ================================================= -->
                 <h2 id="limitations">15. Limitations</h2>
                 <table>
-                    <tr><th>Limitation</th><th>Description</th></tr>
+                    <tbody><tr><th>Limitation</th><th>Description</th></tr>
                     <tr><td>Unweighted colour aggregation</td><td>Per-bin colour aggregation uses a simple arithmetic mean with no weighting by segment length or count, which can make small-population bins visually as prominent in colour intensity as large, statistically robust bins; users must cross-reference petal size when interpreting colour.</td></tr>
                     <tr><td>Compass labels tied to Half rose toggle</td><td>The compass N/E/S/W annotations are suppressed for half-rose diagrams, which is an intentional design choice (the half rose only spans 0–180° and W/S annotations would be geometrically meaningless in that mode), but is not configurable independently of the Half rose toggle.</td></tr>
                     <tr><td>No orientation-bias correction</td><td>Every fracture contributes with equal weight regardless of the angle at which the sampling line or outcrop face intersects it, so sets sub-parallel to the sampling direction are systematically under-represented. No Terzaghi weighting is applied <a class="cite" href="#ref-terzaghi1965">(Terzaghi, 1965)</a>.</td></tr>
@@ -930,7 +921,7 @@ color_values = np.array(color_values)</code></pre>
                     <tr><td>Bin count is a free parameter</td><td>Petal count is set by hand with no data-driven rule. Because a rose diagram's apparent modality can change materially with bin width, the chosen bin count should always be reported and ideally varied to confirm that a peak is robust <a class="cite" href="#ref-fisher1993">(Fisher, 1993)</a>.</td></tr>
                     <tr><td>Strike only, dip discarded</td><td>Folding to a 0–180° strike domain (<a href="#5.1">Section 5.1</a>) collapses the full three-dimensional plane orientation onto a single azimuth, so two sets sharing a strike but dipping oppositely are indistinguishable here. Use the Stereonet tab where dip matters <a class="cite" href="#ref-davis2011">(Davis et al., 2011)</a>.</td></tr>
                     <tr><td>Colour scale is dataset-relative for susceptibility</td><td><code>FractureSusceptibilityNorm</code> is rescaled and inverted against the loaded file's own minimum and maximum (<a href="#5.5">Section 5.5</a>), so a saturated petal marks the least stable orientation in that file, not one at failure. Values are not comparable between datasets.</td></tr>
-                </table>
+                </tbody></table>
 
                 <!-- ================================================= -->
                 <h2 id="references">16. References</h2>
@@ -943,40 +934,40 @@ color_values = np.array(color_values)</code></pre>
                 <ul class="ref-list">
                     <li id="ref-fisher1993">Fisher, N. I. (1993). <em>Statistical Analysis of Circular Data</em>. Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511564345" target="_blank" rel="noopener">https://doi.org/10.1017/CBO9780511564345</a></li>
                     <li id="ref-mardia2000">Mardia, K. V., &amp; Jupp, P. E. (2000). <em>Directional Statistics</em>. John Wiley &amp; Sons, Chichester. <a href="https://doi.org/10.1002/9780470316979" target="_blank" rel="noopener">https://doi.org/10.1002/9780470316979</a></li>
-                    <li id="ref-terzaghi1965">Terzaghi, R. D. (1965). Sources of error in joint surveys. <em>Géotechnique</em>, 15(3), 287&ndash;304. <a href="https://doi.org/10.1680/geot.1965.15.3.287" target="_blank" rel="noopener">https://doi.org/10.1680/geot.1965.15.3.287</a></li>
+                    <li id="ref-terzaghi1965">Terzaghi, R. D. (1965). Sources of error in joint surveys. <em>Géotechnique</em>, 15(3), 287–304. <a href="https://doi.org/10.1680/geot.1965.15.3.287" target="_blank" rel="noopener">https://doi.org/10.1680/geot.1965.15.3.287</a></li>
                 </ul>
 
                 <h3 id="16.2">16.2 Structural Geology, Stress and Reactivation</h3>
                 <ul class="ref-list">
                     <li id="ref-anderson1951">Anderson, E. M. (1951). <em>The Dynamics of Faulting and Dyke Formation with Applications to Britain</em> (2nd ed.). Oliver and Boyd, Edinburgh.</li>
                     <li id="ref-davis2011">Davis, G. H., Reynolds, S. J., &amp; Kluth, C. F. (2011). <em>Structural Geology of Rocks and Regions</em> (3rd ed.). John Wiley &amp; Sons. ISBN 978-0-471-15231-6.</li>
-                    <li id="ref-ferrill2003">Ferrill, D. A., &amp; Morris, A. P. (2003). Dilational normal faults. <em>Journal of Structural Geology</em>, 25(2), 183&ndash;196. <a href="https://doi.org/10.1016/S0191-8141(02)00029-9" target="_blank" rel="noopener">https://doi.org/10.1016/S0191-8141(02)00029-9</a></li>
+                    <li id="ref-ferrill2003">Ferrill, D. A., &amp; Morris, A. P. (2003). Dilational normal faults. <em>Journal of Structural Geology</em>, 25(2), 183–196. <a href="https://doi.org/10.1016/S0191-8141(02)00029-9" target="_blank" rel="noopener">https://doi.org/10.1016/S0191-8141(02)00029-9</a></li>
                     <li id="ref-jaeger2007">Jaeger, J. C., Cook, N. G. W., &amp; Zimmerman, R. W. (2007). <em>Fundamentals of Rock Mechanics</em> (4th ed.). Blackwell Publishing, Oxford. ISBN 978-0-632-05759-7.</li>
-                    <li id="ref-morris1996">Morris, A., Ferrill, D. A., &amp; Henderson, D. B. (1996). Slip-tendency analysis and fault reactivation. <em>Geology</em>, 24(3), 275&ndash;278. <a href="https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2" target="_blank" rel="noopener">https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2</a></li>
-                    <li id="ref-streit2004">Streit, J. E., &amp; Hillis, R. R. (2004). Estimating fault stability and sustainable fluid pressures for underground storage of CO&#8322; in porous rock. <em>Energy</em>, 29(9&ndash;10), 1445&ndash;1456. <a href="https://doi.org/10.1016/j.energy.2004.03.078" target="_blank" rel="noopener">https://doi.org/10.1016/j.energy.2004.03.078</a></li>
+                    <li id="ref-morris1996">Morris, A., Ferrill, D. A., &amp; Henderson, D. B. (1996). Slip-tendency analysis and fault reactivation. <em>Geology</em>, 24(3), 275–278. <a href="https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2" target="_blank" rel="noopener">https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2</a></li>
+                    <li id="ref-streit2004">Streit, J. E., &amp; Hillis, R. R. (2004). Estimating fault stability and sustainable fluid pressures for underground storage of CO₂ in porous rock. <em>Energy</em>, 29(9–10), 1445–1456. <a href="https://doi.org/10.1016/j.energy.2004.03.078" target="_blank" rel="noopener">https://doi.org/10.1016/j.energy.2004.03.078</a></li>
                     <li id="ref-zoback2007">Zoback, M. D. (2007). <em>Reservoir Geomechanics</em>. Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511586477" target="_blank" rel="noopener">https://doi.org/10.1017/CBO9780511586477</a></li>
                 </ul>
 
                 <h3 id="16.3">16.3 Software</h3>
                 <ul class="ref-list">
-                    <li id="ref-harris2020">Harris, C. R., Millman, K. J., van der Walt, S. J., Gommers, R., Virtanen, P., Cournapeau, D., &hellip; Oliphant, T. E. (2020). Array programming with NumPy. <em>Nature</em>, 585(7825), 357&ndash;362. <a href="https://doi.org/10.1038/s41586-020-2649-2" target="_blank" rel="noopener">https://doi.org/10.1038/s41586-020-2649-2</a></li>
-                    <li id="ref-hunter2007">Hunter, J. D. (2007). Matplotlib: A 2D graphics environment. <em>Computing in Science &amp; Engineering</em>, 9(3), 90&ndash;95. <a href="https://doi.org/10.1109/MCSE.2007.55" target="_blank" rel="noopener">https://doi.org/10.1109/MCSE.2007.55</a></li>
+                    <li id="ref-harris2020">Harris, C. R., Millman, K. J., van der Walt, S. J., Gommers, R., Virtanen, P., Cournapeau, D., … Oliphant, T. E. (2020). Array programming with NumPy. <em>Nature</em>, 585(7825), 357–362. <a href="https://doi.org/10.1038/s41586-020-2649-2" target="_blank" rel="noopener">https://doi.org/10.1038/s41586-020-2649-2</a></li>
+                    <li id="ref-hunter2007">Hunter, J. D. (2007). Matplotlib: A 2D graphics environment. <em>Computing in Science &amp; Engineering</em>, 9(3), 90–95. <a href="https://doi.org/10.1109/MCSE.2007.55" target="_blank" rel="noopener">https://doi.org/10.1109/MCSE.2007.55</a></li>
                 </ul>
 
                 <div class="cite-box">
                     <p><strong>Methods statement for the Rose Tab.</strong> If a figure produced by this tab appears
                     in a publication, the details below are what a reader needs in order to reproduce it, and are
                     what the citations above assume:</p>
-                    <p>Equal-area (square-root radius) rose diagram of fracture strike, folded to the 0&ndash;180&deg;
+                    <p>Equal-area (square-root radius) rose diagram of fracture strike, folded to the 0–180°
                     axial domain <a class="cite" href="#ref-mardia2000">(Mardia and Jupp, 2000)</a>, computed with
                     <em>B</em> equal-width bins and weighted by trace length (or by count, as stated) from <em>n</em>
                     observations, drawn as a half or mirrored full rose as stated. Petals coloured by the bin-mean
-                    value of the selected stress-tendency metric &mdash; slip tendency
+                    value of the selected stress-tendency metric — slip tendency
                     <a class="cite" href="#ref-morris1996">(Morris et al., 1996)</a>, dilation tendency
                     <a class="cite" href="#ref-ferrill2003">(Ferrill and Morris, 2003)</a>, fracture susceptibility
                     <a class="cite" href="#ref-streit2004">(Streit and Hillis, 2004)</a>, or the four-tier
-                    critical-state code &mdash; for &sigma;&#8321;/&sigma;&#8322;/&sigma;&#8323; = &hellip; MPa,
-                    P_f = &hellip; MPa, C&#8320; = &hellip; MPa and &mu; = &hellip;
+                    critical-state code — for σ₁/σ₂/σ₃ = … MPa,
+                    P_f = … MPa, C₀ = … MPa and μ = …
                     <a class="cite" href="#ref-jaeger2007">(Jaeger et al., 2007)</a>. Implemented in NumPy
                     <a class="cite" href="#ref-harris2020">(Harris et al., 2020)</a> and rendered with Matplotlib
                     <a class="cite" href="#ref-hunter2007">(Hunter, 2007)</a>. Report <em>B</em>, <em>n</em>, the
@@ -986,11 +977,11 @@ color_values = np.array(color_values)</code></pre>
                 </div>
 
                 <!-- Pagination Navigation -->
-                <div class="pagination-nav"></div>
+                <div class="pagination-nav"><a href="docs_dynamic_map.html" class="nav-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>Previous: Dynamic Map Tab</a><a href="docs_dynamic_mohr.html" class="nav-btn">Next: Dynamic Mohr Tab<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></a></div>
 
             </div>
         </main>
     </div>
     <script src="script.js"></script>
-</body>
-</html>
+
+</body></html>
