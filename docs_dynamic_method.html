@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Method Tab | FracSTAT Docs</title>
@@ -72,8 +71,8 @@
                 </p>
 
                 <figure class="figure-block">
-                    <div class="figure-img-wrap">
-                        <img src="put_your_img_here.png" alt="Dynamic Analyzer Method tab showing the read-only formula reference textbox" loading="lazy">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1788226700/vaiymuj37ohkbrm2pxev.png" alt="Dynamic Analyzer Method tab showing the read-only formula reference textbox" loading="lazy">
                         <button type="button" class="figure-zoom-btn" aria-label="Enlarge image">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
                         </button>
@@ -109,13 +108,13 @@
                     once at build time and then applied selectively as each line is inserted.
                 </p>
                 <table>
-                    <tr><th>Tag</th><th>Font</th><th>Role</th></tr>
+                    <tbody><tr><th>Tag</th><th>Font</th><th>Role</th></tr>
                     <tr><td><code>title</code></td><td>Roboto, 22&nbsp;pt, bold, centred</td><td>The single page heading, "Calculation Method".</td></tr>
                     <tr><td><code>header</code></td><td>Roboto, 16&nbsp;pt, bold</td><td>Section headings (Geometry, Profile Scaling, Stress Angle, Resolved Stress, Tendency Metrics, Plots, Focal-Mechanism Mode).</td></tr>
                     <tr><td><code>body</code></td><td>Roboto, 13&nbsp;pt, regular</td><td>Explanatory prose beneath each section heading.</td></tr>
                     <tr><td><code>math</code></td><td>Consolas, 14&nbsp;pt monospace, left-indented</td><td>Inline formula lines, indented 30&nbsp;px from both margins for visual separation from prose.</td></tr>
                     <tr><td><code>sub</code></td><td>Consolas, 10&nbsp;pt monospace, vertical offset −4&nbsp;px</td><td>Combined with <code>math</code> to render a subscripted symbol (e.g. the "s" in T<sub>s</sub>) at reduced size and lowered baseline within an otherwise monospaced formula line.</td></tr>
-                </table>
+                </tbody></table>
                 <div class="note-box">
                     <strong>Note:</strong> because a plain <code>CTkTextbox</code> cannot mix a smaller, baseline-shifted
                     run of characters into the middle of a single inserted string, every subscripted symbol used in
@@ -241,12 +240,12 @@ c₃ = n · σ̂₃   (horizontal component, perpendicular to σ₁)</div>
                     reported throughout the Dynamic Analyzer's Map, Rose, and Table tabs:
                 </p>
                 <table>
-                    <tr><th>Symbol</th><th>Name</th><th>Formula</th></tr>
+                    <tbody><tr><th>Symbol</th><th>Name</th><th>Formula</th></tr>
                     <tr><td>T<sub>s</sub></td><td>Slip tendency</td><td>T<sub>s</sub> = τ / σₙ <a class="cite" href="#ref-morris1996">(Morris et al., 1996)</a></td></tr>
                     <tr><td>T<sub>d</sub></td><td>Dilation tendency</td><td>T<sub>d</sub> = (σ₁ − σₙ) / (σ₁ − σ₃) <a class="cite" href="#ref-ferrill2003">(Ferrill and Morris, 2003)</a></td></tr>
                     <tr><td>S<sub>f</sub></td><td>Susceptibility / fracture stability margin</td><td>S<sub>f</sub> = σₙ − Pᶠ − (τ − C₀) / μ <a class="cite" href="#ref-mildren2002">(Mildren et al., 2002;</a> <a class="cite" href="#ref-streit2004">Streit and Hillis, 2004)</a></td></tr>
                     <tr><td>CSF</td><td>Critical stress flag</td><td>True where τ ≥ μ(σₙ − Pᶠ) + C₀ <a class="cite" href="#ref-jaeger2007">(Jaeger et al., 2007)</a></td></tr>
-                </table>
+                </tbody></table>
                 <p>
                     Here Pᶠ is pore-fluid pressure, C₀ is cohesion, and μ is the coefficient of friction — the same
                     three Coulomb failure-envelope parameters used to draw the failure line on the Mohr diagram.
@@ -400,12 +399,12 @@ text.configure(state="disabled")</code></pre>
                     workspace computes and displays:
                 </p>
                 <table>
-                    <tr><th>Dynamic Analyzer Tab</th><th>What it uses from the Method tab's formulas</th></tr>
+                    <tbody><tr><th>Dynamic Analyzer Tab</th><th>What it uses from the Method tab's formulas</th></tr>
                     <tr><td>Map Tab</td><td>Colours every segment by whichever tendency/failure metric (T<sub>s</sub>, T<sub>d</sub>, S<sub>f</sub>, or CSF) is currently selected, computed via Sections <a href="#4.3">4.3</a>–<a href="#4.5">4.5</a>.</td></tr>
                     <tr><td>Rose Tab</td><td>Builds a length-weighted, 10° binned, square-root (equal-area) polar histogram of the same corrected strike_N values described in <a href="#4.2">Section 4.2</a>, mirroring 0–180° strikes into the 180–360° half for full-circle display.</td></tr>
                     <tr><td>Mohr Tab</td><td>Plots total stress (σₙ, τ), effective stress shifted by pore pressure Pᶠ, individual segment points, and the Coulomb failure envelope τ = C₀ + μσₙ′ using exactly the resolved-stress formulas of <a href="#4.4">Section 4.4</a>; Mohr-diagram point numbers correspond directly to each segment's ID in the Table tab. The quantity Δτ = τ − [C₀ + μ(σₙ − Pᶠ)] is positive wherever a segment's Mohr point touches or crosses the failure envelope.</td></tr>
                     <tr><td>Table Tab</td><td>Tabulates the per-segment numeric results (strike_N, α, σₙ, τ, T<sub>s</sub>, T<sub>d</sub>, S<sub>f</sub>, CSF) produced by the same pipeline documented here.</td></tr>
-                </table>
+                </tbody></table>
 
                 <!-- ================================================= -->
                 <h2 id="references">8. References</h2>
@@ -418,27 +417,27 @@ text.configure(state="disabled")</code></pre>
 
                 <h3 id="8.1">8.1 Resolved Stress, Failure and Tendency Metrics</h3>
                 <ul class="ref-list">
-                    <li id="ref-ferrill2003">Ferrill, D. A., &amp; Morris, A. P. (2003). Dilational normal faults. <em>Journal of Structural Geology</em>, 25(2), 183&ndash;196. <a href="https://doi.org/10.1016/S0191-8141(02)00029-9" target="_blank" rel="noopener">https://doi.org/10.1016/S0191-8141(02)00029-9</a></li>
+                    <li id="ref-ferrill2003">Ferrill, D. A., &amp; Morris, A. P. (2003). Dilational normal faults. <em>Journal of Structural Geology</em>, 25(2), 183–196. <a href="https://doi.org/10.1016/S0191-8141(02)00029-9" target="_blank" rel="noopener">https://doi.org/10.1016/S0191-8141(02)00029-9</a></li>
                     <li id="ref-jaeger2007">Jaeger, J. C., Cook, N. G. W., &amp; Zimmerman, R. W. (2007). <em>Fundamentals of Rock Mechanics</em> (4th ed.). Blackwell Publishing, Oxford. ISBN 978-0-632-05759-7.</li>
-                    <li id="ref-mildren2002">Mildren, S. D., Hillis, R. R., &amp; Kaldi, J. (2002). Calibrating predictions of fault seal reactivation in the Timor Sea. <em>The APPEA Journal</em>, 42(1), 187&ndash;202. <a href="https://doi.org/10.1071/AJ01011" target="_blank" rel="noopener">https://doi.org/10.1071/AJ01011</a></li>
-                    <li id="ref-morris1996">Morris, A., Ferrill, D. A., &amp; Henderson, D. B. (1996). Slip-tendency analysis and fault reactivation. <em>Geology</em>, 24(3), 275&ndash;278. <a href="https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2" target="_blank" rel="noopener">https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2</a></li>
-                    <li id="ref-streit2004">Streit, J. E., &amp; Hillis, R. R. (2004). Estimating fault stability and sustainable fluid pressures for underground storage of CO&#8322; in porous rock. <em>Energy</em>, 29(9&ndash;10), 1445&ndash;1456. <a href="https://doi.org/10.1016/j.energy.2004.03.078" target="_blank" rel="noopener">https://doi.org/10.1016/j.energy.2004.03.078</a></li>
+                    <li id="ref-mildren2002">Mildren, S. D., Hillis, R. R., &amp; Kaldi, J. (2002). Calibrating predictions of fault seal reactivation in the Timor Sea. <em>The APPEA Journal</em>, 42(1), 187–202. <a href="https://doi.org/10.1071/AJ01011" target="_blank" rel="noopener">https://doi.org/10.1071/AJ01011</a></li>
+                    <li id="ref-morris1996">Morris, A., Ferrill, D. A., &amp; Henderson, D. B. (1996). Slip-tendency analysis and fault reactivation. <em>Geology</em>, 24(3), 275–278. <a href="https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2" target="_blank" rel="noopener">https://doi.org/10.1130/0091-7613(1996)024&lt;0275:STAAFR&gt;2.3.CO;2</a></li>
+                    <li id="ref-streit2004">Streit, J. E., &amp; Hillis, R. R. (2004). Estimating fault stability and sustainable fluid pressures for underground storage of CO₂ in porous rock. <em>Energy</em>, 29(9–10), 1445–1456. <a href="https://doi.org/10.1016/j.energy.2004.03.078" target="_blank" rel="noopener">https://doi.org/10.1016/j.energy.2004.03.078</a></li>
                     <li id="ref-zoback2007">Zoback, M. D. (2007). <em>Reservoir Geomechanics</em>. Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511586477" target="_blank" rel="noopener">https://doi.org/10.1017/CBO9780511586477</a></li>
                 </ul>
 
                 <h3 id="8.2">8.2 Geometric and Kinematic Conventions</h3>
                 <ul class="ref-list">
-                    <li id="ref-aki1980">Aki, K., &amp; Richards, P. G. (1980). <em>Quantitative Seismology: Theory and Methods</em> (Vol. 1), &sect;4.2. W. H. Freeman, San Francisco.</li>
+                    <li id="ref-aki1980">Aki, K., &amp; Richards, P. G. (1980). <em>Quantitative Seismology: Theory and Methods</em> (Vol. 1), §4.2. W. H. Freeman, San Francisco.</li>
                     <li id="ref-anderson1951">Anderson, E. M. (1951). <em>The Dynamics of Faulting and Dyke Formation with Applications to Britain</em> (2nd ed.). Oliver and Boyd, Edinburgh.</li>
-                    <li id="ref-bott1959">Bott, M. H. P. (1959). The mechanics of oblique slip faulting. <em>Geological Magazine</em>, 96(2), 109&ndash;117. <a href="https://doi.org/10.1017/S0016756800059987" target="_blank" rel="noopener">https://doi.org/10.1017/S0016756800059987</a></li>
+                    <li id="ref-bott1959">Bott, M. H. P. (1959). The mechanics of oblique slip faulting. <em>Geological Magazine</em>, 96(2), 109–117. <a href="https://doi.org/10.1017/S0016756800059987" target="_blank" rel="noopener">https://doi.org/10.1017/S0016756800059987</a></li>
                     <li id="ref-ragan2009">Ragan, D. M. (2009). <em>Structural Geology: An Introduction to Geometrical Techniques</em> (4th ed.). Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511816109" target="_blank" rel="noopener">https://doi.org/10.1017/CBO9780511816109</a></li>
-                    <li id="ref-wallace1951">Wallace, R. E. (1951). Geometry of shearing stress and relation to faulting. <em>The Journal of Geology</em>, 59(2), 118&ndash;130. <a href="https://doi.org/10.1086/625831" target="_blank" rel="noopener">https://doi.org/10.1086/625831</a></li>
+                    <li id="ref-wallace1951">Wallace, R. E. (1951). Geometry of shearing stress and relation to faulting. <em>The Journal of Geology</em>, 59(2), 118–130. <a href="https://doi.org/10.1086/625831" target="_blank" rel="noopener">https://doi.org/10.1086/625831</a></li>
                 </ul>
 
                 <div class="cite-box">
                     <p><strong>Methods statement for the Method tab.</strong> The Method tab produces no figure of its
                     own, so what follows is the statement to use when any stress-resolution result obtained anywhere in
-                    the Dynamic Analyzer is reported &mdash; it records the conventions this tab documents:</p>
+                    the Dynamic Analyzer is reported — it records the conventions this tab documents:</p>
                     <p>Fracture-plane poles were constructed from strike and dip in an (East, North, Up) basis
                     <a class="cite" href="#ref-ragan2009">(Ragan, 2009)</a>, with strike corrected to true north by the
                     stated image Y-axis azimuth. Normal and shear stress were resolved on each pole by full
@@ -446,32 +445,32 @@ text.configure(state="disabled")</code></pre>
                     <a class="cite" href="#ref-jaeger2007">(Jaeger et al., 2007)</a>, so both components depend on dip
                     and on all three principal magnitudes. State which principal stress was taken as vertical: the
                     Andersonian regime is an explicit parameter <a class="cite" href="#ref-anderson1951">(Anderson,
-                    1951)</a> and defaults to S<sub>v</sub> = &sigma;&#8322; (strike-slip) here, whereas the
-                    Uncertainty Analyzer defaults to S<sub>v</sub> = &sigma;&#8323;; slip tendency computed under the
-                    wrong regime can differ by more than a factor of two. Report &sigma;&#8321;, &sigma;&#8322;,
-                    &sigma;&#8323;, the &sigma;&#8321; azimuth, P<sub>f</sub>, C&#8320; and &mu; in the working stress
-                    unit. Tendency metrics follow the standard definitions: slip tendency T<sub>s</sub> = &tau;/&sigma;&#8345;
+                    1951)</a> and defaults to S<sub>v</sub> = σ₂ (strike-slip) here, whereas the
+                    Uncertainty Analyzer defaults to S<sub>v</sub> = σ₃; slip tendency computed under the
+                    wrong regime can differ by more than a factor of two. Report σ₁, σ₂,
+                    σ₃, the σ₁ azimuth, P<sub>f</sub>, C₀ and μ in the working stress
+                    unit. Tendency metrics follow the standard definitions: slip tendency T<sub>s</sub> = τ/σₙ
                     <a class="cite" href="#ref-morris1996">(Morris et al., 1996)</a>, dilation tendency
                     <a class="cite" href="#ref-ferrill2003">(Ferrill and Morris, 2003)</a>, and the fracture stability
                     margin S<sub>f</sub>, read as the additional pore-pressure increase a plane can sustain before the
                     effective-stress Coulomb envelope is reached
                     <a class="cite" href="#ref-mildren2002">(Mildren et al., 2002;</a>
                     <a class="cite" href="#ref-streit2004">Streit and Hillis, 2004)</a>. Note that T<sub>s,norm</sub>
-                    is normalised by the theoretical maximum (&sigma;&#8321; &minus; &sigma;&#8323;)/(2&radic;(&sigma;&#8321;&sigma;&#8323;))
+                    is normalised by the theoretical maximum (σ₁ − σ₃)/(2√(σ₁σ₃))
                     rather than by the loaded maximum, and that S<sub>f,norm</sub> is dataset-relative and inverted, so
                     it must not be compared between datasets
                     <a class="cite" href="#ref-zoback2007">(Zoback, 2007)</a>. In focal-mechanism mode, rake misfit is
-                    computed against the Wallace&ndash;Bott prediction that slip parallels the resolved shear stress
+                    computed against the Wallace–Bott prediction that slip parallels the resolved shear stress
                     <a class="cite" href="#ref-wallace1951">(Wallace, 1951;</a>
                     <a class="cite" href="#ref-bott1959">Bott, 1959)</a>, with input and predicted rake both in the
                     <a class="cite" href="#ref-aki1980">Aki and Richards (1980)</a> convention.</p>
                 </div>
 
                 <!-- Pagination Navigation -->
-                <div class="pagination-nav"></div>
+                <div class="pagination-nav"><a href="docs_dynamic_table.html" class="nav-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>Previous: Dynamic Table Tab</a><a href="docs_uncertainty_montecarlo.html" class="nav-btn">Next: Uncertainty Monte Carlo Tab<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></a></div>
             </div>
         </main>
     </div>
     <script src="script.js"></script>
-</body>
-</html>
+
+</body></html>
