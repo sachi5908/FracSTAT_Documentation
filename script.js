@@ -55,6 +55,14 @@ const SIDEBAR_SECTIONS = [
         ]
     },
     {
+        title: "Application Pages",
+        links: [
+            { href: "projects.html", label: "Projects Page" },
+            { href: "settings.html", label: "Settings Page" },
+            { href: "trace-map.html", label: "Trace Map Guide" }
+        ]
+    },
+    {
         title: "Static Analyzer",
         links: [
             { href: "docs_static_map.html", label: "Map Tab" },
@@ -202,6 +210,9 @@ const PAGE_ORDER = [
     { href: "introduction.html", label: "Introduction" },
     { href: "installation.html", label: "Installation Guide" },
     { href: "launcher.html", label: "FracSTAT Home Page" },
+    { href: "projects.html", label: "Projects Page" },
+    { href: "settings.html", label: "Settings Page" },
+    { href: "trace-map.html", label: "Trace Map Guide" },
 
     { href: "docs_static_map.html", label: "Static Map Tab" },
     { href: "docs_static_histogram.html", label: "Static Histogram Tab" },
@@ -632,9 +643,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ---------------------------------------------------------
-    // 3c. Scroll reveal for .reveal elements (index.html
-    //     contributor cards). Mirrors the companion Presentation
-    //     page: each element fades/slides in once when it first
+    // 3c. Scroll reveal for .reveal elements across index.html.
+    //     Mirrors the companion Presentation page: each element
+    //     fades/slides in once when it first
     //     enters the viewport, then stops being observed.
     //     Reduced-motion users get the content immediately, since
     //     the CSS already neutralises the transform for them.

@@ -2261,7 +2261,7 @@ body::before {
     border-radius: 50%;
 }
 
-/* Scroll reveal (see script.js) — staggered per card. */
+/* Scroll reveal (see script.js) — shared by the home-page sections. */
 .reveal {
     opacity: 0;
     transform: translateY(22px);
@@ -2282,6 +2282,25 @@ body::before {
 .contributor-grid .contributor:nth-child(6) { --delay: 0.3s; }
 .contributor-grid .contributor:nth-child(7) { --delay: 0.36s; }
 .contributor-grid .contributor:nth-child(8) { --delay: 0.42s; }
+
+/* Stagger each repeated group while keeping section headings immediate. */
+.feature-grid .feature-card:nth-child(1),
+.logo-track .logo-item:nth-child(1),
+.footer-grid > :nth-child(1) { --delay: 0s; }
+
+.feature-grid .feature-card:nth-child(2),
+.logo-track .logo-item:nth-child(2),
+.footer-grid > :nth-child(2) { --delay: 0.07s; }
+
+.feature-grid .feature-card:nth-child(3),
+.logo-track .logo-item:nth-child(3),
+.footer-grid > :nth-child(3) { --delay: 0.14s; }
+
+.logo-track .logo-item:nth-child(4),
+.footer-grid > :nth-child(4) { --delay: 0.21s; }
+
+.logo-track .logo-item:nth-child(5) { --delay: 0.28s; }
+.logo-track .logo-item:nth-child(6) { --delay: 0.35s; }
 
 @media (max-width: 900px) {
     .contributor-grid {

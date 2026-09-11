@@ -22,6 +22,7 @@ organized to mirror the application's three analyzers:
 | Section | Pages | Covers |
 | --- | --- | --- |
 | Getting Started | `introduction.html`, `installation.html`, `launcher.html` | Rationale and references, per-OS install steps, launcher/home-screen workflow |
+| Application Pages | `projects.html`, `settings.html`, `trace-map.html` | Recent-project management, global preferences, and the Trace Map digitizing workflow |
 | Static Analyzer | `docs_static_*.html` (9 pages) | Map, Histogram, CDF, Rose, Stereonet, Connectivity, Intensity, Profile, Results tabs |
 | Dynamic Analyzer | `docs_dynamic_*.html` (6 pages) | Map, Rose, Mohr, Stereonet, Table, Method tabs |
 | Uncertainty Analyzer | `docs_uncertainty_*.html` (2 pages) | Monte Carlo and Latin Hypercube Sampling tabs |
@@ -58,6 +59,9 @@ web server — or GitHub Pages — can serve the directory as-is.
 ├── introduction.html                # User Manual v1.0 — rationale, comparison, references
 ├── installation.html                # Windows / macOS / Linux install walkthrough
 ├── launcher.html                    # FracSTAT home screen and project workflow
+├── projects.html                    # Recent projects, import, open and removal workflow
+├── settings.html                    # Application-wide preferences and defaults
+├── trace-map.html                   # Complete Trace Map digitizing guide and key map
 │
 ├── docs_static_map.html             # ── Static Analyzer (9 tabs)
 ├── docs_static_histogram.html
