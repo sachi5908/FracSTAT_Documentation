@@ -204,6 +204,18 @@
 
 
                 <!-- ================================================= -->
+                <!-- dynamic-visual:rose-classification-controls:start -->
+                <figure class="figure-block" id="fig-rose-classification-controls">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1789234645/hkiqjxhs8t3nmo87s1qp.png" alt="Native Rose controls showing 36 bins, Length weighting, and the fracture-state summary" width="1535" height="939" loading="lazy" decoding="async">
+                        <button type="button" class="figure-zoom-btn" style="z-index: 2;" aria-label="Enlarge Figure 2.2">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <figcaption class="ph-caption"><strong>Figure 2.2</strong> — Rose controls and fracture-state summary for the existing SVG dataset. With 36 bins and Length weighting, the table reports 184 Stable segments (9.1%) and 1,839 Near Critical segments (90.9%); Critical and Unstable counts are zero. The table summarises segment states independently of the slip-tendency colours on the petals. Angular labels are enabled and duplicate compass labels disabled for readability.</figcaption>
+                </figure>
+                <!-- dynamic-visual:rose-classification-controls:end -->
+
                 <h2 id="data-input">3. Data Input</h2>
                 <p>
                     The Rose Tab does not load, parse, or import any files itself. It is strictly a consumer of
@@ -796,6 +808,30 @@ color_values = np.array(color_values)</code></pre>
                     <li>Redraw with Weight by = Length; note any change in the dominant petal — a strike bin with few but very long fractures may become dominant under length weighting even though it was subordinate under count weighting.</li>
                     <li>Use this comparison to decide whether a proposed fracture set is genuinely volumetrically significant or is merely numerically prevalent due to digitisation of many short segments.</li>
                 </ol>
+
+                <!-- dynamic-visual:rose-count-weighting:start -->
+                <figure class="figure-block" id="fig-rose-count-weighting">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1789234651/pighowcyrzrx2vfbvkee.png" alt="Count-weighted equal-area rose from the SVG dataset with normalized slip-tendency colours" width="1545" height="1415" loading="lazy" decoding="async">
+                        <button type="button" class="figure-zoom-btn" style="z-index: 2;" aria-label="Enlarge Figure 12.1a">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <figcaption class="ph-caption"><strong>Figure 12.1a</strong> — Count-weighted SVG rose: each of the 2,023 calculated segments contributes equally to its strike bin. Petal area represents relative segment frequency, while colour represents the bin&#x27;s normalised slip tendency. Compare with Figure 12.1b using the same 36-bin setting and stress state (100/50/25 MPa; cohesion and pore pressure 0 MPa; friction 0.6). Opposite petals represent the same axial orientation.</figcaption>
+                </figure>
+                <!-- dynamic-visual:rose-count-weighting:end -->
+
+                <!-- dynamic-visual:rose-length-weighting:start -->
+                <figure class="figure-block" id="fig-rose-length-weighting">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1789234655/eaesj6tz3um4bs8owgsb.png" alt="Length-weighted equal-area rose of the same SVG network for comparison with Count weighting" width="1545" height="1415" loading="lazy" decoding="async">
+                        <button type="button" class="figure-zoom-btn" style="z-index: 2;" aria-label="Enlarge Figure 12.1b">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <figcaption class="ph-caption"><strong>Figure 12.1b</strong> — Length-weighted SVG rose with the data, bin count, and stresses unchanged from Figure 12.1a. Each segment now contributes its physical length, so changes in petal area reveal the influence of longer traces rather than a change in stress. For this dataset the dominant axial orientation remains near 120°/300°; the differences in secondary petals are modest.</figcaption>
+                </figure>
+                <!-- dynamic-visual:rose-length-weighting:end -->
 
                 <h3 id="12.3">12.3 Example 3 — Publication-Quality Export</h3>
                 <ol class="step-list">

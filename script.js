@@ -17,6 +17,17 @@ if ("scrollRestoration" in history) {
     const preloader = document.getElementById("preloader");
     if (!preloader) return;
 
+    // Returning from the docs is navigation, not a fresh application launch.
+    // Remove the splash before the incoming view-transition snapshot is taken.
+    const navigation = performance.getEntriesByType("navigation")[0];
+    const referrer = document.referrer ? new URL(document.referrer) : null;
+    const fromSitePage = referrer && referrer.origin === window.location.origin &&
+        referrer.pathname !== window.location.pathname;
+    if (fromSitePage || (navigation && navigation.type === "back_forward")) {
+        preloader.remove();
+        return;
+    }
+
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const minimumVisibleMs = reduceMotion ? 0 : 2500;
     const startedAt = performance.now();
@@ -812,6 +823,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Handle Browser Back/Forward buttons
     window.addEventListener("popstate", () => {
+        if (!contentContainer) return;
         const url = window.location.pathname.split("/").pop() || "docs_intro.html";
         loadPage(url);
     });
@@ -927,6 +939,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const href = anchor.getAttribute("href");
         if (!href) return;
+
+        // Home has its own shell and initialisation. Let the browser perform
+        // this navigation so the shared CSS view transition can bridge both
+        // documents, rather than fetching Home as if it were a docs article.
+        const destination = new URL(href, window.location.href);
+        if (destination.origin === window.location.origin &&
+            (destination.pathname.endsWith("/index.html") || destination.pathname.endsWith("/"))) return;
 
         // Skip hash links (handled by the TOC smooth-scroll listener),
         // external links, mail links, new-tab links, and downloads

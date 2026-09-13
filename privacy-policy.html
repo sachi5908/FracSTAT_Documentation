@@ -65,8 +65,13 @@
                     include any analytics or telemetry, and does not transmit your fracture data, project
                     files, imported SVG/Excel content, calibrated photographs, or exported reports to
                     FracSTAT's authors, servers, or any third party. Everything you load, digitize, or
-                    calculate stays on your own machine, inside the project folder you choose, unless you
-                    yourself export or share a file.
+                    calculate is processed locally unless you yourself export or share a file. Local storage
+                    is not limited to the project folder: application preferences and the recent-project list
+                    are also stored in <code>.fracstat_settings.json</code> and
+                    <code>.fracstat_projects.json</code> in your user home directory. A project or export
+                    saved in a cloud-synchronized folder may be uploaded by your synchronization provider.
+                    Opening documentation, tutorials, or other external links launches your browser and
+                    makes requests to the destination service.
                 </p>
                 <p>
                     Because FracSTAT is open source (see the <a href="license.html">License</a> page), you
@@ -76,12 +81,11 @@
 
                 <h2 id="docs-site">2. This Documentation Website</h2>
                 <p>
-                    This documentation site is a static reference: it does not use analytics cookies,
-                    advertising trackers, or visitor fingerprinting. Standard, unavoidable web-server logs
-                    (such as IP address, browser type, and requested page) may be retained temporarily by
-                    whichever hosting provider serves these pages, purely for operational purposes like
-                    abuse prevention and uptime monitoring — the same baseline logging any web host performs
-                    automatically. FracSTAT's authors do not separately collect or analyze this information.
+                    The documentation's own code does not add analytics cookies, advertising trackers, or
+                    visitor fingerprinting. Hosting and embedded-content providers may receive information
+                    such as your IP address, browser type, and requested resource. Their logging, cookies,
+                    and retention practices are governed by their own policies, not by this site's source code.
+                    FracSTAT's authors do not separately collect or analyze visitor logs through this site.
                 </p>
                 <p>
                     Images and some fonts on this site are served from third-party content delivery
@@ -92,32 +96,34 @@
 
                 <h2 id="admin-panel">3. The Documentation Admin Panel</h2>
                 <p>
-                    A separate, credential-protected admin panel is used internally by the documentation
-                    maintainers to edit and publish these pages. It authenticates against a private
-                    credential store and, once signed in, can commit changes directly to the site's GitHub
-                    repository on the maintainer's behalf. This panel is not intended for general visitors,
-                    collects no information about ordinary readers of the documentation, and is unrelated to
-                    your use of FracSTAT or this site.
+                    A separate admin panel is used by maintainers to edit and publish these pages. Its sign-in
+                    form sends credentials to a configured Google Apps Script endpoint. On successful sign-in,
+                    the browser stores the session flag and returned GitHub token in <code>sessionStorage</code>;
+                    publishing sends authenticated requests to GitHub. Signing out clears those stored values.
+                    The endpoint's server-side credential handling and retention cannot be established from
+                    this website's source. The panel is not required to read the documentation or use FracSTAT.
                 </p>
 
                 <h2 id="third-party">4. Third-Party Services</h2>
-                <p>This site relies on a small number of third-party services purely to host static assets:</p>
+                <p>This site uses third-party services for assets, embedded viewers, and maintainer publishing:</p>
                 <ul>
                     <li><strong>Cloudinary</strong> — hosts the FracSTAT logo, screenshots, and other images embedded in these pages.</li>
                     <li><strong>Google Fonts / cdnjs</strong> — may be used to serve web fonts or small JavaScript libraries referenced by individual pages.</li>
-                    <li><strong>YouTube / Google Drive</strong> — the <a href="tutorial.html">Video Tutorials</a> page embeds videos hosted on these platforms; playing an embedded video is subject to that platform's own privacy policy, not this one.</li>
+                    <li><strong>YouTube / Google Drive</strong> — tutorial thumbnails can trigger requests before playback. Video viewers load when activated, and the <a href="manual.html">PDF manual</a> page embeds a Google Drive viewer that can load without a play-button click. These requests and any provider cookies are subject to the provider's privacy policy.</li>
                     <li><strong>GitHub</strong> — the source code, issue tracker, and (for maintainers) content publishing pipeline live on GitHub, subject to GitHub's own privacy policy.</li>
                 </ul>
                 <p>
-                    None of these services are configured by FracSTAT to build an advertising profile of
-                    visitors; they are used purely as content-delivery infrastructure.
+                    FracSTAT does not add advertising-profile code to these pages. This does not guarantee
+                    that third-party embeds are cookie-free or prevent providers from processing request data
+                    under their own policies and your account or browser settings.
                 </p>
 
                 <h2 id="data-retention">5. Data Retention and Deletion</h2>
                 <p>
                     Because FracSTAT's authors do not operate a database of personal visitor information,
-                    there is generally nothing about an individual reader to retain or delete beyond the
-                    routine, short-lived server logs described in <a href="#docs-site">Section 2</a>. If you
+                    the authors do not have a visitor database to search or delete. Provider-held logs and
+                    embedded-service data described in <a href="#docs-site">Section 2</a> are subject to
+                    those providers' retention and deletion policies; this site cannot promise their retention period. If you
                     have contacted the team directly by email (see the <a href="contact.html">Contact</a>
                     page), that correspondence is retained only as long as reasonably needed to respond to
                     and resolve your query.
@@ -127,8 +133,8 @@
                 <p>
                     FracSTAT and this documentation site are intended for structural geologists, geoscience
                     students, and engineering professionals, and are not directed at children. No
-                    age-gating is implemented because no personal data is knowingly collected from any
-                    visitor in the first place.
+                    age-gating is implemented. The third-party request-data practices described above still
+                    apply when someone visits these pages.
                 </p>
 
                 <h2 id="changes">7. Changes to This Policy</h2>

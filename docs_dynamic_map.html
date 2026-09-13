@@ -315,6 +315,18 @@
                     tiers are already fixed integer codes (0–3) rather than a continuous quantity.
                 </p>
 
+                <!-- dynamic-visual:map-dilation:start -->
+                <figure class="figure-block" id="fig-map-dilation">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1789234637/kkvacsca4b5allsio9it.png" alt="SVG fracture network coloured by dilation tendency with calibrated centimetre axes" width="1633" height="1470" loading="lazy" decoding="async">
+                        <button type="button" class="figure-zoom-btn" style="z-index: 2;" aria-label="Enlarge Figure 5.1">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <figcaption class="ph-caption"><strong>Figure 5.1</strong> — Dilation tendency on the existing SVG fracture network (2,023 calculated segments). The native 0–1 colour scale shows orientation-dependent dilation tendency along the traces, not an interpolated surface. Axes retain the project&#x27;s centimetre calibration. Principal stresses are 100/50/25 MPa; cohesion and pore pressure are 0 MPa, with friction coefficient 0.6.</figcaption>
+                </figure>
+                <!-- dynamic-visual:map-dilation:end -->
+
                 <h3 id="5.2">5.2 Colour Normalization for Rendering</h3>
                 <p>
                     Once the attribute column is selected, <code>MapTab.attribute_colormap_and_norm()</code>
@@ -599,6 +611,18 @@
                     misrepresented as a continuous gradient — a common source of misinterpretation in geomechanical
                     figures.
                 </p>
+
+                <!-- dynamic-visual:map-critical:start -->
+                <figure class="figure-block" id="fig-map-critical">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1789234642/c1utpqghk9ynhi5cef3b.png" alt="SVG fracture network classified as Stable or Near Critical with a four-state legend" width="1615" height="1470" loading="lazy" decoding="async">
+                        <button type="button" class="figure-zoom-btn" style="z-index: 2;" aria-label="Enlarge Figure 8.1">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <figcaption class="ph-caption"><strong>Figure 8.1</strong> — Critical-fracture classification of the same SVG network and stress state as Figure 5.1. Green segments are Stable and yellow segments are Near Critical; no segments occupy the orange Critical or red Unstable classes in this calculation. The complete four-state legend is retained to distinguish classification from a continuous tendency scale.</figcaption>
+                </figure>
+                <!-- dynamic-visual:map-critical:end -->
 
                 <h3 id="8.3">8.3 Event De-duplication (Geographic Mode)</h3>
                 <p>

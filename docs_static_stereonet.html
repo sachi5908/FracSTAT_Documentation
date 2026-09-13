@@ -175,6 +175,18 @@
                     message instead of attempting to draw an empty or degenerate diagram (see <a href="#7.5">Section 7.5</a>).
                 </p>
                 <!-- ================================================= -->
+                <!-- static-visual:stereonet-svg:start -->
+                <figure class="figure-block" id="fig-static-stereonet-svg">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1789261857/qmk8dsjuoguuu7aswgtx.png" alt="Native Orientation-Data Limitation warning explaining that SVG traces lack measured dip values" width="1616" height="931" loading="lazy" decoding="async">
+                        <button type="button" class="figure-zoom-btn" style="z-index: 2;" aria-label="Enlarge Figure 2.1">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <figcaption class="ph-caption"><strong>Figure 2.1</strong> — The native Orientation-Data Limitation screen appears for SVG trace geometry without measured dips. Proceed with SVG data explicitly accepts vertical planes (dip = 90°) for exploratory viewing; it does not supply missing field measurements. The existing measured-orientation workflow should be used for orientation-based conclusions. This warning is preserved here rather than bypassed or edited out of the screenshot.</figcaption>
+                </figure>
+                <!-- static-visual:stereonet-svg:end -->
+
                 <h2 id="controls">3. Settings and Controls, Card by Card</h2>
                 <p>
                     Unless stated otherwise, every control triggers an immediate redraw through
@@ -743,6 +755,18 @@ x = r · sin(pole trend)      y = r · cos(pole trend)</div>
                 </ol>
 
                 <!-- ================================================= -->
+                <!-- static-visual:stereonet-poles:start -->
+                <figure class="figure-block" id="fig-static-stereonet-poles">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1789261860/jzxkuihnh2sqm1kubsqo.png" alt="Native equal-area stereonet after acknowledging the SVG vertical-plane assumption" width="1616" height="931" loading="lazy" decoding="async">
+                        <button type="button" class="figure-zoom-btn" style="z-index: 2;" aria-label="Enlarge Figure 8.1">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <figcaption class="ph-caption"><strong>Figure 8.1</strong> — The same SVG dataset after acknowledging the dip = 90° assumption. Poles of the assumed vertical planes lie on the lower-hemisphere equal-area stereonet rim; coincident orientations overlap. No measured dip override is loaded, so this rim pattern is imposed by the input assumption, not evidence that the mapped fractures were measured as vertical. The native warning in Figure 2.1 explains the limitation.</figcaption>
+                </figure>
+                <!-- static-visual:stereonet-poles:end -->
+
                 <h2 id="interpretation">9. Geological Interpretation</h2>
 
                 <h4 id="9.1">9.1 Reading Pole Clusters</h4>

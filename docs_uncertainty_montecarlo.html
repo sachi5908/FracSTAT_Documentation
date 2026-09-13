@@ -217,6 +217,18 @@
                 </figure>
 
                 <!-- ================================================= -->
+                <!-- uncertainty-visual:montecarlo-workspace-cohesion:start -->
+                <figure class="figure-block" id="fig-montecarlo-workspace-cohesion">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1789237364/yli0j7hgzejywuoendxm.png" alt="Monte Carlo Geomechanics workspace with sampling controls, effective-stress Mohr ensemble, and summary cards" width="1856" height="1051" loading="lazy" decoding="async">
+                        <button type="button" class="figure-zoom-btn" style="z-index: 2;" aria-label="Enlarge Figure 3.2">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <figcaption class="ph-caption"><strong>Figure 3.2</strong> — Monte Carlo workspace after running Sample_Data.xlsx, Sheet1: 1,000 realizations per fault, seed 42, and All Faults (21 faults; 21,000 rows). The reverse/thrust example uses principal-stress means 60/40/25 MPa with standard deviations 5/4/3 MPa, friction 0.60 ± 0.05, and cohesion and pore pressure each 10 ± 2 MPa, sampled as Truncated Normal inputs. Effective stress is enabled and sampled cohesion is included in the displayed envelopes. The Mohr view draws 900 representative circles rather than every row; the sidebar continues below the visible area.</figcaption>
+                </figure>
+                <!-- uncertainty-visual:montecarlo-workspace-cohesion:end -->
+
                 <h2 id="data-input">4. Data Input and Preprocessing</h2>
                 <p>
                     The Monte Carlo tab consumes tabular fault data loaded through the workspace header's Load
@@ -823,14 +835,15 @@ Var[X] = σ² · [ 1 + ( α·φ(α) − β·φ(β) ) / Z − ( ( φ(α) − φ(�
                     </p>
                 </div>
                 <p>
-                    <strong>Not every (mean, sd) pair is attainable on a bounded support.</strong> On
-                    [0,&nbsp;∞) the ratio sd/mean has a supremum of 1 (the exponential limit); on a finite
-                    [l,&nbsp;u] the standard deviation cannot exceed (u&nbsp;−&nbsp;l)/√12 (the uniform
-                    limit); and both ceilings tighten as the mean approaches a bound. A request outside those limits
-                    raises a <code>ValueError</code> that names the largest standard deviation the support can carry
-                    and suggests a Lognormal, Gamma, or Uniform law instead — rather than quietly returning
-                    parameters whose moments differ from the ones asked for. The mean is also required to lie
-                    strictly inside the bounds.
+                    <strong>Not every (mean, sd) pair is attainable by a truncated-normal law.</strong> On
+                    [0,&nbsp;∞), sd/mean has a supremum of 1 (the exponential limit); on a finite
+                    [l,&nbsp;u], sd cannot exceed (u&nbsp;−&nbsp;l)/√12, with a tighter limit when the mean
+                    is away from the midpoint. These are family-specific limits, not limits on every distribution
+                    with those bounds. An unattainable request raises a <code>ValueError</code> reporting an
+                    approximate attainable sd for the truncated normal rather than silently changing the moments.
+                    Consider Lognormal or Gamma for positive unbounded inputs, or Beta or a feasible Uniform law
+                    for friction on [0,1]. Each alternative retains its own moment and support constraints.
+                    For a nonzero sd, the truncated-normal mean must lie strictly inside the bounds.
                 </p>
 
                 <h3 id="7.5">7.5 Orientation Sampling: Von Mises and Fisher 3D Models</h3>
@@ -1089,6 +1102,18 @@ s.d.   = √( −2 · ln R ) · (period / 360°)</div>
                     relationship).
                 </p>
 
+                <!-- uncertainty-visual:montecarlo-statistics:start -->
+                <figure class="figure-block" id="fig-montecarlo-statistics">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1789237367/idbq2rpqwkqia2ruh7g6.png" alt="Monte Carlo slip-tendency histogram with mean, P10–P90 range, and descriptive-statistics cards" width="1856" height="1051" loading="lazy" decoding="async">
+                        <button type="button" class="figure-zoom-btn" style="z-index: 2;" aria-label="Enlarge Figure 9.1">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <figcaption class="ph-caption"><strong>Figure 9.1</strong> — Monte Carlo Statistics module with the pooled slip-tendency histogram and descriptive statistics. The dashed line marks the mean and the shaded band spans P10–P90; that band is a central outcome range, not the separate 95% confidence interval of the mean shown in the sidebar. All Faults combines orientation differences between faults with uncertainty within each fault; select a single fault for its individual distribution.</figcaption>
+                </figure>
+                <!-- uncertainty-visual:montecarlo-statistics:end -->
+
                 <h3 id="9.2">9.2 Per-Fault Statistics</h3>
                 <p>
                     <code>per_fault_statistics()</code> (<code>statistics.py</code>) groups the realization table
@@ -1211,6 +1236,18 @@ s.d.   = √( −2 · ln R ) · (period / 360°)</div>
                     from stabilizing sensitivities.
                 </p>
 
+                <!-- uncertainty-visual:montecarlo-sensitivity:start -->
+                <figure class="figure-block" id="fig-montecarlo-sensitivity">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1789237370/pmri0upxmmhyfwrcuh0c.png" alt="Monte Carlo signed SRC sensitivity tornado and numeric SRC and PRCC table for slip tendency" width="1856" height="1051" loading="lazy" decoding="async">
+                        <button type="button" class="figure-zoom-btn" style="z-index: 2;" aria-label="Enlarge Figure 9.2">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <figcaption class="ph-caption"><strong>Figure 9.2</strong> — Monte Carlo sensitivity of effective slip tendency: signed SRC bars are shown beside the SRC/PRCC table. This population analysis uses 1,000 paired realizations, not 21,000 independent observations. Fault dip and principal stresses dominate this example. Friction and cohesion are not ranked because they are absent from the Ts formula. Correlated inputs mean SRC bars are conditional regression weights, not additive shares of variance.</figcaption>
+                </figure>
+                <!-- uncertainty-visual:montecarlo-sensitivity:end -->
+
                 <h3 id="9.4">9.4 Convergence Diagnostics</h3>
                 <p>
                     <code>convergence_table()</code> (<code>validation.py</code>) evaluates the running Ts mean,
@@ -1316,6 +1353,18 @@ t = σ · n            (traction vector on the plane)
                     code paths; in normal operation this check always passes and exists as a continuous regression
                     safeguard rather than a user-facing diagnostic.
                 </p>
+
+                <!-- uncertainty-visual:montecarlo-validation:start -->
+                <figure class="figure-block" id="fig-montecarlo-validation">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1789237373/ejnoqdyq4nypd6nshbhd.png" alt="Monte Carlo validation dashboard, convergence status, results preview, and Excel and CSV export controls" width="1856" height="1051" loading="lazy" decoding="async">
+                        <button type="button" class="figure-zoom-btn" style="z-index: 2;" aria-label="Enlarge Figure 9.3">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <figcaption class="ph-caption"><strong>Figure 9.3</strong> — Monte Carlo Validation &amp; Export after 1,000 samples per fault. This run passes the configured convergence checks, both analytical benchmarks, and the scalar reference comparison. Passing numerical checks does not establish that the geological assumptions are correct or that rare-event probabilities are precise. The preview contains 21,000 rows with 19 fields; pagination and horizontal scrolling expose the rest. Export Excel/CSV retains the full results and validation metadata.</figcaption>
+                </figure>
+                <!-- uncertainty-visual:montecarlo-validation:end -->
 
                 <h3 id="9.6">9.6 Reproducibility Metadata</h3>
                 <p>
@@ -1452,6 +1501,30 @@ t = σ · n            (traction vector on the plane)
                     inspect a plot at full display resolution while retaining every interactive control.
                 </p>
 
+                <!-- uncertainty-visual:montecarlo-responses-wide:start -->
+                <figure class="figure-block" id="fig-montecarlo-responses-wide">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1789237380/tp834gcxf2kfchl3c771.png" alt="Monte Carlo eight-panel histogram and empirical CDF layout for Ts, Td, Sf, and Fsi" width="4210" height="1970" loading="lazy" decoding="async">
+                        <button type="button" class="figure-zoom-btn" style="z-index: 2;" aria-label="Enlarge Figure 10.2">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <figcaption class="ph-caption"><strong>Figure 10.2</strong> — Native Monte Carlo Response Metric Distributions layout. Each column pairs a histogram (top) with an empirical cumulative distribution in percent (bottom) for Ts, Td, Sf, or Fsi across 21,000 fault-realization rows. Red dashed lines mark sample means; Sf is in MPa and the other metrics are dimensionless. The wider native export keeps all eight panel titles readable; use Enlarge to inspect labels.</figcaption>
+                </figure>
+                <!-- uncertainty-visual:montecarlo-responses-wide:end -->
+
+                <!-- uncertainty-visual:montecarlo-envelopes:start -->
+                <figure class="figure-block" id="fig-montecarlo-envelopes">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1789237384/moqojclajbpg7trmswfz.png" alt="Monte Carlo per-fault P10–P90 uncertainty bands, median markers, thresholds, and probable-behaviour classification" width="2183" height="1242" loading="lazy" decoding="async">
+                        <button type="button" class="figure-zoom-btn" style="z-index: 2;" aria-label="Enlarge Figure 10.3">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <figcaption class="ph-caption"><strong>Figure 10.3</strong> — Native Monte Carlo Fault-Level Uncertainty Envelopes: blue bands show P10–P90 and red markers show P50 for each fault. Fault Index is the plot&#x27;s sequential index, not the original Excel fault ID or a spatial coordinate. Green lines are the application&#x27;s metric-specific reference thresholds, not a common probability cutoff. The final panel shows the native probable-behaviour classification; all displayed points are Moderately Stable. A stable summary or central band does not exclude rare failures in the distribution tails.</figcaption>
+                </figure>
+                <!-- uncertainty-visual:montecarlo-envelopes:end -->
+
                 <h3 id="10.5">10.5 Spatial Probability Map Sub-Tab</h3>
                 <p>
                     This sub-tab is unique among the six in requiring a second, independently loaded data
@@ -1481,6 +1554,18 @@ t = σ · n            (traction vector on the plane)
                 
 
                 <!-- ================================================= -->
+                <!-- uncertainty-visual:montecarlo-spatial:start -->
+                <figure class="figure-block" id="fig-montecarlo-spatial">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1789237377/f9lfxfhb4egzlqrkrwpy.png" alt="Monte Carlo point-coordinate map coloured by per-fault probability that the Coulomb Failure Index reaches one" width="1856" height="1051" loading="lazy" decoding="async">
+                        <button type="button" class="figure-zoom-btn" style="z-index: 2;" aria-label="Enlarge Figure 10.4">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <figcaption class="ph-caption"><strong>Figure 10.4</strong> — Monte Carlo Spatial Probability Map in Point Mode, joining the 21 fault IDs to the X/Y coordinates in the same Excel workbook; both coordinate units are metres. Colours show per-fault P(Fsi ≥ 1) as a fraction, not a percentage. The upper colour-scale value 0.006 corresponds to 0.6%. These are sampled estimates at fault locations, not an interpolated probability surface; zero observed failures does not prove zero risk.</figcaption>
+                </figure>
+                <!-- uncertainty-visual:montecarlo-spatial:end -->
+
                 <h2 id="advanced">11. Advanced Features</h2>
 
                 <h3 id="11.1">11.1 Move Layout Elements (Edit Mode)</h3>
@@ -1788,7 +1873,7 @@ t = σ · n            (traction vector on the plane)
                     <tr><td>Exact-ID coordinate matching</td><td>The Spatial Probability Map requires exact string-matched Fault IDs between the Monte Carlo input spreadsheet and the separately loaded coordinate file; no fuzzy or coordinate-based automatic matching is performed.</td></tr>
                     <tr><td>Sample-size cap</td><td>Maximum sample size is capped at 100,000 realizations per fault by UI validation; very large multi-fault populations (many faults × large sample counts) are bounded primarily by available system memory and interactive redraw performance rather than by an explicit software limit.</td></tr>
                     <tr><td>Single-parameter Fisher coupling</td><td>The Fisher 3D orientation model couples strike and dip using a single shared concentration parameter (from the Strike row); it does not support independently specified strike and dip concentrations within the coupled model.</td></tr>
-                    <tr><td>Not every moment pair is attainable on a bounded support</td><td>A truncated normal on [l,&nbsp;u] cannot have a standard deviation above (u&nbsp;−&nbsp;l)/√12, and on [0,&nbsp;∞) cannot have sd/mean&nbsp;≥&nbsp;1; both ceilings tighten as the mean approaches a bound. Such requests raise rather than silently sampling different moments (<a href="#7.4">Section 7.4</a>), so a wide spread on a tightly bounded input must be expressed with a Lognormal, Gamma, or Uniform law instead.</td></tr>
+                    <tr><td>Truncated-normal moment constraints</td><td>A truncated normal on [l,&nbsp;u] cannot have sd above (u&nbsp;−&nbsp;l)/√12 (the limit is lower away from the midpoint), and on [0,&nbsp;∞) cannot have sd/mean&nbsp;≥&nbsp;1. Such requests raise rather than silently changing moments (<a href="#7.4">Section 7.4</a>). Consider Lognormal or Gamma for positive unbounded inputs, or Beta or a feasible Uniform law for friction on [0,1]; these alternatives have their own support constraints.</td></tr>
                 </tbody></table>
 
                 <!-- ================================================= -->

@@ -139,6 +139,18 @@
 <tr><td><strong>Source badge</strong></td><td>Displays the loaded input filename and worksheet when applicable.</td></tr>
 </tbody></table>
 
+                <!-- uncertainty-visual:lhs-workspace-cohesion:start -->
+                <figure class="figure-block" id="fig-lhs-workspace-cohesion">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1789237338/vm3xy3fet8klke1qmvwu.png" alt="LHS Geomechanics workspace with sampling controls, effective-stress Mohr ensemble, and summary cards" width="1856" height="1051" loading="lazy" decoding="async">
+                        <button type="button" class="figure-zoom-btn" style="z-index: 2;" aria-label="Enlarge Figure 2.1">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <figcaption class="ph-caption"><strong>Figure 2.1</strong> — LHS workspace after running Sample_Data.xlsx, Sheet1: 1,000 realizations per fault, seed 42, and All Faults (21 faults; 21,000 rows). The reverse/thrust example uses principal-stress means 60/40/25 MPa with standard deviations 5/4/3 MPa, friction 0.60 ± 0.05, and cohesion and pore pressure each 10 ± 2 MPa, sampled as Truncated Normal inputs. Effective stress is enabled and sampled cohesion is included in the displayed envelopes. The Mohr view draws 900 representative circles rather than every row; the sidebar continues below the visible area. This 1,000-sample LHS example is not yet converged; increase SAMPLES and review validation before drawing conclusions.</figcaption>
+                </figure>
+                <!-- uncertainty-visual:lhs-workspace-cohesion:end -->
+
 <h2 id="data-input">3. Data Input</h2>
 <h3 id="3.1">3.1 Loading fault/fracture orientation data</h3>
 <p>
@@ -250,6 +262,18 @@
 <tr><td>Appearance</td><td>Background/grid, bins, alpha/hatch, scatter styling, mean/range styling, trend curve, axes, legend and plot size.</td></tr>
 </tbody></table>
 
+                <!-- uncertainty-visual:lhs-statistics:start -->
+                <figure class="figure-block" id="fig-lhs-statistics">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1789237342/zxr3ex2axso8zexupr6j.png" alt="LHS slip-tendency histogram with mean, P10–P90 range, and descriptive-statistics cards" width="1856" height="1051" loading="lazy" decoding="async">
+                        <button type="button" class="figure-zoom-btn" style="z-index: 2;" aria-label="Enlarge Figure 4.1">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <figcaption class="ph-caption"><strong>Figure 4.1</strong> — LHS Statistics module with the pooled slip-tendency histogram and descriptive statistics. The dashed line marks the mean and the shaded band spans P10–P90; that band is a central outcome range, not the separate 95% confidence interval of the mean shown in the sidebar. All Faults combines orientation differences between faults with uncertainty within each fault; select a single fault for its individual distribution. This 1,000-sample LHS example is not yet converged; increase SAMPLES and review validation before drawing conclusions.</figcaption>
+                </figure>
+                <!-- uncertainty-visual:lhs-statistics:end -->
+
 <h3 id="4.3">4.3 Sensitivity module</h3>
 <table>
 <tbody><tr><th>Control</th><th>Purpose</th></tr>
@@ -260,6 +284,18 @@
 <tr><td>Bar styling</td><td>Height, alpha, edge styling, colour mode and colour scale.</td></tr>
 <tr><td>Value labels</td><td>Displays numeric values on the bars.</td></tr>
 </tbody></table>
+
+                <!-- uncertainty-visual:lhs-sensitivity:start -->
+                <figure class="figure-block" id="fig-lhs-sensitivity">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1789237345/qzaxnce8gykbgkl4pzul.png" alt="LHS signed SRC sensitivity tornado and numeric SRC and PRCC table for slip tendency" width="1856" height="1051" loading="lazy" decoding="async">
+                        <button type="button" class="figure-zoom-btn" style="z-index: 2;" aria-label="Enlarge Figure 4.2">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <figcaption class="ph-caption"><strong>Figure 4.2</strong> — LHS sensitivity of effective slip tendency: signed SRC bars are shown beside the SRC/PRCC table. This population analysis uses 1,000 paired realizations, not 21,000 independent observations. Fault dip and principal stresses dominate this example. Friction and cohesion are not ranked because they are absent from the Ts formula. Correlated inputs mean SRC bars are conditional regression weights, not additive shares of variance. This 1,000-sample LHS example is not yet converged; increase SAMPLES and review validation before drawing conclusions.</figcaption>
+                </figure>
+                <!-- uncertainty-visual:lhs-sensitivity:end -->
 
 <h3 id="4.4">4.4 Validation &amp; Export</h3>
 <table>
@@ -301,11 +337,12 @@
     <a class="cite" href="#ref-virtanen2020">(Virtanen et al., 2020)</a>.
 </p>
 <p>
-    This produces evenly stratified one-dimensional projections and generally reduces the variance of
-    estimated output statistics, especially quantiles, compared with simple pseudo-random Monte Carlo
-    sampling of the same size <a class="cite" href="#ref-mckay1979">(McKay et al., 1979)</a>;
-    <a class="cite" href="#ref-helton2003">Helton and Davis (2003)</a> document the same behaviour for
-    propagation through complex system models. The design is a plain Latin hypercube: the strata are
+    This produces evenly stratified one-dimensional projections and can reduce sampling variance relative
+    to pseudo-random Monte Carlo at the same sample size, particularly for means of responses dominated
+    by additive input effects <a class="cite" href="#ref-mckay1979">(McKay et al., 1979)</a>.
+    The benefit depends on the response and statistic: improved precision for every quantile or tail
+    probability is not guaranteed. See <a class="cite" href="#ref-helton2003">Helton and Davis (2003)</a>
+    for uncertainty-propagation applications. The design is a plain Latin hypercube: the strata are
     permuted independently and no space-filling criterion is optimised over candidate permutations
     <a class="cite" href="#ref-morris1995">(cf. Morris and Mitchell, 1995)</a>, and no rank-correlation
     structure is induced across dimensions <a class="cite" href="#ref-iman1982">(cf. Iman and Conover, 1982)</a>.
@@ -361,11 +398,13 @@ Var[X] = σ² · [ 1 + (α·φ(α) − β·φ(β))/Z − ((φ(α) − φ(β))/Z)
     and pore pressure near zero, friction near 0 or 1) were the worst affected.
 </div>
 <p>
-    A bounded support cannot carry every (mean, SD) pair: on [0, ∞) the ratio SD/mean has a supremum of 1
-    (the exponential limit), on a finite [a,b] the SD cannot exceed (b − a)/√12 (the uniform limit), and both
-    ceilings tighten as the mean approaches a bound. An unattainable request raises an error naming the
-    largest SD that support can carry and suggesting a Lognormal, Gamma or Uniform law, rather than quietly
-    sampling different moments.
+    A <strong>truncated-normal law</strong> cannot carry every (mean, SD) pair: on [0, ∞), SD/mean has
+    a supremum of 1 (the exponential limit); on a finite [a,b], SD cannot exceed (b − a)/√12, with a
+    tighter limit when the mean is away from the midpoint. These are family-specific limits, not limits
+    on every distribution with those bounds. An unattainable request raises an error reporting an
+    approximate attainable SD for the truncated normal rather than quietly sampling different moments.
+    For positive unbounded inputs, consider Lognormal or Gamma; for friction on [0,1], consider Beta
+    or a feasible Uniform law. The alternative must still satisfy its own moment and support constraints.
 </p>
 
 <h3 id="5.3">5.3 Orientation sampling</h3>
@@ -655,6 +694,18 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
     These values define the uncertainty band and central-tendency line used by the Visualization module.
 </p>
 
+                <!-- uncertainty-visual:lhs-envelopes:start -->
+                <figure class="figure-block" id="fig-lhs-envelopes">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1789237360/vy9hk6zt8evfmxndgwyu.png" alt="LHS per-fault P10–P90 uncertainty bands, median markers, thresholds, and probable-behaviour classification" width="2183" height="1242" loading="lazy" decoding="async">
+                        <button type="button" class="figure-zoom-btn" style="z-index: 2;" aria-label="Enlarge Figure 8.1">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <figcaption class="ph-caption"><strong>Figure 8.1</strong> — Native LHS Fault-Level Uncertainty Envelopes: blue bands show P10–P90 and red markers show P50 for each fault. Fault Index is the plot&#x27;s sequential index, not the original Excel fault ID or a spatial coordinate. Green lines are the application&#x27;s metric-specific reference thresholds, not a common probability cutoff. The final panel shows the native probable-behaviour classification; all displayed points are Moderately Stable. A stable summary or central band does not exclude rare failures in the distribution tails. This 1,000-sample LHS example is not yet converged; increase SAMPLES and review validation before drawing conclusions.</figcaption>
+                </figure>
+                <!-- uncertainty-visual:lhs-envelopes:end -->
+
 <h3 id="8.4">8.4 Validation diagnostics</h3>
 <table>
 <tbody><tr><th>Check</th><th>Method</th><th>Pass criterion</th></tr>
@@ -705,6 +756,18 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
     standard deviations or physical model are correct.
 </div>
 
+                <!-- uncertainty-visual:lhs-validation:start -->
+                <figure class="figure-block" id="fig-lhs-validation">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1789237348/mekcklcr3plkchuaa0vy.png" alt="LHS validation dashboard, convergence status, results preview, and Excel and CSV export controls" width="1856" height="1051" loading="lazy" decoding="async">
+                        <button type="button" class="figure-zoom-btn" style="z-index: 2;" aria-label="Enlarge Figure 8.2">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <figcaption class="ph-caption"><strong>Figure 8.2</strong> — LHS Validation &amp; Export after 1,000 samples per fault. The analytical benchmarks (2/2) and scalar reference pass, but convergence is Not yet converged: the Ts mean&#x27;s relative increment is about 2.12%, above the 2% criterion. Increase SAMPLES and rerun before treating the estimates as converged. The preview contains 21,000 rows with 19 fields; only the first page and left-hand columns are visible. Export Excel/CSV retains the full results and validation metadata.</figcaption>
+                </figure>
+                <!-- uncertainty-visual:lhs-validation:end -->
+
 <h2 id="visualization">9. Visualization</h2>
 <h3 id="9.1">9.1 Geomechanics plots</h3>
 <table>
@@ -736,6 +799,18 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
     ranks faults by P90−P10 width, making the least certain outcomes visually prominent.
 </p>
 
+                <!-- uncertainty-visual:lhs-spatial:start -->
+                <figure class="figure-block" id="fig-lhs-spatial">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1789237351/owkqpegj72jgaov00h9k.png" alt="LHS point-coordinate map coloured by per-fault probability that the Coulomb Failure Index reaches one" width="1856" height="1051" loading="lazy" decoding="async">
+                        <button type="button" class="figure-zoom-btn" style="z-index: 2;" aria-label="Enlarge Figure 9.1">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <figcaption class="ph-caption"><strong>Figure 9.1</strong> — LHS Spatial Probability Map in Point Mode, joining the 21 fault IDs to the X/Y coordinates in the same Excel workbook; both coordinate units are metres. Colours show per-fault P(Fsi ≥ 1) as a fraction, not a percentage. The upper colour-scale value 0.001 corresponds to 0.1%. These are sampled estimates at fault locations, not an interpolated probability surface; zero observed failures does not prove zero risk. This 1,000-sample LHS example is not yet converged; increase SAMPLES and review validation before drawing conclusions.</figcaption>
+                </figure>
+                <!-- uncertainty-visual:lhs-spatial:end -->
+
 <h3 id="9.5">9.5 Visualization single-plot catalog</h3>
 <table>
 <tbody><tr><th>Plot type</th><th>Description</th></tr>
@@ -761,6 +836,18 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
 <tr><td>Probabilistic Response Analysis</td><td>3 × 3</td><td>Eight input-response panels plus a sensitivity tornado.</td></tr>
 <tr><td>Fault-Level Uncertainty Envelopes</td><td>2 × 3</td><td>Ts, Td, Sf, Fsi envelopes and Fault Behaviour Classification.</td></tr>
 </tbody></table>
+
+                <!-- uncertainty-visual:lhs-responses-wide:start -->
+                <figure class="figure-block" id="fig-lhs-responses-wide">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1789237355/p6suv6nwobppq8qjqlfn.png" alt="LHS eight-panel histogram and empirical CDF layout for Ts, Td, Sf, and Fsi" width="4210" height="1970" loading="lazy" decoding="async">
+                        <button type="button" class="figure-zoom-btn" style="z-index: 2;" aria-label="Enlarge Figure 9.2">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <figcaption class="ph-caption"><strong>Figure 9.2</strong> — Native LHS Response Metric Distributions layout. Each column pairs a histogram (top) with an empirical cumulative distribution in percent (bottom) for Ts, Td, Sf, or Fsi across 21,000 fault-realization rows. Red dashed lines mark sample means; Sf is in MPa and the other metrics are dimensionless. The wider native export keeps all eight panel titles readable; use Enlarge to inspect labels. This 1,000-sample LHS example is not yet converged; increase SAMPLES and review validation before drawing conclusions.</figcaption>
+                </figure>
+                <!-- uncertainty-visual:lhs-responses-wide:end -->
 
 <h2 id="advanced">10. Advanced Features</h2>
 <h3 id="10.1">10.1 Full-screen visualization</h3>
@@ -934,7 +1021,7 @@ rotated_y = nx·cos(SHmax) − ny·sin(SHmax)        (component along the other 
     <li>SRC/PRCC can under-represent strongly non-monotonic input-output relationships, and squared SRCs are a variance decomposition only when the inputs are uncorrelated and the response is linear — read the reported R², ΣSRC² and largest input |r| alongside the tornado chart.</li>
     <li>Fracture susceptibility is always computed on effective normal stress and is exempt from the Effective-Stress switch, because a sustainable pore-pressure increase has no total-stress form; it is undefined where σ′<sub>n</sub> ≤ 0 or μ ≤ 0, and those realizations are excluded from the failure probability rather than counted as non-failures.</li>
     <li>Stress regimes are realised by permuting which sampled magnitude enters each slot of a fixed geometry (<a href="#5.4">Section 5.4</a>), not by re-deriving the geometry; an unrecognised regime string falls back to reverse/thrust.</li>
-    <li>A truncated normal cannot reach every (mean, SD) pair on a bounded support — the SD ceiling is (b − a)/√12 on a finite range and SD/mean &lt; 1 on [0, ∞) — so a wide spread on a tightly bounded input must be expressed with a Lognormal, Gamma or Uniform law.</li>
+    <li>A truncated normal cannot reach every (mean, SD) pair: its SD ceiling is (b − a)/√12 on a finite range (lower away from the midpoint), and SD/mean &lt; 1 on [0, ∞). Consider Lognormal or Gamma for positive unbounded inputs, or Beta or a feasible Uniform law for friction on [0,1]; changing the law does not remove its support constraints.</li>
     <li>The ±1.96·s/√n interval on the statistics cards assumes independent, identically distributed rows, which a stratified LHS design pooled across faults does not satisfy; treat it as indicative and use the convergence diagnostics for decisions.</li>
     <li>Circular treatment covers the mean, dispersion and overlay bands of strike and SHmax and the folding of strike before sensitivity fitting; formal circular-uniformity tests (Rayleigh, Watson) on the sampled orientations are not computed.</li>
     <li>Fisher 3D uses one concentration parameter and cannot represent anisotropic elliptical orientation dispersion.</li>

@@ -535,6 +535,18 @@ field_x, field_y = (radius*np.sin(trend)).ravel(), (radius*np.cos(trend)).ravel(
                     thresholds are always identical between the two tabs for a given stress state.
                 </p>
 
+                <!-- dynamic-visual:stereonet-dilation-field:start -->
+                <figure class="figure-block" id="fig-stereonet-dilation-field">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1789234661/a0mpkddajqzd1mm4pfvi.png" alt="Excel fracture poles over the theoretical dilation-tendency field on an equal-area stereonet" width="1555" height="1215" loading="lazy" decoding="async">
+                        <button type="button" class="figure-zoom-btn" style="z-index: 2;" aria-label="Enlarge Figure 5.1">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <figcaption class="ph-caption"><strong>Figure 5.1</strong> — Dilation-tendency field for the 21 Excel fracture planes, using principal stresses 100/50/25 MPa and the existing stress orientation; cohesion and pore pressure remain 0 MPa and friction is 0.6. Red poles are measured input orientations; the continuous background evaluates all possible plane orientations, not spatial interpolation between measurements. The cyan cross retains the selection of ID 17, and the white symbols identify the three principal-stress axes.</figcaption>
+                </figure>
+                <!-- dynamic-visual:stereonet-dilation-field:end -->
+
                 <h3 id="section-5-2">5.2 Settings Card — General Appearance</h3>
                 <table>
                     <tbody><tr><th>Control</th><th>Widget</th><th>Default</th><th>Effect</th></tr>
@@ -626,6 +638,18 @@ field_x, field_y = (radius*np.sin(trend)).ravel(), (radius*np.cos(trend)).ravel(
                     calls <code>_draw_stereonet()</code> (among the other tabs' own redraw methods) so the newly
                     selected pole's halo appears immediately, without the user needing to manually refresh.
                 </p>
+
+                <!-- dynamic-visual:stereonet-selected-plane:start -->
+                <figure class="figure-block" id="fig-stereonet-selected-plane">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1789234664/rd4tjoqz87x94ifgkca7.png" alt="Selected Excel plane ID 17 and its cyan great circle beside the Stereonet Pole Inspector" width="1535" height="939" loading="lazy" decoding="async">
+                        <button type="button" class="figure-zoom-btn" style="z-index: 2;" aria-label="Enlarge Figure 6.1">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <figcaption class="ph-caption"><strong>Figure 6.1</strong> — Linked selection of Excel plane ID 17 in the Stereonet. The cyan great circle traces the selected plane, while its highlighted pole marks the normal. The Pole Inspector reports strike 51.2°, dip 73.2°, effective normal stress 52.01 MPa, and shear stress 30.32 MPa—the same stress pair shown in the Mohr example. The background here is normalised slip tendency, rather than the dilation field in Figure 5.1.</figcaption>
+                </figure>
+                <!-- dynamic-visual:stereonet-selected-plane:end -->
 
                 <h3 id="section-6-4">6.4 Empty and Degenerate States</h3>
                 <p>

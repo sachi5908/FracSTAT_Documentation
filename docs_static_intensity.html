@@ -334,6 +334,18 @@
                 </tbody></table>
 
                 <!-- ================================================= -->
+                <!-- static-visual:intensity-p21:start -->
+                <figure class="figure-block" id="fig-static-intensity-p21">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1789261868/s4vinai3k0emvqgd8mi2.png" alt="Native P21 intensity heatmap with scan-circle outlines, trace overlay and centimetre inverse units" width="1616" height="931" loading="lazy" decoding="async">
+                        <button type="button" class="figure-zoom-btn" style="z-index: 2;" aria-label="Enlarge Figure 4.1">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <figcaption class="ph-caption"><strong>Figure 4.1</strong> — Native Estimated Intensity, P21 grid heatmap with fracture traces and scan-circle outlines enabled. The Number of scan circles setting is 12, from which the application derives a full two-dimensional grid, not just 12 circles in total. The colour bar is in cm⁻¹. Circle size, calibration, and sampling location affect the estimates; white cells are not coloured estimates and should not automatically be interpreted as measured zero intensity. The sidebar continues below the visible area.</figcaption>
+                </figure>
+                <!-- static-visual:intensity-p21:end -->
+
                 <h2 id="maths">5. Mathematical Background</h2>
                 <p>
                     The circular scanline method was developed to overcome a fundamental limitation of straight‑line
@@ -467,9 +479,10 @@ n_secondary =  floor( L_secondary / Δ_secondary − 1 )</div>
 x_i  =  x_min + i × Δx_circle ,   i = 1 … xNumCircle
 y_j  =  y_min + j × Δy_circle ,   j = 1 … yNumCircle</div>
                 <p>
-                    producing an evenly spaced, inset grid of centres that never places a circle exactly on the
-                    bounding‑box edge, ensuring every circle's full circumference lies within (or at worst, extends
-                    only minimally past) the sampled domain.
+                    producing a regular grid of centres based on the data's bounding box, not a mapped-area
+                    polygon. This does not guarantee that every circle lies inside the surveyed domain,
+                    especially for irregular coverage or a narrow domain where the secondary circle count is
+                    clamped to one. Inspect coverage with <strong>Show scan circles</strong> enabled.
                 </p>
 
                 <!-- ================================================= -->
@@ -484,7 +497,7 @@ y_j  =  y_min + j × Δy_circle ,   j = 1 … yNumCircle</div>
                 <h3 id="sec-6-1">6.1 Step 1 — Validation and Grid Layout</h3>
                 <ol class="step-list">
                     <li>Verify <code>self.results</code> is non‑empty and, if the data source is Excel, that the segments carry real spatial geometry (not orientation‑only preset strike/dip data).</li>
-                    <li>Verify the four required columns (X1, Y1, X2, Y2, Length_m) are present.</li>
+                    <li>Verify the five required columns (X1, Y1, X2, Y2, Length_m) are present.</li>
                     <li>Parse <code>num_circles_var</code> and <code>contour_levels_var</code> from their text fields, applying documented fallback defaults (12 and 15 respectively) on parse failure, and writing the corrected/parsed value back into the StringVar so the sidebar reflects what was actually used.</li>
                     <li>Compute the dataset bounding box (xMin, xMax, yMin, yMax) from the min/max of both endpoint columns, and derive Δx, Δy (mapArea = Δx × Δy).</li>
                     <li>Apply the packing geometry of <a href="#sec-5-5">Section 5.5</a> to obtain xNumCircle, yNumCircle, rCircle, and the two per‑axis centre‑spacing increments, clamping both circle counts to a minimum of 1.</li>
@@ -826,6 +839,18 @@ m_arr = ((d1_sq &lt; r_sq) &amp; tip1_mask[:, None]).astype(int) \
                 </p>
 
                 <!-- ================================================= -->
+                <!-- static-visual:intensity-p20:start -->
+                <figure class="figure-block" id="fig-static-intensity-p20">
+                    <div class="figure-img-wrap img-loaded">
+                        <img src="https://res.cloudinary.com/hcaqjcqf/image/upload/v1789261872/dapu58jonpnnuddzka6u.png" alt="Native P20 density heatmap in inverse square centimetres with fracture traces overlaid" width="2140" height="1552" loading="lazy" decoding="async">
+                        <button type="button" class="figure-zoom-btn" style="z-index: 2;" aria-label="Enlarge Figure 11.1">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                        </button>
+                    </div>
+                    <figcaption class="ph-caption"><strong>Figure 11.1</strong> — Estimated Density, P20 for the same SVG and scan-grid setting, with circle outlines hidden to expose spatial variation. The scale is cm⁻², unlike the P21 scale in Figure 4.1. Density is estimated from trace-tip counts in circular samples; it is not a count of every digitised segment endpoint. Compare spatial patterns, not numerical colour-bar values across P20 and P21, and do not treat either map as a permeability prediction.</figcaption>
+                </figure>
+                <!-- static-visual:intensity-p20:end -->
+
                 <h2 id="interpretation">12. Geological Interpretation</h2>
                 <p>
                     Fracture intensity (P21) and density (P20) are foundational inputs to discrete fracture network

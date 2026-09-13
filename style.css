@@ -1753,7 +1753,41 @@ body::before {
 }
 
 /* Shared navigation ------------------------------------------------------- */
+/* Native document transitions preserve the outgoing page until the next one
+   is ready. Unsupported browsers simply keep normal link navigation. */
+@view-transition {
+    navigation: auto;
+}
+
+::view-transition-group(*) {
+    animation-duration: 320ms;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::view-transition-old(root) {
+    animation: page-content-out 320ms ease both;
+}
+
+::view-transition-new(root) {
+    animation: page-content-in 320ms ease both;
+}
+
+@keyframes page-content-out {
+    to { opacity: 0; }
+}
+
+@keyframes page-content-in {
+    from { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    @view-transition {
+        navigation: none;
+    }
+}
+
 .navbar {
+    view-transition-name: site-navbar;
     min-height: 76px;
     padding: 0 5%;
     background: rgba(13, 19, 16, 0.9);
@@ -1771,6 +1805,14 @@ body::before {
     width: auto;
     height: 38px;
     filter: brightness(0) invert(1);
+}
+
+.navbar .logo-img {
+    view-transition-name: site-logo;
+}
+
+.navbar .nav-links {
+    view-transition-name: site-links;
 }
 
 .nav-links {
