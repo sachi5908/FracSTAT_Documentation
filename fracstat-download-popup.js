@@ -59,7 +59,7 @@ window.FracSTATDownloadPopup = (function () {
     const FIELD_PLACEHOLDERS = {
         name: "e.g. A. Mehta",
         email: "name@example.edu",
-        institution: "e.g. Indian Institute of Technology Bombay",
+        institution: "e.g. Sagar University",
         country: "Select your country"
     };
 

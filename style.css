@@ -5003,6 +5003,14 @@ select.fs-input {
         align-items: stretch;
     }
 
+    /* The note's `flex: 1 1 240px` is a WIDTH basis in the row layout above, but
+       once the foot stacks, that 240px becomes the note's HEIGHT — which left a
+       ~210px hole between the note and the button on phones. Size it to its own
+       text again, and let the gap do the spacing. */
+    .fs-form-note {
+        flex: 0 0 auto;
+    }
+
     .fs-submit {
         width: 100%;
     }
