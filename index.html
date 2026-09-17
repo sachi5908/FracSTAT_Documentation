@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FracSTAT | Fracture Statistical Analysis</title>
     <link rel="icon" type="image/png" href="https://res.cloudinary.com/hcaqjcqf/image/upload/v1784441772/akioq6cgnbsigsemtf0f.png">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
     <!-- Home-page loader: animated FracSTAT mark with lightweight status. -->
@@ -48,18 +48,23 @@
         <div class="hero-content">
             <div class="badge">
                 <span class="badge-pulse"></span>
-                v1.0.0 is now available
+                Pre-registration open — v1.0.0 coming soon
             </div>
             
             <h1 class="gradient-text">Unified <em>Fracture Network</em> Analyzer</h1>
             <p>Comprehensive, high-performance tools for static, dynamic, and uncertainty analysis of complex fracture networks.</p>
             
             <div class="hero-buttons">
-                <button id="downloadBtn" class="btn primary-btn">
+                <!-- data-fracstat-download is the hook fracstat-download-popup.js
+                     listens for: the click opens the pre-registration form.
+                     FracSTAT v1.0.0 is not published yet, so nothing is
+                     transferred — the form records the visitor and emails the
+                     download link once the release is live. -->
+                <button id="downloadBtn" class="btn primary-btn" data-fracstat-download="true">
                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                     </svg>
-                    Download FracSTAT
+                    Pre-register for FracSTAT
                 </button>
                 <a href="introduction.html" class="btn secondary-btn">
                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -78,6 +83,17 @@
                     PDF Manual
                 </a>
             </div>
+
+            <!-- Nobody is offered a file yet. The note says so plainly and
+                 states the one thing the registration form promises: the link
+                 is emailed to whoever pre-registers. Kept out of the admin
+                 editor's reach (this hero is not inside [data-admin-root]) so
+                 the promise cannot drift from fracstat-download-popup.js. -->
+            <p class="hero-soon-note">
+                <strong>Download link coming soon.</strong> FracSTAT v1.0.0 is in final
+                preparation. Pre-register now and we will email the download link to your
+                address as soon as the release is available.
+            </p>
         </div>
 
         <!-- Desktop App Mockup Presentation -->
@@ -302,6 +318,59 @@
     </section>
     </div><!-- /.home-editable -->
 
+    <!-- =====================================================================
+         Download statistics — where FracSTAT is being used
+         ---------------------------------------------------------------------
+         Deliberately kept OUTSIDE [data-admin-root]: the heatmap SVG is built
+         at runtime by fracstat-worldmap.js, and if this markup were part of
+         the admin editor's editable region a "Download / push to GitHub" run
+         would bake the generated paths into the HTML file.
+
+         The three hosts below are filled by the modules loaded at the bottom
+         of this page, all of them from the same statistics snapshot
+         (data/fracstat_downloads.json + this browser's queued submissions):
+           #statsMeta  — aggregate chips (total, countries, institutions, …)
+           #statsMap   — interactive world heatmap
+           #statsRank  — ranked country list (also the accessible alternative)
+         Append ?statsdemo=1 to the URL to preview it with sample numbers.
+    ====================================================================== -->
+    <section class="download-stats" id="download-stats">
+        <div class="download-stats-head reveal">
+            <small>Global reach</small>
+            <h2>Where FracSTAT is being used</h2>
+            <p>Each registration is counted once, by country and by institution. The map, the
+                ranking list and the figures above them are all built from the same public
+                statistics file — no tracking cookies, no third-party analytics.</p>
+        </div>
+
+        <!-- Aggregate chips: rendered by FracSTATWorldMap.renderMeta(). -->
+        <div class="download-stats-meta" id="statsMeta" aria-live="polite"></div>
+
+        <div class="download-stats-grid">
+            <div class="download-stats-map">
+                <!-- Interactive heatmap: rendered by FracSTATWorldMap.create(). -->
+                <div id="statsMap" class="download-stats-map-host"></div>
+            </div>
+
+            <aside class="download-stats-rank">
+                <h3>Top countries</h3>
+                <p class="download-stats-rank-sub">Registered downloads, all time.</p>
+                <!-- Ranked bars: rendered by FracSTATWorldMap.createRankList(). -->
+                <div id="statsRank"></div>
+                <p class="download-stats-rank-hint">Hover a row to highlight that country on the map.</p>
+            </aside>
+        </div>
+
+        <p class="download-stats-foot">
+            The download link is coming soon — pre-register and we will email it to you as soon as
+            the release is available. Statistics are aggregated and stored without any personal
+            details being published.
+            <button type="button" class="download-stats-cta" data-fracstat-download="true">
+                Pre-register for FracSTAT
+            </button>
+        </p>
+    </section>
+
     <footer class="modern-footer">
         <div class="footer-grid">
             <!-- Brand Column -->
@@ -371,5 +440,97 @@
 
     <script src="script.js"></script>
 
+
+    <!-- =====================================================================
+         Download statistics modules (load order matters)
+         ---------------------------------------------------------------------
+           0. data/world-countries.js      country outlines (defines a global)
+           1. fracstat-stats.js            config, JSON store, aggregation
+           2. fracstat-worldmap.js         heatmap, rank list, meta chips
+           3. fracstat-download-popup.js   pre-registration form (no file is
+                                           published yet — the link is emailed)
+
+         All three modules are dependency-free and degrade on their own: if the
+         statistics feed or the country outlines cannot be loaded the section
+         shows an explanatory line instead of numbers, and a registration never
+         blocks the file download.
+    ====================================================================== -->
+    <!-- The country outlines travel as a <script>, not as a fetch: a page
+         opened straight from disk (file://) cannot fetch a sibling JSON file,
+         which is how the heatmap used to fall back to a CDN copy drawn with the
+         de-facto India boundary. The ?v= stamp is the release marker — bump it
+         together with FRACSTAT_CONFIG.geojsonVersion so a cached copy can never
+         outlive a boundary fix. -->
+    <script src="data/world-countries.js?v=2"></script>
+    <script src="fracstat-stats.js?v=5"></script>
+    <script src="fracstat-worldmap.js?v=2"></script>
+    <script src="fracstat-download-popup.js?v=4"></script>
+    <script>
+    /* ---------------------------------------------------------------------
+       Home-page boot: wires the statistics section to the modules.
+
+       Kept inline (instead of in script.js) because index.html is the only
+       page that shows the heatmap; admin.html mounts its own panel. The
+       widgets repaint themselves after a new registration through
+       FracSTATStats.subscribe(), so nothing else has to be called here.
+    --------------------------------------------------------------------- */
+    (function () {
+        "use strict";
+
+        function startWidgets() {
+            var stats = window.FracSTATStats;
+            var worldMap = window.FracSTATWorldMap;
+            var mapHost = document.getElementById("statsMap");
+            var rankHost = document.getElementById("statsRank");
+            var metaHost = document.getElementById("statsMeta");
+
+            if (!stats || !worldMap) return;
+
+            var map = null;
+            if (mapHost) {
+                try {
+                    map = worldMap.create(mapHost, { stats: stats });
+                } catch (err) {
+                    // The section keeps its heading and copy without the map.
+                    if (window.console && console.error) console.error("Download map:", err);
+                }
+            }
+
+            if (rankHost) {
+                try {
+                    worldMap.createRankList(rankHost, { stats: stats, map: map });
+                } catch (err) {
+                    if (window.console && console.error) console.error("Country ranking:", err);
+                }
+            }
+
+            if (metaHost) {
+                try {
+                    worldMap.renderMeta(metaHost, { stats: stats });
+                } catch (err) {
+                    if (window.console && console.error) console.error("Statistics chips:", err);
+                }
+            }
+        }
+
+        function boot() {
+            var stats = window.FracSTATStats;
+            if (!stats || typeof stats.load !== "function") {
+                startWidgets();
+                return;
+            }
+            // Read the published snapshot (plus anything queued in this
+            // browser) first, then paint. load() resolves even when the file
+            // is missing, in which case the widgets explain the failure.
+            Promise.resolve(stats.load()).then(startWidgets, startWidgets);
+        }
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", boot);
+        } else {
+            boot();
+        }
+    }());
+    </script>
 
 </body></html>

@@ -1707,6 +1707,37 @@ body.lightbox-open {
     --sage: #8a9a57;
     --border: rgba(17, 26, 18, 0.12);
     --border-dark: rgba(245, 241, 228, 0.14);
+
+    /* ---- Download heatmap -------------------------------------------------
+       The map panel stays light, like every other surface on the site: a pale
+       sea-glass ocean with warm parchment land. The hue split between those two
+       is what makes a country read as a shape, and the contrast on top of it
+       comes from the heat ramp, whose six steps are all mid-tone so they work
+       on this panel and on the cream rank card alike. --map-land is the colour
+       of a country with no downloads yet; it is also the empty legend swatch,
+       so both live here. The ocean is a shade deeper than the page cream on
+       purpose — that is what gives the parchment land something to sit against
+       (dE ~11) while both stay light, and the ink alphas below are set so all
+       three still clear 4.5:1 against it. */
+    --map-ocean: #c9e0d9;
+    --map-land: #efece0;
+    --map-border: rgba(13, 19, 16, 0.18);
+    --map-border-strong: rgba(13, 19, 16, 0.34);
+    --map-ink: #0d1310;
+    --map-ink-soft: rgba(13, 19, 16, 0.72);
+    --map-ink-faint: rgba(13, 19, 16, 0.64);
+
+    /* ---- Download actions -------------------------------------------------
+       One ember ramp for every "download FracSTAT" control (hero button,
+       statistics CTA, modal submit). The light end is deliberately deep enough
+       that the white label still clears WCAG AA at 4.7:1; the flat
+       --rust -> #d4763f gradient this replaced reached only 3.1:1. */
+    --ember-1: #ba5620;
+    --ember-2: #a2451a;
+    --ember-3: #88320f;
+    --ember-glow: rgba(136, 50, 15, 0.28);
+    --ember-glow-strong: rgba(136, 50, 15, 0.42);
+
     --primary-color: var(--teal);
     --primary-hover: #176b60;
     --secondary-color: var(--stone);
@@ -1945,26 +1976,56 @@ body::before {
     text-transform: uppercase;
 }
 
+/* The download action. Deep ember with a top sheen, so it reads as a lit
+   button rather than a flat orange slab, plus a rim that keeps the edge crisp
+   on the cream page. */
 .primary-btn {
-    background: linear-gradient(135deg, var(--rust), #d4763f);
-    box-shadow: 0 14px 30px rgba(193, 100, 47, 0.28);
+    background: linear-gradient(160deg, var(--ember-1) 0%, var(--ember-2) 55%, var(--ember-3) 100%);
+    color: #fff;
+    box-shadow:
+        0 14px 30px var(--ember-glow),
+        inset 0 1px 0 rgba(255, 255, 255, 0.24),
+        0 0 0 1px rgba(106, 38, 10, 0.35);
 }
 
 .primary-btn:hover {
-    background: linear-gradient(135deg, var(--rust), #d4763f);
-    box-shadow: 0 18px 36px rgba(193, 100, 47, 0.38);
+    background: linear-gradient(160deg, #c96229 0%, var(--ember-2) 55%, var(--ember-3) 100%);
+    box-shadow:
+        0 18px 38px var(--ember-glow-strong),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 0 0 1px rgba(106, 38, 10, 0.4);
 }
 
+.primary-btn:active {
+    transform: translateY(0);
+    box-shadow:
+        0 8px 18px var(--ember-glow),
+        inset 0 2px 6px rgba(60, 20, 5, 0.35);
+}
+
+/* Focus is a solid ink ring — 16.6:1 against the cream page and 3.4:1 against
+   the button itself, so it is unmissable from either side. */
+.primary-btn:focus-visible,
+.secondary-btn:focus-visible,
+.download-stats-cta:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+}
+
+/* A solid white surface with a teal hover: the pair to the ember button
+   without competing with it. */
 .secondary-btn {
-    border-color: var(--border);
-    background: rgba(255, 255, 255, 0.6);
+    border-color: rgba(17, 26, 18, 0.18);
+    background: #fff;
     color: var(--ink);
+    box-shadow: 0 2px 8px rgba(13, 19, 16, 0.06);
 }
 
 .secondary-btn:hover {
-    border-color: var(--muted-light);
+    border-color: var(--teal);
     background: #fff;
-    color: var(--ink);
+    color: var(--teal);
+    box-shadow: 0 6px 16px rgba(31, 133, 119, 0.16);
 }
 
 .app-mockup-container {
@@ -3546,6 +3607,28 @@ body::before {
     justify-content: center;
 }
 
+/* The hero's promise while FracSTAT v1.0.0 is pre-registration only: there is
+   no file to fetch yet, so the note says so and states what the form does with
+   the address (emails the link). The selector is heavier than the generic
+   `.hero-content p` above on purpose — the note keeps its own compact size and
+   quiet colour instead of picking up the hero lead's 1.25rem. */
+.hero-content p.hero-soon-note {
+    display: inline-block;
+    max-width: 620px;
+    margin: 1.15rem auto 0;
+    padding: 0.55rem 1rem;
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.55);
+    color: var(--muted);
+    font-size: 0.86rem;
+    line-height: 1.6;
+}
+
+.hero-content p.hero-soon-note strong {
+    color: var(--ink);
+}
+
 .hero-fracture-art {
     position: absolute;
     z-index: 1;
@@ -3877,17 +3960,28 @@ body::before {
     flex-shrink: 0;
 }
 
+/* The manual page's own download action, so it matches the ember ramp used by
+   the hero button, the statistics CTA and the registration modal's submit. */
 .pdf-action-btn--primary {
     border-color: transparent;
-    background: linear-gradient(135deg, var(--rust), #d4763f);
+    background: linear-gradient(160deg, var(--ember-1) 0%, var(--ember-2) 55%, var(--ember-3) 100%);
     color: #fff;
-    box-shadow: 0 14px 30px rgba(193, 100, 47, 0.28);
+    box-shadow:
+        0 14px 30px var(--ember-glow),
+        inset 0 1px 0 rgba(255, 255, 255, 0.24);
 }
 
 .pdf-action-btn--primary:hover {
     border-color: transparent;
-    background: linear-gradient(135deg, var(--rust), #d4763f);
-    box-shadow: 0 18px 36px rgba(193, 100, 47, 0.38);
+    background: linear-gradient(160deg, #c96229 0%, var(--ember-2) 55%, var(--ember-3) 100%);
+    box-shadow:
+        0 18px 36px var(--ember-glow-strong),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.pdf-action-btn--primary:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
 }
 
 /* The generic docs link rule (.docs-content a:not(.nav-btn):not(.figure-zoom-btn))
@@ -3962,6 +4056,968 @@ body::before {
     .pdf-viewer-wrap {
         height: min(70vh, 620px);
         border-radius: 12px;
+    }
+}
+
+
+/* ==========================================================================
+   Download statistics — public section (index.html)
+   --------------------------------------------------------------------------
+   The heatmap, the ranking list and the chip row are built at runtime by
+   fracstat-worldmap.js, so every class below either belongs to this section's
+   static markup (index.html, outside [data-admin-root]) or to a widget that
+   module creates.
+
+   The map keeps the site's light surface — a pale sea-glass panel (--map-ocean)
+   rather than the cream page itself, so a country with no downloads (--map-land,
+   warm parchment) still reads as a shape. The six heat steps mirror
+   DEFAULT_COLORS in fracstat-worldmap.js and are all mid-tone on purpose: each
+   one has to stay legible on that pale panel *and* as a thin bar on the cream
+   rank-list card, which is exactly what the old pale-teal ramp failed at:
+       #2f7d9e  #2f9c85  #57b96b  #a8c94a  #e0a63a  #c2411d
+   teal-blue -> teal -> green -> yellow-green -> amber -> ember, i.e. cold for
+   the fewest downloads and hot for the most.
+   ========================================================================== */
+.download-stats {
+    position: relative;
+    overflow: hidden;
+    padding: 6.5rem 5%;
+    background:
+        radial-gradient(ellipse 55% 45% at 88% 8%, rgba(31, 133, 119, 0.08), transparent),
+        radial-gradient(ellipse 50% 40% at 6% 92%, rgba(193, 100, 47, 0.06), transparent),
+        var(--paper);
+}
+
+.download-stats-head {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 2.5rem;
+    text-align: center;
+}
+
+.download-stats-head small {
+    color: var(--rust);
+    font-family: var(--mono-font);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.download-stats-head h2 {
+    margin-top: 0.7rem;
+    color: var(--ink);
+    font-family: var(--display-font);
+    font-weight: 800;
+    font-size: clamp(1.8rem, 3.6vw, 2.6rem);
+    letter-spacing: -0.03em;
+}
+
+.download-stats-head p {
+    max-width: 620px;
+    margin: 0.85rem auto 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.7;
+}
+
+.download-stats-meta {
+    max-width: 1180px;
+    margin: 0 auto 1.75rem;
+}
+
+.download-stats-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.85fr) minmax(270px, 1fr);
+    align-items: start;
+    gap: 1.35rem;
+    max-width: 1180px;
+    margin: 0 auto;
+}
+
+.download-stats-map,
+.download-stats-rank {
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: rgba(251, 249, 242, 0.92);
+    box-shadow: 0 1px 2px rgba(13, 19, 16, 0.04);
+}
+
+.download-stats-map {
+    padding: 1rem 1rem 0.8rem;
+}
+
+.download-stats-map-host {
+    position: relative;
+}
+
+.download-stats-rank {
+    padding: 1.15rem 1.2rem 1.25rem;
+}
+
+.download-stats-rank h3 {
+    color: var(--ink);
+    font-family: var(--display-font);
+    font-size: 1.02rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.download-stats-rank-sub {
+    margin-top: 0.2rem;
+    color: var(--muted-light);
+    font-family: var(--mono-font);
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.download-stats-rank-hint {
+    margin-top: 0.9rem;
+    color: var(--muted);
+    font-size: 0.72rem;
+    line-height: 1.6;
+}
+
+.download-stats-foot {
+    max-width: 1180px;
+    margin: 1.6rem auto 0;
+    color: var(--muted);
+    font-size: 0.82rem;
+    text-align: center;
+}
+
+/* The same download action as the hero button, at the size a sentence can
+   carry — as an underlined teal link it was almost invisible. */
+.download-stats-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1.05rem;
+    border: 0;
+    border-radius: 999px;
+    margin-left: 0.45rem;
+    background: linear-gradient(160deg, var(--ember-1) 0%, var(--ember-2) 55%, var(--ember-3) 100%);
+    color: #fff;
+    font: inherit;
+    font-size: 0.86rem;
+    font-weight: 600;
+    vertical-align: middle;
+    cursor: pointer;
+    box-shadow:
+        0 8px 20px var(--ember-glow),
+        inset 0 1px 0 rgba(255, 255, 255, 0.24);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.download-stats-cta:hover {
+    transform: translateY(-1px);
+    box-shadow:
+        0 12px 26px var(--ember-glow-strong),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* --------------------------------------------------------------------------
+   Heatmap chrome (fracstat-worldmap.js -> .fs-map*)
+   -------------------------------------------------------------------------- */
+/* The panel: pale sea-glass ocean, warm parchment land. The hue split between
+   those two is what makes a country with no downloads read as a shape, so
+   nothing has to go dark to be seen. The two glows are the section's own
+   teal/rust accents, kept faint so they never compete with the heat ramp. */
+.fs-map {
+    position: relative;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background:
+        radial-gradient(ellipse 62% 58% at 16% 10%, rgba(31, 133, 119, 0.1), transparent 72%),
+        radial-gradient(ellipse 58% 52% at 90% 92%, rgba(193, 100, 47, 0.07), transparent 72%),
+        var(--map-ocean);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.fs-map-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* No inline fill is written for a country with zero downloads, so this is both
+   the "no data" colour and the colour of the empty legend swatch. The stroke is
+   a dark hairline: on a light map it is the gaps between countries that read as
+   borders, the way a printed map works, and it is also what separates the
+   parchment land from the sea-glass ocean. */
+.fs-map-country {
+    fill: var(--map-land);
+    stroke: var(--map-border);
+    stroke-width: 0.6;
+    stroke-linejoin: round;
+    cursor: pointer;
+    transition: fill 0.25s ease, opacity 0.2s ease;
+}
+
+/* A country with data gets a slightly stronger outline, so the data shapes sit
+   crisply on top of the quiet no-data ones. */
+.fs-map-country.has-data {
+    stroke: var(--map-border-strong);
+}
+
+/* Dimming the rest of the world while one country is hovered has to stop short
+   of washing the fills out, or the pale end of the ramp disappears. */
+.fs-map-country.is-dim {
+    opacity: 0.5;
+}
+
+/* Hover/selection is a near-black outline — the one colour on the panel that no
+   heat step uses, so it can never be mistaken for data. */
+.fs-map-country.is-active {
+    stroke: var(--map-ink);
+    stroke-width: 1.2;
+    opacity: 1;
+}
+
+.fs-map-status {
+    padding: 2.2rem 1rem;
+    color: var(--map-ink-soft);
+    font-family: var(--mono-font);
+    font-size: 0.74rem;
+    text-align: center;
+}
+
+.fs-map-status.is-error {
+    color: var(--ember-3);
+}
+
+.fs-map-note {
+    margin-top: 0.6rem;
+    color: var(--map-ink-faint);
+    font-size: 0.72rem;
+    line-height: 1.6;
+}
+
+.is-hidden {
+    display: none !important;
+}
+
+.fs-map-legend {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem 0.85rem;
+    margin-top: 0.55rem;
+    color: var(--map-ink-soft);
+    font-family: var(--mono-font);
+    font-size: 0.66rem;
+}
+
+.fs-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.fs-legend-swatch {
+    display: inline-block;
+    width: 14px;
+    height: 10px;
+    border: 1px solid var(--map-border-strong);
+    border-radius: 3px;
+}
+
+.fs-swatch-empty {
+    background: var(--map-land);
+}
+
+.fs-legend-caption {
+    margin-left: auto;
+    color: var(--map-ink-faint);
+}
+
+/* Dark bubble on the pale panel: it is the one dark surface in the widget, and
+   that is what separates it from the map behind it. */
+.fs-map-tooltip {
+    position: absolute;
+    z-index: 5;
+    max-width: 230px;
+    padding: 0.5rem 0.65rem;
+    border: 1px solid var(--border-dark);
+    border-radius: 10px;
+    background: var(--ink);
+    color: var(--stone);
+    font-size: 0.72rem;
+    line-height: 1.5;
+    pointer-events: none;
+    box-shadow: 0 16px 34px rgba(4, 10, 8, 0.3);
+    transform: translate(-50%, calc(-100% - 14px));
+}
+
+.fs-map-tooltip strong {
+    display: block;
+    font-size: 0.76rem;
+}
+
+.fs-map-tooltip span {
+    display: block;
+    color: var(--stone-2);
+}
+
+/* Edge clamping: the bubble is positioned by its centre, so close to either
+   side it is nudged back inside the frame instead of overflowing it. */
+.fs-map-tooltip.flip-left {
+    transform: translate(-8px, calc(-100% - 14px));
+}
+
+.fs-map-tooltip.flip-right {
+    transform: translate(calc(-100% + 8px), calc(-100% - 14px));
+}
+
+/* --------------------------------------------------------------------------
+   Ranked country list (fracstat-worldmap.js -> .fs-rank*)
+   -------------------------------------------------------------------------- */
+.fs-rank-list {
+    display: grid;
+    gap: 0.25rem;
+    margin: 0.85rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.fs-rank-item {
+    display: grid;
+    grid-template-columns: 1.35rem minmax(0, 1fr) 4.25rem 3.6rem;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.32rem 0.45rem;
+    border-radius: 9px;
+    cursor: default;
+    transition: background 0.2s ease;
+}
+
+.fs-rank-item:hover,
+.fs-rank-item.is-active {
+    background: rgba(31, 133, 119, 0.1);
+}
+
+.fs-rank-pos {
+    color: var(--muted-light);
+    font-family: var(--mono-font);
+    font-size: 0.66rem;
+    text-align: right;
+}
+
+.fs-rank-name {
+    overflow: hidden;
+    color: var(--text);
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.fs-rank-bar {
+    display: block;
+    overflow: hidden;
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(17, 26, 18, 0.08);
+}
+
+.fs-rank-bar i {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    transition: width 0.4s ease;
+}
+
+.fs-rank-count {
+    color: var(--ink);
+    font-family: var(--mono-font);
+    font-size: 0.72rem;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
+.fs-rank-count em {
+    display: block;
+    color: var(--muted-light);
+    font-size: 0.6rem;
+    font-style: normal;
+}
+
+.fs-rank-empty {
+    padding: 0.6rem 0.45rem;
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-style: italic;
+    line-height: 1.6;
+}
+
+.fs-rank-toggle {
+    padding: 0;
+    border: 0;
+    margin-top: 0.75rem;
+    background: none;
+    color: var(--teal);
+    font-family: var(--mono-font);
+    font-size: 0.68rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.fs-rank-toggle[hidden] {
+    display: none;
+}
+
+.fs-rank-toggle:hover {
+    color: var(--primary-hover);
+}
+
+/* --------------------------------------------------------------------------
+   Aggregate chips (fracstat-worldmap.js -> .fs-stat-chips)
+   -------------------------------------------------------------------------- */
+.fs-stat-chips {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+}
+
+.fs-stat-chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.45rem;
+    padding: 0.55rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: rgba(251, 249, 242, 0.92);
+}
+
+.fs-stat-chip strong {
+    color: var(--ink);
+    font-family: var(--display-font);
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.fs-stat-chip em {
+    color: var(--muted);
+    font-family: var(--mono-font);
+    font-size: 0.64rem;
+    font-style: normal;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+}
+
+/* Registrations recorded in this browser that the published file does not
+   contain yet — shown, but visibly provisional. */
+.fs-stat-chip.is-note {
+    border-color: rgba(193, 100, 47, 0.35);
+    background: rgba(193, 100, 47, 0.09);
+}
+
+.fs-stat-chip.is-note strong {
+    color: var(--rust);
+}
+
+/* --------------------------------------------------------------------------
+   Statistics section — narrow screens
+   -------------------------------------------------------------------------- */
+@media (max-width: 980px) {
+    .download-stats-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .download-stats-map {
+        padding: 0.75rem;
+    }
+}
+
+@media (max-width: 620px) {
+    .download-stats {
+        padding: 4.5rem 5%;
+    }
+
+    .download-stats-rank {
+        padding: 1rem;
+    }
+
+    .fs-rank-item {
+        grid-template-columns: 1.2rem minmax(0, 1fr) 3.5rem;
+    }
+
+    /* The bar is the first thing to go when the rows get tight. */
+    .fs-rank-bar {
+        display: none;
+    }
+
+    .fs-legend-caption {
+        margin-left: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fs-map-country,
+    .fs-rank-item,
+    .fs-rank-bar i,
+    .download-stats-cta {
+        transition: none;
+    }
+}
+
+/* ==========================================================================
+   Download registration modal (fracstat-download-popup.js)
+   --------------------------------------------------------------------------
+   The modal markup is created by the module, so a page only needs the script
+   tag. Class list: .fs-modal > .fs-modal-backdrop + .fs-modal-dialog, which
+   contains .fs-modal-close and either .fs-form or .fs-success.
+   ========================================================================== */
+html.fs-modal-open {
+    overflow: hidden;
+}
+
+.fs-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10050;
+    display: grid;
+    place-items: center;
+    padding: 1.25rem;
+}
+
+.fs-modal[hidden] {
+    display: none;
+}
+
+.fs-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(13, 19, 16, 0.62);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+}
+
+.fs-modal-dialog {
+    position: relative;
+    z-index: 1;
+    overflow-y: auto;
+    width: 100%;
+    max-width: 620px;
+    max-height: min(90vh, 820px);
+    padding: 1.6rem 1.6rem 1.4rem;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--paper);
+    box-shadow: 0 30px 80px rgba(13, 19, 16, 0.42);
+    animation: fsModalIn 0.22s ease-out;
+}
+
+@keyframes fsModalIn {
+    from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.99);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.fs-modal-close {
+    position: absolute;
+    top: 0.65rem;
+    right: 0.75rem;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: var(--muted);
+    font-size: 1.35rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.fs-modal-close:hover {
+    background: rgba(17, 26, 18, 0.07);
+    color: var(--ink);
+}
+
+.fs-form-head {
+    padding-right: 2.2rem;
+    margin-bottom: 1.25rem;
+}
+
+.fs-form-badge {
+    display: inline-block;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--stone);
+    font-family: var(--mono-font);
+    font-size: 0.62rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+}
+
+.fs-form-head h3 {
+    margin-top: 0.6rem;
+    color: var(--ink);
+    font-family: var(--display-font);
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.fs-form-head p {
+    margin-top: 0.4rem;
+    color: var(--muted);
+    font-size: 0.82rem;
+    line-height: 1.65;
+}
+
+.fs-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem 1rem;
+}
+
+/* Same order as FIELD_ORDER in the module (name, email, institution,
+   position, country) plus the consent row: institution and the consent
+   checkbox get the full width because they hold the longest text. */
+.fs-fields > .fs-field:nth-child(3),
+.fs-field-consent {
+    grid-column: 1 / -1;
+}
+
+.fs-field,
+.fs-field-label {
+    display: block;
+}
+
+.fs-field-label {
+    margin-bottom: 0.3rem;
+    color: var(--ink);
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.fs-req {
+    color: var(--rust);
+}
+
+.fs-optional {
+    color: var(--muted-light);
+    font-family: var(--mono-font);
+    font-size: 0.6rem;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.fs-input {
+    width: 100%;
+    padding: 0.62rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    background: #fff;
+    color: var(--text);
+    font-family: var(--body-font);
+    font-size: 0.85rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fs-input:focus {
+    outline: none;
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px rgba(31, 133, 119, 0.16);
+}
+
+select.fs-input {
+    cursor: pointer;
+}
+
+.fs-field.has-error .fs-input {
+    border-color: #b4453a;
+    box-shadow: 0 0 0 3px rgba(180, 69, 58, 0.14);
+}
+
+.fs-field-hint {
+    margin-top: 0.28rem;
+    color: var(--muted-light);
+    font-size: 0.68rem;
+    line-height: 1.5;
+}
+
+.fs-field-error {
+    margin-top: 0.28rem;
+    color: #b4453a;
+    font-size: 0.68rem;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.fs-field-error:empty {
+    display: none;
+}
+
+.fs-consent {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    color: var(--muted);
+    font-size: 0.76rem;
+    line-height: 1.6;
+    cursor: pointer;
+}
+
+.fs-consent input {
+    flex: 0 0 auto;
+    width: 1rem;
+    height: 1rem;
+    margin-top: 0.18rem;
+    accent-color: var(--teal);
+}
+
+.fs-consent a {
+    color: var(--teal);
+}
+
+.fs-form-status {
+    margin-top: 0.9rem;
+    font-size: 0.78rem;
+    line-height: 1.6;
+}
+
+.fs-form-status[hidden] {
+    display: none;
+}
+
+.fs-form-status.is-error {
+    color: #b4453a;
+}
+
+.fs-form-status.is-ok {
+    color: var(--teal);
+}
+
+.fs-form-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    margin-top: 1.1rem;
+}
+
+.fs-form-note {
+    flex: 1 1 240px;
+    color: var(--muted-light);
+    font-size: 0.68rem;
+    line-height: 1.6;
+}
+
+.fs-form-note a {
+    color: var(--teal);
+}
+
+/* Same ember ramp as the hero button: the last step of the download flow
+   should not look like a different action. */
+.fs-submit {
+    padding: 0.68rem 1.35rem;
+    border: 0;
+    border-radius: 999px;
+    background: linear-gradient(160deg, var(--ember-1) 0%, var(--ember-2) 55%, var(--ember-3) 100%);
+    color: #fff;
+    font-family: var(--body-font);
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    box-shadow:
+        0 10px 22px var(--ember-glow),
+        inset 0 1px 0 rgba(255, 255, 255, 0.24);
+    transition: background 0.2s ease, transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fs-submit:hover {
+    background: linear-gradient(160deg, #c96229 0%, var(--ember-2) 55%, var(--ember-3) 100%);
+    transform: translateY(-1px);
+    box-shadow:
+        0 14px 28px var(--ember-glow-strong),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.fs-submit:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+}
+
+.fs-submit:disabled,
+.fs-submit.is-busy {
+    opacity: 0.65;
+    cursor: progress;
+    transform: none;
+}
+
+/* --------------------------------------------------------------------------
+   Success panel (shown after the registration is stored)
+   -------------------------------------------------------------------------- */
+.fs-success {
+    padding: 0.5rem 0.25rem 0;
+    text-align: center;
+}
+
+.fs-success[hidden] {
+    display: none;
+}
+
+.fs-success-mark {
+    width: 46px;
+    height: 46px;
+    margin: 0.35rem auto 0.9rem;
+    border-radius: 50%;
+    background: var(--teal);
+    color: var(--stone);
+    font-size: 1.4rem;
+    line-height: 46px;
+    text-align: center;
+}
+
+.fs-success-title {
+    color: var(--ink);
+    font-family: var(--display-font);
+    font-size: 1.22rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.fs-success-message {
+    max-width: 430px;
+    margin: 0.5rem auto 0;
+    color: var(--muted);
+    font-size: 0.82rem;
+    line-height: 1.65;
+}
+
+.fs-success-summary {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.3rem 0.85rem;
+    max-width: 430px;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin: 1.15rem auto 0;
+    text-align: left;
+}
+
+.fs-success-summary[hidden] {
+    display: none;
+}
+
+.fs-success-summary dt {
+    color: var(--muted-light);
+    font-family: var(--mono-font);
+    font-size: 0.64rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+}
+
+.fs-success-summary dd {
+    overflow-wrap: anywhere;
+    color: var(--text);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.fs-success-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem 1rem;
+    margin-top: 1.35rem;
+}
+
+.fs-success-download {
+    padding: 0.65rem 1.25rem;
+    border-radius: 999px;
+    background: var(--teal);
+    color: var(--stone);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s ease;
+}
+
+.fs-success-download:hover {
+    background: var(--primary-hover);
+}
+
+.fs-success-close {
+    padding: 0.65rem 1.1rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: none;
+    color: var(--muted);
+    font-family: var(--body-font);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.fs-success-close:hover {
+    border-color: var(--teal);
+    color: var(--teal);
+}
+
+@media (max-width: 560px) {
+    .fs-modal {
+        padding: 0.75rem;
+    }
+
+    .fs-modal-dialog {
+        max-height: 92vh;
+        padding: 1.3rem 1.1rem 1.1rem;
+        border-radius: 16px;
+    }
+
+    .fs-fields {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .fs-form-foot {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .fs-submit {
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fs-modal-dialog {
+        animation: none;
+    }
+
+    .fs-modal-close,
+    .fs-input,
+    .fs-submit,
+    .fs-success-download,
+    .fs-success-close {
+        transition: none;
+    }
+
+    .fs-submit:hover {
+        transform: none;
     }
 }
 

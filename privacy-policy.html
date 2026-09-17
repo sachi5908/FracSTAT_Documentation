@@ -49,12 +49,11 @@
                     <ul>
                         <li><a href="#desktop-app">1. The FracSTAT Desktop Application</a></li>
                         <li><a href="#docs-site">2. This Documentation Website</a></li>
-                        <li><a href="#admin-panel">3. The Documentation Admin Panel</a></li>
-                        <li><a href="#third-party">4. Third-Party Services</a></li>
-                        <li><a href="#data-retention">5. Data Retention and Deletion</a></li>
-                        <li><a href="#childrens-privacy">6. Children's Privacy</a></li>
-                        <li><a href="#changes">7. Changes to This Policy</a></li>
-                        <li><a href="#contact-us">8. Contact</a></li>
+                        <li><a href="#third-party">3. Third-Party Services</a></li>
+                        <li><a href="#data-retention">4. Data Retention and Deletion</a></li>
+                        <li><a href="#childrens-privacy">5. Children's Privacy</a></li>
+                        <li><a href="#changes">6. Changes to This Policy</a></li>
+                        <li><a href="#contact-us">7. Contact</a></li>
                     </ul>
                 </div>
 
@@ -89,28 +88,18 @@
                 </p>
                 <p>
                     Images and some fonts on this site are served from third-party content delivery
-                    networks (see <a href="#third-party">Section 4</a>); loading a page may cause your
+                    networks (see <a href="#third-party">Section 3</a>); loading a page may cause your
                     browser to make requests to those providers in the ordinary course of rendering the
                     page.
                 </p>
 
-                <h2 id="admin-panel">3. The Documentation Admin Panel</h2>
-                <p>
-                    A separate admin panel is used by maintainers to edit and publish these pages. Its sign-in
-                    form sends credentials to a configured Google Apps Script endpoint. On successful sign-in,
-                    the browser stores the session flag and returned GitHub token in <code>sessionStorage</code>;
-                    publishing sends authenticated requests to GitHub. Signing out clears those stored values.
-                    The endpoint's server-side credential handling and retention cannot be established from
-                    this website's source. The panel is not required to read the documentation or use FracSTAT.
-                </p>
-
-                <h2 id="third-party">4. Third-Party Services</h2>
-                <p>This site uses third-party services for assets, embedded viewers, and maintainer publishing:</p>
+                <h2 id="third-party">3. Third-Party Services</h2>
+                <p>This site uses third-party services for assets and embedded viewers:</p>
                 <ul>
                     <li><strong>Cloudinary</strong> — hosts the FracSTAT logo, screenshots, and other images embedded in these pages.</li>
                     <li><strong>Google Fonts / cdnjs</strong> — may be used to serve web fonts or small JavaScript libraries referenced by individual pages.</li>
                     <li><strong>YouTube / Google Drive</strong> — tutorial thumbnails can trigger requests before playback. Video viewers load when activated, and the <a href="manual.html">PDF manual</a> page embeds a Google Drive viewer that can load without a play-button click. These requests and any provider cookies are subject to the provider's privacy policy.</li>
-                    <li><strong>GitHub</strong> — the source code, issue tracker, and (for maintainers) content publishing pipeline live on GitHub, subject to GitHub's own privacy policy.</li>
+                    <li><strong>GitHub</strong> — the source code and issue tracker live on GitHub, subject to GitHub's own privacy policy.</li>
                 </ul>
                 <p>
                     FracSTAT does not add advertising-profile code to these pages. This does not guarantee
@@ -118,7 +107,7 @@
                     under their own policies and your account or browser settings.
                 </p>
 
-                <h2 id="data-retention">5. Data Retention and Deletion</h2>
+                <h2 id="data-retention">4. Data Retention and Deletion</h2>
                 <p>
                     Because FracSTAT's authors do not operate a database of personal visitor information,
                     the authors do not have a visitor database to search or delete. Provider-held logs and
@@ -129,7 +118,7 @@
                     and resolve your query.
                 </p>
 
-                <h2 id="childrens-privacy">6. Children's Privacy</h2>
+                <h2 id="childrens-privacy">5. Children's Privacy</h2>
                 <p>
                     FracSTAT and this documentation site are intended for structural geologists, geoscience
                     students, and engineering professionals, and are not directed at children. No
@@ -137,14 +126,14 @@
                     apply when someone visits these pages.
                 </p>
 
-                <h2 id="changes">7. Changes to This Policy</h2>
+                <h2 id="changes">6. Changes to This Policy</h2>
                 <p>
                     If this policy is ever updated — for example, if a future release of FracSTAT introduces
                     an optional, explicitly opt-in feature such as crash reporting — the "Last updated" date
                     at the top of this page will be revised and the change will be described here.
                 </p>
 
-                <h2 id="contact-us">8. Contact</h2>
+                <h2 id="contact-us">7. Contact</h2>
                 <p>
                     Questions about this policy can be sent to any of the addresses listed on the
                     <a href="contact.html">Contact</a> page, or raised as an issue on the project's

@@ -550,8 +550,14 @@ document.addEventListener("DOMContentLoaded", () => {
     // ---------------------------------------------------------
     // 1. Basic Setup & Mobile Toggle
     // ---------------------------------------------------------
-    const downloadBtn = document.getElementById("downloadBtn");
-    if (downloadBtn) downloadBtn.addEventListener("click", () => alert("Starting download..."));
+    // The Download button is owned by fracstat-download-popup.js: it asks for
+    // the visitor's details (name, email, institution, position, country) and
+    // records them in the statistics store. FracSTAT v1.0.0 is not published
+    // yet, so no file transfer happens — the form says the download link is
+    // coming soon and is emailed to the address that was registered. The old
+    // alert() stub was removed together with that change — do not add a second
+    // click handler here, it would fire before the modal and defeat the
+    // registration step.
 
     const mobileToggle = document.getElementById("mobileToggle");
     const docsSidebar = document.getElementById("docsSidebar");
