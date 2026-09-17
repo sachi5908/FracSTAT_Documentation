@@ -256,9 +256,24 @@ window.FracSTATWorldMap = (function () {
         }
 
         // ---- Legend --------------------------------------------------------
+        // Both parts are optional, and the public page uses the second one:
+        //   showLegend: false         — no swatch row at all; the element itself
+        //                               is hidden, so an empty flex row cannot
+        //                               leave a stray gap under the map
+        //   showLegendCaption: false  — the swatches stay, only the
+        //                               "Registered downloads per country"
+        //                               caption is dropped
         function renderLegend() {
             legend.innerHTML = "";
-            if (opts.showLegend === false) return;
+
+            if (opts.showLegend === false) {
+                // The element itself has to go, not just its contents: as an
+                // empty flex row it would still contribute its margin-top and
+                // leave a gap under the map.
+                legend.style.display = "none";
+                return;
+            }
+            legend.style.display = "";
 
             const empty = document.createElement("span");
             empty.className = "fs-legend-item";
@@ -274,10 +289,14 @@ window.FracSTATWorldMap = (function () {
                 legend.appendChild(item);
             });
 
-            const caption = document.createElement("span");
-            caption.className = "fs-legend-caption";
-            caption.textContent = opts.legendCaption || "Registered downloads per country";
-            legend.appendChild(caption);
+            // Opt-out on its own, so the swatch row can sit centred without the
+            // caption trailing it (index.html does exactly that).
+            if (opts.showLegendCaption !== false) {
+                const caption = document.createElement("span");
+                caption.className = "fs-legend-caption";
+                caption.textContent = opts.legendCaption || "Registered downloads per country";
+                legend.appendChild(caption);
+            }
         }
 
         function updateNote(unmatched) {

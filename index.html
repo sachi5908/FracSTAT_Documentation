@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FracSTAT | Fracture Statistical Analysis</title>
     <link rel="icon" type="image/png" href="https://res.cloudinary.com/hcaqjcqf/image/upload/v1784441772/akioq6cgnbsigsemtf0f.png">
-    <link rel="stylesheet" href="style.css?v=4">
+    <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
     <!-- Home-page loader: animated FracSTAT mark with lightweight status. -->
@@ -463,7 +463,7 @@
          outlive a boundary fix. -->
     <script src="data/world-countries.js?v=2"></script>
     <script src="fracstat-stats.js?v=5"></script>
-    <script src="fracstat-worldmap.js?v=2"></script>
+    <script src="fracstat-worldmap.js?v=4"></script>
     <script src="fracstat-download-popup.js?v=4"></script>
     <script>
     /* ---------------------------------------------------------------------
@@ -489,7 +489,14 @@
             var map = null;
             if (mapHost) {
                 try {
-                    map = worldMap.create(mapHost, { stats: stats });
+                    // showLegendCaption: false — the swatch row ("0 / 1 – 1 /
+                    // > 2") stays and is centred under the map; only its
+                    // "Registered downloads per country" caption is dropped,
+                    // because the chips above the map and the Top countries list
+                    // beside it already say what is being counted. The admin
+                    // panel keeps the caption (it mounts the map without this
+                    // option).
+                    map = worldMap.create(mapHost, { stats: stats, showLegendCaption: false });
                 } catch (err) {
                     // The section keeps its heading and copy without the map.
                     if (window.console && console.error) console.error("Download map:", err);

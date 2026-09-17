@@ -4298,9 +4298,14 @@ body::before {
     display: none !important;
 }
 
+/* The legend is centred under the map: it is a short row of swatches, and on the
+   public page (which drops the caption) left-aligning it made the panel look
+   lopsided. The admin panel's caption still sits at the right edge, because its
+   own margin-left: auto absorbs the free space before justify-content applies. */
 .fs-map-legend {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
     gap: 0.35rem 0.85rem;
     margin-top: 0.55rem;
