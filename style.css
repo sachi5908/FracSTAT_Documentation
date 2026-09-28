@@ -3634,51 +3634,17 @@ body::before {
     z-index: 1;
     inset: 0;
     pointer-events: none;
-    opacity: 0.4;
+    opacity: 0.72;
     -webkit-mask-image: none;
     mask-image: none;
 }
 
-.hero-fracture-art svg {
+.hero-fracture-art canvas {
     display: block;
     width: 100%;
     height: 100%;
     overflow: hidden;
 }
-
-.fracture-network {
-    transform-box: fill-box;
-    transform-origin: center;
-    animation: fracture-drift 12s ease-in-out infinite;
-}
-
-.fracture-path {
-    fill: none;
-    stroke-width: 2.25;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke-dasharray: 1;
-    stroke-dashoffset: 1;
-    opacity: 0;
-    filter: drop-shadow(0 0 2px rgba(31, 133, 119, 0.18));
-    animation: fracture-draw 1.8s var(--delay) cubic-bezier(0.16, 0.8, 0.24, 1) forwards;
-}
-
-.fracture-path.rust { stroke: var(--rust); }
-.fracture-path.teal { stroke: var(--teal); }
-.fracture-path.sage { stroke: var(--sage); }
-.fracture-path.muted { stroke: rgba(31, 133, 119, 0.4); stroke-width: 1.45; }
-
-.fracture-node {
-    opacity: 0;
-    transform-box: fill-box;
-    transform-origin: center;
-    animation: fracture-node-in 0.45s var(--delay) ease-out forwards, fracture-pulse 3s calc(var(--delay) + 0.45s) ease-in-out infinite;
-}
-
-.node-rust { fill: var(--rust); }
-.node-teal { fill: var(--teal); }
-.node-sage { fill: var(--sage); }
 
 .app-mockup-container {
     position: relative;
@@ -3692,27 +3658,6 @@ body::before {
 
 @keyframes title-shimmer {
     to { background-position: 200% center; }
-}
-
-@keyframes fracture-draw {
-    0% { opacity: 0; stroke-dashoffset: 1; }
-    8% { opacity: 0.92; }
-    100% { opacity: 0.64; stroke-dashoffset: 0; }
-}
-
-@keyframes fracture-node-in {
-    from { opacity: 0; transform: scale(0); }
-    to { opacity: 0.9; transform: scale(1); }
-}
-
-@keyframes fracture-pulse {
-    0%, 100% { opacity: 0.75; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.65); }
-}
-
-@keyframes fracture-drift {
-    0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-    50% { transform: translate3d(-5px, 7px, 0) rotate(-0.35deg); }
 }
 
 @media (max-width: 900px) {
@@ -3756,21 +3701,11 @@ body::before {
 @media (prefers-reduced-motion: reduce) {
     .hero-content,
     .gradient-text,
-    .fracture-network,
-    .fracture-path,
-    .fracture-node {
+    .hero-fracture-art {
         animation: none !important;
     }
 
-    .hero-content,
-    .fracture-path,
-    .fracture-node {
-        opacity: 1;
-    }
-
-    .fracture-path {
-        stroke-dashoffset: 0;
-    }
+    .hero-content { opacity: 1; }
 }
 
 /* Tutorial filters reveal a single section at a time. Keep its heading close

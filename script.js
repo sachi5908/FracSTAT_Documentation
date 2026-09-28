@@ -1079,3 +1079,110 @@ document.addEventListener("DOMContentLoaded", () => {
     svg.appendChild(network);
     svg.dataset.rendered = "true";
 }());
+
+// Light, cursor-reactive network used on the home hero.
+(function renderHeroNetwork() {
+    const canvas = document.getElementById("heroNetwork");
+    if (!canvas) return;
+    const hero = canvas.closest(".hero");
+    const ctx = canvas.getContext("2d");
+    const pointer = { x: null, y: null, radius: 145 };
+    const nodeColors = {
+        endpoint: "#e53935",
+        two: "#8e44ad",
+        three: "#2477d4",
+        many: "#319447",
+        isolated: "#16191d"
+    };
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let width = 0;
+    let height = 0;
+    let particles = [];
+    let frame = 0;
+
+    function resize() {
+        const bounds = hero.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        width = bounds.width;
+        height = bounds.height;
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const count = Math.min(110, Math.max(36, Math.floor(width * height / 10500)));
+        particles = Array.from({ length: count }, () => ({
+            x: Math.random() * width, y: Math.random() * height,
+            vx: (Math.random() - 0.5) * 0.42, vy: (Math.random() - 0.5) * 0.42,
+            size: Math.random() * 1.7 + 0.7
+        }));
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, width, height);
+        particles.forEach((p) => {
+            if (reducedMotion) return;
+            p.x += p.vx;
+            p.y += p.vy;
+            if (p.x < 0 || p.x > width) p.vx *= -1;
+            if (p.y < 0 || p.y > height) p.vy *= -1;
+            if (pointer.x !== null) {
+                const dx = p.x - pointer.x;
+                const dy = p.y - pointer.y;
+                const distance = Math.hypot(dx, dy) || 1;
+                if (distance < pointer.radius) {
+                    const force = (pointer.radius - distance) / pointer.radius;
+                    p.x += dx / distance * force * 2.1;
+                    p.y += dy / distance * force * 2.1;
+                }
+            }
+        });
+        const connections = [];
+        const degrees = new Array(particles.length).fill(0);
+        for (let a = 0; a < particles.length; a += 1) {
+            const p = particles[a];
+            for (let b = a + 1; b < particles.length; b += 1) {
+                const q = particles[b];
+                const distance = Math.hypot(p.x - q.x, p.y - q.y);
+                if (distance < 135) {
+                    connections.push({ a, b, distance });
+                    degrees[a] += 1;
+                    degrees[b] += 1;
+                }
+            }
+        }
+        connections.forEach(({ a, b, distance }) => {
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(22, 27, 31, ${(1 - distance / 135) * 0.48})`;
+            ctx.lineWidth = 1.15;
+            ctx.moveTo(particles[a].x, particles[a].y);
+            ctx.lineTo(particles[b].x, particles[b].y);
+            ctx.stroke();
+        });
+        particles.forEach((p, index) => {
+            const degree = degrees[index];
+            const color = degree === 1 ? nodeColors.endpoint
+                : degree === 2 ? nodeColors.two
+                    : degree === 3 ? nodeColors.three
+                        : degree >= 4 ? nodeColors.many : nodeColors.isolated;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+        });
+        if (!reducedMotion) frame = requestAnimationFrame(draw);
+    }
+
+    hero.addEventListener("pointermove", (event) => {
+        const bounds = hero.getBoundingClientRect();
+        pointer.x = event.clientX - bounds.left;
+        pointer.y = event.clientY - bounds.top;
+    }, { passive: true });
+    hero.addEventListener("pointerleave", () => { pointer.x = null; pointer.y = null; });
+    new ResizeObserver(() => {
+        cancelAnimationFrame(frame);
+        resize();
+        if (reducedMotion) draw();
+        else draw();
+    }).observe(hero);
+    resize();
+    draw();
+}());
